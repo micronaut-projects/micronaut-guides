@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'/>
+    <title>Custom constraint annotation for validation</title>
+    <link rel='stylesheet' id='wp-block-library-css' href='https://micronaut.io/wp-includes/css/dist/block-library/style.min.css' type='text/css' media='all'/>
+    <link rel='stylesheet' id='fonts-fira-sans-css' href='https://fonts.googleapis.com/css2?family=Fira+Sans%3Awght%40300%3B500&#038;display=swap&#038;ver=5.7' type='text/css' media='all'/>
+    <link rel='stylesheet' id='micronaut-style-css' href='https://micronaut.io/wp-content/themes/micronaut/style.min.css' type='text/css' media='all'/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link rel="shortcut icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link rel="alternate" type="application/rss+xml" title="Micronaut Guides RSS Feed" href="https://guides.micronaut.io/latest/rss.xml" />
+    <link rel="alternate" type="application/json" title="Micronaut Guides JSON Feed" href="https://guides.micronaut.io/latest/feed.json" />
+    <link href="coderay.css" rel="stylesheet" />
+    <link href="rouge-github.css" rel="stylesheet" />
+    <link href="guide.css" rel="stylesheet" />
+    <script src="lunr.js"></script>
+    <script src="guide.js"></script>
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:image" content="https://guides.micronaut.io/latest/images/cards/micronaut-custom-validation-annotation.png"/>
+    <meta name="twitter:creator" content="@micronautfw"/>
+    <meta name="twitter:site" content="@micronautfw"/>
+    <meta name="twitter:title" content="Custom constraint annotation for validation"/>
+    <meta name="twitter:description" content="How to create a custom constraint annotation for validation in your Micronaut application"/>
+</head>
+<body class="page-template page-template-page-sidebar page-template-page-sidebar-php page page-parent guide">
+
+<header id="header">
+
+    <div class="container">
+
+        <nav class="navbar navbar-expand-lg navbar-dark">
+
+            <button class="collapsed" type="button" data-toggle="collapse" data-target="#nav" aria-expanded="false">
+                <span></span>
+            </button>
+
+            <a class="navbar-brand" href="https://micronaut.io">
+                <img src="https://micronaut.io/wp-content/uploads/2020/11/MIcronautLogo_Horizontal.svg" alt="Micronaut framework"/>
+            </a>
+
+            <div class="collapse navbar-collapse" id="nav">
+
+                <ul class="navbar-nav ml-auto">
+
+                    <li id="menu-item-2865" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2865 nav-item"><a href="https://micronaut.io/download/" class="nav-link">Download</a></li>
+                    <li id="menu-item-2868" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-2868 dropdown nav-item"><a href="https://micronaut.io/learn/" class="nav-link dropdown-toggle" data-toggle="dropdown">Learn</a><ul class="dropdown-menu">
+                        <li id="menu-item-4943" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4943"><a href="https://micronaut.io/learn/" class="dropdown-item">Overview</a></li>
+                        <li id="menu-item-5111" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-5111"><a href="https://docs.micronaut.io/index.html" class="dropdown-item">User Documentaton</a></li>
+                        <li id="menu-item-4510" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4510"><a href="https://micronaut.io/guides/" class="dropdown-item">Guides</a></li>
+                        <li id="menu-item-2896" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2896"><a href="https://micronaut.io/category/microcast/" class="dropdown-item">Microcasts</a></li>
+                        <li id="menu-item-2897" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2897"><a href="https://micronaut.io/category/webinar/" class="dropdown-item">Webinars</a></li>
+                        <li id="menu-item-2871" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2871"><a href="https://micronaut.io/professional-training/" class="dropdown-item">Professional Training</a></li>
+                        <li id="menu-item-6526" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-6526"><a href="https://micronaut-projects.github.io/micronaut-guides-mn3/latest/" class="dropdown-item">Guides for Micronaut Framework 3</a></li>
+                    </ul>
+                    </li>
+                    <li id="menu-item-2878" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item"><a href="https://micronaut.io/resources/" class="nav-link dropdown-toggle" data-toggle="dropdown">Resources</a><ul class="dropdown-menu">
+                        <li id="menu-item-4999" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4999"><a href="https://micronaut.io/upcoming-events/" class="dropdown-item">Upcoming Events</a></li>
+                        <li id="menu-item-2879" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2879"><a href="https://micronaut.io/blog/" class="dropdown-item">Blog</a></li>
+                        <li id="menu-item-6478" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-6478"><a href="https://micronaut.io/category/release-announcements/" class="dropdown-item">Releases</a></li>
+                        <li id="menu-item-6715" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-6715"><a href="https://micronaut.io/category/security-announcements/" class="dropdown-item">Security Announcements</a></li>
+                        <li id="menu-item-4499" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-4499"><a href="https://micronautpodcast.com/" class="dropdown-item">Podcast</a></li>
+                        <li id="menu-item-5798" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5798"><a href="https://micronaut.io/support/" class="dropdown-item">Commercial Support</a></li>
+                        <li id="menu-item-4186" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4186"><a href="https://micronaut.io/resources/community-support/" class="dropdown-item">Community Support</a></li>
+                        <li id="menu-item-2882" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2882"><a href="https://micronaut.io/faq/" class="dropdown-item">FAQ</a></li>
+                        <li id="menu-item-2883" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2883"><a href="https://micronaut.io/contact/" class="dropdown-item">Contact</a></li>
+                        <li id="menu-item-6479" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-6479"><a href="https://micronaut.io/micronaut-success-stories/" class="dropdown-item">Micronaut Success Stories</a></li>
+                    </ul>
+                    </li>
+                    <li id="menu-item-2872" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2872 dropdown nav-item"><a href="https://micronaut.io/foundation/" class="nav-link dropdown-toggle" data-toggle="dropdown">Foundation</a><ul class="dropdown-menu">
+                        <li id="menu-item-2877" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2877"><a href="https://micronaut.io/foundation/" class="dropdown-item">Overview</a></li>
+                        <li id="menu-item-2874" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2874"><a href="https://micronaut.io/foundation/corporate-sponsorship/" class="dropdown-item">Corporate Sponsorship</a></li>
+                        <li id="menu-item-2873" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2873"><a href="https://micronaut.io/foundation/community-sponsorship/" class="dropdown-item">Community Sponsorship</a></li>
+                        <li id="menu-item-2876" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2876"><a href="https://micronaut.io/foundation/sponsors/" class="dropdown-item">Sponsors</a></li>
+                        <li id="menu-item-3838" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-3838"><a href="https://micronaut.io/meeting-minutes/" class="dropdown-item">Meeting Minutes</a></li>
+                    </ul>
+                    </li>
+                    <li id="menu-item-2884" class="action menu-item menu-item-type-custom menu-item-object-custom menu-item-2884 nav-item"><a target="_blank" rel="noopener" href="https://micronaut.io/launch/" class="nav-link">Launch</a></li>
+
+                </ul>
+
+            </div>
+
+        </nav>
+
+    </div>
+</header>
+
+<div style="background: #fff;padding-top: 20px;padding-bottom: 20px;">
+    <div class="container" style="clear: both;">
+        <fieldset style="float: right;">
+            <input type="search" id="search-form-query"/>
+            <input type="submit" onclick="search()" value="Search">
+            <input type="submit" onclick="resetSearch()" value="Reset">
+        </fieldset>
+    </div>
+    <div class="container" style="clear: both;margin-top: -20px;">
+        <div class="guide-list" id="searchResults">
+        </div>
+    </div>
+</div>
+<div id="breadcrumbs"><div class="container"><a href="https://micronaut.io/">Home</a> » <a href="./index.html">Guides</a> » <a href="micronaut-custom-validation-annotation.html">Custom constraint annotation for validation</a> » <span class="breadcrumb_last" aria-current="page">gradle | java</span></div></div><!-- .breadcrumbs -->
+<main id="main">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+
+                <div class="toc">
+                    <div class="inner">
+                        <h1 class="title title_large first-word-bold first-word-break">Table of Contents</h1>
+                        <div class="underline"></div>
+                        
+<ul class="sectlevel1">
+<li><a href="#getting-started">1. Getting Started</a></li>
+<li><a href="#what-you-will-need">2. What you will need</a></li>
+<li><a href="#solution">3. Solution</a></li>
+<li><a href="#writing-the-application">4. Writing the Application</a></li>
+<li><a href="#writing-the-application-2">5. Writing the application</a>
+<ul class="sectlevel2">
+<li><a href="#country-code">5.1. Country Code</a></li>
+</ul>
+</li>
+<li><a href="#phone-e164">6. Phone E164</a></li>
+<li><a href="#custom-validation-annotation">7. Custom Validation Annotation</a></li>
+<li><a href="#validation-factory">8. Validation Factory</a></li>
+<li><a href="#validation-messages">9. Validation Messages</a></li>
+<li><a href="#testing-validation">10. Testing Validation</a></li>
+<li><a href="#next-steps">11. Next Steps</a></li>
+<li><a href="#help-with-the-micronaut-framework">12. Help with the Micronaut Framework</a></li>
+<li><a href="#license">13. License</a></li>
+</ul>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <h1>Custom constraint annotation for validation</h1>
+                <div class="underline"></div>
+<div class="sect1">
+<div class="sectionbody">
+
+<div class="paragraph">
+<p>How to create a custom constraint annotation for validation in your Micronaut application</p>
+</div>
+<div class="paragraph">
+<p>Authors: Sergio del Amo</p>
+</div>
+<div class="paragraph">
+<p>Micronaut Version: 4.9.1</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="getting-started">1. Getting Started</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this guide, we will create a Micronaut application written in Java.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="what-you-will-need">2. What you will need</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To complete this guide, you will need the following:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Some time on your hands</p>
+</li>
+<li>
+<p>A decent text editor or IDE (e.g. <a href="https://guides.micronaut.io/latest/micronaut-intellij-idea-ide-setup.html">IntelliJ IDEA</a>)</p>
+</li>
+<li>
+<p>JDK 21 or greater installed with <code>JAVA_HOME</code> <a href="https://www.baeldung.com/java-home-on-windows-7-8-10-mac-os-x-linux">configured appropriately</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div></div><div class="row"><div class="col-md-12"><div class="sect1">
+<h2 id="solution">3. Solution</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We recommend that you follow the instructions in the next sections and create the application step by step. However, you can go right to the <strong>completed example</strong>.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="micronaut-custom-validation-annotation-gradle-java.zip">Download</a> and unzip the source</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="writing-the-application">4. Writing the Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Create an application using the <a href="https://docs.micronaut.io/latest/guide/#cli">Micronaut Command Line Interface</a> or with <a href="https://launch.micronaut.io">Micronaut Launch</a>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide <span class="se">\</span>
+    <span class="nt">--features</span><span class="o">=</span>junit-params,validation <span class="se">\</span>
+    <span class="nt">--build</span><span class="o">=</span>gradle <span class="se">\</span>
+    <span class="nt">--lang</span><span class="o">=</span>java <span class="se">\</span>
+    <span class="nt">--test</span><span class="o">=</span>junit</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you don&#8217;t specify the <code>--build</code> argument, Gradle with the <a href="https://docs.gradle.org/current/userguide/kotlin_dsl.html">Kotlin DSL</a> is used as the build tool. <br/> If you don&#8217;t specify the <code>--lang</code> argument, Java is used as the language.<br/> If you don&#8217;t specify the <code>--test</code> argument, JUnit is used for Java and Kotlin, and Spock is used for Groovy.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The previous command creates a Micronaut application with the default package <code>example.micronaut</code> in a directory named <code>micronautguide</code>.</p>
+</div>
+<div class="paragraph">
+<p>If you use Micronaut Launch, select Micronaut Application as application type and add <code>junit-params</code>, and <code>validation</code> features.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you have an existing Micronaut application and want to add the functionality described here, you can view the dependency and configuration changes from the specified features, and apply those changes to your application.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><a href="https://micronaut.io/launch?features=junit-params&amp;features=validation&amp;lang=JAVA&amp;build=GRADLE&amp;test=JUNIT&amp;name=micronautguide&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">Diff</a></p>
+</div>
+<div class="paragraph">
+<p><a href="https://guides.micronaut.io/latest/micronaut-intellij-idea-ide-setup.html">Setup IntelliJ IDEA to develop Micronaut Applications</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="writing-the-application-2">5. Writing the application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this guide, you will code an annotation - <code>@E164</code> - to validate phone numbers.</p>
+</div>
+<div class="paragraph">
+<p><a href="https://www.twilio.com/docs/glossary/what-e164">E-164</a></p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>E.164 is the international telephone numbering plan that ensures each device on the PSTN has globally unique number.</p>
+</div>
+<div class="paragraph">
+<p>This number allows phone calls and text messages can be correctly routed to individual phones in different countries. E.164 numbers are formatted [+] [country code] [subscriber number including area code] and can have a maximum of fifteen digits.</p>
+</div>
+</blockquote>
+</div>
+<div class="sect2">
+<h3 id="country-code">5.1. Country Code</h3>
+<div class="paragraph">
+<p>Create an enum for the country code. The following enum maps the <a href="https://www.itu.int/dms_pub/itu-t/opb/sp/T-SP-E.164D-11-2011-PDF-E.pdf"> ITU_T recommendation for E.164 assigned country codes</a>.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/CountryCode.java</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">io.micronaut.core.annotation.Nullable</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.annotation.Nonnull</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.validation.constraints.NotBlank</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.validation.constraints.NotNull</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">java.util.ArrayList</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.Arrays</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.Comparator</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.List</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.Map</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.stream.Collectors</span><span class="o">;</span>
+
+<span class="cm">/**
+ * Every country code in the world.
+ * @see &lt;a href="https://www.itu.int/dms_pub/itu-t/opb/sp/T-SP-E.164D-11-2011-PDF-E.pdf"&gt;LIST OF ITU-T RECOMMENDATION E.164 ASSIGNED COUNTRY CODES&lt;/a&gt;
+ */</span>
+<span class="kd">public</span> <span class="kd">enum</span> <span class="nc">CountryCode</span> <span class="o">{</span>
+
+    <span class="no">AFGHANISTAN</span><span class="o">(</span><span class="s">"93"</span><span class="o">,</span> <span class="s">"Afghanistan"</span><span class="o">),</span>
+    <span class="no">ALBANIA</span><span class="o">(</span><span class="s">"355"</span><span class="o">,</span> <span class="s">"Albania (Republic of)"</span><span class="o">),</span>
+    <span class="no">ALGERIA</span><span class="o">(</span><span class="s">"213"</span><span class="o">,</span> <span class="s">"Algeria (People's Democratic Republic of)"</span><span class="o">),</span>
+    <span class="no">AMERICAN_SAMOA</span><span class="o">(</span><span class="s">"1"</span><span class="o">,</span> <span class="s">"American Samoa"</span><span class="o">),</span>
+    <span class="no">ANDORRA</span><span class="o">(</span><span class="s">"376"</span><span class="o">,</span> <span class="s">"Andorra (Principality of)"</span><span class="o">),</span>
+    <span class="no">ANGOLA</span><span class="o">(</span><span class="s">"244"</span><span class="o">,</span> <span class="s">"Angola (Republic of)"</span><span class="o">),</span>
+    <span class="no">ANGUILLA</span><span class="o">(</span><span class="s">"1"</span><span class="o">,</span> <span class="s">"Anguilla"</span><span class="o">),</span>
+    <span class="no">ANTIGUA_AND_BARBUDA</span><span class="o">(</span><span class="s">"1"</span><span class="o">,</span> <span class="s">"Antigua and Barbuda"</span><span class="o">),</span>
+    <span class="no">ARGENTINA</span><span class="o">(</span><span class="s">"54"</span><span class="o">,</span> <span class="s">"Argentine Republic"</span><span class="o">),</span>
+    <span class="no">ARMENIA</span><span class="o">(</span><span class="s">"374"</span><span class="o">,</span> <span class="s">"Armenia (Republic of)"</span><span class="o">),</span>
+    <span class="no">ARUBA</span><span class="o">(</span><span class="s">"297"</span><span class="o">,</span> <span class="s">"Aruba"</span><span class="o">),</span>
+    <span class="no">AUSTRALIA</span><span class="o">(</span><span class="s">"61"</span><span class="o">,</span> <span class="s">"Australia"</span><span class="o">),</span>
+    <span class="no">AUSTRALIAN_EXTERNAL_TERRITORIES</span><span class="o">(</span><span class="s">"672"</span><span class="o">,</span> <span class="s">"Australian External Territories"</span><span class="o">),</span>
+    <span class="no">AUSTRIA</span><span class="o">(</span><span class="s">"43"</span><span class="o">,</span> <span class="s">"Austria"</span><span class="o">),</span>
+    <span class="no">AZERBAIJAN</span><span class="o">(</span><span class="s">"994"</span><span class="o">,</span> <span class="s">"Azerbaijan (Republic of)"</span><span class="o">),</span>
+    <span class="no">BAHAMAS</span><span class="o">(</span><span class="s">"1"</span><span class="o">,</span> <span class="s">"Bahamas (Commonwealth of the)"</span><span class="o">),</span>
+    <span class="no">BAHRAIN</span><span class="o">(</span><span class="s">"973"</span><span class="o">,</span> <span class="s">"Bahrain (Kingdom of)"</span><span class="o">),</span>
+    <span class="no">BANGLADESH</span><span class="o">(</span><span class="s">"880"</span><span class="o">,</span> <span class="s">"Bangladesh (People's Republic of)"</span><span class="o">),</span>
+    <span class="no">BARBADOS</span><span class="o">(</span><span class="s">"1"</span><span class="o">,</span> <span class="s">"Barbados"</span><span class="o">),</span>
+    <span class="no">BELARUS</span><span class="o">(</span><span class="s">"375"</span><span class="o">,</span> <span class="s">"Belarus (Republic of)"</span><span class="o">),</span>
+    <span class="no">BELGIUM</span><span class="o">(</span><span class="s">"32"</span><span class="o">,</span> <span class="s">"Belgium"</span><span class="o">),</span>
+    <span class="no">BELIZE</span><span class="o">(</span><span class="s">"501"</span><span class="o">,</span> <span class="s">"Belize"</span><span class="o">),</span>
+    <span class="no">BENIN</span><span class="o">(</span><span class="s">"229"</span><span class="o">,</span> <span class="s">"Benin (Republic of)"</span><span class="o">),</span>
+    <span class="no">BERMUDA</span><span class="o">(</span><span class="s">"1"</span><span class="o">,</span> <span class="s">"Bermuda"</span><span class="o">),</span>
+    <span class="no">BHUTAN</span><span class="o">(</span><span class="s">"975"</span><span class="o">,</span> <span class="s">"Bhutan (Kingdom of)"</span><span class="o">),</span>
+    <span class="no">BOLIVIA</span><span class="o">(</span><span class="s">"591"</span><span class="o">,</span> <span class="s">"Bolivia (Plurinational State of)"</span><span class="o">),</span>
+    <span class="no">BONAIRE_SINT_EUSTATIUS_AND_SABA</span><span class="o">(</span><span class="s">"599"</span><span class="o">,</span> <span class="s">"Bonaire, Sint Eustatius and Saba"</span><span class="o">),</span>
+    <span class="no">BOSNIA_AND_HERZEGOVINA</span><span class="o">(</span><span class="s">"387"</span><span class="o">,</span> <span class="s">"Bosnia and Herzegovina"</span><span class="o">),</span>
+    <span class="no">BOTSWANA</span><span class="o">(</span><span class="s">"267"</span><span class="o">,</span> <span class="s">"Botswana (Republic of)"</span><span class="o">),</span>
+    <span class="no">BRAZIL</span><span class="o">(</span><span class="s">"55"</span><span class="o">,</span> <span class="s">"Brazil (Federative Republic of)"</span><span class="o">),</span>
+    <span class="no">BRITISH_VIRGIN_ISLANDS</span><span class="o">(</span><span class="s">"1"</span><span class="o">,</span> <span class="s">"British Version Islands"</span><span class="o">),</span>
+    <span class="no">BRUNEI</span><span class="o">(</span><span class="s">"673"</span><span class="o">,</span> <span class="s">"Brunei Darussalam"</span><span class="o">),</span>
+    <span class="no">BULGARIA</span><span class="o">(</span><span class="s">"359"</span><span class="o">,</span> <span class="s">"Bulgaria (Republic of)"</span><span class="o">),</span>
+    <span class="no">BURKINA_FASO</span><span class="o">(</span><span class="s">"226"</span><span class="o">,</span> <span class="s">"Burkina Faso"</span><span class="o">),</span>
+    <span class="no">BURUNDI</span><span class="o">(</span><span class="s">"257"</span><span class="o">,</span> <span class="s">"Burundi (Republic of)"</span><span class="o">),</span>
+    <span class="no">CABO_VERDE</span><span class="o">(</span><span class="s">"238"</span><span class="o">,</span> <span class="s">"Cabo Verde (Republic of)"</span><span class="o">),</span>
+    <span class="no">CAMBODIA</span><span class="o">(</span><span class="s">"855"</span><span class="o">,</span> <span class="s">"Cambodia (Kingdom of"</span><span class="o">),</span>
+    <span class="no">CAMEROON</span><span class="o">(</span><span class="s">"237"</span><span class="o">,</span> <span class="s">"Cameroon (Republic of)"</span><span class="o">),</span>
+    <span class="no">CANADA</span><span class="o">(</span><span class="s">"1"</span><span class="o">,</span> <span class="s">"Canada"</span><span class="o">),</span>
+    <span class="no">CAYMAN_ISLANDS</span><span class="o">(</span><span class="s">"1"</span><span class="o">,</span> <span class="s">"Cayman Islands"</span><span class="o">),</span>
+    <span class="no">CENTRAL_AFRICAN_REPUBLIC</span><span class="o">(</span><span class="s">"236"</span><span class="o">,</span> <span class="s">"Central African Republic"</span><span class="o">),</span>
+    <span class="no">CHAD</span><span class="o">(</span><span class="s">"235"</span><span class="o">,</span> <span class="s">"Chad (Republic of)"</span><span class="o">),</span>
+    <span class="no">CHILE</span><span class="o">(</span><span class="s">"56"</span><span class="o">,</span> <span class="s">"Chile"</span><span class="o">),</span>
+    <span class="no">CHINA</span><span class="o">(</span><span class="s">"86"</span><span class="o">,</span> <span class="s">"China (People's Republic of)"</span><span class="o">),</span>
+    <span class="no">COLOMBIA</span><span class="o">(</span><span class="s">"57"</span><span class="o">,</span> <span class="s">"Colombia (Republic of)"</span><span class="o">),</span>
+    <span class="no">COMOROS</span><span class="o">(</span><span class="s">"269"</span><span class="o">,</span> <span class="s">"Comoros (Union of the)"</span><span class="o">),</span>
+    <span class="no">CONGO</span><span class="o">(</span><span class="s">"242"</span><span class="o">,</span> <span class="s">"Congo (Republic of the)"</span><span class="o">),</span>
+    <span class="no">COOK_ISLANDS</span><span class="o">(</span><span class="s">"682"</span><span class="o">,</span> <span class="s">"Cook Islands"</span><span class="o">),</span>
+    <span class="no">COSTA_RICA</span><span class="o">(</span><span class="s">"506"</span><span class="o">,</span> <span class="s">"Costa Rica"</span><span class="o">),</span>
+    <span class="no">CROATIA</span><span class="o">(</span><span class="s">"385"</span><span class="o">,</span> <span class="s">"Croatia (Republic of)"</span><span class="o">),</span>
+    <span class="no">CUBA</span><span class="o">(</span><span class="s">"53"</span><span class="o">,</span> <span class="s">"Cuba"</span><span class="o">),</span>
+    <span class="no">CURACAO</span><span class="o">(</span><span class="s">"599"</span><span class="o">,</span> <span class="s">"Curacao"</span><span class="o">),</span>
+    <span class="no">CYPRUS</span><span class="o">(</span><span class="s">"357"</span><span class="o">,</span> <span class="s">"Cyprus (Republic of)"</span><span class="o">),</span>
+    <span class="no">CZECH_REPUBLIC</span><span class="o">(</span><span class="s">"420"</span><span class="o">,</span> <span class="s">"Czech Republic"</span><span class="o">),</span>
+    <span class="no">DEMOCRATIC_REPUBLIC_OF_THE_CONGO</span><span class="o">(</span><span class="s">"243"</span><span class="o">,</span> <span class="s">"Democratic Republic of the Congo"</span><span class="o">),</span>
+    <span class="no">DENMARK</span><span class="o">(</span><span class="s">"45"</span><span class="o">,</span> <span class="s">"Denmark"</span><span class="o">),</span>
+    <span class="no">DISASTER_RELIEF</span><span class="o">(</span><span class="s">"888"</span><span class="o">,</span> <span class="s">"Telecommunications for Disaster Relief (TDR)"</span><span class="o">),</span>
+    <span class="no">DJIBOUTI</span><span class="o">(</span><span class="s">"253"</span><span class="o">,</span> <span class="s">"Djibouti (Republic of)"</span><span class="o">),</span>
+    <span class="no">DOMINICA</span><span class="o">(</span><span class="s">"1"</span><span class="o">,</span> <span class="s">"Dominica (Commonwealth of)"</span><span class="o">),</span>
+    <span class="no">DOMINICAN_REPUBLIC</span><span class="o">(</span><span class="s">"1"</span><span class="o">,</span> <span class="s">"Dominican Republic"</span><span class="o">),</span>
+    <span class="no">EAST_TIMOR</span><span class="o">(</span><span class="s">"670"</span><span class="o">,</span> <span class="s">"Timor-Leste (Democratic Republic of)"</span><span class="o">),</span>
+    <span class="no">ECUADOR</span><span class="o">(</span><span class="s">"593"</span><span class="o">,</span> <span class="s">"Ecuador"</span><span class="o">),</span>
+    <span class="no">EGYPT</span><span class="o">(</span><span class="s">"20"</span><span class="o">,</span> <span class="s">"Egypt (Arab Republic of)"</span><span class="o">),</span>
+    <span class="no">EL_SALVADOR</span><span class="o">(</span><span class="s">"503"</span><span class="o">,</span> <span class="s">"El Salvador (Republic of)"</span><span class="o">),</span>
+    <span class="no">EQUATORIAL_GUINEA</span><span class="o">(</span><span class="s">"240"</span><span class="o">,</span> <span class="s">"Equatorial Guinea (Republic of)"</span><span class="o">),</span>
+    <span class="no">ERITREA</span><span class="o">(</span><span class="s">"291"</span><span class="o">,</span> <span class="s">"Eritrea"</span><span class="o">),</span>
+    <span class="no">ESTONIA</span><span class="o">(</span><span class="s">"372"</span><span class="o">,</span> <span class="s">"Estonia (Republic of)"</span><span class="o">),</span>
+    <span class="no">ETHIOPIA</span><span class="o">(</span><span class="s">"251"</span><span class="o">,</span> <span class="s">"Ethiopia (Federal Democratic Republic of)"</span><span class="o">),</span>
+    <span class="no">FALKLAND_ISLANDS</span><span class="o">(</span><span class="s">"500"</span><span class="o">,</span> <span class="s">"Falkland Islands (Malvinas)"</span><span class="o">),</span>
+    <span class="no">FAROE_ISLANDS</span><span class="o">(</span><span class="s">"298"</span><span class="o">,</span> <span class="s">"Faroe Islands"</span><span class="o">),</span>
+    <span class="no">FIJI</span><span class="o">(</span><span class="s">"679"</span><span class="o">,</span> <span class="s">"Fiji (Republic of"</span><span class="o">),</span>
+    <span class="no">FINLAND</span><span class="o">(</span><span class="s">"358"</span><span class="o">,</span> <span class="s">"Finland"</span><span class="o">),</span>
+    <span class="no">FRANCE</span><span class="o">(</span><span class="s">"33"</span><span class="o">,</span> <span class="s">"France"</span><span class="o">),</span>
+    <span class="no">FRENCH_GUIANA</span><span class="o">(</span><span class="s">"590"</span><span class="o">,</span> <span class="s">"French Guiana (French Department of)"</span><span class="o">),</span>
+    <span class="no">FRENCH_POLYNESIA</span><span class="o">(</span><span class="s">"689"</span><span class="o">,</span> <span class="s">"French Polynesia"</span><span class="o">),</span>
+    <span class="no">GABON</span><span class="o">(</span><span class="s">"241"</span><span class="o">,</span> <span class="s">"Gabonese Republic"</span><span class="o">),</span>
+    <span class="no">GAMBIA</span><span class="o">(</span><span class="s">"220"</span><span class="o">,</span> <span class="s">"Gambia (Republic of)"</span><span class="o">),</span>
+    <span class="no">GEORGIA</span><span class="o">(</span><span class="s">"995"</span><span class="o">,</span> <span class="s">"Georgia"</span><span class="o">),</span>
+    <span class="no">GERMANY</span><span class="o">(</span><span class="s">"49"</span><span class="o">,</span> <span class="s">"Germany (Federal Republic of)"</span><span class="o">),</span>
+    <span class="no">GHANA</span><span class="o">(</span><span class="s">"233"</span><span class="o">,</span> <span class="s">"Ghana"</span><span class="o">),</span>
+    <span class="no">GIBRALTAR</span><span class="o">(</span><span class="s">"350"</span><span class="o">,</span> <span class="s">"Gibraltar"</span><span class="o">),</span>
+    <span class="no">GMSS</span><span class="o">(</span><span class="s">"881"</span><span class="o">,</span> <span class="s">"Global Missile Satellite System (GMSS), shared code"</span><span class="o">),</span>
+    <span class="no">GREECE</span><span class="o">(</span><span class="s">"30"</span><span class="o">,</span> <span class="s">"Greece"</span><span class="o">),</span>
+    <span class="no">GREENLAND</span><span class="o">(</span><span class="s">"299"</span><span class="o">,</span> <span class="s">"Greenland (Denmark)"</span><span class="o">),</span>
+    <span class="no">GRENADA</span><span class="o">(</span><span class="s">"1"</span><span class="o">,</span> <span class="s">"Grenada"</span><span class="o">),</span>
+    <span class="no">GROUP_SHARED</span><span class="o">(</span><span class="s">"388"</span><span class="o">,</span> <span class="s">"Group of countries, shared code"</span><span class="o">),</span>
+    <span class="no">GUADELOUPE</span><span class="o">(</span><span class="s">"590"</span><span class="o">,</span> <span class="s">"Guadeloupe (French Department of"</span><span class="o">),</span>
+    <span class="no">GUAM</span><span class="o">(</span><span class="s">"1"</span><span class="o">,</span> <span class="s">"Guam"</span><span class="o">),</span>
+    <span class="no">GUATEMALA</span><span class="o">(</span><span class="s">"502"</span><span class="o">,</span> <span class="s">"Guatemala (Republic of)"</span><span class="o">),</span>
+    <span class="no">GUINEA</span><span class="o">(</span><span class="s">"224"</span><span class="o">,</span> <span class="s">"Guinea (Republic of)"</span><span class="o">),</span>
+    <span class="no">GUINEA_BISSAU</span><span class="o">(</span><span class="s">"245"</span><span class="o">,</span> <span class="s">"Guinnea-Bassau (Republic of)"</span><span class="o">),</span>
+    <span class="no">GUYANA</span><span class="o">(</span><span class="s">"592"</span><span class="o">,</span> <span class="s">"Guyana"</span><span class="o">),</span>
+    <span class="no">HAITI</span><span class="o">(</span><span class="s">"509"</span><span class="o">,</span> <span class="s">"Haiti (Republic of)"</span><span class="o">),</span>
+    <span class="no">HONDURAS</span><span class="o">(</span><span class="s">"504"</span><span class="o">,</span> <span class="s">"Honduras (Republic of)"</span><span class="o">),</span>
+    <span class="no">HONG_KONG</span><span class="o">(</span><span class="s">"852"</span><span class="o">,</span> <span class="s">"Hong Kong, China"</span><span class="o">),</span>
+    <span class="no">HUNGARY</span><span class="o">(</span><span class="s">"36"</span><span class="o">,</span> <span class="s">"Hungary (Republic of)"</span><span class="o">),</span>
+    <span class="no">ICELAND</span><span class="o">(</span><span class="s">"354"</span><span class="o">,</span> <span class="s">"Iceland"</span><span class="o">),</span>
+    <span class="no">INDIA</span><span class="o">(</span><span class="s">"91"</span><span class="o">,</span> <span class="s">"India (Republic of)"</span><span class="o">),</span>
+    <span class="no">INDONESIA</span><span class="o">(</span><span class="s">"62"</span><span class="o">,</span> <span class="s">"Indonesia"</span><span class="o">),</span>
+    <span class="no">INMARSAT</span><span class="o">(</span><span class="s">"870"</span><span class="o">,</span> <span class="s">"Inmarsat SNAC"</span><span class="o">),</span>
+    <span class="no">INTERNATIONAL_FREEPHONE</span><span class="o">(</span><span class="s">"800"</span><span class="o">,</span> <span class="s">"International Freephone Service"</span><span class="o">),</span>
+    <span class="no">INTERNATIONAL_NETWORKS</span><span class="o">(</span><span class="s">"882"</span><span class="o">,</span> <span class="s">"International Networks, shared code"</span><span class="o">),</span> <span class="c1">//There is a second entry for 883 with the same name.</span>
+    <span class="no">INTERNATIONAL_PREMIUM</span><span class="o">(</span><span class="s">"979"</span><span class="o">,</span> <span class="s">"International Premium Rate Service (IPRS)"</span><span class="o">),</span>
+    <span class="no">INTERNATIONAL_SHARED</span><span class="o">(</span><span class="s">"808"</span><span class="o">,</span> <span class="s">"International Shared Cost Service (ISCS)"</span><span class="o">),</span>
+    <span class="no">INTERNATIONAL_TRIAL</span><span class="o">(</span><span class="s">"991"</span><span class="o">,</span> <span class="s">"Trial of a proposed new international telecommunication public correspondence service, shared code"</span><span class="o">),</span>
+    <span class="no">IRAN</span><span class="o">(</span><span class="s">"98"</span><span class="o">,</span> <span class="s">"Iran (Islamic Republic of)"</span><span class="o">),</span>
+    <span class="no">IRAQ</span><span class="o">(</span><span class="s">"964"</span><span class="o">,</span> <span class="s">"Iraq (Republic of)"</span><span class="o">),</span>
+    <span class="no">IRELAND</span><span class="o">(</span><span class="s">"353"</span><span class="o">,</span> <span class="s">"Ireland"</span><span class="o">),</span>
+    <span class="no">ISRAEL</span><span class="o">(</span><span class="s">"972"</span><span class="o">,</span> <span class="s">"Israel (State of)"</span><span class="o">),</span>
+    <span class="no">ITALY</span><span class="o">(</span><span class="s">"39"</span><span class="o">,</span> <span class="s">"Italy"</span><span class="o">),</span>
+    <span class="no">IVORY_COAST</span><span class="o">(</span><span class="s">"225"</span><span class="o">,</span> <span class="s">"Cote d'Ivoire (Republic of)"</span><span class="o">),</span>
+    <span class="no">JAMAICA</span><span class="o">(</span><span class="s">"1"</span><span class="o">,</span> <span class="s">"Jamaica"</span><span class="o">),</span>
+    <span class="no">JAPAN</span><span class="o">(</span><span class="s">"81"</span><span class="o">,</span> <span class="s">"Japan"</span><span class="o">),</span>
+    <span class="no">JORDAN</span><span class="o">(</span><span class="s">"962"</span><span class="o">,</span> <span class="s">"Jordan (Hashemite Kingdom of)"</span><span class="o">),</span>
+    <span class="no">KAZAKHSTAN</span><span class="o">(</span><span class="s">"7"</span><span class="o">,</span> <span class="s">"Kazakhstan (Republic of)"</span><span class="o">),</span>
+    <span class="no">KENYA</span><span class="o">(</span><span class="s">"254"</span><span class="o">,</span> <span class="s">"Kenya (Republic of)"</span><span class="o">),</span>
+    <span class="no">KIRIBATI</span><span class="o">(</span><span class="s">"686"</span><span class="o">,</span> <span class="s">"Kiribati (Republic of)"</span><span class="o">),</span>
+    <span class="no">KOSOVO</span><span class="o">(</span><span class="s">"383"</span><span class="o">,</span> <span class="s">"Kosovo"</span><span class="o">),</span>
+    <span class="no">KUWAIT</span><span class="o">(</span><span class="s">"965"</span><span class="o">,</span> <span class="s">"Kuwait (State of)"</span><span class="o">),</span>
+    <span class="no">KYRGYZSTAN</span><span class="o">(</span><span class="s">"996"</span><span class="o">,</span> <span class="s">"Kyrgyz Republic"</span><span class="o">),</span>
+    <span class="no">LAOS</span><span class="o">(</span><span class="s">"856"</span><span class="o">,</span> <span class="s">"Lao People's Democratic Republic"</span><span class="o">),</span>
+    <span class="no">LATVIA</span><span class="o">(</span><span class="s">"371"</span><span class="o">,</span> <span class="s">"Latvia (Republic of)"</span><span class="o">),</span>
+    <span class="no">LEBANON</span><span class="o">(</span><span class="s">"961"</span><span class="o">,</span> <span class="s">"Lebanon"</span><span class="o">),</span>
+    <span class="no">LESOTHO</span><span class="o">(</span><span class="s">"266"</span><span class="o">,</span> <span class="s">"Lesotho (Kingdom of)"</span><span class="o">),</span>
+    <span class="no">LIBERIA</span><span class="o">(</span><span class="s">"231"</span><span class="o">,</span> <span class="s">"Liberia (Republic of)"</span><span class="o">),</span>
+    <span class="no">LIBYA</span><span class="o">(</span><span class="s">"218"</span><span class="o">,</span> <span class="s">"Libya"</span><span class="o">),</span>
+    <span class="no">LIECHTENSTEIN</span><span class="o">(</span><span class="s">"423"</span><span class="o">,</span> <span class="s">"Liechtenstein (Principality of)"</span><span class="o">),</span>
+    <span class="no">LITHUANIA</span><span class="o">(</span><span class="s">"370"</span><span class="o">,</span> <span class="s">"Lithuania (Republic of)"</span><span class="o">),</span>
+    <span class="no">LUXEMBOURG</span><span class="o">(</span><span class="s">"352"</span><span class="o">,</span> <span class="s">"Luxembourg"</span><span class="o">),</span>
+    <span class="no">MACAO</span><span class="o">(</span><span class="s">"853"</span><span class="o">,</span> <span class="s">"Macao, China"</span><span class="o">),</span>
+    <span class="no">MACEDONIA</span><span class="o">(</span><span class="s">"389"</span><span class="o">,</span> <span class="s">"The Former Yugoslav Republic of Macedonia"</span><span class="o">),</span>
+    <span class="no">MADAGASCAR</span><span class="o">(</span><span class="s">"261"</span><span class="o">,</span> <span class="s">"Madagascar (Republic of)"</span><span class="o">),</span>
+    <span class="no">MALAWI</span><span class="o">(</span><span class="s">"265"</span><span class="o">,</span> <span class="s">"Malawi"</span><span class="o">),</span>
+    <span class="no">MALAYSIA</span><span class="o">(</span><span class="s">"60"</span><span class="o">,</span> <span class="s">"Malaysia"</span><span class="o">),</span>
+    <span class="no">MALDIVES</span><span class="o">(</span><span class="s">"960"</span><span class="o">,</span> <span class="s">"Maldives (Republic of)"</span><span class="o">),</span>
+    <span class="no">MALI</span><span class="o">(</span><span class="s">"223"</span><span class="o">,</span> <span class="s">"Mali (Republic of)"</span><span class="o">),</span>
+    <span class="no">MALTA</span><span class="o">(</span><span class="s">"356"</span><span class="o">,</span> <span class="s">"Malta"</span><span class="o">),</span>
+    <span class="no">MARSHALL_ISLANDS</span><span class="o">(</span><span class="s">"692"</span><span class="o">,</span> <span class="s">"Marshall Islands (Republic of)"</span><span class="o">),</span>
+    <span class="no">MARTINIQUE</span><span class="o">(</span><span class="s">"596"</span><span class="o">,</span> <span class="s">"Martinique (French Department of"</span><span class="o">),</span>
+    <span class="no">MAURITANIA</span><span class="o">(</span><span class="s">"222"</span><span class="o">,</span> <span class="s">"Mauritania (Islamic Republic of)"</span><span class="o">),</span>
+    <span class="no">MAURITIUS</span><span class="o">(</span><span class="s">"230"</span><span class="o">,</span> <span class="s">"Mauritius (Republic of)"</span><span class="o">),</span>
+    <span class="no">MEXICO</span><span class="o">(</span><span class="s">"52"</span><span class="o">,</span> <span class="s">"Mexico"</span><span class="o">),</span>
+    <span class="no">MICRONESIA</span><span class="o">(</span><span class="s">"691"</span><span class="o">,</span> <span class="s">"Micronesia (Federated States of)"</span><span class="o">),</span>
+    <span class="no">MOLDOVA</span><span class="o">(</span><span class="s">"373"</span><span class="o">,</span> <span class="s">"Moldova (Republic of)"</span><span class="o">),</span>
+    <span class="no">MONACO</span><span class="o">(</span><span class="s">"377"</span><span class="o">,</span> <span class="s">"Monaco (Principality of)"</span><span class="o">),</span>
+    <span class="no">MONGOLIA</span><span class="o">(</span><span class="s">"976"</span><span class="o">,</span> <span class="s">"Mongolia"</span><span class="o">),</span>
+    <span class="no">MONTENEGRO</span><span class="o">(</span><span class="s">"382"</span><span class="o">,</span> <span class="s">"Montenegro (Republic of)"</span><span class="o">),</span>
+    <span class="no">MONTSERRAT</span><span class="o">(</span><span class="s">"1"</span><span class="o">,</span> <span class="s">"Montserrat"</span><span class="o">),</span>
+    <span class="no">MOROCCO</span><span class="o">(</span><span class="s">"212"</span><span class="o">,</span> <span class="s">"Morocco (Kingdom of)"</span><span class="o">),</span>
+    <span class="no">MOZAMBIQUE</span><span class="o">(</span><span class="s">"258"</span><span class="o">,</span> <span class="s">"Mozambique (Republic of)"</span><span class="o">),</span>
+    <span class="no">MYANMAR</span><span class="o">(</span><span class="s">"95"</span><span class="o">,</span> <span class="s">"Myanmar (The Republic of the Union of)"</span><span class="o">),</span>
+    <span class="no">NAMIBIA</span><span class="o">(</span><span class="s">"264"</span><span class="o">,</span> <span class="s">"Namibia (Republic of)"</span><span class="o">),</span>
+    <span class="no">NAURU</span><span class="o">(</span><span class="s">"674"</span><span class="o">,</span> <span class="s">"Nauru (Republic of)"</span><span class="o">),</span>
+    <span class="no">NEPAL</span><span class="o">(</span><span class="s">"977"</span><span class="o">,</span> <span class="s">"Nepal (Federal Democratic Republic of)"</span><span class="o">),</span>
+    <span class="no">NETHERLANDS</span><span class="o">(</span><span class="s">"31"</span><span class="o">,</span> <span class="s">"Netherlands (Kingdom of the)"</span><span class="o">),</span>
+    <span class="no">NEW_CALEDONIA</span><span class="o">(</span><span class="s">"687"</span><span class="o">,</span> <span class="s">"New Caledonia (Territoire francais d'outre-mer)"</span><span class="o">),</span>
+    <span class="no">NEW_ZEALAND</span><span class="o">(</span><span class="s">"64"</span><span class="o">,</span> <span class="s">"New Zealand"</span><span class="o">),</span>
+    <span class="no">NICARAGUA</span><span class="o">(</span><span class="s">"505"</span><span class="o">,</span> <span class="s">"Nicaragua"</span><span class="o">),</span>
+    <span class="no">NIGER</span><span class="o">(</span><span class="s">"227"</span><span class="o">,</span> <span class="s">"Niger (Republic of)"</span><span class="o">),</span>
+    <span class="no">NIGERIA</span><span class="o">(</span><span class="s">"234"</span><span class="o">,</span> <span class="s">"Nigeria (Federal Republic of)"</span><span class="o">),</span>
+    <span class="no">NIUE</span><span class="o">(</span><span class="s">"683"</span><span class="o">,</span> <span class="s">"Niue"</span><span class="o">),</span>
+    <span class="no">NORTH_KOREA</span><span class="o">(</span><span class="s">"850"</span><span class="o">,</span> <span class="s">"Democratic People's Republic of Korea\n"</span><span class="o">),</span>
+    <span class="no">NORTHERN_MARIANA_ISLANDS</span><span class="o">(</span><span class="s">"1"</span><span class="o">,</span> <span class="s">"Northern Mariana Islands (Commonwealth of the)"</span><span class="o">),</span>
+    <span class="no">NORWAY</span><span class="o">(</span><span class="s">"47"</span><span class="o">,</span> <span class="s">"Norway"</span><span class="o">),</span>
+    <span class="no">OMAN</span><span class="o">(</span><span class="s">"968"</span><span class="o">,</span> <span class="s">"Oman (Sultanate of)"</span><span class="o">),</span>
+    <span class="no">PAKISTAN</span><span class="o">(</span><span class="s">"92"</span><span class="o">,</span> <span class="s">"Pakistan (Islamic Republic of)"</span><span class="o">),</span>
+    <span class="no">PALAU</span><span class="o">(</span><span class="s">"680"</span><span class="o">,</span> <span class="s">"Palau (Republic of)"</span><span class="o">),</span>
+    <span class="no">PANAMA</span><span class="o">(</span><span class="s">"507"</span><span class="o">,</span> <span class="s">"Panama (Republic of)"</span><span class="o">),</span>
+    <span class="no">PAPUA_NEW_GUINEA</span><span class="o">(</span><span class="s">"675"</span><span class="o">,</span> <span class="s">"Papua New Guinea"</span><span class="o">),</span>
+    <span class="no">PARAGUAY</span><span class="o">(</span><span class="s">"595"</span><span class="o">,</span> <span class="s">"PARAGUAY (Republic of)"</span><span class="o">),</span>
+    <span class="no">PERU</span><span class="o">(</span><span class="s">"51"</span><span class="o">,</span> <span class="s">"Peru"</span><span class="o">),</span>
+    <span class="no">PHILIPPINES</span><span class="o">(</span><span class="s">"63"</span><span class="o">,</span> <span class="s">"Philippines (Republic of the)"</span><span class="o">),</span>
+    <span class="no">POLAND</span><span class="o">(</span><span class="s">"48"</span><span class="o">,</span> <span class="s">"Poland (Republic of)"</span><span class="o">),</span>
+    <span class="no">PORTUGAL</span><span class="o">(</span><span class="s">"351"</span><span class="o">,</span> <span class="s">"Portugal"</span><span class="o">),</span>
+    <span class="no">PUERTO_RICO</span><span class="o">(</span><span class="s">"1"</span><span class="o">,</span> <span class="s">"Puerto Rico"</span><span class="o">),</span>
+    <span class="no">QATAR</span><span class="o">(</span><span class="s">"974"</span><span class="o">,</span> <span class="s">"Qatar (State of)"</span><span class="o">),</span>
+    <span class="no">REUNION</span><span class="o">(</span><span class="s">"262"</span><span class="o">,</span> <span class="s">"French Departments and Territories in the Indian Ocean"</span><span class="o">),</span>
+    <span class="no">ROMANIA</span><span class="o">(</span><span class="s">"40"</span><span class="o">,</span> <span class="s">"Romania"</span><span class="o">),</span>
+    <span class="no">RUSSIA</span><span class="o">(</span><span class="s">"7"</span><span class="o">,</span> <span class="s">"Russian Federation"</span><span class="o">),</span>
+    <span class="no">RWANDA</span><span class="o">(</span><span class="s">"250"</span><span class="o">,</span> <span class="s">"Rwanda (Republic of)"</span><span class="o">),</span>
+    <span class="no">SAINT_HELENA</span><span class="o">(</span><span class="s">"290"</span><span class="o">,</span> <span class="s">"Saint Helena, Ascension and the Tristan da Cunha"</span><span class="o">),</span> <span class="c1">//Also, 247 has an identical entry</span>
+    <span class="no">SAINT_KITTS_AND_NEVIS</span><span class="o">(</span><span class="s">"1"</span><span class="o">,</span> <span class="s">"Saint Kitts and Nevis"</span><span class="o">),</span>
+    <span class="no">SAINT_LUCIA</span><span class="o">(</span><span class="s">"1"</span><span class="o">,</span> <span class="s">"Saint Lucia"</span><span class="o">),</span>
+    <span class="no">SAINT_PIERRE_AND_MIQUELON</span><span class="o">(</span><span class="s">"508"</span><span class="o">,</span> <span class="s">"Saint Pierre and Miquelon (Collectivite territoriale de la Republique francaise)"</span><span class="o">),</span>
+    <span class="no">SAINT_VINCENT_AND_THE_GRENADINES</span><span class="o">(</span><span class="s">"1"</span><span class="o">,</span> <span class="s">"Saint Vincent and the Grenadines"</span><span class="o">),</span>
+    <span class="no">SAMOA</span><span class="o">(</span><span class="s">"685"</span><span class="o">,</span> <span class="s">"Samoa (Independent State of"</span><span class="o">),</span>
+    <span class="no">SAN_MARINO</span><span class="o">(</span><span class="s">"378"</span><span class="o">,</span> <span class="s">"San Marino (Republic of)"</span><span class="o">),</span>
+    <span class="no">SAO_TOME_AND_PRINCIPE</span><span class="o">(</span><span class="s">"239"</span><span class="o">,</span> <span class="s">"Sao Tome and Principe (Democratic Republic of)"</span><span class="o">),</span>
+    <span class="no">SAUDI_ARABIA</span><span class="o">(</span><span class="s">"966"</span><span class="o">,</span> <span class="s">"Saudi Arabia (Kingdom of)"</span><span class="o">),</span>
+    <span class="no">SENEGAL</span><span class="o">(</span><span class="s">"221"</span><span class="o">,</span> <span class="s">"Senegal (Republic of)"</span><span class="o">),</span>
+    <span class="no">SERBIA</span><span class="o">(</span><span class="s">"381"</span><span class="o">,</span> <span class="s">"Serbia (Republic of)"</span><span class="o">),</span>
+    <span class="no">SEYCHELLES</span><span class="o">(</span><span class="s">"248"</span><span class="o">,</span> <span class="s">"Seychelles (Republic of)"</span><span class="o">),</span>
+    <span class="no">SIERRA_LEONE</span><span class="o">(</span><span class="s">"232"</span><span class="o">,</span> <span class="s">"Sierra Leone"</span><span class="o">),</span>
+    <span class="no">SINGAPORE</span><span class="o">(</span><span class="s">"65"</span><span class="o">,</span> <span class="s">"Singapore (Republic of)"</span><span class="o">),</span>
+    <span class="no">SINT_MAARTEN</span><span class="o">(</span><span class="s">"1"</span><span class="o">,</span> <span class="s">"Sint Maarten (Dutch part)"</span><span class="o">),</span>
+    <span class="no">SLOVAKIA</span><span class="o">(</span><span class="s">"421"</span><span class="o">,</span> <span class="s">"Slovak Republic"</span><span class="o">),</span>
+    <span class="no">SLOVENIA</span><span class="o">(</span><span class="s">"386"</span><span class="o">,</span> <span class="s">"Slovenia (Republic of)"</span><span class="o">),</span>
+    <span class="no">SOLOMON_ISLANDS</span><span class="o">(</span><span class="s">"677"</span><span class="o">,</span> <span class="s">"Solomon Islands"</span><span class="o">),</span>
+    <span class="no">SOMALIA</span><span class="o">(</span><span class="s">"252"</span><span class="o">,</span> <span class="s">"Somalia (Federal Republic of)"</span><span class="o">),</span>
+    <span class="no">SOUTH_AFRICA</span><span class="o">(</span><span class="s">"27"</span><span class="o">,</span> <span class="s">"South Africa (Republic of)"</span><span class="o">),</span>
+    <span class="no">SOUTH_KOREA</span><span class="o">(</span><span class="s">"82"</span><span class="o">,</span> <span class="s">"Korea (Republic of)"</span><span class="o">),</span>
+    <span class="no">SOUTH_SUDAN</span><span class="o">(</span><span class="s">"211"</span><span class="o">,</span> <span class="s">"South Sudan (Republic of)"</span><span class="o">),</span>
+    <span class="no">SPAIN</span><span class="o">(</span><span class="s">"34"</span><span class="o">,</span> <span class="s">"Spain"</span><span class="o">),</span>
+    <span class="no">SRI_LANKA</span><span class="o">(</span><span class="s">"94"</span><span class="o">,</span> <span class="s">"Sri Lanka (Democratic Socialist Republic of)"</span><span class="o">),</span>
+    <span class="no">SUDAN</span><span class="o">(</span><span class="s">"249"</span><span class="o">,</span> <span class="s">"Sudan (Republic of)"</span><span class="o">),</span>
+    <span class="no">SURINAME</span><span class="o">(</span><span class="s">"597"</span><span class="o">,</span> <span class="s">"Suriname (Republic of"</span><span class="o">),</span>
+    <span class="no">SWAZILAND</span><span class="o">(</span><span class="s">"268"</span><span class="o">,</span> <span class="s">"Swaziland (Kingdom of)"</span><span class="o">),</span>
+    <span class="no">SWEDEN</span><span class="o">(</span><span class="s">"46"</span><span class="o">,</span> <span class="s">"Sweden"</span><span class="o">),</span>
+    <span class="no">SWITZERLAND</span><span class="o">(</span><span class="s">"41"</span><span class="o">,</span> <span class="s">"Switzerland (Confederation of)"</span><span class="o">),</span>
+    <span class="no">SYRIA</span><span class="o">(</span><span class="s">"963"</span><span class="o">,</span> <span class="s">"Syrian Arab Republic"</span><span class="o">),</span>
+    <span class="no">TAIWAN</span><span class="o">(</span><span class="s">"886"</span><span class="o">,</span> <span class="s">"Taiwan, China"</span><span class="o">),</span> <span class="c1">//Republic of China?</span>
+    <span class="no">TAJIKISTAN</span><span class="o">(</span><span class="s">"992"</span><span class="o">,</span> <span class="s">"Tajikstan (Republic of)"</span><span class="o">),</span>
+    <span class="no">TANZANIA</span><span class="o">(</span><span class="s">"255"</span><span class="o">,</span> <span class="s">"Tanzania (United Republic of)"</span><span class="o">),</span>
+    <span class="no">THAILAND</span><span class="o">(</span><span class="s">"66"</span><span class="o">,</span> <span class="s">"Thailand"</span><span class="o">),</span>
+    <span class="no">TOGO</span><span class="o">(</span><span class="s">"228"</span><span class="o">,</span> <span class="s">"Togolese Republic"</span><span class="o">),</span>
+    <span class="no">TOKELAU</span><span class="o">(</span><span class="s">"690"</span><span class="o">,</span> <span class="s">"Tokelau"</span><span class="o">),</span>
+    <span class="no">TONGA</span><span class="o">(</span><span class="s">"676"</span><span class="o">,</span> <span class="s">"Tonga (Kingdom of)"</span><span class="o">),</span>
+    <span class="no">TRINIDAD_AND_TOBAGO</span><span class="o">(</span><span class="s">"1"</span><span class="o">,</span> <span class="s">"Trinidad and Tobago"</span><span class="o">),</span>
+    <span class="no">TUNISIA</span><span class="o">(</span><span class="s">"216"</span><span class="o">,</span> <span class="s">"Tunisia"</span><span class="o">),</span>
+    <span class="no">TURKEY</span><span class="o">(</span><span class="s">"90"</span><span class="o">,</span> <span class="s">"Turkey"</span><span class="o">),</span>
+    <span class="no">TURKMENISTAN</span><span class="o">(</span><span class="s">"993"</span><span class="o">,</span> <span class="s">"Turkemenistan"</span><span class="o">),</span>
+    <span class="no">TURKS_AND_CAICOS_ISLANDS</span><span class="o">(</span><span class="s">"1"</span><span class="o">,</span> <span class="s">"Turks and Caicos Islands"</span><span class="o">),</span>
+    <span class="no">TUVALU</span><span class="o">(</span><span class="s">"688"</span><span class="o">,</span> <span class="s">"Tuvalu"</span><span class="o">),</span>
+    <span class="no">UGANDA</span><span class="o">(</span><span class="s">"256"</span><span class="o">,</span> <span class="s">"Uganda (Republic of)"</span><span class="o">),</span>
+    <span class="no">UKRAINE</span><span class="o">(</span><span class="s">"380"</span><span class="o">,</span> <span class="s">"Ukraine"</span><span class="o">),</span>
+    <span class="no">UNITED_ARAB_EMIRATES</span><span class="o">(</span><span class="s">"971"</span><span class="o">,</span> <span class="s">"United Arab Emirates"</span><span class="o">),</span>
+    <span class="no">UNITED_KINGDOM</span><span class="o">(</span><span class="s">"44"</span><span class="o">,</span> <span class="s">"United Kingdom of Great Britain and Northern Ireland"</span><span class="o">),</span>
+    <span class="no">UNITED_STATES</span><span class="o">(</span><span class="s">"1"</span><span class="o">,</span> <span class="s">"United States of America"</span><span class="o">),</span>
+    <span class="no">UPT</span><span class="o">(</span><span class="s">"878"</span><span class="o">,</span> <span class="s">"Universal Personal Telecommunication Service (UPT)"</span><span class="o">),</span>
+    <span class="no">URUGUAY</span><span class="o">(</span><span class="s">"598"</span><span class="o">,</span> <span class="s">"Uruguay (Eastern Republic of)"</span><span class="o">),</span>
+    <span class="no">UZBEKISTAN</span><span class="o">(</span><span class="s">"998"</span><span class="o">,</span> <span class="s">"Uzbekistan (Republic of)"</span><span class="o">),</span>
+    <span class="no">VANUATU</span><span class="o">(</span><span class="s">"678"</span><span class="o">,</span> <span class="s">"Vanuatu (Republic of)"</span><span class="o">),</span>
+    <span class="no">VATICAN</span><span class="o">(</span><span class="s">"379"</span><span class="o">,</span> <span class="s">"Vatican City State"</span><span class="o">),</span>
+    <span class="no">VENEZUELA</span><span class="o">(</span><span class="s">"58"</span><span class="o">,</span> <span class="s">"Venezuala (Bolivarian Republic of)"</span><span class="o">),</span>
+    <span class="no">VIETNAM</span><span class="o">(</span><span class="s">"84"</span><span class="o">,</span> <span class="s">"Viet nam (Socialist Republic of)"</span><span class="o">),</span>
+    <span class="no">WALLIS_AND_FUTUNA</span><span class="o">(</span><span class="s">"681"</span><span class="o">,</span> <span class="s">"Wallis and Futuna (Territoire francais d'outre-mer)"</span><span class="o">),</span>
+    <span class="no">YEMEN</span><span class="o">(</span><span class="s">"967"</span><span class="o">,</span> <span class="s">"Yemen (Republic of)"</span><span class="o">),</span>
+    <span class="no">ZAMBIA</span><span class="o">(</span><span class="s">"260"</span><span class="o">,</span> <span class="s">"Zambia (Republic of)"</span><span class="o">),</span>
+    <span class="no">ZIMBABWE</span><span class="o">(</span><span class="s">"263"</span><span class="o">,</span> <span class="s">"Zimbabwe (Republic of)"</span><span class="o">);</span>
+
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">String</span> <span class="n">code</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">String</span> <span class="n">countryName</span><span class="o">;</span>
+
+    <span class="cm">/**
+     * Constructor for countries whose name does not match the enum.
+     * @param code country code
+     * @param countryName full country name
+     */</span>
+    <span class="nc">CountryCode</span><span class="o">(</span><span class="nc">String</span> <span class="n">code</span><span class="o">,</span> <span class="nc">String</span> <span class="n">countryName</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">code</span> <span class="o">=</span> <span class="n">code</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">countryName</span> <span class="o">=</span> <span class="n">countryName</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nc">String</span> <span class="nf">getCode</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="k">this</span><span class="o">.</span><span class="na">code</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="cm">/**
+     * Country name.
+     * @return country name
+     */</span>
+    <span class="kd">public</span> <span class="nc">String</span> <span class="nf">getCountryName</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="k">this</span><span class="o">.</span><span class="na">countryName</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="nc">String</span> <span class="no">PLUS_SIGN</span> <span class="o">=</span> <span class="s">"+"</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="nc">Map</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">,</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">CountryCode</span><span class="o">&gt;&gt;</span> <span class="no">COUNTRYCODESBYCODE</span> <span class="o">=</span>
+            <span class="nc">Arrays</span><span class="o">.</span><span class="na">stream</span><span class="o">(</span><span class="nc">CountryCode</span><span class="o">.</span><span class="na">values</span><span class="o">())</span>
+                    <span class="o">.</span><span class="na">collect</span><span class="o">(</span><span class="nc">Collectors</span><span class="o">.</span><span class="na">groupingBy</span><span class="o">(</span><span class="nl">CountryCode:</span><span class="o">:</span><span class="n">getCode</span><span class="o">));</span>
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="no">CODES</span> <span class="o">=</span> <span class="no">COUNTRYCODESBYCODE</span><span class="o">.</span><span class="na">keySet</span><span class="o">().</span><span class="na">stream</span><span class="o">()</span>
+            <span class="o">.</span><span class="na">sorted</span><span class="o">(</span><span class="nc">Comparator</span><span class="o">.</span><span class="na">comparing</span><span class="o">(</span><span class="nl">String:</span><span class="o">:</span><span class="n">length</span><span class="o">).</span><span class="na">reversed</span><span class="o">()).</span><span class="na">toList</span><span class="o">();</span>
+
+    <span class="cm">/**
+     *
+     * @param code Country code
+     * @return a List of {@link CountryCode} for a found code or an empty list
+     */</span>
+    <span class="nd">@NotNull</span>
+    <span class="nd">@Nonnull</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">CountryCode</span><span class="o">&gt;</span> <span class="nf">countryCodesByCode</span><span class="o">(</span><span class="nd">@Nonnull</span> <span class="nd">@NotBlank</span> <span class="nc">String</span> <span class="n">code</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="no">COUNTRYCODESBYCODE</span><span class="o">.</span><span class="na">containsKey</span><span class="o">(</span><span class="n">code</span><span class="o">))</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="no">COUNTRYCODESBYCODE</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">code</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nc">ArrayList</span><span class="o">&lt;&gt;();</span>
+    <span class="o">}</span>
+
+    <span class="cm">/**
+     *
+     * @return Country codes ordered from codes of longer length to less length.
+     */</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="nf">getCodes</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="no">CODES</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="cm">/**
+     *
+     * @param number Phone number
+     * @return the Country code found in the phone number or {@code null} if not found.
+     */</span>
+    <span class="nd">@Nullable</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="nc">String</span> <span class="nf">parseCountryCode</span><span class="o">(</span><span class="nd">@Nonnull</span> <span class="nd">@NotBlank</span> <span class="nc">String</span> <span class="n">number</span><span class="o">)</span> <span class="o">{</span>
+        <span class="nc">String</span> <span class="n">phone</span> <span class="o">=</span> <span class="n">number</span><span class="o">.</span><span class="na">startsWith</span><span class="o">(</span><span class="no">PLUS_SIGN</span><span class="o">)</span> <span class="o">?</span> <span class="n">number</span><span class="o">.</span><span class="na">substring</span><span class="o">(</span><span class="mi">1</span><span class="o">)</span> <span class="o">:</span> <span class="n">number</span><span class="o">;</span>
+        <span class="k">for</span> <span class="o">(</span><span class="nc">String</span> <span class="n">code</span> <span class="o">:</span> <span class="n">getCodes</span><span class="o">())</span> <span class="o">{</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">phone</span><span class="o">.</span><span class="na">startsWith</span><span class="o">(</span><span class="n">code</span><span class="o">))</span> <span class="o">{</span>
+                <span class="k">return</span> <span class="n">code</span><span class="o">;</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="nc">String</span> <span class="nf">toString</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="k">this</span><span class="o">.</span><span class="na">code</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And a test for this enum:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/java/example/micronaut/CountryCodeTest.java</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">org.junit.jupiter.api.Test</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">java.util.Arrays</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">junit</span><span class="o">.</span><span class="na">jupiter</span><span class="o">.</span><span class="na">api</span><span class="o">.</span><span class="na">Assertions</span><span class="o">.</span><span class="na">assertEquals</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">junit</span><span class="o">.</span><span class="na">jupiter</span><span class="o">.</span><span class="na">api</span><span class="o">.</span><span class="na">Assertions</span><span class="o">.</span><span class="na">assertNull</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">junit</span><span class="o">.</span><span class="na">jupiter</span><span class="o">.</span><span class="na">api</span><span class="o">.</span><span class="na">Assertions</span><span class="o">.</span><span class="na">assertTrue</span><span class="o">;</span>
+
+<span class="kd">class</span> <span class="nc">CountryCodeTest</span> <span class="o">{</span>
+
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">preferredNameGetsUsed</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nc">String</span> <span class="n">name</span> <span class="o">=</span> <span class="nc">CountryCode</span><span class="o">.</span><span class="na">YEMEN</span><span class="o">.</span><span class="na">getCountryName</span><span class="o">();</span>
+        <span class="n">assertEquals</span><span class="o">(</span><span class="n">name</span><span class="o">,</span> <span class="s">"Yemen (Republic of)"</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">defaultNameIsCapitalizedCorrectly</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nc">String</span> <span class="n">name</span> <span class="o">=</span> <span class="nc">CountryCode</span><span class="o">.</span><span class="na">SPAIN</span><span class="o">.</span><span class="na">getCountryName</span><span class="o">();</span>
+        <span class="n">assertEquals</span><span class="o">(</span><span class="n">name</span><span class="o">,</span> <span class="s">"Spain"</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">toStringReturnsCorrectValue</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nc">String</span> <span class="n">code</span> <span class="o">=</span> <span class="nc">CountryCode</span><span class="o">.</span><span class="na">AMERICAN_SAMOA</span><span class="o">.</span><span class="na">toString</span><span class="o">();</span>
+        <span class="n">assertEquals</span><span class="o">(</span><span class="n">code</span><span class="o">,</span> <span class="s">"1"</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">countryCodeGetCodesReturnEveryCodeWithLongestCodesFirst</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">assertTrue</span><span class="o">(</span><span class="nc">CountryCode</span><span class="o">.</span><span class="na">getCodes</span><span class="o">().</span><span class="na">get</span><span class="o">(</span><span class="mi">0</span><span class="o">).</span><span class="na">length</span><span class="o">()</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">countryCodeParseCountryCodeParseCodes</span><span class="o">()</span> <span class="o">{</span>
+
+        <span class="n">assertNull</span><span class="o">(</span><span class="nc">CountryCode</span><span class="o">.</span><span class="na">parseCountryCode</span><span class="o">(</span><span class="s">"999999"</span><span class="o">));</span>
+
+        <span class="n">assertEquals</span><span class="o">(</span><span class="s">"34"</span><span class="o">,</span><span class="nc">CountryCode</span><span class="o">.</span><span class="na">parseCountryCode</span><span class="o">(</span><span class="s">"34630443322"</span><span class="o">));</span>
+        <span class="n">assertEquals</span><span class="o">(</span><span class="s">"268"</span><span class="o">,</span><span class="nc">CountryCode</span><span class="o">.</span><span class="na">parseCountryCode</span><span class="o">(</span><span class="s">"2684046441"</span><span class="o">));</span>
+        <span class="n">assertEquals</span><span class="o">(</span><span class="s">"1"</span><span class="o">,</span><span class="nc">CountryCode</span><span class="o">.</span><span class="na">parseCountryCode</span><span class="o">(</span><span class="s">"+14155552671"</span><span class="o">));</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">countryCodeCountryCodesByCodeReturnAListOfCountryCodeWithTheSameCountryCode</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">assertTrue</span><span class="o">(</span><span class="nc">CountryCode</span><span class="o">.</span><span class="na">countryCodesByCode</span><span class="o">(</span><span class="s">"999999"</span><span class="o">).</span><span class="na">isEmpty</span><span class="o">());</span>
+        <span class="n">assertEquals</span><span class="o">(</span><span class="nc">CountryCode</span><span class="o">.</span><span class="na">countryCodesByCode</span><span class="o">(</span><span class="s">"1"</span><span class="o">),</span> <span class="nc">Arrays</span><span class="o">.</span><span class="na">asList</span><span class="o">(</span>
+                <span class="nc">CountryCode</span><span class="o">.</span><span class="na">AMERICAN_SAMOA</span><span class="o">,</span>
+                <span class="nc">CountryCode</span><span class="o">.</span><span class="na">ANGUILLA</span><span class="o">,</span>
+                <span class="nc">CountryCode</span><span class="o">.</span><span class="na">ANTIGUA_AND_BARBUDA</span><span class="o">,</span>
+                <span class="nc">CountryCode</span><span class="o">.</span><span class="na">BAHAMAS</span><span class="o">,</span>
+                <span class="nc">CountryCode</span><span class="o">.</span><span class="na">BARBADOS</span><span class="o">,</span>
+                <span class="nc">CountryCode</span><span class="o">.</span><span class="na">BERMUDA</span><span class="o">,</span>
+                <span class="nc">CountryCode</span><span class="o">.</span><span class="na">BRITISH_VIRGIN_ISLANDS</span><span class="o">,</span>
+                <span class="nc">CountryCode</span><span class="o">.</span><span class="na">CANADA</span><span class="o">,</span>
+                <span class="nc">CountryCode</span><span class="o">.</span><span class="na">CAYMAN_ISLANDS</span><span class="o">,</span>
+                <span class="nc">CountryCode</span><span class="o">.</span><span class="na">DOMINICA</span><span class="o">,</span>
+                <span class="nc">CountryCode</span><span class="o">.</span><span class="na">DOMINICAN_REPUBLIC</span><span class="o">,</span>
+                <span class="nc">CountryCode</span><span class="o">.</span><span class="na">GRENADA</span><span class="o">,</span>
+                <span class="nc">CountryCode</span><span class="o">.</span><span class="na">GUAM</span><span class="o">,</span>
+                <span class="nc">CountryCode</span><span class="o">.</span><span class="na">JAMAICA</span><span class="o">,</span>
+                <span class="nc">CountryCode</span><span class="o">.</span><span class="na">MONTSERRAT</span><span class="o">,</span>
+                <span class="nc">CountryCode</span><span class="o">.</span><span class="na">NORTHERN_MARIANA_ISLANDS</span><span class="o">,</span>
+                <span class="nc">CountryCode</span><span class="o">.</span><span class="na">PUERTO_RICO</span><span class="o">,</span>
+                <span class="nc">CountryCode</span><span class="o">.</span><span class="na">SAINT_KITTS_AND_NEVIS</span><span class="o">,</span>
+                <span class="nc">CountryCode</span><span class="o">.</span><span class="na">SAINT_LUCIA</span><span class="o">,</span>
+                <span class="nc">CountryCode</span><span class="o">.</span><span class="na">SAINT_VINCENT_AND_THE_GRENADINES</span><span class="o">,</span>
+                <span class="nc">CountryCode</span><span class="o">.</span><span class="na">SINT_MAARTEN</span><span class="o">,</span>
+                <span class="nc">CountryCode</span><span class="o">.</span><span class="na">TRINIDAD_AND_TOBAGO</span><span class="o">,</span>
+                <span class="nc">CountryCode</span><span class="o">.</span><span class="na">TURKS_AND_CAICOS_ISLANDS</span><span class="o">,</span>
+                <span class="nc">CountryCode</span><span class="o">.</span><span class="na">UNITED_STATES</span><span class="o">));</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="phone-e164">6. Phone E164</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Create a <code>Utils</code> class to validate a phone number.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/E164Utils.java</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">io.micronaut.core.annotation.Nullable</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.core.util.StringUtils</span><span class="o">;</span>
+
+<span class="cm">/**
+ * Utility methods to ease {@link E164} validation.
+ */</span>
+<span class="kd">public</span> <span class="kd">final</span> <span class="kd">class</span> <span class="nc">E164Utils</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">int</span> <span class="no">MAX_NUMBER_OF_DIGITS</span> <span class="o">=</span> <span class="mi">15</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="nc">String</span> <span class="no">PLUS_SIGN</span> <span class="o">=</span> <span class="s">"+"</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="nf">E164Utils</span><span class="o">()</span> <span class="o">{</span>
+    <span class="o">}</span>
+
+    <span class="cm">/**
+     * @param value phone number
+     * @return Whether a phone is E.164 formatted
+     */</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">boolean</span> <span class="nf">isValid</span><span class="o">(</span><span class="nd">@Nullable</span> <span class="nc">String</span> <span class="n">value</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">value</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">||</span> <span class="n">value</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">())</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+        <span class="o">}</span>
+
+        <span class="nc">String</span> <span class="n">phone</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="na">startsWith</span><span class="o">(</span><span class="no">PLUS_SIGN</span><span class="o">)</span> <span class="o">?</span> <span class="n">value</span><span class="o">.</span><span class="na">substring</span><span class="o">(</span><span class="mi">1</span><span class="o">)</span> <span class="o">:</span> <span class="n">value</span><span class="o">;</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">phone</span><span class="o">.</span><span class="na">length</span><span class="o">()</span> <span class="o">&gt;</span> <span class="no">MAX_NUMBER_OF_DIGITS</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+        <span class="o">}</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">phone</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">())</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+        <span class="o">}</span>
+        <span class="k">if</span> <span class="o">(!</span><span class="nc">StringUtils</span><span class="o">.</span><span class="na">isDigits</span><span class="o">(</span><span class="n">phone</span><span class="o">)</span> <span class="o">||</span> <span class="n">phone</span><span class="o">.</span><span class="na">charAt</span><span class="o">(</span><span class="mi">0</span><span class="o">)</span> <span class="o">==</span> <span class="sc">'0'</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+        <span class="o">}</span>
+
+        <span class="k">return</span> <span class="nc">CountryCode</span><span class="o">.</span><span class="na">parseCountryCode</span><span class="o">(</span><span class="n">phone</span><span class="o">)</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>and a test for valid and invalid phones:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/java/example/micronaut/E164UtilsTest.java</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">org.junit.jupiter.params.ParameterizedTest</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.junit.jupiter.params.provider.ValueSource</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">junit</span><span class="o">.</span><span class="na">jupiter</span><span class="o">.</span><span class="na">api</span><span class="o">.</span><span class="na">Assertions</span><span class="o">.</span><span class="na">assertFalse</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">junit</span><span class="o">.</span><span class="na">jupiter</span><span class="o">.</span><span class="na">api</span><span class="o">.</span><span class="na">Assertions</span><span class="o">.</span><span class="na">assertTrue</span><span class="o">;</span>
+
+<span class="kd">class</span> <span class="nc">E164UtilsTest</span> <span class="o">{</span>
+
+    <span class="nd">@ParameterizedTest</span>
+    <span class="nd">@ValueSource</span><span class="o">(</span><span class="n">strings</span> <span class="o">=</span> <span class="o">{</span>
+            <span class="s">"+04630443322"</span><span class="o">,</span>
+            <span class="s">"+1415555267102345"</span><span class="o">,</span>
+            <span class="s">"+1-4155552671"</span><span class="o">,</span>
+            <span class="s">""</span>
+    <span class="o">})</span>
+    <span class="kt">void</span> <span class="nf">invalidPhones</span><span class="o">(</span><span class="nc">String</span> <span class="n">phone</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">assertFalse</span><span class="o">(</span><span class="nc">E164Utils</span><span class="o">.</span><span class="na">isValid</span><span class="o">(</span><span class="n">phone</span><span class="o">));</span>
+    <span class="o">}</span>
+
+    <span class="nd">@ParameterizedTest</span>
+    <span class="nd">@ValueSource</span><span class="o">(</span><span class="n">strings</span> <span class="o">=</span> <span class="o">{</span>
+            <span class="s">"+14155552671"</span><span class="o">,</span>
+            <span class="s">"+442071838750"</span><span class="o">,</span>
+            <span class="s">"+55115525632"</span><span class="o">,</span>
+            <span class="s">"14155552671"</span><span class="o">,</span>
+            <span class="s">"442071838750"</span><span class="o">,</span>
+            <span class="s">"55115525632"</span><span class="o">,</span>
+            <span class="s">"55115525632"</span><span class="o">,</span>
+    <span class="o">})</span>
+    <span class="kt">void</span> <span class="nf">validPhones</span><span class="o">(</span><span class="nc">String</span> <span class="n">phone</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">assertTrue</span><span class="o">(</span><span class="nc">E164Utils</span><span class="o">.</span><span class="na">isValid</span><span class="o">(</span><span class="n">phone</span><span class="o">));</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="custom-validation-annotation">7. Custom Validation Annotation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Create a custom annotation:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/E164.java</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">jakarta.validation.Constraint</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.validation.Payload</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.lang.annotation.Documented</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.lang.annotation.ElementType</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.lang.annotation.Repeatable</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.lang.annotation.Retention</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.lang.annotation.RetentionPolicy</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.lang.annotation.Target</span><span class="o">;</span>
+
+<span class="cm">/**
+ * The annotated element must be a E.164 phone number.
+ *
+ * @see &lt;a href="https://www.itu.int/rec/T-REC-E.164/en"&gt;ITU E.164 recommendation&lt;/a&gt;
+ * @see &lt;a href="https://www.twilio.com/docs/glossary/what-e164"&gt;E.614&lt;/a&gt;
+ */</span>
+<span class="nd">@Target</span><span class="o">({</span><span class="nc">ElementType</span><span class="o">.</span><span class="na">METHOD</span><span class="o">,</span> <span class="nc">ElementType</span><span class="o">.</span><span class="na">FIELD</span><span class="o">,</span> <span class="nc">ElementType</span><span class="o">.</span><span class="na">ANNOTATION_TYPE</span><span class="o">,</span> <span class="nc">ElementType</span><span class="o">.</span><span class="na">PARAMETER</span><span class="o">,</span> <span class="nc">ElementType</span><span class="o">.</span><span class="na">TYPE_USE</span><span class="o">})</span>
+<span class="nd">@Retention</span><span class="o">(</span><span class="nc">RetentionPolicy</span><span class="o">.</span><span class="na">RUNTIME</span><span class="o">)</span>
+<span class="nd">@Repeatable</span><span class="o">(</span><span class="no">E164</span><span class="o">.</span><span class="na">List</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+<span class="nd">@Documented</span>
+<span class="nd">@Constraint</span><span class="o">(</span><span class="n">validatedBy</span> <span class="o">=</span> <span class="o">{})</span>
+<span class="kd">public</span> <span class="nd">@interface</span> <span class="no">E164</span> <span class="o">{</span>
+
+    <span class="nc">String</span> <span class="no">MESSAGE</span> <span class="o">=</span> <span class="s">"example.micronaut.E164.message"</span><span class="o">;</span>
+
+    <span class="cm">/**
+     * @return message The error message
+     */</span>
+    <span class="nc">String</span> <span class="nf">message</span><span class="o">()</span> <span class="k">default</span> <span class="s">"{"</span> <span class="o">+</span> <span class="no">MESSAGE</span> <span class="o">+</span> <span class="s">"}"</span><span class="o">;</span>
+
+    <span class="cm">/**
+     * @return Groups to control the order in which constraints are evaluated,
+     * or to perform validation of the partial state of a JavaBean.
+     */</span>
+    <span class="nc">Class</span><span class="o">&lt;?&gt;[]</span> <span class="n">groups</span><span class="o">()</span> <span class="k">default</span> <span class="o">{};</span>
+
+    <span class="cm">/**
+     * @return Payloads used by validation clients to associate some metadata information with a given constraint declaration
+     */</span>
+    <span class="nc">Class</span><span class="o">&lt;?</span> <span class="kd">extends</span> <span class="nc">Payload</span><span class="o">&gt;[]</span> <span class="nf">payload</span><span class="o">()</span> <span class="k">default</span> <span class="o">{};</span>
+
+    <span class="cm">/**
+     * List annotation.
+     */</span>
+    <span class="nd">@Target</span><span class="o">({</span><span class="nc">ElementType</span><span class="o">.</span><span class="na">METHOD</span><span class="o">,</span> <span class="nc">ElementType</span><span class="o">.</span><span class="na">FIELD</span><span class="o">,</span> <span class="nc">ElementType</span><span class="o">.</span><span class="na">ANNOTATION_TYPE</span><span class="o">,</span> <span class="nc">ElementType</span><span class="o">.</span><span class="na">PARAMETER</span><span class="o">,</span> <span class="nc">ElementType</span><span class="o">.</span><span class="na">TYPE_USE</span><span class="o">})</span>
+    <span class="nd">@Retention</span><span class="o">(</span><span class="nc">RetentionPolicy</span><span class="o">.</span><span class="na">RUNTIME</span><span class="o">)</span>
+    <span class="nd">@Documented</span>
+    <span class="nd">@interface</span> <span class="nc">List</span> <span class="o">{</span>
+
+        <span class="cm">/**
+         * @return An array of E164.
+         */</span>
+        <span class="no">E164</span><span class="o">[]</span> <span class="nf">value</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="validation-factory">8. Validation Factory</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Create a factory that creates a <code>ConstraintValidator</code> for the annotation defined in the previous step.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/CustomValidationFactory.java</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">io.micronaut.context.annotation.Factory</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.validation.validator.constraints.ConstraintValidator</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.inject.Singleton</span><span class="o">;</span>
+
+<span class="nd">@Factory</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">class</span> <span class="nc">CustomValidationFactory</span> <span class="o">{</span>
+
+    <span class="cm">/**
+     * @return A {@link ConstraintValidator} implementation of a {@link E164} constraint for type {@link String}.
+     */</span>
+    <span class="nd">@Singleton</span> <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="nc">ConstraintValidator</span><span class="o">&lt;</span><span class="no">E164</span><span class="o">,</span> <span class="nc">String</span><span class="o">&gt;</span> <span class="nf">e164Validator</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="o">(</span><span class="n">value</span><span class="o">,</span> <span class="n">annotationMetadata</span><span class="o">,</span> <span class="n">context</span><span class="o">)</span> <span class="o">-&gt;</span> <span class="nc">E164Utils</span><span class="o">.</span><span class="na">isValid</span><span class="o">(</span><span class="n">value</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>A class annotated with the <code>@Factory</code> annotated is a factory. It provides one or more methods annotated with a bean scope annotation (e.g. <code>@Singleton</code>). Read more about <a href="https://docs.micronaut.io/latest/guide/#factories">Bean factories</a>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Use <code>jakarta.inject.Singleton</code> to designate a class as a singleton.</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="validation-messages">9. Validation Messages</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Create a default message for the E164 constraint:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/CustomValidationMessages.java</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">io.micronaut.context.StaticMessageSource</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.inject.Singleton</span><span class="o">;</span>
+
+<span class="cm">/**
+ * Adds validation messages.
+ */</span>
+<span class="nd">@Singleton</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">CustomValidationMessages</span> <span class="kd">extends</span> <span class="nc">StaticMessageSource</span> <span class="o">{</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="nc">String</span> <span class="no">E164_MESSAGE</span> <span class="o">=</span> <span class="s">"must be a phone in E.164 format"</span><span class="o">;</span>
+    <span class="cm">/**
+     * The message suffix to use.
+     */</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="nc">String</span> <span class="no">MESSAGE_SUFFIX</span> <span class="o">=</span> <span class="s">".message"</span><span class="o">;</span>
+
+    <span class="cm">/**
+     * Default constructor to initialize messages.
+     * via {@link #addMessage(String, String)}
+     */</span>
+    <span class="kd">public</span> <span class="nf">CustomValidationMessages</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">addMessage</span><span class="o">(</span><span class="no">E164</span><span class="o">.</span><span class="na">class</span><span class="o">.</span><span class="na">getName</span><span class="o">()</span> <span class="o">+</span> <span class="no">MESSAGE_SUFFIX</span><span class="o">,</span> <span class="no">E164_MESSAGE</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="testing-validation">10. Testing Validation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Create a <code>Contact</code> object which uses the custom annotation.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/Contact.java</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">io.micronaut.core.annotation.Introspected</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.core.annotation.NonNull</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">jakarta.validation.constraints.NotBlank</span><span class="o">;</span>
+
+<span class="nd">@Introspected</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Contact</span> <span class="o">{</span>
+
+    <span class="nd">@E164</span>
+    <span class="nd">@NotBlank</span>
+    <span class="nd">@NonNull</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">String</span> <span class="n">phone</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nf">Contact</span><span class="o">(</span><span class="nd">@NonNull</span> <span class="nc">String</span> <span class="n">phone</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">phone</span> <span class="o">=</span> <span class="n">phone</span><span class="o">;</span>
+    <span class="o">}</span>
+
+
+    <span class="nd">@NonNull</span>
+    <span class="kd">public</span> <span class="nc">String</span> <span class="nf">getPhone</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">phone</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Create a test verifies the custom annotation participates in the validation of the object.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/java/example/micronaut/ContactTest.java</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.inject.Inject</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.junit.jupiter.api.Test</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">jakarta.validation.ConstraintViolation</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.validation.Validator</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">java.util.Set</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">junit</span><span class="o">.</span><span class="na">jupiter</span><span class="o">.</span><span class="na">api</span><span class="o">.</span><span class="na">Assertions</span><span class="o">.</span><span class="na">assertFalse</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">junit</span><span class="o">.</span><span class="na">jupiter</span><span class="o">.</span><span class="na">api</span><span class="o">.</span><span class="na">Assertions</span><span class="o">.</span><span class="na">assertTrue</span><span class="o">;</span>
+
+<span class="nd">@MicronautTest</span><span class="o">(</span><span class="n">startApplication</span> <span class="o">=</span> <span class="kc">false</span><span class="o">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">class</span> <span class="nc">ContactTest</span> <span class="o">{</span>
+
+    <span class="nd">@Inject</span> <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="nc">Validator</span> <span class="n">validator</span><span class="o">;</span>
+
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">contactValidation</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">assertTrue</span><span class="o">(</span><span class="n">validator</span><span class="o">.</span><span class="na">validate</span><span class="o">(</span><span class="k">new</span> <span class="nc">Contact</span><span class="o">(</span><span class="s">"+14155552671"</span><span class="o">)).</span><span class="na">isEmpty</span><span class="o">());</span>
+        <span class="nc">Set</span><span class="o">&lt;</span><span class="nc">ConstraintViolation</span><span class="o">&lt;</span><span class="nc">Contact</span><span class="o">&gt;&gt;</span> <span class="n">violationSet</span> <span class="o">=</span> <span class="n">validator</span><span class="o">.</span><span class="na">validate</span><span class="o">(</span><span class="k">new</span> <span class="nc">Contact</span><span class="o">(</span><span class="s">"+1-4155552671"</span><span class="o">));</span>
+        <span class="n">assertFalse</span><span class="o">(</span><span class="n">violationSet</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">());</span>
+        <span class="nc">String</span> <span class="n">template</span> <span class="o">=</span> <span class="s">"{example.micronaut.E164.message}"</span><span class="o">;</span>
+        <span class="n">assertTrue</span><span class="o">(</span><span class="n">violationSet</span><span class="o">.</span><span class="na">stream</span><span class="o">().</span><span class="na">anyMatch</span><span class="o">(</span><span class="n">violation</span> <span class="o">-&gt;</span>
+                <span class="n">violation</span><span class="o">.</span><span class="na">getMessageTemplate</span><span class="o">().</span><span class="na">equals</span><span class="o">(</span><span class="n">template</span><span class="o">)</span>
+                        <span class="o">&amp;&amp;</span> <span class="n">violation</span><span class="o">.</span><span class="na">getInvalidValue</span><span class="o">().</span><span class="na">equals</span><span class="o">(</span><span class="s">"+1-4155552671"</span><span class="o">)</span>
+                        <span class="o">&amp;&amp;</span> <span class="n">violation</span><span class="o">.</span><span class="na">getMessage</span><span class="o">().</span><span class="na">equals</span><span class="o">(</span><span class="s">"must be a phone in E.164 format"</span><span class="o">))</span>
+        <span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Annotate the class with <code>@MicronautTest</code> so the Micronaut framework will initialize the application context. This test does not need the embedded server. Set <code>startApplication</code> to <code>false</code> to avoid starting it.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Injection for <code>Validator</code>.</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="next-steps">11. Next Steps</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Explore more features with <a href="https://micronaut.io/guides/">Micronaut Guides</a>.</p>
+</div>
+<div class="paragraph">
+<p>Learn about <a href="https://docs.micronaut.io/latest/guide/#beanValidation">Bean Validation</a> and how to <a href="https://guides.micronaut.io/latest/localized-message-source.html">localize your application</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="help-with-the-micronaut-framework">12. Help with the Micronaut Framework</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The <a href="https://micronaut.io/foundation/">Micronaut Foundation</a> sponsored the creation of this Guide. A variety of <a href="https://micronaut.io/commercial-support/">consulting and support services</a> are available.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="license">13. License</h2>
+<div class="sectionbody">
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+All guides are released with an <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache license 2.0 license</a> for the code and a <a href="https://creativecommons.org/licenses/by/4.0/deed.en">Creative Commons Attribution 4.0</a> license for the writing and media (images&#8230;&#8203;).
+</td>
+</tr>
+</table>
+</div>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer id="footer">
+    <div class="container">
+
+        <div class="row">
+            <div class="col-sm-5 footer-left">
+
+                <div id="text-14" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <a href="https://micronaut.io/foundation/"><img class="alignnone size-medium wp-image-3736" src="./images/micronaut_foundation_horizontal_white.svg" alt="Micronaut Foundation"/></a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-7 footer-right">
+
+                <ul class="meta">
+
+                    <li id="menu-item-2895" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2895">
+                        <a href="https://micronaut.io/brand-guidelines/">Brand Guidelines</a>
+                    </li>
+                    <li id="menu-item-2894" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2894">
+                        <a href="https://micronaut.io/community-guidelines/">Community Guidelines</a>
+                    </li>
+                    <li id="menu-item-3377" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-privacy-policy menu-item-3377">
+                        <a href="https://micronaut.io/privacy-policy/">Privacy Policy</a>
+                    </li>
+
+                </ul>
+
+                <div id="nav_menu-2" class="widget widget_nav_menu">
+                    <div class="menu-links-container">
+                        <ul id="menu-links" class="menu">
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="https://micronautpodcast.com"><i class="fa fa-podcast"><span class="sr-only">Podcast</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="https://micronaut.io/feed/rss/"><i class="fa fa-feed"><span class="sr-only">Feed</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="mailto:info@micronaut.io"><i class="fas fa-envelope"><span class="sr-only">Mail</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://twitter.com/micronautfw"><i class="fab fa-twitter"><span class="sr-only">Twitter</span></i></a></li>
+                            <li id="menu-item-6740" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-6740"><a href="https://fosstodon.org/@micronaut"><i class="fab fa-mastodon"><span class="sr-only">Mastodon</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://discord.gg/9xRFsHv98T"><i class="fab fa-discord"><span class="sr-only">Discord</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://github.com/micronaut-projects/"><i class="fab fa-github"><span class="sr-only">GitHub</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.youtube.com/@MicronautFramework"><i class="fab fa-youtube"><span class="sr-only">YouTube</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.linkedin.com/showcase/micronaut"><i class="fab fa-linkedin"><span class="sr-only">LinkedIn</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.twitch.tv/micronautfw"><i class="fab fa-twitch"><span class="sr-only">Twitch</span></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="text-5" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <small>Guides are licensed under <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> for the writing/media and <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache.2.0</a> for the code</small>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>

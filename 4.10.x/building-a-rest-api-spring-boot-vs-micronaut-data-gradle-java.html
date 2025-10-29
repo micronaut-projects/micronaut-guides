@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'/>
+    <title>4. Data - Spring Boot vs Micronaut Framework - Building a Rest API</title>
+    <link rel='stylesheet' id='wp-block-library-css' href='https://micronaut.io/wp-includes/css/dist/block-library/style.min.css' type='text/css' media='all'/>
+    <link rel='stylesheet' id='fonts-fira-sans-css' href='https://fonts.googleapis.com/css2?family=Fira+Sans%3Awght%40300%3B500&#038;display=swap&#038;ver=5.7' type='text/css' media='all'/>
+    <link rel='stylesheet' id='micronaut-style-css' href='https://micronaut.io/wp-content/themes/micronaut/style.min.css' type='text/css' media='all'/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link rel="shortcut icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link rel="alternate" type="application/rss+xml" title="Micronaut Guides RSS Feed" href="https://guides.micronaut.io/latest/rss.xml" />
+    <link rel="alternate" type="application/json" title="Micronaut Guides JSON Feed" href="https://guides.micronaut.io/latest/feed.json" />
+    <link href="coderay.css" rel="stylesheet" />
+    <link href="rouge-github.css" rel="stylesheet" />
+    <link href="guide.css" rel="stylesheet" />
+    <script src="lunr.js"></script>
+    <script src="guide.js"></script>
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:image" content="https://guides.micronaut.io/latest/images/cards/micronauttwittercard.png"/>
+    <meta name="twitter:creator" content="@micronautfw"/>
+    <meta name="twitter:site" content="@micronautfw"/>
+    <meta name="twitter:title" content="4. Data - Spring Boot vs Micronaut Framework - Building a Rest API"/>
+    <meta name="twitter:description" content="This guide compares how to add Spring Data or Micronaut Data to power a GET endpoint in both Micronaut and Spring Boot applications."/>
+</head>
+<body class="page-template page-template-page-sidebar page-template-page-sidebar-php page page-parent guide">
+
+<header id="header">
+
+    <div class="container">
+
+        <nav class="navbar navbar-expand-lg navbar-dark">
+
+            <button class="collapsed" type="button" data-toggle="collapse" data-target="#nav" aria-expanded="false">
+                <span></span>
+            </button>
+
+            <a class="navbar-brand" href="https://micronaut.io">
+                <img src="https://micronaut.io/wp-content/uploads/2020/11/MIcronautLogo_Horizontal.svg" alt="Micronaut framework"/>
+            </a>
+
+            <div class="collapse navbar-collapse" id="nav">
+
+                <ul class="navbar-nav ml-auto">
+
+                    <li id="menu-item-2865" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2865 nav-item"><a href="https://micronaut.io/download/" class="nav-link">Download</a></li>
+                    <li id="menu-item-2868" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-2868 dropdown nav-item"><a href="https://micronaut.io/learn/" class="nav-link dropdown-toggle" data-toggle="dropdown">Learn</a><ul class="dropdown-menu">
+                        <li id="menu-item-4943" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4943"><a href="https://micronaut.io/learn/" class="dropdown-item">Overview</a></li>
+                        <li id="menu-item-5111" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-5111"><a href="https://docs.micronaut.io/index.html" class="dropdown-item">User Documentaton</a></li>
+                        <li id="menu-item-4510" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4510"><a href="https://micronaut.io/guides/" class="dropdown-item">Guides</a></li>
+                        <li id="menu-item-2896" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2896"><a href="https://micronaut.io/category/microcast/" class="dropdown-item">Microcasts</a></li>
+                        <li id="menu-item-2897" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2897"><a href="https://micronaut.io/category/webinar/" class="dropdown-item">Webinars</a></li>
+                        <li id="menu-item-2871" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2871"><a href="https://micronaut.io/professional-training/" class="dropdown-item">Professional Training</a></li>
+                        <li id="menu-item-6526" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-6526"><a href="https://micronaut-projects.github.io/micronaut-guides-mn3/latest/" class="dropdown-item">Guides for Micronaut Framework 3</a></li>
+                    </ul>
+                    </li>
+                    <li id="menu-item-2878" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item"><a href="https://micronaut.io/resources/" class="nav-link dropdown-toggle" data-toggle="dropdown">Resources</a><ul class="dropdown-menu">
+                        <li id="menu-item-4999" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4999"><a href="https://micronaut.io/upcoming-events/" class="dropdown-item">Upcoming Events</a></li>
+                        <li id="menu-item-2879" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2879"><a href="https://micronaut.io/blog/" class="dropdown-item">Blog</a></li>
+                        <li id="menu-item-6478" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-6478"><a href="https://micronaut.io/category/release-announcements/" class="dropdown-item">Releases</a></li>
+                        <li id="menu-item-6715" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-6715"><a href="https://micronaut.io/category/security-announcements/" class="dropdown-item">Security Announcements</a></li>
+                        <li id="menu-item-4499" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-4499"><a href="https://micronautpodcast.com/" class="dropdown-item">Podcast</a></li>
+                        <li id="menu-item-5798" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5798"><a href="https://micronaut.io/support/" class="dropdown-item">Commercial Support</a></li>
+                        <li id="menu-item-4186" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4186"><a href="https://micronaut.io/resources/community-support/" class="dropdown-item">Community Support</a></li>
+                        <li id="menu-item-2882" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2882"><a href="https://micronaut.io/faq/" class="dropdown-item">FAQ</a></li>
+                        <li id="menu-item-2883" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2883"><a href="https://micronaut.io/contact/" class="dropdown-item">Contact</a></li>
+                        <li id="menu-item-6479" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-6479"><a href="https://micronaut.io/micronaut-success-stories/" class="dropdown-item">Micronaut Success Stories</a></li>
+                    </ul>
+                    </li>
+                    <li id="menu-item-2872" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2872 dropdown nav-item"><a href="https://micronaut.io/foundation/" class="nav-link dropdown-toggle" data-toggle="dropdown">Foundation</a><ul class="dropdown-menu">
+                        <li id="menu-item-2877" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2877"><a href="https://micronaut.io/foundation/" class="dropdown-item">Overview</a></li>
+                        <li id="menu-item-2874" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2874"><a href="https://micronaut.io/foundation/corporate-sponsorship/" class="dropdown-item">Corporate Sponsorship</a></li>
+                        <li id="menu-item-2873" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2873"><a href="https://micronaut.io/foundation/community-sponsorship/" class="dropdown-item">Community Sponsorship</a></li>
+                        <li id="menu-item-2876" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2876"><a href="https://micronaut.io/foundation/sponsors/" class="dropdown-item">Sponsors</a></li>
+                        <li id="menu-item-3838" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-3838"><a href="https://micronaut.io/meeting-minutes/" class="dropdown-item">Meeting Minutes</a></li>
+                    </ul>
+                    </li>
+                    <li id="menu-item-2884" class="action menu-item menu-item-type-custom menu-item-object-custom menu-item-2884 nav-item"><a target="_blank" rel="noopener" href="https://micronaut.io/launch/" class="nav-link">Launch</a></li>
+
+                </ul>
+
+            </div>
+
+        </nav>
+
+    </div>
+</header>
+
+<div style="background: #fff;padding-top: 20px;padding-bottom: 20px;">
+    <div class="container" style="clear: both;">
+        <fieldset style="float: right;">
+            <input type="search" id="search-form-query"/>
+            <input type="submit" onclick="search()" value="Search">
+            <input type="submit" onclick="resetSearch()" value="Reset">
+        </fieldset>
+    </div>
+    <div class="container" style="clear: both;margin-top: -20px;">
+        <div class="guide-list" id="searchResults">
+        </div>
+    </div>
+</div>
+<div id="breadcrumbs"><div class="container"><a href="https://micronaut.io/">Home</a> » <a href="./index.html">Guides</a> » <a href="building-a-rest-api-spring-boot-vs-micronaut-data.html">4. Data - Spring Boot vs Micronaut Framework - Building a Rest API</a> » <span class="breadcrumb_last" aria-current="page">gradle | java</span></div></div><!-- .breadcrumbs -->
+<main id="main">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+
+                <div class="toc">
+                    <div class="inner">
+                        <h1 class="title title_large first-word-bold first-word-break">Table of Contents</h1>
+                        <div class="underline"></div>
+                        
+<ul class="sectlevel1">
+<li><a href="#sample-project">1. Sample Project</a></li>
+<li><a href="#introduction">2. Introduction</a>
+<ul class="sectlevel2">
+<li><a href="#micronaut-data-vs-spring-data">2.1. Micronaut Data vs Spring Data</a></li>
+</ul>
+</li>
+<li><a href="#dependencies">3. Dependencies</a>
+<ul class="sectlevel2">
+<li><a href="#spring-boot-data-and-h2">3.1. Spring Boot Data and H2</a></li>
+<li><a href="#micronaut-data-and-h2">3.2. Micronaut Data and H2</a></li>
+</ul>
+</li>
+<li><a href="#entities">4. Entities</a>
+<ul class="sectlevel2">
+<li><a href="#spring-boot">4.1. Spring Boot</a></li>
+<li><a href="#micronaut">4.2. Micronaut</a></li>
+</ul>
+</li>
+<li><a href="#sql">5. SQL</a>
+<ul class="sectlevel2">
+<li><a href="#sql-schema">5.1. SQL Schema</a></li>
+<li><a href="#sample-data">5.2. Sample Data</a></li>
+</ul>
+</li>
+<li><a href="#repository">6. Repository</a>
+<ul class="sectlevel2">
+<li><a href="#spring-boot-repository">6.1. Spring Boot Repository</a></li>
+<li><a href="#micronaut-repository">6.2. Micronaut Repository</a></li>
+</ul>
+</li>
+<li><a href="#controller">7. Controller</a>
+<ul class="sectlevel2">
+<li><a href="#spring-boot-controller">7.1. Spring Boot Controller</a></li>
+<li><a href="#micronaut-controller">7.2. Micronaut Controller</a></li>
+</ul>
+</li>
+<li><a href="#tests">8. Tests</a>
+<ul class="sectlevel2">
+<li><a href="#micronaut-test">8.1. Micronaut Test</a></li>
+</ul>
+</li>
+<li><a href="#conclusion">9. Conclusion</a></li>
+<li><a href="#license">10. License</a></li>
+</ul>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <h1>4. Data - Spring Boot vs Micronaut Framework - Building a Rest API</h1>
+                <div class="underline"></div>
+<div class="sect1">
+<div class="sectionbody">
+
+<div class="paragraph">
+<p>This guide compares how to add Spring Data or Micronaut Data to power a GET endpoint in both Micronaut and Spring Boot applications.</p>
+</div>
+<div class="paragraph">
+<p>Authors: Sergio del Amo</p>
+</div>
+<div class="paragraph">
+<p>Micronaut Version: 4.9.1</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="sample-project">1. Sample Project</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>You can <a href="building-a-rest-api-spring-boot-vs-micronaut-data-gradle-java.zip">download a sample application</a> with the code examples in this article.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="introduction">2. Introduction</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>This guide compares how to power a GET endpoint with a persistence layer in a Micronaut Framework and Spring Boot applications.</p>
+</div>
+<div class="paragraph">
+<p>The Spring Boot application uses <a href="https://spring.io/projects/spring-data">Spring Data</a> and <a href="https://www.h2database.com/html/main.html">H2</a>. The Micronaut application uses <a href="https://micronaut-projects.github.io/micronaut-data/snapshot/guide/">Micronaut Data</a> and H2.</p>
+</div>
+<div class="paragraph">
+<p>This guide is the third tutorial of <a href="https://guides.micronaut.io/latest/tag-building_a_rest_api.html">Building a Rest API</a> - a series of tutorials comparing how to develop a REST API with Micronaut Framework and Spring Boot.</p>
+</div>
+<div class="paragraph">
+<p>Micronaut Data is a database access toolkit that uses Ahead of Time (AoT) compilation to pre-compute queries for repository interfaces that are then executed by a thin, lightweight runtime layer.</p>
+</div>
+<div class="sect2">
+<h3 id="micronaut-data-vs-spring-data">2.1. Micronaut Data vs Spring Data</h3>
+<div class="paragraph">
+<p>Micronaut Data improves on Spring Data in the following ways:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><strong>No runtime model</strong> - Spring Data maintains a runtime metamodel that uses reflection to model relationships between entities. This model consumes significant memory and memory requirements grow as your application size grows. The problem is worse when combined with Hibernate which maintains its own metamodel as you end up with duplicate meta-models.</p>
+</li>
+<li>
+<p><strong>No query translation</strong> - Spring Data uses regular expressions and pattern matching in combination with runtime generated proxies to translate a method definition on a Java interface into a query at runtime. No such runtime translation exists in Micronaut Data and this work is carried out by the Micronaut compiler at compilation time.</p>
+</li>
+<li>
+<p><strong>No Reflection or Runtime Proxies</strong> - Micronaut Data uses no reflection or runtime proxies, resulting in better performance, smaller stack traces and reduced memory consumption due to a complete lack of reflection caches (Note that the backing implementation, for example Hibernate, may use reflection).</p>
+</li>
+<li>
+<p><strong>Type Safety</strong> - Micronaut Data will actively check at compile time that a repository method can be implemented and fail compilation if it cannot.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div></div><div class="row"><div class="col-md-12"><div class="sect1">
+<h2 id="dependencies">3. Dependencies</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="spring-boot-data-and-h2">3.1. Spring Boot Data and H2</h3>
+<div class="paragraph">
+<p>To use Spring Data JDBC and H2 add the following dependencies:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="groovy"><span class="n">implementation</span><span class="o">(</span><span class="s2">"org.springframework.data:spring-data-jdbc"</span><span class="o">)</span>
+<span class="n">runtimeOnly</span><span class="o">(</span><span class="s2">"com.h2database:h2"</span><span class="o">)</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="micronaut-data-and-h2">3.2. Micronaut Data and H2</h3>
+<div class="paragraph">
+<p>To use Micronaut Data JDBC and H2 add the following dependencies:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="groovy"><span class="n">annotationProcessor</span><span class="o">(</span><span class="s2">"io.micronaut.data:micronaut-data-processor"</span><span class="o">)</span>
+<span class="n">implementation</span><span class="o">(</span><span class="s2">"io.micronaut.data:micronaut-data-jdbc"</span><span class="o">)</span>
+<span class="n">runtimeOnly</span><span class="o">(</span><span class="s2">"com.h2database:h2"</span><span class="o">)</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Please note the addition of the <code>micronaut-data-processor</code> in the annotation processor classpath. Micronaut Data does a lot of work at compilation, which leads to applications with better performance and a reduced memory consumption.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="entities">4. Entities</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We modified the <code>SaasSubscription</code> Java Record. We use it as a persistence entity.</p>
+</div>
+<div class="sect2">
+<h3 id="spring-boot">4.1. Spring Boot</h3>
+<div class="paragraph">
+<p>For Spring Data, we added the <code>@Id</code> annotation.</p>
+</div>
+<div class="listingblock">
+<div class="title">springboot/src/main/java/example/micronaut/SaasSubscription.java</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">org.springframework.data.annotation.Id</span><span class="o">;</span>
+
+<span class="n">record</span> <span class="nf">SaasSubscription</span><span class="o">(</span><span class="nd">@Id</span> <span class="nc">Long</span> <span class="n">id</span><span class="o">,</span> <span class="nc">String</span> <span class="n">name</span><span class="o">,</span> <span class="nc">Integer</span> <span class="n">cents</span><span class="o">)</span> <span class="o">{</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="micronaut">4.2. Micronaut</h3>
+<div class="paragraph">
+<p>For Micronaut Framework, the entity is annotated with <code>@MappedEntity</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">micronautframework/src/main/java/example/micronaut/SaasSubscription.java</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">io.micronaut.serde.annotation.Serdeable</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.data.annotation.Id</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.data.annotation.MappedEntity</span><span class="o">;</span>
+
+<span class="nd">@Serdeable</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="nd">@MappedEntity</span> <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="n">record</span> <span class="nf">SaasSubscription</span><span class="o">(</span><span class="nd">@Id</span> <span class="nc">Long</span> <span class="n">id</span><span class="o">,</span> <i class="conum" data-value="3"></i><b>(3)</b>
+                        <span class="nc">String</span> <span class="n">name</span><span class="o">,</span>
+                        <span class="nc">Integer</span> <span class="n">cents</span><span class="o">)</span> <span class="o">{</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Declare the <code>@Serdeable</code> annotation at the type level in your source code to allow the type to be serialized or deserialized.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Annotate the class with <code>@MappedEntity</code> to map the class to the table defined in the schema.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Specifies the ID of an entity</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="sql">5. SQL</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="https://docs.spring.io/spring-boot/docs/2.1.x/reference/html/howto-database-initialization.html#howto-initialize-a-database-using-spring-jdbc">Spring Boot loads SQL from the standard root classpath locations: <code>schema.sql</code> and <code>data.sql</code></a>. Micronaut Framework recommends you manage your database schema with <a href="https://micronaut-projects.github.io/micronaut-liquibase/snapshot/guide">Liquibase</a> or <a href="https://micronaut-projects.github.io/micronaut-flyway/snapshot/guide">Flyway</a>.
+However, to keep applications as close as possible, we will create the database schema with an SQL file in the Micronaut application. <a href="https://micronaut-projects.github.io/micronaut-test/4.3.0/guide/#sql">Micronaut Test supports loading SQL before tests</a> seamlessly.
+To keep both apps as close as possible,</p>
+</div>
+<div class="paragraph">
+<p>We will use two SQL files in the tests:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>src/main/resources/schema.sql</code>.</p>
+</li>
+<li>
+<p><code>src/main/resources/data.sql</code>.</p>
+</li>
+</ul>
+</div>
+<div class="sect2">
+<h3 id="sql-schema">5.1. SQL Schema</h3>
+<div class="listingblock">
+<div class="title">micronautframework/src/test/resources/schema.sql</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sql"><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">IF</span> <span class="k">NOT</span> <span class="k">EXISTS</span> <span class="n">saas_subscription</span>
+<span class="p">(</span>
+    <span class="n">id</span>     <span class="nb">BIGINT</span> <span class="k">GENERATED</span> <span class="k">BY</span> <span class="k">DEFAULT</span> <span class="k">AS</span> <span class="k">IDENTITY</span> <span class="k">PRIMARY</span> <span class="k">KEY</span><span class="p">,</span>
+    <span class="n">name</span>  <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="n">cents</span> <span class="n">NUMBER</span> <span class="k">NOT</span> <span class="k">NULL</span> <span class="k">DEFAULT</span> <span class="mi">0</span>
+<span class="p">);</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="sample-data">5.2. Sample Data</h3>
+<div class="listingblock">
+<div class="title">micronautframework/src/test/resources/data.sql</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sql"><span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">saas_subscription</span><span class="p">(</span><span class="n">id</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">cents</span><span class="p">)</span> <span class="k">VALUES</span> <span class="p">(</span><span class="mi">99</span><span class="p">,</span> <span class="s1">'Advanced'</span><span class="p">,</span> <span class="mi">2900</span><span class="p">);</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="repository">6. Repository</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Both Micronaut Data and Spring Data enable developers to use the repository pattern. You write an interface and the framework provides the implementation.</p>
+</div>
+<div class="sect2">
+<h3 id="spring-boot-repository">6.1. Spring Boot Repository</h3>
+<div class="listingblock">
+<div class="title">springboot/src/main/java/example/micronaut/SaasSubscriptionRepository.java</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">org.springframework.data.repository.CrudRepository</span><span class="o">;</span>
+
+<span class="kd">interface</span> <span class="nc">SaasSubscriptionRepository</span> <span class="kd">extends</span> <span class="nc">CrudRepository</span><span class="o">&lt;</span><span class="nc">SaasSubscription</span><span class="o">,</span> <span class="nc">Long</span><span class="o">&gt;</span> <span class="o">{</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="micronaut-repository">6.2. Micronaut Repository</h3>
+<div class="paragraph">
+<p>Because Micronaut Data works at build-time, you have to specify the dialect.</p>
+</div>
+<div class="listingblock">
+<div class="title">micronautframework/src/main/java/example/micronaut/SaasSubscriptionRepository.java</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">io.micronaut.data.jdbc.annotation.JdbcRepository</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.data.model.query.builder.sql.Dialect</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.data.repository.CrudRepository</span><span class="o">;</span>
+
+<span class="nd">@JdbcRepository</span><span class="o">(</span><span class="n">dialect</span> <span class="o">=</span> <span class="nc">Dialect</span><span class="o">.</span><span class="na">H2</span><span class="o">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">interface</span> <span class="nc">SaasSubscriptionRepository</span> <span class="kd">extends</span> <span class="nc">CrudRepository</span><span class="o">&lt;</span><span class="nc">SaasSubscription</span><span class="o">,</span> <span class="nc">Long</span><span class="o">&gt;</span> <span class="o">{</span> <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>@JdbcRepository</code> with a specific dialect.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>By extending <code>CrudRepository</code> you enable automatic generation of CRUD (Create, Read, Update, Delete) operations.</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="controller">7. Controller</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We modified the controller we wrote in the previous tutorial to inject the repository. We use constructor injection in both applications.</p>
+</div>
+<div class="sect2">
+<h3 id="spring-boot-controller">7.1. Spring Boot Controller</h3>
+<div class="listingblock">
+<div class="title">springboot/src/main/java/example/micronaut/SaasSubscriptionController.java</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">org.springframework.http.ResponseEntity</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.web.bind.annotation.GetMapping</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.web.bind.annotation.PathVariable</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.web.bind.annotation.RequestMapping</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.web.bind.annotation.RestController</span><span class="o">;</span>
+
+<span class="nd">@RestController</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="nd">@RequestMapping</span><span class="o">(</span><span class="s">"/subscriptions"</span><span class="o">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="kd">class</span> <span class="nc">SaasSubscriptionController</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">SaasSubscriptionRepository</span> <span class="n">repository</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="nf">SaasSubscriptionController</span><span class="o">(</span><span class="nc">SaasSubscriptionRepository</span> <span class="n">repository</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">repository</span> <span class="o">=</span> <span class="n">repository</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="nd">@GetMapping</span><span class="o">(</span><span class="s">"/{id}"</span><span class="o">)</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="kd">private</span> <span class="nc">ResponseEntity</span><span class="o">&lt;</span><span class="nc">SaasSubscription</span><span class="o">&gt;</span> <span class="nf">findById</span><span class="o">(</span><span class="nd">@PathVariable</span> <span class="nc">Long</span> <span class="n">id</span><span class="o">)</span> <span class="o">{</span> <i class="conum" data-value="4"></i><b>(4)</b>
+        <span class="k">return</span> <span class="n">repository</span><span class="o">.</span><span class="na">findById</span><span class="o">(</span><span class="n">id</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">map</span><span class="o">(</span><span class="nl">ResponseEntity:</span><span class="o">:</span><span class="n">ok</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">orElseGet</span><span class="o">(()</span> <span class="o">-&gt;</span> <span class="nc">ResponseEntity</span><span class="o">.</span><span class="na">notFound</span><span class="o">().</span><span class="na">build</span><span class="o">());</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Annotate a class <code>@RestController</code> to identify the class as a <code>Component</code> capable of handling HTTP requests.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>@RequestMapping</code> identifies the request paths that invoke this Controller.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>The <code>@GetMapping</code> annotation maps the <code>findById</code> method to an HTTP GET request on <code>/subscriptions/{id}</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Add the <code>@PathVariable</code> annotation to the handler method argument to make controller aware.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="micronaut-controller">7.2. Micronaut Controller</h3>
+<div class="listingblock">
+<div class="title">micronautframework/src/main/java/example/micronaut/SaasSubscriptionController.java</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">io.micronaut.http.HttpResponse</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Controller</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Get</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.PathVariable</span><span class="o">;</span>
+
+<span class="nd">@Controller</span><span class="o">(</span><span class="s">"/subscriptions"</span><span class="o">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">class</span> <span class="nc">SaasSubscriptionController</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">SaasSubscriptionRepository</span> <span class="n">repository</span><span class="o">;</span>
+
+    <span class="nc">SaasSubscriptionController</span><span class="o">(</span><span class="nc">SaasSubscriptionRepository</span> <span class="n">repository</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">repository</span> <span class="o">=</span> <span class="n">repository</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Get</span><span class="o">(</span><span class="s">"/{id}"</span><span class="o">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="nc">HttpResponse</span><span class="o">&lt;</span><span class="nc">SaasSubscription</span><span class="o">&gt;</span> <span class="nf">findById</span><span class="o">(</span><span class="nd">@PathVariable</span> <span class="nc">Long</span> <span class="n">id</span><span class="o">)</span> <span class="o">{</span> <i class="conum" data-value="3"></i><b>(3)</b>
+        <span class="k">return</span> <span class="n">repository</span><span class="o">.</span><span class="na">findById</span><span class="o">(</span><span class="n">id</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">map</span><span class="o">(</span><span class="nl">HttpResponse:</span><span class="o">:</span><span class="n">ok</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">orElseGet</span><span class="o">(</span><span class="nl">HttpResponse:</span><span class="o">:</span><span class="n">notFound</span><span class="o">);</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The class is defined as a controller with the <a href="https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Controller.html">@Controller</a> annotation mapped to the path <code>/subscriptions</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The <a href="https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Get.html">@Get</a> annotation maps the <code>findById</code> method to an HTTP GET request on <code>/subscriptions/{id}</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>You can define path variables with a RFC-6570 URI template in the HTTP Method annotation value. The method argument can optionally be annotated with <code>@PathVariable</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>You can use the HTTPResponse fluid API to control the response&#8217;s status code, its body and headers.</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="tests">8. Tests</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this tutorial, we use <a href="https://joel-costigliola.github.io/assertj/">AssertJ</a> in the tests. Moreover, we use <a href="https://github.com/json-path/JsonPath">Jayway JsonPath</a> - a Java DSL for reading JSON documents.</p>
+</div>
+<div class="sect2">
+<h3 id="micronaut-test">8.1. Micronaut Test</h3>
+<div class="paragraph">
+<p>The Spring boot tests are identical to those in the previous tutorial. In the Micronaut Test, we need to annotate the test with <code>@Sql</code> to load the SQL files before the tests.</p>
+</div>
+<div class="listingblock">
+<div class="title">micronautframework/src/test/java/example/micronaut/SaasSubscriptionControllerGetTest.java</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">com.jayway.jsonpath.DocumentContext</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">com.jayway.jsonpath.JsonPath</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.HttpResponse</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.HttpStatus</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.client.BlockingHttpClient</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.client.HttpClient</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.client.annotation.Client</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.client.exceptions.HttpClientResponseException</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.inject.Inject</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.junit.jupiter.api.Test</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">assertj</span><span class="o">.</span><span class="na">core</span><span class="o">.</span><span class="na">api</span><span class="o">.</span><span class="na">Assertions</span><span class="o">.</span><span class="na">assertThat</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">assertj</span><span class="o">.</span><span class="na">core</span><span class="o">.</span><span class="na">api</span><span class="o">.</span><span class="na">AssertionsForClassTypes</span><span class="o">.</span><span class="na">catchThrowableOfType</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.test.annotation.Sql</span><span class="o">;</span>
+
+<span class="nd">@Sql</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="o">{</span><span class="s">"classpath:schema.sql"</span><span class="o">,</span> <span class="s">"classpath:data.sql"</span><span class="o">})</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="nd">@MicronautTest</span> <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="kd">class</span> <span class="nc">SaasSubscriptionControllerGetTest</span> <span class="o">{</span>
+
+    <span class="nd">@Inject</span>
+    <span class="nd">@Client</span><span class="o">(</span><span class="s">"/"</span><span class="o">)</span>
+    <span class="nc">HttpClient</span> <span class="n">httpClient</span><span class="o">;</span> <i class="conum" data-value="3"></i><b>(3)</b>
+
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">shouldReturnASaasSubscriptionWhenDataIsSaved</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nc">BlockingHttpClient</span> <span class="n">client</span> <span class="o">=</span> <span class="n">httpClient</span><span class="o">.</span><span class="na">toBlocking</span><span class="o">();</span>
+        <span class="nc">HttpResponse</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="na">exchange</span><span class="o">(</span><span class="s">"/subscriptions/99"</span><span class="o">,</span> <span class="nc">String</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">response</span><span class="o">.</span><span class="na">status</span><span class="o">().</span><span class="na">getCode</span><span class="o">()).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="nc">HttpStatus</span><span class="o">.</span><span class="na">OK</span><span class="o">.</span><span class="na">getCode</span><span class="o">());</span>
+
+        <span class="nc">DocumentContext</span> <span class="n">documentContext</span> <span class="o">=</span> <span class="nc">JsonPath</span><span class="o">.</span><span class="na">parse</span><span class="o">(</span><span class="n">response</span><span class="o">.</span><span class="na">body</span><span class="o">());</span>
+        <span class="nc">Number</span> <span class="n">id</span> <span class="o">=</span> <span class="n">documentContext</span><span class="o">.</span><span class="na">read</span><span class="o">(</span><span class="s">"$.id"</span><span class="o">);</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">id</span><span class="o">).</span><span class="na">isNotNull</span><span class="o">();</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">id</span><span class="o">).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="mi">99</span><span class="o">);</span>
+
+        <span class="nc">String</span> <span class="n">name</span> <span class="o">=</span> <span class="n">documentContext</span><span class="o">.</span><span class="na">read</span><span class="o">(</span><span class="s">"$.name"</span><span class="o">);</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">name</span><span class="o">).</span><span class="na">isNotNull</span><span class="o">();</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">name</span><span class="o">).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="s">"Advanced"</span><span class="o">);</span>
+
+        <span class="nc">Integer</span> <span class="n">cents</span> <span class="o">=</span> <span class="n">documentContext</span><span class="o">.</span><span class="na">read</span><span class="o">(</span><span class="s">"$.cents"</span><span class="o">);</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">cents</span><span class="o">).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="mi">2900</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">shouldNotReturnASaasSubscriptionWithAnUnknownId</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nc">BlockingHttpClient</span> <span class="n">client</span> <span class="o">=</span> <span class="n">httpClient</span><span class="o">.</span><span class="na">toBlocking</span><span class="o">();</span>
+        <span class="nc">HttpClientResponseException</span> <span class="n">thrown</span> <span class="o">=</span> <span class="n">catchThrowableOfType</span><span class="o">(()</span> <span class="o">-&gt;</span> <i class="conum" data-value="4"></i><b>(4)</b>
+                <span class="n">client</span><span class="o">.</span><span class="na">exchange</span><span class="o">(</span><span class="s">"/subscriptions/1000"</span><span class="o">,</span> <span class="nc">String</span><span class="o">.</span><span class="na">class</span><span class="o">),</span> <span class="nc">HttpClientResponseException</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">thrown</span><span class="o">.</span><span class="na">getStatus</span><span class="o">().</span><span class="na">getCode</span><span class="o">()).</span><span class="na">isEqualTo</span><span class="o">(</span><span class="nc">HttpStatus</span><span class="o">.</span><span class="na">NOT_FOUND</span><span class="o">.</span><span class="na">getCode</span><span class="o">());</span>
+        <span class="n">assertThat</span><span class="o">(</span><span class="n">thrown</span><span class="o">.</span><span class="na">getResponse</span><span class="o">().</span><span class="na">getBody</span><span class="o">()).</span><span class="na">isEmpty</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><a href="https://micronaut-projects.github.io/micronaut-test/4.3.0/guide/#sql"><code>@Sql</code> allows you to load SQL before tests</a></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Annotate the class with <code>@MicronautTest</code> so the Micronaut framework will initialize the application context and the embedded server. <a href="https://micronaut-projects.github.io/micronaut-test/latest/guide/">More info</a>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Inject the <code>HttpClient</code> bean and point it to the embedded server.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>When the HTTP Client receives a response with an HTTP Status Code &gt;= 400, it throws an <code>HttpClientResponseException</code>. You can obtain the response status and body from the exception.</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="conclusion">9. Conclusion</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Adding a persistence layer is easy in both frameworks, and the API is almost identical. However, Micronaut Data&#8217;s compile-time/reflection-free approach results in better performance, smaller stack traces, and reduced memory consumption.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="license">10. License</h2>
+<div class="sectionbody">
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+All guides are released with an <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache license 2.0 license</a> for the code and a <a href="https://creativecommons.org/licenses/by/4.0/deed.en">Creative Commons Attribution 4.0</a> license for the writing and media (images&#8230;&#8203;).
+</td>
+</tr>
+</table>
+</div>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer id="footer">
+    <div class="container">
+
+        <div class="row">
+            <div class="col-sm-5 footer-left">
+
+                <div id="text-14" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <a href="https://micronaut.io/foundation/"><img class="alignnone size-medium wp-image-3736" src="./images/micronaut_foundation_horizontal_white.svg" alt="Micronaut Foundation"/></a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-7 footer-right">
+
+                <ul class="meta">
+
+                    <li id="menu-item-2895" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2895">
+                        <a href="https://micronaut.io/brand-guidelines/">Brand Guidelines</a>
+                    </li>
+                    <li id="menu-item-2894" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2894">
+                        <a href="https://micronaut.io/community-guidelines/">Community Guidelines</a>
+                    </li>
+                    <li id="menu-item-3377" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-privacy-policy menu-item-3377">
+                        <a href="https://micronaut.io/privacy-policy/">Privacy Policy</a>
+                    </li>
+
+                </ul>
+
+                <div id="nav_menu-2" class="widget widget_nav_menu">
+                    <div class="menu-links-container">
+                        <ul id="menu-links" class="menu">
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="https://micronautpodcast.com"><i class="fa fa-podcast"><span class="sr-only">Podcast</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="https://micronaut.io/feed/rss/"><i class="fa fa-feed"><span class="sr-only">Feed</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="mailto:info@micronaut.io"><i class="fas fa-envelope"><span class="sr-only">Mail</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://twitter.com/micronautfw"><i class="fab fa-twitter"><span class="sr-only">Twitter</span></i></a></li>
+                            <li id="menu-item-6740" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-6740"><a href="https://fosstodon.org/@micronaut"><i class="fab fa-mastodon"><span class="sr-only">Mastodon</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://discord.gg/9xRFsHv98T"><i class="fab fa-discord"><span class="sr-only">Discord</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://github.com/micronaut-projects/"><i class="fab fa-github"><span class="sr-only">GitHub</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.youtube.com/@MicronautFramework"><i class="fab fa-youtube"><span class="sr-only">YouTube</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.linkedin.com/showcase/micronaut"><i class="fab fa-linkedin"><span class="sr-only">LinkedIn</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.twitch.tv/micronautfw"><i class="fab fa-twitch"><span class="sr-only">Twitch</span></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="text-5" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <small>Guides are licensed under <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> for the writing/media and <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache.2.0</a> for the code</small>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>

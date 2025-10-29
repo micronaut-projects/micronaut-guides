@@ -1,0 +1,1878 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'/>
+    <title>Micronaut Server generation with OpenAPI</title>
+    <link rel='stylesheet' id='wp-block-library-css' href='https://micronaut.io/wp-includes/css/dist/block-library/style.min.css' type='text/css' media='all'/>
+    <link rel='stylesheet' id='fonts-fira-sans-css' href='https://fonts.googleapis.com/css2?family=Fira+Sans%3Awght%40300%3B500&#038;display=swap&#038;ver=5.7' type='text/css' media='all'/>
+    <link rel='stylesheet' id='micronaut-style-css' href='https://micronaut.io/wp-content/themes/micronaut/style.min.css' type='text/css' media='all'/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link rel="shortcut icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link rel="alternate" type="application/rss+xml" title="Micronaut Guides RSS Feed" href="https://guides.micronaut.io/latest/rss.xml" />
+    <link rel="alternate" type="application/json" title="Micronaut Guides JSON Feed" href="https://guides.micronaut.io/latest/feed.json" />
+    <link href="coderay.css" rel="stylesheet" />
+    <link href="rouge-github.css" rel="stylesheet" />
+    <link href="guide.css" rel="stylesheet" />
+    <script src="lunr.js"></script>
+    <script src="guide.js"></script>
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:image" content="https://guides.micronaut.io/latest/images/cards/micronaut-openapi-generator-server.png"/>
+    <meta name="twitter:creator" content="@micronautfw"/>
+    <meta name="twitter:site" content="@micronautfw"/>
+    <meta name="twitter:title" content="Micronaut Server generation with OpenAPI"/>
+    <meta name="twitter:description" content="Learn how to write an OpenAPI definition, use it to generate a server template for a Micronaut application, and get it all to work"/>
+</head>
+<body class="page-template page-template-page-sidebar page-template-page-sidebar-php page page-parent guide">
+
+<header id="header">
+
+    <div class="container">
+
+        <nav class="navbar navbar-expand-lg navbar-dark">
+
+            <button class="collapsed" type="button" data-toggle="collapse" data-target="#nav" aria-expanded="false">
+                <span></span>
+            </button>
+
+            <a class="navbar-brand" href="https://micronaut.io">
+                <img src="https://micronaut.io/wp-content/uploads/2020/11/MIcronautLogo_Horizontal.svg" alt="Micronaut framework"/>
+            </a>
+
+            <div class="collapse navbar-collapse" id="nav">
+
+                <ul class="navbar-nav ml-auto">
+
+                    <li id="menu-item-2865" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2865 nav-item"><a href="https://micronaut.io/download/" class="nav-link">Download</a></li>
+                    <li id="menu-item-2868" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-2868 dropdown nav-item"><a href="https://micronaut.io/learn/" class="nav-link dropdown-toggle" data-toggle="dropdown">Learn</a><ul class="dropdown-menu">
+                        <li id="menu-item-4943" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4943"><a href="https://micronaut.io/learn/" class="dropdown-item">Overview</a></li>
+                        <li id="menu-item-5111" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-5111"><a href="https://docs.micronaut.io/index.html" class="dropdown-item">User Documentaton</a></li>
+                        <li id="menu-item-4510" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4510"><a href="https://micronaut.io/guides/" class="dropdown-item">Guides</a></li>
+                        <li id="menu-item-2896" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2896"><a href="https://micronaut.io/category/microcast/" class="dropdown-item">Microcasts</a></li>
+                        <li id="menu-item-2897" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2897"><a href="https://micronaut.io/category/webinar/" class="dropdown-item">Webinars</a></li>
+                        <li id="menu-item-2871" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2871"><a href="https://micronaut.io/professional-training/" class="dropdown-item">Professional Training</a></li>
+                        <li id="menu-item-6526" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-6526"><a href="https://micronaut-projects.github.io/micronaut-guides-mn3/latest/" class="dropdown-item">Guides for Micronaut Framework 3</a></li>
+                    </ul>
+                    </li>
+                    <li id="menu-item-2878" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item"><a href="https://micronaut.io/resources/" class="nav-link dropdown-toggle" data-toggle="dropdown">Resources</a><ul class="dropdown-menu">
+                        <li id="menu-item-4999" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4999"><a href="https://micronaut.io/upcoming-events/" class="dropdown-item">Upcoming Events</a></li>
+                        <li id="menu-item-2879" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2879"><a href="https://micronaut.io/blog/" class="dropdown-item">Blog</a></li>
+                        <li id="menu-item-6478" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-6478"><a href="https://micronaut.io/category/release-announcements/" class="dropdown-item">Releases</a></li>
+                        <li id="menu-item-6715" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-6715"><a href="https://micronaut.io/category/security-announcements/" class="dropdown-item">Security Announcements</a></li>
+                        <li id="menu-item-4499" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-4499"><a href="https://micronautpodcast.com/" class="dropdown-item">Podcast</a></li>
+                        <li id="menu-item-5798" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5798"><a href="https://micronaut.io/support/" class="dropdown-item">Commercial Support</a></li>
+                        <li id="menu-item-4186" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4186"><a href="https://micronaut.io/resources/community-support/" class="dropdown-item">Community Support</a></li>
+                        <li id="menu-item-2882" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2882"><a href="https://micronaut.io/faq/" class="dropdown-item">FAQ</a></li>
+                        <li id="menu-item-2883" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2883"><a href="https://micronaut.io/contact/" class="dropdown-item">Contact</a></li>
+                        <li id="menu-item-6479" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-6479"><a href="https://micronaut.io/micronaut-success-stories/" class="dropdown-item">Micronaut Success Stories</a></li>
+                    </ul>
+                    </li>
+                    <li id="menu-item-2872" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2872 dropdown nav-item"><a href="https://micronaut.io/foundation/" class="nav-link dropdown-toggle" data-toggle="dropdown">Foundation</a><ul class="dropdown-menu">
+                        <li id="menu-item-2877" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2877"><a href="https://micronaut.io/foundation/" class="dropdown-item">Overview</a></li>
+                        <li id="menu-item-2874" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2874"><a href="https://micronaut.io/foundation/corporate-sponsorship/" class="dropdown-item">Corporate Sponsorship</a></li>
+                        <li id="menu-item-2873" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2873"><a href="https://micronaut.io/foundation/community-sponsorship/" class="dropdown-item">Community Sponsorship</a></li>
+                        <li id="menu-item-2876" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2876"><a href="https://micronaut.io/foundation/sponsors/" class="dropdown-item">Sponsors</a></li>
+                        <li id="menu-item-3838" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-3838"><a href="https://micronaut.io/meeting-minutes/" class="dropdown-item">Meeting Minutes</a></li>
+                    </ul>
+                    </li>
+                    <li id="menu-item-2884" class="action menu-item menu-item-type-custom menu-item-object-custom menu-item-2884 nav-item"><a target="_blank" rel="noopener" href="https://micronaut.io/launch/" class="nav-link">Launch</a></li>
+
+                </ul>
+
+            </div>
+
+        </nav>
+
+    </div>
+</header>
+
+<div style="background: #fff;padding-top: 20px;padding-bottom: 20px;">
+    <div class="container" style="clear: both;">
+        <fieldset style="float: right;">
+            <input type="search" id="search-form-query"/>
+            <input type="submit" onclick="search()" value="Search">
+            <input type="submit" onclick="resetSearch()" value="Reset">
+        </fieldset>
+    </div>
+    <div class="container" style="clear: both;margin-top: -20px;">
+        <div class="guide-list" id="searchResults">
+        </div>
+    </div>
+</div>
+<div id="breadcrumbs"><div class="container"><a href="https://micronaut.io/">Home</a> » <a href="./index.html">Guides</a> » <a href="micronaut-openapi-generator-server.html">Micronaut Server generation with OpenAPI</a> » <span class="breadcrumb_last" aria-current="page">gradle | java</span></div></div><!-- .breadcrumbs -->
+<main id="main">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+
+                <div class="toc">
+                    <div class="inner">
+                        <h1 class="title title_large first-word-bold first-word-break">Table of Contents</h1>
+                        <div class="underline"></div>
+                        
+<ul class="sectlevel1">
+<li><a href="#getting-started">1. Getting Started</a>
+<ul class="sectlevel2">
+<li><a href="#what-openapi-is">1.1. What OpenAPI Is</a></li>
+<li><a href="#advantages-of-openapi">1.2. Advantages Of OpenAPI</a></li>
+<li><a href="#what-you-will-learn">1.3. What You Will Learn</a></li>
+<li><a href="#solution">1.4. Solution</a></li>
+</ul>
+</li>
+<li><a href="#what-you-will-need">2. What you will need</a></li>
+<li><a href="#creating-the-api-definition-file">3. Creating The API Definition File</a>
+<ul class="sectlevel2">
+<li><a href="#describing-general-server-info">3.1. Describing General Server Info</a></li>
+<li><a href="#defining-paths-and-operations">3.2. Defining Paths And Operations</a></li>
+<li><a href="#defining-schemas">3.3. Defining Schemas</a></li>
+</ul>
+</li>
+<li><a href="#writing-the-application">4. Writing the Application</a></li>
+<li><a href="#generating-server-api-from-the-openapi-definition">5. Generating Server API From The OpenAPI Definition</a></li>
+<li><a href="#application-structure">6. Application Structure</a></li>
+<li><a href="#configuration">7. Configuration</a></li>
+<li><a href="#data-storage-and-access-with-postgresql-and-jdbc">8. Data Storage And Access With PostgreSQL and JDBC</a>
+<ul class="sectlevel2">
+<li><a href="#configure-access-for-a-data-source">8.1. Configure Access for a Data Source</a></li>
+<li><a href="#database-migration-with-flyway">8.2. Database Migration with Flyway</a></li>
+<li><a href="#creating-a-mappedentity">8.3. Creating a MappedEntity</a></li>
+<li><a href="#writing-a-repository">8.4. Writing a Repository</a></li>
+</ul>
+</li>
+<li><a href="#writing-the-controller-logic">9. Writing the Controller Logic</a>
+<ul class="sectlevel2">
+<li><a href="#create-the-controller-class">9.1. Create the Controller class</a></li>
+<li><a href="#implementing-controller-methods">9.2. Implementing Controller Methods</a></li>
+</ul>
+</li>
+<li><a href="#test-resources">10. Test Resources</a></li>
+<li><a href="#running-the-application">11. Running the Application</a></li>
+<li><a href="#testing-the-application">12. Testing the Application</a>
+<ul class="sectlevel2">
+<li><a href="#testing-models">12.1. Testing Models</a></li>
+<li><a href="#testing-the-controller">12.2. Testing the Controller</a></li>
+</ul>
+</li>
+<li><a href="#generate-a-micronaut-application-native-executable-with-graalvm">13. Generate a Micronaut Application Native Executable with GraalVM</a>
+<ul class="sectlevel2">
+<li><a href="#graalvm-installation">13.1. GraalVM Installation</a></li>
+<li><a href="#native-executable-generation">13.2. Native Executable Generation</a></li>
+</ul>
+</li>
+<li><a href="#next-steps">14. Next Steps</a>
+<ul class="sectlevel2">
+<li><a href="#learn-more">14.1. Learn More</a></li>
+<li><a href="#add-security">14.2. Add Security</a></li>
+<li><a href="#generate-micronaut-client">14.3. Generate Micronaut Client</a></li>
+</ul>
+</li>
+<li><a href="#license">15. License</a></li>
+</ul>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <h1>Micronaut Server generation with OpenAPI</h1>
+                <div class="underline"></div>
+<div class="sect1">
+<div class="sectionbody">
+
+<div class="paragraph">
+<p>Learn how to write an OpenAPI definition, use it to generate a server template for a Micronaut application, and get it all to work</p>
+</div>
+<div class="paragraph">
+<p>Authors: Andriy Dmytruk</p>
+</div>
+<div class="paragraph">
+<p>Micronaut Version: 4.9.1</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="getting-started">1. Getting Started</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this guide, we will write an OpenAPI definition file and then use it to generate a Java Micronaut server API with OpenAPI Generator.</p>
+</div>
+<div class="paragraph">
+<p>Then we will add internal logic to the API and test our implementation.</p>
+</div>
+<div class="sect2">
+<h3 id="what-openapi-is">1.1. What OpenAPI Is</h3>
+<div class="paragraph">
+<p>The <a href="https://oai.github.io/Documentation/start-here.html">OpenAPI Specification</a> defines a format for uniquely describing REST APIs that is both human- and machine-readable. Later in this guide, we will discover the structure of documents in the OpenAPI format. We will also create such a document for our desired API. Note that we will refer to the document describing our API as an <strong>API definition</strong> file.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="advantages-of-openapi">1.2. Advantages Of OpenAPI</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>It provides a unique way of describing a REST API that is easy to understand and modify. It is the most broadly adopted industry standard for describing new APIs and has the most developed tooling ecosystem.</p>
+</li>
+<li>
+<p>You can generate interactive documentation and client implementations from the same definition file in numerous languages.</p>
+</li>
+<li>
+<p>You can use the same definition file to generate a server template. The template will include client-server communication specifics based on your API definition. It removes the need for developers to write extensive documentation about each possible path and parameter for the APIs - most can be described in the definition file. This prevents incompatibility issues between the client and server sides which might be caused by ill-communication.</p>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The internal server logic cannot be generated from a definition file and needs to be implemented manually based on the generated server template. The reason for this is very simple: there cannot be a unified way of describing all the possible server implementations.
+</td>
+</tr>
+</table>
+</div>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="what-you-will-learn">1.3. What You Will Learn</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>You will discover the general structure of a document in the OpenAPI format and a definition file in this format describing the desired API for our custom server.</p>
+</li>
+<li>
+<p>You will learn to use the <a href="https://github.com/micronaut-projects/micronaut-openapi/">Micronaut OpenAPI</a>'s build tool plugins to generate Micronaut code in Java for the server application. We will extend the code by implementing internal logic and testing it.</p>
+</li>
+<li>
+<p>You will learn how to use Micronaut Data JDBC to connect to a PostgreSQL database from our application to store and retrieve data. You will complement the application with tests.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="solution">1.4. Solution</h3>
+<div class="paragraph">
+<p>We recommend that you follow the instructions in the next sections and create the application step by step. However, you can directly get the complete solution by downloading and unzipping <a href="micronaut-openapi-generator-server-gradle-java.zip">micronaut-openapi-generator-server-gradle-java.zip</a>.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="what-you-will-need">2. What you will need</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To complete this guide, you will need the following:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Some time on your hands</p>
+</li>
+<li>
+<p>A decent text editor or IDE (e.g. <a href="https://guides.micronaut.io/latest/micronaut-intellij-idea-ide-setup.html">IntelliJ IDEA</a>)</p>
+</li>
+<li>
+<p>JDK 21 or greater installed with <code>JAVA_HOME</code> <a href="https://www.baeldung.com/java-home-on-windows-7-8-10-mac-os-x-linux">configured appropriately</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div></div><div class="row"><div class="col-md-12"><div class="sect1">
+<h2 id="creating-the-api-definition-file">3. Creating The API Definition File</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We will now create a definition file that will describe our server API, including the available paths and operations.</p>
+</div>
+<div class="paragraph">
+<p>The definition file must be in the OpenAPI format. The document must have a specific structure. <a href="https://oai.github.io/Documentation/specification.html">"OpenAPI Specification" guide</a> describes it with more detail. We will write sections of the definition document based on the specification.</p>
+</div>
+<div class="paragraph">
+<p>OpenAPI generator supports <code>.yml</code> and <code>.json</code> file formats for the definition file. We will use YAML due to its simplicity and human readability.</p>
+</div>
+<div class="paragraph">
+<p>In the directory where you downloaded the OpenAPI generator CLI, create a file named <code>library-definition.yml</code> and open it in your favourite text editor.</p>
+</div>
+<div class="sect2">
+<h3 id="describing-general-server-info">3.1. Describing General Server Info</h3>
+<div class="paragraph">
+<p>We will first provide general server information in the definition file. Paste the following text to the file:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/library-definition.yml</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="yaml"><span class="na">openapi</span><span class="pi">:</span> <span class="s">3.0.0</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="na">info</span><span class="pi">:</span> <i class="conum" data-value="2"></i><b>(2)</b>
+  <span class="na">description</span><span class="pi">:</span> <span class="s">This is a library API</span>
+  <span class="na">version</span><span class="pi">:</span> <span class="s">1.0.0</span>
+  <span class="na">title</span><span class="pi">:</span> <span class="s">Library</span>
+  <span class="na">license</span><span class="pi">:</span>
+    <span class="na">name</span><span class="pi">:</span> <span class="s">Apache-2.0</span>
+    <span class="na">url</span><span class="pi">:</span> <span class="s2">"</span><span class="s">https://www.apache.org/licenses/LICENSE-2.0.html"</span>
+<span class="na">tags</span><span class="pi">:</span> <i class="conum" data-value="3"></i><b>(3)</b>
+  <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">books</span>
+    <span class="na">description</span><span class="pi">:</span> <span class="s">Search for books and add new ones</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The version that will be used for parsing.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The info object contains general information about the API like a short description and license. In this case, we will be creating a website for a library.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Tags will be used to logically structure different paths.</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you are new to OpenAPI, you might be interested in reading the <a href="https://swagger.io/docs/specification/about/">OpenAPI guide</a> or the <a href="https://swagger.io/specification/">OpenAPI 3.0.0 specification</a> after you finish this guide.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="defining-paths-and-operations">3.2. Defining Paths And Operations</h3>
+<div class="paragraph">
+<p>The paths section of the definition is described in the <a href="https://oai.github.io/Documentation/specification-paths.html">"API Endpoints" OpenAPI Guide</a>, but can also be understood from a few examples. This section defines paths and various operations (like <code>GET</code>, <code>PUT</code>, and <code>POST</code>) available on these paths.</p>
+</div>
+<div class="paragraph">
+<p>We will proceed by defining a path that is supposed to be used for searching books in our library. The parameters that we will define in the definition will be used to narrow the search results.</p>
+</div>
+<div class="paragraph">
+<p>Paste the following to our file:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/library-definition.yml</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="yaml"><span class="na">paths</span><span class="pi">:</span>
+
+  <span class="na">/search</span><span class="pi">:</span>
+    <span class="na">get</span><span class="pi">:</span> <i class="conum" data-value="1"></i><b>(1)</b>
+      <span class="na">tags</span><span class="pi">:</span> 
+        <span class="pi">-</span> <span class="s">books</span> <i class="conum" data-value="2"></i><b>(2)</b>
+      <span class="na">summary</span><span class="pi">:</span> <span class="s">Search for a book</span>
+      <span class="na">operationId</span><span class="pi">:</span> <span class="s">search</span> <i class="conum" data-value="3"></i><b>(3)</b>
+      <span class="na">parameters</span><span class="pi">:</span> <i class="conum" data-value="4"></i><b>(4)</b>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">book-name</span>
+          <span class="na">in</span><span class="pi">:</span> <span class="s">query</span>
+          <span class="na">schema</span><span class="pi">:</span> 
+            <span class="na">type</span><span class="pi">:</span> <span class="s">string</span>
+            <span class="na">minLength</span><span class="pi">:</span> <span class="s">3</span> <i class="conum" data-value="5"></i><b>(5)</b>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">author-name</span>
+          <span class="na">in</span><span class="pi">:</span> <span class="s">query</span>
+          <span class="na">schema</span><span class="pi">:</span> 
+            <span class="na">type</span><span class="pi">:</span> <span class="s">string</span>
+      <span class="na">responses</span><span class="pi">:</span> <i class="conum" data-value="6"></i><b>(6)</b>
+        <span class="s2">"</span><span class="s">200"</span><span class="err">:</span> <i class="conum" data-value="7"></i><b>(7)</b>
+          <span class="na">description</span><span class="pi">:</span> <span class="s">Success</span>
+          <span class="na">content</span><span class="pi">:</span>
+            <span class="s2">"</span><span class="s">application/json"</span><span class="err">:</span>
+              <span class="na">schema</span><span class="pi">:</span>
+                <span class="na">type</span><span class="pi">:</span> <span class="s">array,</span> 
+                <span class="na">items</span><span class="pi">:</span> 
+                  <span class="na">$ref</span><span class="pi">:</span> <span class="s2">"</span><span class="s">#/components/schemas/BookInfo"</span>
+      <span class="err">  </span><span class="s2">"</span><span class="s">400"</span><span class="err">:</span> <i class="conum" data-value="8"></i><b>(8)</b>
+          <span class="na">description</span><span class="pi">:</span> <span class="s">Bad Request</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>We define the <code>GET</code> operation on the <code>/search</code> path.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>We use the <code>books</code> tag that we previously defined. Note that for each tag a controller will be generated that will implement its operations.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>The <code>search</code> operation id will be used as method name for the given path.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>We define two parameters of type string that the user should supply in the query.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Validation can be used on parameters. In this case, book name must contain at least three characters.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>The <code>responses</code> object describes the response codes that can be produced. It also defines the structure of body if any.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>In case of correct request, we define the body to contain a list of <code>BookInfo</code> objects. The schema for the book info object will be defined later in <code>components/schemas</code> section of the definition.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="8"></i><b>8</b></td>
+<td>The <code>"400"</code> status code will be produced by Micronaut in case of a bad request, like an incorrect type supplied or failed validation. Even though Micronaut handles it automatically and no implementation is needed on our side, we add it for a complete API specification.</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+You can read more about parameter descriptions in the
+<a href="https://swagger.io/docs/specification/describing-parameters/">"Describing Parameters" OpenAPI guide</a>.
+All the available types and their validations are described in
+<a href="https://swagger.io/docs/specification/data-models/data-types/">"Data Models (Schemas)" OpenAPI guide</a>.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>We will define another path with a <code>POST</code> operation, that is supposed to be used to add info about a book in our library. In this case, the request will contain a body with all the book information:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/library-definition.yml</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="yaml">  <span class="na">/add</span><span class="pi">:</span>
+    <span class="na">post</span><span class="pi">:</span> <i class="conum" data-value="1"></i><b>(1)</b>
+      <span class="na">tags</span><span class="pi">:</span> <span class="pi">[</span><span class="nv">books</span><span class="pi">]</span>
+      <span class="na">summary</span><span class="pi">:</span> <span class="s">Add a new book</span>
+      <span class="na">operationId</span><span class="pi">:</span> <span class="s">addBook</span>
+      <span class="na">requestBody</span><span class="pi">:</span> <i class="conum" data-value="2"></i><b>(2)</b>
+        <span class="na">required</span><span class="pi">:</span> <span class="no">true</span>
+        <span class="na">content</span><span class="pi">:</span>
+          <span class="s2">"</span><span class="s">application/json"</span><span class="err">:</span> 
+            <span class="na">schema</span><span class="pi">:</span> 
+              <span class="na">$ref</span><span class="pi">:</span> <span class="s2">"</span><span class="s">#/components/schemas/BookInfo"</span> <i class="conum" data-value="3"></i><b>(3)</b>
+      <span class="na">responses</span><span class="pi">:</span>
+        <span class="s2">"</span><span class="s">200"</span><span class="err">:</span>
+          <span class="na">description</span><span class="pi">:</span> <span class="s">Success</span>
+        <span class="s2">"</span><span class="s">400"</span><span class="err">:</span>
+          <span class="na">description</span><span class="pi">:</span> <span class="s">Bad Request</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>We define the <code>POST</code> method for the <code>/add</code> path, and add the same tag <code>books</code> to it.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>We specify that a body is required and what are the supported content-types for it. (in this case only <code>application/json</code>, but multiple can be allowed).</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>We write that <code>BookInfo</code> object is required to be in the request body. We reference the same <code>BookInfo</code> schema that we will define next.</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+To read more about body definitions, see the
+<a href="https://swagger.io/docs/specification/describing-request-body/">"Describing Request Body" OpenAPI guide</a>.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="defining-schemas">3.3. Defining Schemas</h3>
+<div class="paragraph">
+<p>Schemas are required whenever a parameter, request body or a response body we want to describe needs to be an object. In that case we add a schema that defines all the properties of the object. You can find out about the format for schemas in the <a href="https://oai.github.io/Documentation/specification-content.html">"Content of Message Bodies" OpenAPI Guide</a>.</p>
+</div>
+<div class="paragraph">
+<p>We will add schemas to our definition file:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/library-definition.yml</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="yaml"><span class="na">components</span><span class="pi">:</span>
+  <span class="na">schemas</span><span class="pi">:</span>
+    <span class="na">BookInfo</span><span class="pi">:</span>
+      <span class="na">title</span><span class="pi">:</span> <span class="s">Book Info</span> <i class="conum" data-value="1"></i><b>(1)</b>
+      <span class="na">description</span><span class="pi">:</span> <span class="s">Object containg all the info about a book</span>
+      <span class="na">type</span><span class="pi">:</span> <span class="s">object</span>
+      <span class="na">properties</span><span class="pi">:</span> <i class="conum" data-value="2"></i><b>(2)</b>
+        <span class="na">name</span><span class="pi">:</span> <span class="pi">{</span><span class="nv">type</span><span class="pi">:</span> <span class="nv">string</span><span class="pi">}</span>
+        <span class="na">availability</span><span class="pi">:</span> <span class="pi">{</span><span class="nv">$ref</span><span class="pi">:</span> <span class="s2">"</span><span class="s">#/components/schemas/BookAvailability"</span><span class="pi">}</span> <i class="conum" data-value="3"></i><b>(3)</b>
+        <span class="na">author</span><span class="pi">:</span> <span class="pi">{</span><span class="nv">type</span><span class="pi">:</span> <span class="nv">string</span><span class="pi">,</span> <span class="nv">minLength</span><span class="pi">:</span> <span class="nv">3</span><span class="pi">}</span>
+        <span class="na">isbn</span><span class="pi">:</span> <span class="pi">{</span><span class="nv">type</span><span class="pi">:</span> <span class="nv">string</span><span class="pi">,</span> <span class="nv">pattern</span><span class="pi">:</span> <span class="s2">"</span><span class="s">[0-9]{13}"</span><span class="pi">}</span>
+      <span class="na">required</span><span class="pi">:</span> <span class="pi">[</span><span class="s2">"</span><span class="s">name"</span><span class="pi">,</span> <span class="s2">"</span><span class="s">availability"</span><span class="pi">]</span>
+    <span class="na">BookAvailability</span><span class="pi">:</span> <i class="conum" data-value="4"></i><b>(4)</b>
+      <span class="na">type</span><span class="pi">:</span> <span class="s">string</span>
+      <span class="na">enum</span><span class="pi">:</span> <span class="pi">[</span><span class="s2">"</span><span class="s">available"</span><span class="pi">,</span> <span class="s2">"</span><span class="s">not</span><span class="nv"> </span><span class="s">available"</span><span class="pi">,</span> <span class="s2">"</span><span class="s">reserved"</span><span class="pi">]</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>We define the <code>BookInfo</code> schema inside the <code>components/schemas</code> section. From this schema a Java class will be generated with the same <code>BookInfo</code> class name.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>We define all the properties of <code>BookInfo</code>, including required validation on them (In this case, it is a minimal length requirement on one string and a regex pattern on another). An abbreviated form is used for some YAML lists and dictionaries to reduce the number of rows and simplify readability.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>We reference another schema to be used as a property.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>We define <code>BookAvailability</code> schema to be an enum with three available values. A Java <code>BookAvailability</code> class will be generated with given enum values based on our definition.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>As you can see, schemas can be defined as enums when they can only be assigned a finite number of values. Also, you can reference other schemas as properties of a schema.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+You can read more about writing schemas in the
+<a href="https://swagger.io/docs/specification/data-models/">"Data Models (Schemas)" OpenAPI guide</a>.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Save the file and proceed to the next part of the guide.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="writing-the-application">4. Writing the Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Create an application using the <a href="https://docs.micronaut.io/latest/guide/#cli">Micronaut Command Line Interface</a> or with <a href="https://launch.micronaut.io">Micronaut Launch</a>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide <span class="se">\</span>
+    <span class="nt">--features</span><span class="o">=</span>validation,security,reactor,data-jdbc,flyway,jdbc-hikari,postgres,graalvm <span class="se">\</span>
+    <span class="nt">--build</span><span class="o">=</span>gradle <span class="se">\</span>
+    <span class="nt">--lang</span><span class="o">=</span>java <span class="se">\</span>
+    <span class="nt">--test</span><span class="o">=</span>junit</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you don&#8217;t specify the <code>--build</code> argument, Gradle with the <a href="https://docs.gradle.org/current/userguide/kotlin_dsl.html">Kotlin DSL</a> is used as the build tool. <br/> If you don&#8217;t specify the <code>--lang</code> argument, Java is used as the language.<br/> If you don&#8217;t specify the <code>--test</code> argument, JUnit is used for Java and Kotlin, and Spock is used for Groovy.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The previous command creates a Micronaut application with the default package <code>example.micronaut</code> in a directory named <code>micronautguide</code>.</p>
+</div>
+<div class="paragraph">
+<p>If you use Micronaut Launch, select Micronaut Application as application type and add <code>validation</code>, <code>security</code>, <code>reactor</code>, <code>data-jdbc</code>, <code>flyway</code>, <code>jdbc-hikari</code>, <code>postgres</code>, and <code>graalvm</code> features.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you have an existing Micronaut application and want to add the functionality described here, you can view the dependency and configuration changes from the specified features, and apply those changes to your application.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><a href="https://micronaut.io/launch?features=validation&amp;features=security&amp;features=reactor&amp;features=data-jdbc&amp;features=flyway&amp;features=jdbc-hikari&amp;features=postgres&amp;features=graalvm&amp;lang=JAVA&amp;build=GRADLE&amp;test=JUNIT&amp;name=micronautguide&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">Diff</a></p>
+</div>
+<div class="paragraph">
+<p><a href="https://guides.micronaut.io/latest/micronaut-intellij-idea-ide-setup.html">Setup IntelliJ IDEA to develop Micronaut Applications</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="generating-server-api-from-the-openapi-definition">5. Generating Server API From The OpenAPI Definition</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Now we will generate server API files from our definition. The generated server code will be in Java and will use the Micronaut features for client-server communication.</p>
+</div>
+<div class="paragraph">
+<p>Open your <code>build.gradle</code> file and apply the <code>micronaut-openapi</code> plugin:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="groovy"><span class="n">plugins</span> <span class="o">{</span>
+  <span class="n">id</span> <span class="s1">'io.micronaut.openapi'</span> <span class="n">version</span> <span class="s1">'...'</span>
+  <span class="o">....</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And configure your build to generate a client:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="groovy"><span class="n">micronaut</span> <span class="o">{</span>
+  <span class="o">...</span>
+  <span class="n">openapi</span> <span class="o">{</span>
+    <span class="n">server</span><span class="o">(</span><span class="n">file</span><span class="o">(</span><span class="s2">"src/main/resources/library-definition.yml"</span><span class="o">))</span> <span class="o">{</span> <i class="conum" data-value="1"></i><b>(1)</b>
+      <span class="n">apiPackageName</span> <span class="o">=</span> <span class="s2">"example.micronaut.api"</span>
+      <span class="n">modelPackageName</span> <span class="o">=</span> <span class="s2">"example.micronaut.model"</span>
+      <span class="n">useReactive</span> <span class="o">=</span> <span class="kc">false</span>                                       <i class="conum" data-value="2"></i><b>(2)</b>
+      <span class="n">useAuth</span> <span class="o">=</span> <span class="kc">true</span>                                            <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="o">}</span>
+  <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Loads the service definition in order to generate a server</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Configures the generator to not generate reactive code</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Configures the generator to support authentication</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The server code will be generated in your build directory but automatically added as a source set.
+Therefore, you can for example run <code>./gradlew compileJava --console=verbose</code> and see that the sources are generated and compiled:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code>&gt; Task :generateServerOpenApiApis
+...
+&gt; Task :generateServerOpenApiModels
+...
+&gt; Task :compileJava</code></pre>
+</div>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+The Micronaut OpenAPI generator supports a large number of parameters. Please refer to the <a href="https://micronaut-projects.github.io/micronaut-gradle-plugin/snapshot/#_generating_a_server">Micronaut OpenAPI Gradle plugin documentation</a> for all possible options.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>After generation finishes, you should see the following directory structure under your <code>build/generated/openapi</code> directory:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code>build/generated/openapi
+├── generateServerOpenApiApis
+│   └── src
+│       └── main
+│           ├── java
+│           │   └── example
+│           │       └── micronaut
+│           │           ├── api
+│           │           │   └── BooksApi.java       <i class="conum" data-value="1"></i><b>(1)</b>
+│           │           └── annotation
+│           │               └── HardNullable.java
+├── generateServerOpenApiModels
+│   └── src
+│       └── main
+│           └── java
+│               └── example
+│                   └── micronaut
+│                       └── model                              <i class="conum" data-value="2"></i><b>(2)</b>
+│                           ├── BookAvailability.java
+│                           └── BookInfo.java</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The api package will contain generated interfaces for our API that we will need to implement in our controller</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>It also generates model classes which are required by the service</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="application-structure">6. Application Structure</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To better understand the Micronaut Application we want to develop, let&#8217;s first look at the schematic of the whole application:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/openapi-generator/server-component-scheme.svg" alt="server component scheme">
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The controller will receive client requests utilizing Micronaut server features.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The controller will call repository methods responsible for interaction with the database.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>The repository methods will be implemented utilizing Micronaut JDBC, and will send queries to the database.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>The files we generated with OpenAPI generator include Micronaut features responsible for server-client communication, like parameter and body binding, and JSON conversion.</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="configuration">7. Configuration</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Set <code>context-path</code> to <code>/</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/application.properties</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="properties"><span class="py">context-path</span><span class="p">=</span><span class="s">/</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="data-storage-and-access-with-postgresql-and-jdbc">8. Data Storage And Access With PostgreSQL and JDBC</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We will use PostgreSQL database to store and access data. This will ensure that stored data is persistent between the server runs and can be easily accessed and modified by multiple instances of our application.</p>
+</div>
+<div class="paragraph">
+<p>Before implementing any server logic, we need to create a database and configure a connection to it. We will use Flyway to set up the database schema and JDBC for accessing the data.</p>
+</div>
+<div class="sect2">
+<h3 id="configure-access-for-a-data-source">8.1. Configure Access for a Data Source</h3>
+<div class="paragraph">
+<p>We will use <a href="https://micronaut-projects.github.io/micronaut-data/latest/guide/#dbc">Micronaut Data JDBC</a> to access the MySQL data source.</p>
+</div>
+<div class="paragraph">
+<p>Add the following required dependencies:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="groovy"><span class="n">annotationProcessor</span><span class="o">(</span><span class="s2">"io.micronaut.data:micronaut-data-processor"</span><span class="o">)</span>
+<span class="n">implementation</span><span class="o">(</span><span class="s2">"io.micronaut.data:micronaut-data-jdbc"</span><span class="o">)</span>
+<span class="n">implementation</span><span class="o">(</span><span class="s2">"io.micronaut.sql:micronaut-jdbc-hikari"</span><span class="o">)</span>
+<span class="n">runtimeOnly</span><span class="o">(</span><span class="s2">"org.postgresql:postgresql"</span><span class="o">)</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Locally, the database will be provided by <a href="#test-resources">Test Resources</a>.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/application.properties</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="properties"><i class="conum" data-value="1"></i><b>(1)</b>
+<span class="py">datasources.default.dialect</span><span class="p">=</span><span class="s">POSTGRES</span>
+<i class="conum" data-value="2"></i><b>(2)</b>
+<span class="py">datasources.default.driverClassName</span><span class="p">=</span><span class="s">${JDBC_DRIVER:org.postgresql.Driver}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Create datasource called <code>default</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Set the dialect and driver class name.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>With the configured data source we will be able to access the data using Micronaut JDBC API, which will be shown further in the guide.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="database-migration-with-flyway">8.2. Database Migration with Flyway</h3>
+<div class="paragraph">
+<p>We need a way to create the database schema. For that, we use <a href="https://micronaut-projects.github.io/micronaut-flyway/latest/guide/">Micronaut integration with Flyway</a>.</p>
+</div>
+<div class="paragraph">
+<p><a href="https://www.flywaydb.org">Flyway</a> automates schema changes, significantly simplifying schema management tasks, such as migrating, rolling back, and reproducing in multiple environments.</p>
+</div>
+<div class="paragraph">
+<p>Add the following snippet to include the necessary dependencies:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="groovy"><span class="n">implementation</span><span class="o">(</span><span class="s2">"io.micronaut.flyway:micronaut-flyway"</span><span class="o">)</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We will enable Flyway in the Micronaut configuration file and configure it to perform migrations on one of the defined data sources.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/application.properties</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="properties"><span class="py">flyway.datasources.default.enabled</span><span class="p">=</span><span class="s">true</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Enable Flyway for the <code>default</code> datasource.</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Configuring multiple data sources is as simple as enabling Flyway for each one. You can also specify directories that will be used for migrating each data source. Review the <a href="https://micronaut-projects.github.io/micronaut-flyway/latest/guide/">Micronaut Flyway documentation</a> for additional details.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Flyway migration will be automatically triggered before your Micronaut application starts. Flyway will read migration commands in the <code>resources/db/migration/</code> directory, execute them if necessary, and verify that the configured data source is consistent with them.</p>
+</div>
+<div class="paragraph">
+<p>Create the following migration files with the database schema creation:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/db/migration/V1__schema.sql</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sql"><span class="k">CREATE</span> <span class="k">TYPE</span> <span class="n">bookavailability</span> <span class="k">as</span> <span class="nb">ENUM</span><span class="p">(</span><span class="s1">'available'</span><span class="p">,</span> <span class="s1">'reserved'</span><span class="p">,</span> <span class="s1">'not available'</span><span class="p">);</span>
+<span class="k">CREATE</span> <span class="k">cast</span> <span class="p">(</span> <span class="nb">character</span> <span class="nb">varying</span> <span class="k">as</span> <span class="n">bookavailability</span><span class="p">)</span> <span class="k">WITH</span> <span class="k">inout</span> <span class="k">AS</span> <span class="k">assignment</span><span class="p">;</span>
+<span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">book</span> <span class="p">(</span>
+    <span class="n">id</span> <span class="nb">SERIAL</span> <span class="k">PRIMARY</span> <span class="k">KEY</span><span class="p">,</span>
+    <span class="n">name</span> <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="n">availability</span> <span class="n">bookavailability</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="n">author</span> <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">255</span><span class="p">),</span>
+    <span class="n">ISBN</span> <span class="nb">CHAR</span><span class="p">(</span><span class="mi">13</span><span class="p">)</span>
+<span class="p">);</span>
+
+<span class="k">INSERT</span> <span class="k">INTO</span>
+    <span class="n">book</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">availability</span><span class="p">,</span> <span class="n">author</span><span class="p">,</span> <span class="n">ISBN</span><span class="p">)</span>
+<span class="k">VALUES</span>
+    <span class="p">(</span><span class="s1">'Alice</span><span class="se">''</span><span class="s1">s Adventures in Wonderland'</span><span class="p">,</span>      <span class="s1">'available'</span><span class="p">,</span>   <span class="s1">'Lewis Caroll'</span><span class="p">,</span>   <span class="s1">'9783161484100'</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">'The Hitchhiker</span><span class="se">''</span><span class="s1">s Guide to the Galaxy'</span><span class="p">,</span>  <span class="s1">'reserved'</span><span class="p">,</span>    <span class="s1">'Douglas Adams'</span><span class="p">,</span>  <span class="k">NULL</span><span class="p">),</span>
+    <span class="p">(</span><span class="s1">'Java Guide for Beginners'</span><span class="p">,</span>               <span class="s1">'available'</span><span class="p">,</span>   <span class="k">NULL</span><span class="p">,</span>             <span class="k">NULL</span><span class="p">);</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The SQL commands in the migration will create the <code>book</code> table with <code>id</code> and four columns describing its properties, and populate the table with three sample rows.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="creating-a-mappedentity">8.3. Creating a MappedEntity</h3>
+<div class="paragraph">
+<p>To retrieve objects from the database, you need to define a class annotated with <a href="https://micronaut-projects.github.io/micronaut-data/latest/api/io/micronaut/data/annotation/MappedEntity.html">@MappedEntity</a>. Instances of the class will represent a single row retrieved from the database in a query.</p>
+</div>
+<div class="paragraph">
+<p>We will now create <code>BookEntity</code> class. We will be retrieving data from the <code>book</code> table, and therefore class properties match columns in the table. Note that special annotations are added on the property corresponding to the primary key of the table.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/BookEntity.java</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">example.micronaut.model.BookAvailability</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.core.annotation.NonNull</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.core.annotation.Nullable</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.data.annotation.GeneratedValue</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.data.annotation.Id</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.data.annotation.MappedEntity</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">jakarta.validation.constraints.NotBlank</span><span class="o">;</span>
+
+<span class="nd">@MappedEntity</span><span class="o">(</span><span class="s">"book"</span><span class="o">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">public</span> <span class="n">record</span> <span class="nf">BookEntity</span><span class="o">(</span>
+    <span class="nd">@Nullable</span> <span class="nd">@Id</span> <span class="nd">@GeneratedValue</span><span class="o">(</span><span class="nc">GeneratedValue</span><span class="o">.</span><span class="na">Type</span><span class="o">.</span><span class="na">AUTO</span><span class="o">)</span> <span class="nc">Long</span> <span class="n">id</span><span class="o">,</span> <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="nd">@NonNull</span> <span class="nd">@NotBlank</span> <span class="nc">String</span> <span class="n">name</span><span class="o">,</span>
+    <span class="nd">@NonNull</span> <span class="nd">@NotBlank</span> <span class="nc">BookAvailability</span> <span class="n">availability</span><span class="o">,</span>
+    <span class="nd">@Nullable</span> <span class="nc">String</span> <span class="n">author</span><span class="o">,</span>
+    <span class="nd">@Nullable</span> <span class="nc">String</span> <span class="n">isbn</span><span class="o">)</span> <span class="o">{</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Annotate the class with <code>@MappedEntity</code> to map the class to the table defined in the schema.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Specifies the ID of an entity</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="writing-a-repository">8.4. Writing a Repository</h3>
+<div class="paragraph">
+<p>Next, we will create a repository interface and define the required operations to access the database. Micronaut Data will implement the interface at compilation time. It will determine the operations to be implemented based on method naming and parameters, and supports <a href="https://micronaut-projects.github.io/micronaut-data/latest/guide/#dataUpdates">simple create, read, update, delete operations</a> along with <a href="https://micronaut-projects.github.io/micronaut-data/latest/guide/#querying">highly-customizable queries</a>.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/BookRepository.java</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">example.micronaut.model.BookAvailability</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.core.annotation.NonNull</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.data.jdbc.annotation.JdbcRepository</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.data.model.query.builder.sql.Dialect</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.data.repository.CrudRepository</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.validation.constraints.NotBlank</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.validation.constraints.NotNull</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">java.util.List</span><span class="o">;</span>
+
+<span class="nd">@JdbcRepository</span><span class="o">(</span><span class="n">dialect</span> <span class="o">=</span> <span class="nc">Dialect</span><span class="o">.</span><span class="na">POSTGRES</span><span class="o">)</span>                                 <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">BookRepository</span> <span class="kd">extends</span> <span class="nc">CrudRepository</span><span class="o">&lt;</span><span class="nc">BookEntity</span><span class="o">,</span> <span class="nc">Long</span><span class="o">&gt;</span> <span class="o">{</span>  <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="nd">@NonNull</span>
+    <span class="nc">List</span><span class="o">&lt;</span><span class="nc">BookEntity</span><span class="o">&gt;</span> <span class="nf">findAll</span><span class="o">();</span>
+
+
+    <span class="nd">@NonNull</span>
+    <span class="nc">BookEntity</span> <span class="nf">save</span><span class="o">(</span><span class="nd">@NonNull</span> <span class="nd">@NotBlank</span> <span class="nc">String</span> <span class="n">name</span><span class="o">,</span>                         <i class="conum" data-value="3"></i><b>(3)</b>
+                    <span class="nd">@NonNull</span> <span class="nd">@NotNull</span> <span class="nc">BookAvailability</span> <span class="n">availability</span><span class="o">,</span>
+                    <span class="nd">@NonNull</span> <span class="nd">@NotBlank</span> <span class="nc">String</span> <span class="n">author</span><span class="o">,</span>
+                    <span class="nd">@NonNull</span> <span class="nd">@NotBlank</span> <span class="nc">String</span> <span class="n">isbn</span><span class="o">);</span>
+
+    <span class="nd">@NonNull</span>
+    <span class="nc">List</span><span class="o">&lt;</span><span class="nc">BookEntity</span><span class="o">&gt;</span> <span class="nf">findAllByAuthorContains</span><span class="o">(</span><span class="nc">String</span> <span class="n">author</span><span class="o">);</span>                <i class="conum" data-value="4"></i><b>(4)</b>
+
+    <span class="nd">@NonNull</span>
+    <span class="nc">List</span><span class="o">&lt;</span><span class="nc">BookEntity</span><span class="o">&gt;</span> <span class="nf">findAllByNameContains</span><span class="o">(</span><span class="nc">String</span> <span class="n">name</span><span class="o">);</span>                    <i class="conum" data-value="5"></i><b>(5)</b>
+
+    <span class="nd">@NonNull</span>
+    <span class="nc">List</span><span class="o">&lt;</span><span class="nc">BookEntity</span><span class="o">&gt;</span> <span class="nf">findAllByAuthorContainsAndNameContains</span><span class="o">(</span>                <i class="conum" data-value="6"></i><b>(6)</b>
+            <span class="nc">String</span> <span class="n">author</span><span class="o">,</span>
+            <span class="nc">String</span> <span class="n">name</span>
+    <span class="o">);</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>@JdbcRepository</code> with a specific dialect.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>BookEntity</code>, the entity to treat as the root entity for the purposes of querying, is established either from the method signature or from the generic type parameter specified to the <code>CrudRepository</code> interface.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>The <code>save</code> method will be used to store new entities in the database</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Micronaut Data will generate the implementation of <code>findAllByAuthorContains</code> for us</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>We can create as many finders as needed</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>And we can combine criteria in a single method name</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="writing-the-controller-logic">9. Writing the Controller Logic</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>If you look inside the generated <code>BookInfo.java</code> file, you can see the class that was generated with all the parameters
+based on our definition. Notice that the constructor signature has two parameters, which were defined as <code>required</code> in the
+YAML definition file:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java">    <span class="kd">public</span> <span class="nf">BookInfo</span><span class="o">(</span><span class="nc">String</span> <span class="n">name</span><span class="o">,</span> <span class="nc">BookAvailability</span> <span class="n">availability</span><span class="o">)</span> <span class="o">{</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Along with that it has getters and setters for parameters and Jackson serialization annotations.</p>
+</div>
+<div class="sect2">
+<h3 id="create-the-controller-class">9.1. Create the Controller class</h3>
+<div class="paragraph">
+<p>Micronaut OpenAPI has generated an interface for called <code>BooksApi</code> that we need to implement in order to implement our controller.</p>
+</div>
+<div class="paragraph">
+<p>Create a <code>BooksController.java</code> class with the following contents:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/controller/BooksController.java</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="o">}</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="implementing-controller-methods">9.2. Implementing Controller Methods</h3>
+<div class="paragraph">
+<p>Now open <code>BooksController</code>.
+Thanks to the <a href="https://docs.micronaut.io/latest/guide/#httpServer">@Controller</a> annotation, an instance of the class will be initialized when Micronaut application starts, and the corresponding method will be called when there is a request.
+The class must implement the <code>BooksApi</code> interface: it should have two methods named the same as the operations we created in the definition file.
+The methods in the interface have Micronaut framework annotations describing the required API.
+We will now implement them in the controller.</p>
+</div>
+<div class="paragraph">
+<p>Using the Inversion of Control principle, we will inject <code>BookRepository</code> so it can be used in the methods. When initializing the controller, Micronaut will automatically provide an instance of the repository as a constructor argument:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/controller/BooksController.java</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kd">private</span> <span class="kd">final</span> <span class="nc">BookRepository</span> <span class="n">bookRepository</span><span class="o">;</span> <i class="conum" data-value="1"></i><b>(1)</b>
+
+<span class="kd">public</span> <span class="nf">BooksController</span><span class="o">(</span><span class="nc">BookRepository</span> <span class="n">bookRepository</span><span class="o">)</span> <span class="o">{</span> <i class="conum" data-value="1"></i><b>(1)</b>
+    <span class="k">this</span><span class="o">.</span><span class="na">bookRepository</span> <span class="o">=</span> <span class="n">bookRepository</span><span class="o">;</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Use constructor injection to inject a bean of type <code>BookRepository</code>.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Next, keeping all the generated annotations, add this implementation for the <code>search</code> method:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/controller/BooksController.java</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@ExecuteOn</span><span class="o">(</span><span class="nc">TaskExecutors</span><span class="o">.</span><span class="na">BLOCKING</span><span class="o">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">public</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">BookInfo</span><span class="o">&gt;</span> <span class="nf">search</span><span class="o">(</span>
+        <span class="nc">String</span> <span class="n">bookName</span><span class="o">,</span>
+        <span class="nc">String</span> <span class="n">authorName</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="nf">searchEntities</span><span class="o">(</span><span class="n">bookName</span><span class="o">,</span> <span class="n">authorName</span><span class="o">)</span>
+            <span class="o">.</span><span class="na">stream</span><span class="o">()</span>
+            <span class="o">.</span><span class="na">map</span><span class="o">(</span><span class="k">this</span><span class="o">::</span><span class="n">map</span><span class="o">)</span> <i class="conum" data-value="5"></i><b>(5)</b>
+            <span class="o">.</span><span class="na">toList</span><span class="o">();</span>
+<span class="o">}</span>
+
+<span class="kd">private</span> <span class="nc">BookInfo</span> <span class="nf">map</span><span class="o">(</span><span class="nc">BookEntity</span> <span class="n">entity</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kt">var</span> <span class="n">book</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">BookInfo</span><span class="o">(</span><span class="n">entity</span><span class="o">.</span><span class="na">name</span><span class="o">(),</span> <span class="n">entity</span><span class="o">.</span><span class="na">availability</span><span class="o">());</span>
+    <span class="n">book</span><span class="o">.</span><span class="na">setIsbn</span><span class="o">(</span><span class="n">entity</span><span class="o">.</span><span class="na">isbn</span><span class="o">());</span>
+    <span class="n">book</span><span class="o">.</span><span class="na">setAuthor</span><span class="o">(</span><span class="n">entity</span><span class="o">.</span><span class="na">author</span><span class="o">());</span>
+    <span class="k">return</span> <span class="n">book</span><span class="o">;</span>
+<span class="o">}</span>
+
+<span class="nd">@NonNull</span>
+<span class="kd">private</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">BookEntity</span><span class="o">&gt;</span> <span class="nf">searchEntities</span><span class="o">(</span><span class="nc">String</span> <span class="n">name</span><span class="o">,</span> <span class="nc">String</span> <span class="n">author</span><span class="o">)</span> <span class="o">{</span> <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="k">if</span> <span class="o">(</span><span class="nc">StringUtils</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">(</span><span class="n">name</span><span class="o">)</span> <span class="o">&amp;&amp;</span> <span class="nc">StringUtils</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">(</span><span class="n">author</span><span class="o">))</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">bookRepository</span><span class="o">.</span><span class="na">findAll</span><span class="o">();</span>
+    <span class="o">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="nc">StringUtils</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">(</span><span class="n">name</span><span class="o">))</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">bookRepository</span><span class="o">.</span><span class="na">findAllByAuthorContains</span><span class="o">(</span><span class="n">author</span><span class="o">);</span> <i class="conum" data-value="3"></i><b>(3)</b>
+
+    <span class="o">}</span> <span class="k">else</span>  <span class="k">if</span> <span class="o">(</span><span class="nc">StringUtils</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">(</span><span class="n">author</span><span class="o">))</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">bookRepository</span><span class="o">.</span><span class="na">findAllByNameContains</span><span class="o">(</span><span class="n">name</span><span class="o">);</span>
+    <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">bookRepository</span><span class="o">.</span><span class="na">findAllByAuthorContainsAndNameContains</span><span class="o">(</span><span class="n">author</span><span class="o">,</span><span class="n">name</span><span class="o">);</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>It is critical that any blocking I/O operations (such as fetching the data from the database) are offloaded to a separate thread pool that does not block the Event loop.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Define the <code>searchEntities</code> method that will manage the different combinations of desired search parameters.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Use the predicate we previously defined to search for substring in one column</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Use the repository methods implemented automatically by Micronaut Data to perform a search</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Map the <code>BookEntity</code> instances to the desired return type.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Finally, we will implement the <code>addBook</code> method:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/controller/BooksController.java</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@ExecuteOn</span><span class="o">(</span><span class="nc">TaskExecutors</span><span class="o">.</span><span class="na">BLOCKING</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">addBook</span><span class="o">(</span><span class="nc">BookInfo</span> <span class="n">bookInfo</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">bookRepository</span><span class="o">.</span><span class="na">save</span><span class="o">(</span><span class="n">bookInfo</span><span class="o">.</span><span class="na">getName</span><span class="o">(),</span> <i class="conum" data-value="3"></i><b>(3)</b>
+            <span class="n">bookInfo</span><span class="o">.</span><span class="na">getAvailability</span><span class="o">(),</span>
+            <span class="n">bookInfo</span><span class="o">.</span><span class="na">getAuthor</span><span class="o">(),</span>
+            <span class="n">bookInfo</span><span class="o">.</span><span class="na">getIsbn</span><span class="o">());</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="test-resources">10. Test Resources</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>When the application is started locally&#8201;&#8212;&#8201;either under test or by <a href="#running-the-application">running the application</a>&#8201;&#8212;&#8201;resolution of the datasource URL is detected and the Test Resources service will start a local PostgreSQL docker container, and inject the properties required to use this as the datasource.</p>
+</div>
+<div class="paragraph">
+<p>For more information, see the <a href="https://micronaut-projects.github.io/micronaut-test-resources/snapshot/guide/#modules-databases-jdbc">JDBC section of the Test Resources documentation</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="running-the-application">11. Running the Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To run the application, use the <code>./gradlew run</code> command, which starts the application on port 8080.</p>
+</div>
+<div class="paragraph">
+<p>You can send a few requests to the paths to test the application. We will use cURL for that.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The search for book names, that have <code>"Guide"</code> as substring should return 2 <code>BookInfo</code> objects:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">curl <span class="s2">"localhost:8080/search?book-name=Guide"</span></code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash"><span class="o">[{</span><span class="s2">"name"</span>:<span class="s2">"The Hitchhiker's Guide to the Galaxy"</span>,<span class="s2">"availability"</span>:<span class="s2">"reserved"</span>,<span class="s2">"author"</span>:<span class="s2">"Douglas Adams"</span><span class="o">}</span>,
+<span class="o">{</span><span class="s2">"name"</span>:<span class="s2">"Java Guide for Beginners"</span>,<span class="s2">"availability"</span>:<span class="s2">"available"</span><span class="o">}]</span></code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>The search for a substring <code>"Gu"</code> in name will return a <code>"Bad Request"</code> error, since we have defined the <code>book-name</code> parameter to
+have at least three characters:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">curl <span class="nt">-i</span> <span class="s2">"localhost:8080/search?book-name=Gu"</span></code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">HTTP/1.1 400 Bad Request
+Content-Type: application/json
+<span class="nb">date</span>: <span class="k">****</span>
+content-length: 180
+connection: keep-alive
+
+<span class="o">{</span><span class="s2">"message"</span>:<span class="s2">"Bad Request"</span>,<span class="s2">"_embedded"</span>:<span class="o">{</span><span class="s2">"errors"</span>:[<span class="o">{</span><span class="s2">"message"</span>:<span class="s2">"bookName: size must be between 3 and 2147483647"</span><span class="o">}]}</span>,
+<span class="s2">"_links"</span>:<span class="o">{</span><span class="s2">"self"</span>:<span class="o">{</span><span class="s2">"href"</span>:<span class="s2">"/search?book-name=Gu"</span>,<span class="s2">"templated"</span>:false<span class="o">}}}</span></code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>Addition of a new book should not result in errors:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">curl <span class="nt">-i</span> <span class="nt">-d</span> <span class="s1">'{"name": "My book", "availability": "available"}'</span> <span class="se">\</span>
+  <span class="nt">-H</span> <span class="s1">'Content-Type: application/json'</span> <span class="nt">-X</span> POST localhost:8080/add</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">HTTP/1.1 200 OK
+<span class="nb">date</span>: Tue, 1 Feb 2022 00:01:57 GMT
+Content-Type: application/json
+content-length: 0
+connection: keep-alive</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can then verify that the addition was successful by performing another search.</p>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="testing-the-application">12. Testing the Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To run the tests:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">./gradlew <span class="nb">test</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then open <code>build/reports/tests/test/index.html</code> in a browser to see the results.</p>
+</div>
+<div class="sect2">
+<h3 id="testing-models">12.1. Testing Models</h3>
+<div class="paragraph">
+<p>As we have noticed previously, some files were generated as templates for tests.
+We will implement tests for models inside these files. Their main purpose will be to verify that we correctly described
+our API in the YAML file, and therefore the generated files behave as expected.</p>
+</div>
+<div class="paragraph">
+<p>We will begin by writing tests for the required properties of <code>BookInfo</code> object.
+Define the following imports:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/java/example/micronaut/model/BookInfoTest.java</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">import</span> <span class="nn">io.micronaut.context.annotation.Property</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.context.annotation.Requires</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.HttpRequest</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.MediaType</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Controller</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Get</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Produces</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.client.HttpClient</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.client.annotation.Client</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.annotation.security.PermitAll</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.inject.Inject</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.junit.jupiter.api.Test</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.validation.Validator</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">junit</span><span class="o">.</span><span class="na">jupiter</span><span class="o">.</span><span class="na">api</span><span class="o">.</span><span class="na">Assertions</span><span class="o">.*;</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Add the following methods inside the <code>BookInfoTest</code> class:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/java/example/micronaut/model/BookInfoTest.java</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java">    <span class="nd">@Inject</span>
+    <span class="nc">Validator</span> <span class="n">validator</span><span class="o">;</span> <i class="conum" data-value="1"></i><b>(1)</b>
+
+    <span class="nd">@Test</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">nameTest</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nc">BookInfo</span> <span class="n">bookInfo</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">BookInfo</span><span class="o">(</span><span class="s">"Alice's Adventures in Wonderland"</span><span class="o">,</span> <span class="nc">BookAvailability</span><span class="o">.</span><span class="na">AVAILABLE</span><span class="o">);</span>
+        <span class="n">assertTrue</span><span class="o">(</span><span class="n">validator</span><span class="o">.</span><span class="na">validate</span><span class="o">(</span><span class="n">bookInfo</span><span class="o">).</span><span class="na">isEmpty</span><span class="o">());</span> <i class="conum" data-value="2"></i><b>(2)</b>
+
+        <span class="n">bookInfo</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">BookInfo</span><span class="o">(</span><span class="kc">null</span><span class="o">,</span> <span class="nc">BookAvailability</span><span class="o">.</span><span class="na">AVAILABLE</span><span class="o">);</span>
+        <span class="n">assertFalse</span><span class="o">(</span><span class="n">validator</span><span class="o">.</span><span class="na">validate</span><span class="o">(</span><span class="n">bookInfo</span><span class="o">).</span><span class="na">isEmpty</span><span class="o">());</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="o">}</span>
+
+    <span class="nd">@Test</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">availabilityTest</span><span class="o">()</span> <span class="o">{</span> <i class="conum" data-value="4"></i><b>(4)</b>
+        <span class="nc">BookInfo</span> <span class="n">bookInfo</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">BookInfo</span><span class="o">(</span><span class="s">"ALice's Adventures in Wonderland"</span><span class="o">,</span> <span class="nc">BookAvailability</span><span class="o">.</span><span class="na">RESERVED</span><span class="o">);</span>
+        <span class="n">assertTrue</span><span class="o">(</span><span class="n">validator</span><span class="o">.</span><span class="na">validate</span><span class="o">(</span><span class="n">bookInfo</span><span class="o">).</span><span class="na">isEmpty</span><span class="o">());</span>
+
+        <span class="n">bookInfo</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">BookInfo</span><span class="o">(</span><span class="s">"Alice's Adventures in Wonderland"</span><span class="o">,</span> <span class="kc">null</span><span class="o">);</span>
+        <span class="n">assertFalse</span><span class="o">(</span><span class="n">validator</span><span class="o">.</span><span class="na">validate</span><span class="o">(</span><span class="n">bookInfo</span><span class="o">).</span><span class="na">isEmpty</span><span class="o">());</span>
+    <span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Instruct Micronaut to inject an instance of the <a href="https://docs.micronaut.io/latest/guide/#beanValidation">Validator</a>.
+<code>Validator</code> will automatically validate parameters and response bodies annotated with <code>@Valid</code> in the controller.
+We will use it to test the validations manually.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Verify that the validator doesn&#8217;t produce any violations on a correct <code>BookInfo</code> instance.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Verify that <code>null</code> value is not allowed for the <code>name</code> property, since the property is marked as required.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Perform the same tests for the required <code>availability</code> property.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>We will then write similar tests for other properties:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/java/example/micronaut/model/BookInfoTest.java</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java">    <span class="nd">@Test</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">authorTest</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nc">BookInfo</span> <span class="n">bookInfo</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">BookInfo</span><span class="o">(</span><span class="s">"Alice's Adventures in Wonderland"</span><span class="o">,</span> <span class="nc">BookAvailability</span><span class="o">.</span><span class="na">AVAILABLE</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">author</span><span class="o">(</span><span class="kc">null</span><span class="o">);</span>
+        <span class="n">assertTrue</span><span class="o">(</span><span class="n">validator</span><span class="o">.</span><span class="na">validate</span><span class="o">(</span><span class="n">bookInfo</span><span class="o">).</span><span class="na">isEmpty</span><span class="o">());</span>
+
+        <span class="n">bookInfo</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">BookInfo</span><span class="o">(</span><span class="s">"Alice's Adventures in Wonderland"</span><span class="o">,</span> <span class="nc">BookAvailability</span><span class="o">.</span><span class="na">AVAILABLE</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">author</span><span class="o">(</span><span class="s">"Lewis Carroll"</span><span class="o">);</span>
+        <span class="n">assertTrue</span><span class="o">(</span><span class="n">validator</span><span class="o">.</span><span class="na">validate</span><span class="o">(</span><span class="n">bookInfo</span><span class="o">).</span><span class="na">isEmpty</span><span class="o">());</span> <i class="conum" data-value="1"></i><b>(1)</b>
+
+        <span class="n">bookInfo</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">BookInfo</span><span class="o">(</span><span class="s">"Alice's Adventures in Wonderland"</span><span class="o">,</span> <span class="nc">BookAvailability</span><span class="o">.</span><span class="na">AVAILABLE</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">author</span><span class="o">(</span><span class="s">"fo"</span><span class="o">);</span>
+        <span class="n">assertFalse</span><span class="o">(</span><span class="n">validator</span><span class="o">.</span><span class="na">validate</span><span class="o">(</span><span class="n">bookInfo</span><span class="o">).</span><span class="na">isEmpty</span><span class="o">());</span> <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="o">}</span>
+
+    <span class="nd">@Test</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">ISBNTest</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nc">BookInfo</span> <span class="n">bookInfo</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">BookInfo</span><span class="o">(</span><span class="s">"Alice's Adventures in Wonderland"</span><span class="o">,</span> <span class="nc">BookAvailability</span><span class="o">.</span><span class="na">AVAILABLE</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">isbn</span><span class="o">(</span><span class="kc">null</span><span class="o">);</span>
+        <span class="n">assertTrue</span><span class="o">(</span><span class="n">validator</span><span class="o">.</span><span class="na">validate</span><span class="o">(</span><span class="n">bookInfo</span><span class="o">).</span><span class="na">isEmpty</span><span class="o">());</span>
+
+        <span class="n">bookInfo</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">BookInfo</span><span class="o">(</span><span class="s">"Alice's Adventures in Wonderland"</span><span class="o">,</span> <span class="nc">BookAvailability</span><span class="o">.</span><span class="na">AVAILABLE</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">isbn</span><span class="o">(</span><span class="s">"9783161484100"</span><span class="o">);</span>
+        <span class="n">assertTrue</span><span class="o">(</span><span class="n">validator</span><span class="o">.</span><span class="na">validate</span><span class="o">(</span><span class="n">bookInfo</span><span class="o">).</span><span class="na">isEmpty</span><span class="o">());</span> <i class="conum" data-value="3"></i><b>(3)</b>
+
+        <span class="n">bookInfo</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">BookInfo</span><span class="o">(</span><span class="s">"Alice's Adventures in Wonderland"</span><span class="o">,</span> <span class="nc">BookAvailability</span><span class="o">.</span><span class="na">AVAILABLE</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">isbn</span><span class="o">(</span><span class="s">"9783161 84100"</span><span class="o">);</span>
+        <span class="n">assertFalse</span><span class="o">(</span><span class="n">validator</span><span class="o">.</span><span class="na">validate</span><span class="o">(</span><span class="n">bookInfo</span><span class="o">).</span><span class="na">isEmpty</span><span class="o">());</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Verify that there are no violations for both <code>null</code> or <code>"Lewis Carroll"</code> used as a value for the <code>author</code> property.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Verify that there is a violation if the name is too short (at least three characters are required).</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Verify that there are no violations for valid values of the <code>ISBN</code> property.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Verify that there is a violation if the value doesn&#8217;t match the required pattern (A space is present).</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Finally, we will test JSON serialization and parsing by writing a simple controller and client:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/java/example/micronaut/model/BookInfoTest.java</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Property</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"spec.name"</span><span class="o">,</span> <span class="n">value</span> <span class="o">=</span> <span class="s">"BookInfoTest"</span><span class="o">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="nd">@MicronautTest</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">BookInfoTest</span> <span class="o">{</span>
+
+    <span class="nd">@Inject</span>
+    <span class="nd">@Client</span><span class="o">(</span><span class="s">"/"</span><span class="o">)</span>
+    <span class="nc">HttpClient</span> <span class="n">httpClient</span><span class="o">;</span>
+
+    <span class="nd">@Test</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">bookInfoJsonSerialization</span><span class="o">()</span> <span class="o">{</span>
+        <span class="nc">BookInfo</span> <span class="n">requiredBookInfo</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">BookInfo</span><span class="o">(</span><span class="s">"Alice's Adventures in Wonderland"</span><span class="o">,</span> <span class="nc">BookAvailability</span><span class="o">.</span><span class="na">AVAILABLE</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">author</span><span class="o">(</span><span class="s">"Lewis Carroll"</span><span class="o">)</span>
+                <span class="o">.</span><span class="na">isbn</span><span class="o">(</span><span class="s">"9783161484100"</span><span class="o">);</span>
+
+        <span class="nc">BookInfo</span> <span class="n">bookInfo</span> <span class="o">=</span> <span class="n">httpClient</span><span class="o">.</span><span class="na">toBlocking</span><span class="o">().</span><span class="na">retrieve</span><span class="o">(</span><span class="nc">HttpRequest</span><span class="o">.</span><span class="na">GET</span><span class="o">(</span><span class="s">"/bookinfo"</span><span class="o">),</span> <span class="nc">BookInfo</span><span class="o">.</span><span class="na">class</span><span class="o">);</span> <i class="conum" data-value="5"></i><b>(5)</b>
+        <span class="n">assertEquals</span><span class="o">(</span><span class="n">requiredBookInfo</span><span class="o">,</span> <span class="n">bookInfo</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Requires</span><span class="o">(</span><span class="n">property</span> <span class="o">=</span> <span class="s">"spec.name"</span><span class="o">,</span> <span class="n">value</span> <span class="o">=</span> <span class="s">"BookInfoTest"</span><span class="o">)</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="nd">@Controller</span><span class="o">(</span><span class="s">"/bookinfo"</span><span class="o">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+    <span class="kd">static</span> <span class="kd">class</span> <span class="nc">BookInfoSerdeController</span> <span class="o">{</span>
+        <span class="nd">@PermitAll</span>
+        <span class="nd">@Get</span>
+        <span class="nc">BookInfo</span> <span class="nf">index</span><span class="o">()</span> <span class="o">{</span> <i class="conum" data-value="4"></i><b>(4)</b>
+            <span class="k">return</span> <span class="k">new</span> <span class="nf">BookInfo</span><span class="o">(</span><span class="s">"Alice's Adventures in Wonderland"</span><span class="o">,</span> <span class="nc">BookAvailability</span><span class="o">.</span><span class="na">AVAILABLE</span><span class="o">)</span>
+                    <span class="o">.</span><span class="na">author</span><span class="o">(</span><span class="s">"Lewis Carroll"</span><span class="o">)</span>
+                    <span class="o">.</span><span class="na">isbn</span><span class="o">(</span><span class="s">"9783161484100"</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Create a simple controller that will respond to requests on the <code>/bookinfo</code> path.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Specify the <code>spec.name</code> property for this test class.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Use the <a href="https://docs.micronaut.io/latest/guide/#metaScopes">Requires</a> annotation to specify that
+this controller will only be used if the <code>spec.name</code> property is set to <code>BookInfoTest</code>. This will prevent the controller
+from running during other tests.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Define a <code>GET</code> method that will return a <code>BookInfo</code> object in the <code>application/json</code> format.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Create a test that will send a request to the server and verify that the response matches the desired object
+(This means that both serialization and parsing work correctly).</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Similarly, we can implement tests for the <code>BookAvailability</code> class. The details are not shown in this guide.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="testing-the-controller">12.2. Testing the Controller</h3>
+<div class="paragraph">
+<p>We will write tests for the two paths of <code>BookController</code>.</p>
+</div>
+<div class="paragraph">
+<p>Create a <code>BooksControllerTest</code> with the following contents:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/java/example/micronaut/controller/BooksControllerTest.java</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut.controller</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">example.micronaut.model.BookAvailability</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">example.micronaut.model.BookInfo</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.core.type.Argument</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.HttpRequest</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.HttpStatus</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.client.HttpClient</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.client.annotation.Client</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.uri.UriBuilder</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.inject.Inject</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.junit.jupiter.api.Test</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">junit</span><span class="o">.</span><span class="na">jupiter</span><span class="o">.</span><span class="na">api</span><span class="o">.</span><span class="na">Assertions</span><span class="o">.</span><span class="na">assertEquals</span><span class="o">;</span>
+
+<span class="nd">@MicronautTest</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">BooksControllerTest</span> <span class="o">{</span>
+
+    <span class="nd">@Inject</span>
+    <span class="nd">@Client</span><span class="o">(</span><span class="s">"${context-path}"</span><span class="o">)</span>
+    <span class="nc">HttpClient</span> <span class="n">client</span><span class="o">;</span> <i class="conum" data-value="2"></i><b>(2)</b>
+
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">addBookClientApiTest</span><span class="o">()</span> <span class="o">{</span>
+        <span class="kt">var</span> <span class="n">body</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">BookInfo</span><span class="o">(</span><span class="s">"Building Microservices"</span><span class="o">,</span> <span class="nc">BookAvailability</span><span class="o">.</span><span class="na">AVAILABLE</span><span class="o">);</span>
+        <span class="n">body</span><span class="o">.</span><span class="na">setAuthor</span><span class="o">(</span><span class="s">"Sam Newman"</span><span class="o">);</span>
+        <span class="n">body</span><span class="o">.</span><span class="na">setIsbn</span><span class="o">(</span><span class="s">"9781492034025"</span><span class="o">);</span>
+        <span class="kt">var</span> <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="na">toBlocking</span><span class="o">()</span>
+                <span class="o">.</span><span class="na">exchange</span><span class="o">(</span><span class="nc">HttpRequest</span><span class="o">.</span><span class="na">POST</span><span class="o">(</span><span class="s">"/add"</span><span class="o">,</span> <span class="n">body</span><span class="o">));</span> <i class="conum" data-value="3"></i><b>(3)</b>
+        <span class="n">assertEquals</span><span class="o">(</span><span class="nc">HttpStatus</span><span class="o">.</span><span class="na">OK</span><span class="o">,</span> <span class="n">response</span><span class="o">.</span><span class="na">status</span><span class="o">());</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="o">}</span>
+
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">searchClientApiTest</span><span class="o">()</span> <span class="o">{</span>
+        <span class="kt">var</span> <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="na">toBlocking</span><span class="o">()</span>
+                <span class="o">.</span><span class="na">exchange</span><span class="o">(</span><span class="nc">HttpRequest</span><span class="o">.</span><span class="na">GET</span><span class="o">(</span><span class="nc">UriBuilder</span><span class="o">.</span><span class="na">of</span><span class="o">(</span><span class="s">"/search"</span><span class="o">)</span>
+                        <span class="o">.</span><span class="na">queryParam</span><span class="o">(</span><span class="s">"book-name"</span><span class="o">,</span> <span class="s">"Guide"</span><span class="o">)</span>
+                        <span class="o">.</span><span class="na">build</span><span class="o">()</span>
+                <span class="o">),</span> <span class="nc">Argument</span><span class="o">.</span><span class="na">listOf</span><span class="o">(</span><span class="nc">BookInfo</span><span class="o">.</span><span class="na">class</span><span class="o">));</span> <i class="conum" data-value="5"></i><b>(5)</b>
+        <span class="kt">var</span> <span class="n">body</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="na">body</span><span class="o">();</span> <i class="conum" data-value="6"></i><b>(6)</b>
+        <span class="n">assertEquals</span><span class="o">(</span><span class="nc">HttpStatus</span><span class="o">.</span><span class="na">OK</span><span class="o">,</span> <span class="n">response</span><span class="o">.</span><span class="na">status</span><span class="o">());</span>
+        <span class="n">assertEquals</span><span class="o">(</span><span class="mi">2</span><span class="o">,</span> <span class="n">body</span><span class="o">.</span><span class="na">size</span><span class="o">());</span> <i class="conum" data-value="7"></i><b>(7)</b>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Annotate the class with <code>@MicronautTest</code> so the Micronaut framework will initialize the application context and the embedded server. <a href="https://micronaut-projects.github.io/micronaut-test/latest/guide/">More info</a>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Inject the <code>HttpClient</code> bean and point it to the embedded server.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Creating HTTP Requests is easy thanks to the Micronaut framework fluid API.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Verify that addition of book info was successful by checking the status code.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Micronaut HTTP Client simplifies binding a JSON array to a list of POJOs by using <code>Argument::listOf</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>Use <code>.body()</code> to retrieve the parsed payload.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>Verify that there are exactly two books with <code>"Guide"</code> substring in title.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>To run the tests:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">./gradlew <span class="nb">test</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then open <code>build/reports/tests/test/index.html</code> in a browser to see the results.</p>
+</div>
+<div class="paragraph">
+<p>All the tests should run successfully.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="generate-a-micronaut-application-native-executable-with-graalvm">13. Generate a Micronaut Application Native Executable with GraalVM</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We will use <a href="https://www.graalvm.org/">GraalVM</a>, an advanced JDK with ahead-of-time Native Image compilation, to generate a native executable of this Micronaut application.</p>
+</div>
+<div class="paragraph">
+<p>Compiling Micronaut applications ahead of time with GraalVM significantly improves startup time and reduces the memory footprint of JVM-based applications.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Only Java and Kotlin projects support using GraalVM&#8217;s <code>native-image</code> tool. Groovy relies heavily on reflection, which is only partially supported by GraalVM.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="graalvm-installation">13.1. GraalVM Installation</h3>
+<div class="paragraph">
+<p>The easiest way to install <a href="https://www.graalvm.org">GraalVM</a> on Linux or Mac is to use <a href="https://sdkman.io/">SDKMan.io</a>.</p>
+</div>
+<div class="listingblock">
+<div class="title">Java 21</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">sdk <span class="nb">install </span>java 21.0.5-graal</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For installation on Windows, or for a manual installation on Linux or Mac, see the <a href="https://www.graalvm.org/latest/docs/getting-started/">GraalVM Getting Started</a> documentation.</p>
+</div>
+<div class="paragraph">
+<p>The previous command installs Oracle GraalVM, which is free to use in production and free to redistribute, at no cost, under the <a href="https://www.oracle.com/downloads/licenses/graal-free-license.html">GraalVM Free Terms and Conditions</a>.</p>
+</div>
+<div class="paragraph">
+<p>Alternatively, you can use the <a href="https://github.com/graalvm/graalvm-ce-builds/releases/">GraalVM Community Edition</a>:</p>
+</div>
+<div class="listingblock">
+<div class="title">Java 21</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">sdk <span class="nb">install </span>java 21.0.2-graalce</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="native-executable-generation">13.2. Native Executable Generation</h3>
+<div class="paragraph">
+<p>To generate a native executable using Gradle, run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">./gradlew nativeCompile</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The native executable is created in <code>build/native/nativeCompile</code> directory and can be run with <code>build/native/nativeCompile/micronautguide</code>.</p>
+</div>
+<div class="paragraph">
+<p>It is possible to customize the name of the native executable or pass additional parameters to GraalVM:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="groovy"><span class="n">graalvmNative</span> <span class="o">{</span>
+    <span class="n">binaries</span> <span class="o">{</span>
+        <span class="n">main</span> <span class="o">{</span>
+            <span class="n">imageName</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="s1">'mn-graalvm-application'</span><span class="o">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+            <span class="n">buildArgs</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s1">'-Ob'</span><span class="o">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The native executable name will now be <code>mn-graalvm-application</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>It is possible to pass extra build arguments to <code>native-image</code>. For example, <code>-Ob</code> enables the quick build mode.</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="next-steps">14. Next Steps</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="learn-more">14.1. Learn More</h3>
+<div class="paragraph">
+<p>Read OpenAPI and Micronaut documentation and guides:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://www.openapis.org">OpenAPI</a></p>
+</li>
+<li>
+<p>Definition files generation from annotated controllers with <a href="https://micronaut-projects.github.io/micronaut-openapi/latest/guide">Micronaut OpenAPI</a></p>
+</li>
+<li>
+<p><a href="https://micronaut-projects.github.io/micronaut-data/latest/guide">Micronaut Data</a></p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="add-security">14.2. Add Security</h3>
+<div class="paragraph">
+<p>We could have defined our security requirements by adding a security schema to the <code>library-definition.yml</code> file.
+For example, we will add HTTP Basic authentication:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="yaml"><span class="na">paths</span><span class="pi">:</span>
+  <span class="na">/search</span><span class="pi">:</span>
+    <span class="c1"># ... #</span>
+  <span class="na">/add</span><span class="pi">:</span>
+    <span class="na">post</span><span class="pi">:</span>
+      <span class="c1"># ... #</span>
+      <span class="na">security</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">MyBasicAuth</span><span class="pi">:</span> <span class="pi">[]</span> <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="na">components</span><span class="pi">:</span>
+  <span class="na">schemas</span><span class="pi">:</span>
+    <span class="c1"># ... #</span>
+  <span class="na">securitySchemes</span><span class="pi">:</span>
+    <span class="na">MyBasicAuth</span><span class="pi">:</span> <i class="conum" data-value="1"></i><b>(1)</b>
+      <span class="na">type</span><span class="pi">:</span> <span class="s">http</span>
+      <span class="na">scheme</span><span class="pi">:</span> <span class="s">basic</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Define a security schema inside the <code>components/securitySchemes</code>. We want to use Basic auth for authentication.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Add the schema to the paths that you want to secure. In this case, we want to restrict access to
+adding books into our library.</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+You can read more about describing various authentication in the
+<a href="https://swagger.io/docs/specification/authentication/">"Authentication and Authorization" OpenAPI guide</a>.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The generator will then annotate such endpoints with the
+<a href="https://micronaut-projects.github.io/micronaut-security/latest/guide/#secured">Secured</a> annotation accordingly:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="nd">@Secured</span><span class="o">(</span><span class="nc">SecurityRule</span><span class="o">.</span><span class="na">IS_AUTHENTICATED</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">addBook</span><span class="o">(</span> <span class="cm">/* ... */</span> <span class="o">){</span> <span class="cm">/* ... */</span> <span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You will then need to implement an
+<a href="https://micronaut-projects.github.io/micronaut-security/latest/guide/#authenticationProviders">AuthenticationProvider</a>
+that satisfies your needs. If you want to finish implementing the basic authentication, continue to the
+<a href="https://guides.micronaut.io/latest/micronaut-security-basicauth.html">Micronaut Basic Auth guide</a> and replicate
+steps to create the <code>AuthenticationProvider</code> and appropriate tests.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+You can also read <a href="https://micronaut-projects.github.io/micronaut-security/latest/guide/">Micronaut Security documentation</a>
+or <a href="https://micronaut.io/guides">Micronaut guides</a> about security to learn more about
+the supported Authorization strategies.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="generate-micronaut-client">14.3. Generate Micronaut Client</h3>
+<div class="paragraph">
+<p>You can generate a Micronaut client based on the same <code>library-definition.yml</code> file.</p>
+</div>
+<div class="paragraph">
+<p>You can follow the <a href="https://guides.micronaut.io/latest/micronaut-openapi-generator-client.html">"Use OpenAPI Definition to Generate a Micronaut Client" Guide</a> for more information.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="license">15. License</h2>
+<div class="sectionbody">
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+All guides are released with an <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache license 2.0 license</a> for the code and a <a href="https://creativecommons.org/licenses/by/4.0/deed.en">Creative Commons Attribution 4.0</a> license for the writing and media (images&#8230;&#8203;).
+</td>
+</tr>
+</table>
+</div>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer id="footer">
+    <div class="container">
+
+        <div class="row">
+            <div class="col-sm-5 footer-left">
+
+                <div id="text-14" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <a href="https://micronaut.io/foundation/"><img class="alignnone size-medium wp-image-3736" src="./images/micronaut_foundation_horizontal_white.svg" alt="Micronaut Foundation"/></a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-7 footer-right">
+
+                <ul class="meta">
+
+                    <li id="menu-item-2895" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2895">
+                        <a href="https://micronaut.io/brand-guidelines/">Brand Guidelines</a>
+                    </li>
+                    <li id="menu-item-2894" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2894">
+                        <a href="https://micronaut.io/community-guidelines/">Community Guidelines</a>
+                    </li>
+                    <li id="menu-item-3377" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-privacy-policy menu-item-3377">
+                        <a href="https://micronaut.io/privacy-policy/">Privacy Policy</a>
+                    </li>
+
+                </ul>
+
+                <div id="nav_menu-2" class="widget widget_nav_menu">
+                    <div class="menu-links-container">
+                        <ul id="menu-links" class="menu">
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="https://micronautpodcast.com"><i class="fa fa-podcast"><span class="sr-only">Podcast</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="https://micronaut.io/feed/rss/"><i class="fa fa-feed"><span class="sr-only">Feed</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="mailto:info@micronaut.io"><i class="fas fa-envelope"><span class="sr-only">Mail</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://twitter.com/micronautfw"><i class="fab fa-twitter"><span class="sr-only">Twitter</span></i></a></li>
+                            <li id="menu-item-6740" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-6740"><a href="https://fosstodon.org/@micronaut"><i class="fab fa-mastodon"><span class="sr-only">Mastodon</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://discord.gg/9xRFsHv98T"><i class="fab fa-discord"><span class="sr-only">Discord</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://github.com/micronaut-projects/"><i class="fab fa-github"><span class="sr-only">GitHub</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.youtube.com/@MicronautFramework"><i class="fab fa-youtube"><span class="sr-only">YouTube</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.linkedin.com/showcase/micronaut"><i class="fab fa-linkedin"><span class="sr-only">LinkedIn</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.twitch.tv/micronautfw"><i class="fab fa-twitch"><span class="sr-only">Twitch</span></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="text-5" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <small>Guides are licensed under <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> for the writing/media and <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache.2.0</a> for the code</small>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>

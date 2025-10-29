@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'/>
+    <title>Publishing and subscribing to MQTT Topics from a Micronaut Application</title>
+    <link rel='stylesheet' id='wp-block-library-css' href='https://micronaut.io/wp-includes/css/dist/block-library/style.min.css' type='text/css' media='all'/>
+    <link rel='stylesheet' id='fonts-fira-sans-css' href='https://fonts.googleapis.com/css2?family=Fira+Sans%3Awght%40300%3B500&#038;display=swap&#038;ver=5.7' type='text/css' media='all'/>
+    <link rel='stylesheet' id='micronaut-style-css' href='https://micronaut.io/wp-content/themes/micronaut/style.min.css' type='text/css' media='all'/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link rel="shortcut icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link rel="alternate" type="application/rss+xml" title="Micronaut Guides RSS Feed" href="https://guides.micronaut.io/latest/rss.xml" />
+    <link rel="alternate" type="application/json" title="Micronaut Guides JSON Feed" href="https://guides.micronaut.io/latest/feed.json" />
+    <link href="coderay.css" rel="stylesheet" />
+    <link href="rouge-github.css" rel="stylesheet" />
+    <link href="guide.css" rel="stylesheet" />
+    <script src="lunr.js"></script>
+    <script src="guide.js"></script>
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:image" content="https://guides.micronaut.io/latest/images/cards/micronaut-mqtt.png"/>
+    <meta name="twitter:creator" content="@micronautfw"/>
+    <meta name="twitter:site" content="@micronautfw"/>
+    <meta name="twitter:title" content="Publishing and subscribing to MQTT Topics from a Micronaut Application"/>
+    <meta name="twitter:description" content="Learn how to use Mosquitto as an MQTT broker, create a Micronaut CLI application and publish an MQTT topic, and subscribe to the MQTT topic in a different Micronaut Messaging application."/>
+</head>
+<body class="page-template page-template-page-sidebar page-template-page-sidebar-php page page-parent guide">
+
+<header id="header">
+
+    <div class="container">
+
+        <nav class="navbar navbar-expand-lg navbar-dark">
+
+            <button class="collapsed" type="button" data-toggle="collapse" data-target="#nav" aria-expanded="false">
+                <span></span>
+            </button>
+
+            <a class="navbar-brand" href="https://micronaut.io">
+                <img src="https://micronaut.io/wp-content/uploads/2020/11/MIcronautLogo_Horizontal.svg" alt="Micronaut framework"/>
+            </a>
+
+            <div class="collapse navbar-collapse" id="nav">
+
+                <ul class="navbar-nav ml-auto">
+
+                    <li id="menu-item-2865" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2865 nav-item"><a href="https://micronaut.io/download/" class="nav-link">Download</a></li>
+                    <li id="menu-item-2868" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-2868 dropdown nav-item"><a href="https://micronaut.io/learn/" class="nav-link dropdown-toggle" data-toggle="dropdown">Learn</a><ul class="dropdown-menu">
+                        <li id="menu-item-4943" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4943"><a href="https://micronaut.io/learn/" class="dropdown-item">Overview</a></li>
+                        <li id="menu-item-5111" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-5111"><a href="https://docs.micronaut.io/index.html" class="dropdown-item">User Documentaton</a></li>
+                        <li id="menu-item-4510" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4510"><a href="https://micronaut.io/guides/" class="dropdown-item">Guides</a></li>
+                        <li id="menu-item-2896" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2896"><a href="https://micronaut.io/category/microcast/" class="dropdown-item">Microcasts</a></li>
+                        <li id="menu-item-2897" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2897"><a href="https://micronaut.io/category/webinar/" class="dropdown-item">Webinars</a></li>
+                        <li id="menu-item-2871" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2871"><a href="https://micronaut.io/professional-training/" class="dropdown-item">Professional Training</a></li>
+                        <li id="menu-item-6526" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-6526"><a href="https://micronaut-projects.github.io/micronaut-guides-mn3/latest/" class="dropdown-item">Guides for Micronaut Framework 3</a></li>
+                    </ul>
+                    </li>
+                    <li id="menu-item-2878" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item"><a href="https://micronaut.io/resources/" class="nav-link dropdown-toggle" data-toggle="dropdown">Resources</a><ul class="dropdown-menu">
+                        <li id="menu-item-4999" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4999"><a href="https://micronaut.io/upcoming-events/" class="dropdown-item">Upcoming Events</a></li>
+                        <li id="menu-item-2879" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2879"><a href="https://micronaut.io/blog/" class="dropdown-item">Blog</a></li>
+                        <li id="menu-item-6478" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-6478"><a href="https://micronaut.io/category/release-announcements/" class="dropdown-item">Releases</a></li>
+                        <li id="menu-item-6715" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-6715"><a href="https://micronaut.io/category/security-announcements/" class="dropdown-item">Security Announcements</a></li>
+                        <li id="menu-item-4499" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-4499"><a href="https://micronautpodcast.com/" class="dropdown-item">Podcast</a></li>
+                        <li id="menu-item-5798" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5798"><a href="https://micronaut.io/support/" class="dropdown-item">Commercial Support</a></li>
+                        <li id="menu-item-4186" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4186"><a href="https://micronaut.io/resources/community-support/" class="dropdown-item">Community Support</a></li>
+                        <li id="menu-item-2882" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2882"><a href="https://micronaut.io/faq/" class="dropdown-item">FAQ</a></li>
+                        <li id="menu-item-2883" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2883"><a href="https://micronaut.io/contact/" class="dropdown-item">Contact</a></li>
+                        <li id="menu-item-6479" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-6479"><a href="https://micronaut.io/micronaut-success-stories/" class="dropdown-item">Micronaut Success Stories</a></li>
+                    </ul>
+                    </li>
+                    <li id="menu-item-2872" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2872 dropdown nav-item"><a href="https://micronaut.io/foundation/" class="nav-link dropdown-toggle" data-toggle="dropdown">Foundation</a><ul class="dropdown-menu">
+                        <li id="menu-item-2877" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2877"><a href="https://micronaut.io/foundation/" class="dropdown-item">Overview</a></li>
+                        <li id="menu-item-2874" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2874"><a href="https://micronaut.io/foundation/corporate-sponsorship/" class="dropdown-item">Corporate Sponsorship</a></li>
+                        <li id="menu-item-2873" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2873"><a href="https://micronaut.io/foundation/community-sponsorship/" class="dropdown-item">Community Sponsorship</a></li>
+                        <li id="menu-item-2876" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2876"><a href="https://micronaut.io/foundation/sponsors/" class="dropdown-item">Sponsors</a></li>
+                        <li id="menu-item-3838" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-3838"><a href="https://micronaut.io/meeting-minutes/" class="dropdown-item">Meeting Minutes</a></li>
+                    </ul>
+                    </li>
+                    <li id="menu-item-2884" class="action menu-item menu-item-type-custom menu-item-object-custom menu-item-2884 nav-item"><a target="_blank" rel="noopener" href="https://micronaut.io/launch/" class="nav-link">Launch</a></li>
+
+                </ul>
+
+            </div>
+
+        </nav>
+
+    </div>
+</header>
+
+<div style="background: #fff;padding-top: 20px;padding-bottom: 20px;">
+    <div class="container" style="clear: both;">
+        <fieldset style="float: right;">
+            <input type="search" id="search-form-query"/>
+            <input type="submit" onclick="search()" value="Search">
+            <input type="submit" onclick="resetSearch()" value="Reset">
+        </fieldset>
+    </div>
+    <div class="container" style="clear: both;margin-top: -20px;">
+        <div class="guide-list" id="searchResults">
+        </div>
+    </div>
+</div>
+<div id="breadcrumbs"><div class="container"><a href="https://micronaut.io/">Home</a> » <a href="./index.html">Guides</a> » <a href="micronaut-mqtt.html">Publishing and subscribing to MQTT Topics from a Micronaut Application</a> » <span class="breadcrumb_last" aria-current="page">gradle | kotlin</span></div></div><!-- .breadcrumbs -->
+<main id="main">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+
+                <div class="toc">
+                    <div class="inner">
+                        <h1 class="title title_large first-word-bold first-word-break">Table of Contents</h1>
+                        <div class="underline"></div>
+                        
+<ul class="sectlevel1">
+<li><a href="#getting-started">1. Getting Started</a></li>
+<li><a href="#what-you-will-need">2. What you will need</a></li>
+<li><a href="#solution">3. Solution</a></li>
+<li><a href="#test-resources">4. Test Resources</a></li>
+<li><a href="#writing-the-cli-command-line-interface-application">5. Writing the CLI (Command Line Interface) Application</a>
+<ul class="sectlevel2">
+<li><a href="#create-an-mqttpublisher">5.1. Create an MqttPublisher</a></li>
+<li><a href="#writing-the-cli-command">5.2. Writing the CLI Command</a></li>
+</ul>
+</li>
+<li><a href="#writing-an-mqtt-subscriber-application">6. Writing an MQTT subscriber application</a>
+<ul class="sectlevel2">
+<li><a href="#configuration">6.1. Configuration</a></li>
+<li><a href="#create-subscriber">6.2. Create Subscriber</a></li>
+<li><a href="#add-test">6.3. Add test</a></li>
+</ul>
+</li>
+<li><a href="#running-the-application">7. Running the Application</a>
+<ul class="sectlevel2">
+<li><a href="#run-the-subscriber-app">7.1. Run the Subscriber App</a></li>
+<li><a href="#run-the-cli">7.2. Run the CLI</a></li>
+</ul>
+</li>
+<li><a href="#generate-a-micronaut-application-native-executable-with-graalvm">8. Generate a Micronaut Application Native Executable with GraalVM</a>
+<ul class="sectlevel2">
+<li><a href="#graalvm-installation">8.1. GraalVM Installation</a></li>
+<li><a href="#native-executable-generation">8.2. Native Executable Generation</a></li>
+</ul>
+</li>
+<li><a href="#next-steps">9. Next Steps</a></li>
+<li><a href="#help-with-the-micronaut-framework">10. Help with the Micronaut Framework</a></li>
+<li><a href="#license">11. License</a></li>
+</ul>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <h1>Publishing and subscribing to MQTT Topics from a Micronaut Application</h1>
+                <div class="underline"></div>
+<div class="sect1">
+<div class="sectionbody">
+
+<div class="paragraph">
+<p>Learn how to use Mosquitto as an MQTT broker, create a Micronaut CLI application and publish an MQTT topic, and subscribe to the MQTT topic in a different Micronaut Messaging application.</p>
+</div>
+<div class="paragraph">
+<p>Authors: Sergio del Amo</p>
+</div>
+<div class="paragraph">
+<p>Micronaut Version: 4.9.1</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="getting-started">1. Getting Started</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this guide, we will create a Micronaut application written in Kotlin.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="what-you-will-need">2. What you will need</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To complete this guide, you will need the following:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Some time on your hands</p>
+</li>
+<li>
+<p>A decent text editor or IDE (e.g. <a href="https://guides.micronaut.io/latest/micronaut-intellij-idea-ide-setup.html">IntelliJ IDEA</a>)</p>
+</li>
+<li>
+<p>JDK 21 or greater installed with <code>JAVA_HOME</code> <a href="https://www.baeldung.com/java-home-on-windows-7-8-10-mac-os-x-linux">configured appropriately</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div></div><div class="row"><div class="col-md-12"><div class="sect1">
+<h2 id="solution">3. Solution</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We recommend that you follow the instructions in the next sections and create the application step by step. However, you can go right to the <strong>completed example</strong>.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="micronaut-mqtt-gradle-kotlin.zip">Download</a> and unzip the source</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="test-resources">4. Test Resources</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>For this guide, we will use Mosquitto via Test Resources.
+As described in the <a href="https://micronaut-projects.github.io/micronaut-test-resources/latest/guide/#modules-mqtt">MQTT section of the Test Resources documentation</a>, configure a mosquitto container:</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+This should be done in both apps for this guide.
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/application.yml</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="yaml"><span class="na">test-resources</span><span class="pi">:</span>
+  <span class="na">containers</span><span class="pi">:</span>
+    <span class="na">mosquitto</span><span class="pi">:</span>
+      <span class="na">image-name</span><span class="pi">:</span> <span class="s">eclipse-mosquitto</span>
+      <span class="na">hostnames</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="s">mqtt.host</span>
+      <span class="na">exposed-ports</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">mqtt.port</span><span class="pi">:</span> <span class="m">1883</span>
+      <span class="na">ro-fs-bind</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="s2">"</span><span class="s">src/test-resources/mosquitto.conf"</span><span class="err">:</span> <span class="s">/mosquitto/config/mosquitto.conf</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>And then define the mosquitto configuration file:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test-resources/mosquitto.conf</div>
+<div class="content">
+<pre class="rouge highlight"><code>persistence false
+allow_anonymous true
+connection_messages true
+log_type all
+listener 1883</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>As we have defined that Test Resources are shared in the build, both applications will make use of the same instance of Mosquitto.</p>
+</div>
+<div class="paragraph">
+<p>When running under production, you should replace this property with the location of your production message broker via an environment variable.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="shell"><span class="nv">MQTT_CLIENT_SERVER_URI</span><span class="o">=</span>tcp://production-server:1183</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="writing-the-cli-command-line-interface-application">5. Writing the CLI (Command Line Interface) Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Create an application using the <a href="https://docs.micronaut.io/latest/guide/#cli">Micronaut Command Line Interface</a> or with <a href="https://launch.micronaut.io">Micronaut Launch</a>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">mn create-cli-app example.micronaut.micronautguide <span class="se">\</span>
+    <span class="nt">--features</span><span class="o">=</span>yaml,mqtt,graalvm,awaitility,kapt <span class="se">\</span>
+    <span class="nt">--build</span><span class="o">=</span>gradle <span class="nt">--lang</span><span class="o">=</span>kotlin</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you don&#8217;t specify the <code>--build</code> argument, Gradle with the <a href="https://docs.gradle.org/current/userguide/kotlin_dsl.html">Kotlin DSL</a> is used as the build tool. <br/> If you don&#8217;t specify the <code>--lang</code> argument, Java is used as the language.<br/> If you don&#8217;t specify the <code>--test</code> argument, JUnit is used for Java and Kotlin, and Spock is used for Groovy.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The previous command creates a Micronaut application with the default package <code>example.micronaut</code> in a directory named <code>micronautguide</code>.</p>
+</div>
+<div class="paragraph">
+<p>Rename this <code>micronautguide</code> directory to <code>cli</code>.</p>
+</div>
+<div class="paragraph">
+<p>If you use Micronaut Launch, select Micronaut Application as application type and add <code>yaml</code>, <code>mqtt</code>, <code>graalvm</code>, <code>awaitility</code>, and <code>kapt</code> features.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you have an existing Micronaut application and want to add the functionality described here, you can view the dependency and configuration changes from the specified features, and apply those changes to your application.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><a href="https://micronaut.io/launch?features=yaml&amp;features=mqtt&amp;features=graalvm&amp;features=awaitility&amp;features=kapt&amp;lang=KOTLIN&amp;build=GRADLE&amp;test=JUNIT&amp;name=cli&amp;type=CLI&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">Diff</a></p>
+</div>
+<div class="paragraph">
+<p><a href="https://guides.micronaut.io/latest/micronaut-intellij-idea-ide-setup.html">Setup IntelliJ IDEA to develop Micronaut Applications</a>.</p>
+</div>
+<div class="sect2">
+<h3 id="create-an-mqttpublisher">5.1. Create an MqttPublisher</h3>
+<div class="paragraph">
+<p>Create an interface to publish MQTT Topics:</p>
+</div>
+<div class="listingblock">
+<div class="title">cli/src/main/kotlin/example/micronaut/TemperatureClient.kt</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
+
+<span class="k">import</span> <span class="nn">io.micronaut.mqtt.annotation.Topic</span>
+<span class="k">import</span> <span class="nn">io.micronaut.mqtt.annotation.v5.MqttPublisher</span>
+
+<span class="nd">@MqttPublisher</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">interface</span> <span class="nc">TemperatureClient</span> <span class="p">{</span>
+
+    <span class="nd">@Topic</span><span class="p">(</span><span class="s">"house/livingroom/temperature"</span><span class="p">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="k">fun</span> <span class="nf">publishLivingroomTemperature</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="nc">ByteArray</span><span class="p">)</span>
+<span class="p">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Micronaut MQTT implements the interface automatically because it is annotated with <code>@MqttPublisher</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>To set the topic to publish to, apply the <code>@Topic</code> annotation to the method or an argument of the method.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="writing-the-cli-command">5.2. Writing the CLI Command</h3>
+<div class="paragraph">
+<p>Create an enum to allow the user to submit temperatures in Celsius or Fahrenheit:</p>
+</div>
+<div class="listingblock">
+<div class="title">cli/src/main/kotlin/example/micronaut/Scale.kt</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
+
+<span class="k">import</span> <span class="nn">java.util.Collections</span>
+<span class="k">import</span> <span class="nn">java.util.Optional</span>
+<span class="k">import</span> <span class="nn">java.util.concurrent.ConcurrentHashMap</span>
+
+<span class="k">enum</span> <span class="kd">class</span> <span class="nc">Scale</span><span class="p">(</span><span class="kd">val</span> <span class="py">scaleName</span><span class="p">:</span> <span class="nc">String</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nc">FAHRENHEIT</span><span class="p">(</span><span class="s">"Fahrenheit"</span><span class="p">),</span>
+    <span class="nc">CELSIUS</span><span class="p">(</span><span class="s">"Celsius"</span><span class="p">);</span>
+
+    <span class="k">override</span> <span class="k">fun</span> <span class="nf">toString</span><span class="p">():</span> <span class="nc">String</span> <span class="p">=</span> <span class="n">scaleName</span>
+
+    <span class="k">companion</span> <span class="k">object</span> <span class="p">{</span>
+        <span class="k">private</span> <span class="kd">var</span> <span class="py">ENUM_MAP</span><span class="p">:</span> <span class="nc">Map</span><span class="p">&lt;</span><span class="nc">String</span><span class="p">,</span> <span class="nc">Scale</span><span class="p">&gt;</span>
+
+        <span class="nf">init</span> <span class="p">{</span>
+            <span class="kd">val</span> <span class="py">map</span><span class="p">:</span> <span class="nc">MutableMap</span><span class="p">&lt;</span><span class="nc">String</span><span class="p">,</span> <span class="nc">Scale</span><span class="p">&gt;</span> <span class="p">=</span> <span class="nc">ConcurrentHashMap</span><span class="p">()</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">instance</span> <span class="k">in</span> <span class="nf">values</span><span class="p">())</span> <span class="p">{</span>
+                <span class="n">map</span><span class="p">[</span><span class="n">instance</span><span class="p">.</span><span class="n">scaleName</span><span class="p">]</span> <span class="p">=</span> <span class="n">instance</span>
+            <span class="p">}</span>
+            <span class="nc">ENUM_MAP</span> <span class="p">=</span> <span class="nc">Collections</span><span class="p">.</span><span class="nf">unmodifiableMap</span><span class="p">(</span><span class="n">map</span><span class="p">)</span>
+        <span class="p">}</span>
+
+        <span class="k">fun</span> <span class="nf">of</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nc">String</span><span class="p">):</span> <span class="nc">Optional</span><span class="p">&lt;</span><span class="nc">Scale</span><span class="p">&gt;</span> <span class="p">=</span> <span class="nc">Optional</span><span class="p">.</span><span class="nf">ofNullable</span><span class="p">(</span><span class="nc">ENUM_MAP</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
+
+        <span class="k">fun</span> <span class="nf">candidates</span><span class="p">():</span> <span class="nc">Set</span><span class="p">&lt;</span><span class="nc">String</span><span class="p">&gt;</span> <span class="p">=</span> <span class="nc">ENUM_MAP</span><span class="p">.</span><span class="n">keys</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Create a class to show completion candidates:</p>
+</div>
+<div class="listingblock">
+<div class="title">cli/src/main/kotlin/example/micronaut/TemperatureScaleCandidates.kt</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
+
+<span class="k">import</span> <span class="nn">java.util.ArrayList</span>
+
+<span class="kd">class</span> <span class="nc">TemperatureScaleCandidates</span> <span class="p">:</span> <span class="nc">ArrayList</span><span class="p">&lt;</span><span class="nc">String</span><span class="p">&gt;(</span><span class="nc">Scale</span><span class="p">.</span><span class="nf">candidates</span><span class="p">())</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Replace the command:</p>
+</div>
+<div class="listingblock">
+<div class="title">cli/src/main/kotlin/example/micronaut/MicronautguideCommand.kt</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
+
+<span class="k">import</span> <span class="nn">example.micronaut.Scale.CELSIUS</span>
+<span class="k">import</span> <span class="nn">example.micronaut.Scale.FAHRENHEIT</span>
+<span class="k">import</span> <span class="nn">io.micronaut.configuration.picocli.PicocliRunner</span>
+<span class="k">import</span> <span class="nn">jakarta.inject.Inject</span>
+<span class="k">import</span> <span class="nn">picocli.CommandLine.Command</span>
+<span class="k">import</span> <span class="nn">picocli.CommandLine.Option</span>
+<span class="k">import</span> <span class="nn">java.math.BigDecimal</span>
+<span class="k">import</span> <span class="nn">java.math.RoundingMode</span>
+
+<span class="nd">@Command</span><span class="p">(</span><span class="n">name</span> <span class="p">=</span> <span class="s">"house-livingroom-temperature"</span><span class="p">,</span> <i class="conum" data-value="1"></i><b>(1)</b>
+         <span class="n">description</span> <span class="p">=</span> <span class="p">[</span><span class="s">"Publish living room temperature"</span><span class="p">],</span>
+         <span class="n">mixinStandardHelpOptions</span> <span class="p">=</span> <span class="k">true</span><span class="p">)</span>
+<span class="kd">class</span> <span class="nc">MicronautguideCommand</span> <span class="p">:</span> <span class="nc">Runnable</span> <span class="p">{</span>
+
+    <span class="nd">@Option</span><span class="p">(</span><span class="n">names</span> <span class="p">=</span> <span class="p">[</span><span class="s">"-t"</span><span class="p">,</span> <span class="s">"--temperature"</span><span class="p">],</span> <i class="conum" data-value="2"></i><b>(2)</b>
+            <span class="n">required</span> <span class="p">=</span> <span class="k">true</span><span class="p">,</span> <i class="conum" data-value="3"></i><b>(3)</b>
+            <span class="n">description</span> <span class="p">=</span> <span class="p">[</span><span class="s">"Temperature value"</span><span class="p">])</span>
+    <span class="kd">var</span> <span class="py">temperature</span><span class="p">:</span> <span class="nc">BigDecimal</span><span class="p">?</span> <span class="p">=</span> <span class="k">null</span>
+
+    <span class="nd">@Option</span><span class="p">(</span><span class="n">names</span> <span class="p">=</span> <span class="p">[</span><span class="s">"-s"</span><span class="p">,</span> <span class="s">"--scale"</span><span class="p">],</span> <i class="conum" data-value="2"></i><b>(2)</b>
+            <span class="n">required</span> <span class="p">=</span> <span class="k">false</span><span class="p">,</span> <i class="conum" data-value="3"></i><b>(3)</b>
+            <span class="n">description</span> <span class="p">=</span> <span class="p">[</span><span class="s">"Temperate scales \${COMPLETION-CANDIDATES}"</span><span class="p">],</span> <i class="conum" data-value="4"></i><b>(4)</b>
+            <span class="n">completionCandidates</span> <span class="p">=</span> <span class="nc">TemperatureScaleCandidates</span><span class="o">::</span><span class="k">class</span><span class="p">)</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="kd">var</span> <span class="py">scale</span><span class="p">:</span> <span class="nc">String</span><span class="p">?</span> <span class="p">=</span> <span class="k">null</span>
+
+    <span class="nd">@Inject</span>
+    <span class="k">lateinit</span> <span class="kd">var</span> <span class="py">temperatureClient</span><span class="p">:</span> <span class="nc">TemperatureClient</span> <i class="conum" data-value="5"></i><b>(5)</b>
+
+    <span class="k">override</span> <span class="k">fun</span> <span class="nf">run</span><span class="p">()</span> <span class="p">{</span>
+        <span class="kd">val</span> <span class="py">temperatureScale</span> <span class="p">=</span> <span class="k">if</span> <span class="p">(</span><span class="n">scale</span> <span class="p">!=</span> <span class="k">null</span><span class="p">)</span> <span class="nc">Scale</span><span class="p">.</span><span class="nf">of</span><span class="p">(</span><span class="n">scale</span><span class="o">!!</span><span class="p">).</span><span class="nf">orElse</span><span class="p">(</span><span class="nc">CELSIUS</span><span class="p">)</span> <span class="k">else</span> <span class="nc">CELSIUS</span>
+        <span class="kd">val</span> <span class="py">celsius</span> <span class="p">=</span> <span class="k">if</span> <span class="p">(</span><span class="n">temperatureScale</span> <span class="p">===</span> <span class="nc">FAHRENHEIT</span><span class="p">)</span> <span class="nf">fahrenheitToCelsius</span><span class="p">(</span><span class="n">temperature</span><span class="o">!!</span><span class="p">)</span> <span class="k">else</span> <span class="n">temperature</span><span class="o">!!</span>
+        <span class="kd">val</span> <span class="py">data</span> <span class="p">=</span> <span class="n">celsius</span><span class="p">.</span><span class="nf">toPlainString</span><span class="p">().</span><span class="nf">toByteArray</span><span class="p">()</span>
+        <span class="n">temperatureClient</span><span class="p">.</span><span class="nf">publishLivingroomTemperature</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <i class="conum" data-value="6"></i><b>(6)</b>
+        <span class="nf">println</span><span class="p">(</span><span class="s">"Topic published"</span><span class="p">)</span>
+    <span class="p">}</span>
+
+    <span class="k">companion</span> <span class="k">object</span> <span class="p">{</span>
+
+        <span class="nd">@JvmStatic</span>
+        <span class="k">fun</span> <span class="nf">main</span><span class="p">(</span><span class="n">args</span><span class="p">:</span> <span class="nc">Array</span><span class="p">&lt;</span><span class="nc">String</span><span class="p">&gt;)</span> <span class="p">{</span>
+            <span class="nc">PicocliRunner</span><span class="p">.</span><span class="nf">run</span><span class="p">(</span><span class="nc">MicronautguideCommand</span><span class="o">::</span><span class="k">class</span><span class="p">.</span><span class="n">java</span><span class="p">,</span> <span class="p">*</span><span class="n">args</span><span class="p">)</span>
+        <span class="p">}</span>
+
+        <span class="k">private</span> <span class="k">fun</span> <span class="nf">fahrenheitToCelsius</span><span class="p">(</span><span class="n">temperature</span><span class="p">:</span> <span class="nc">BigDecimal</span><span class="p">):</span> <span class="nc">BigDecimal</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="n">temperature</span>
+                    <span class="p">.</span><span class="nf">subtract</span><span class="p">(</span><span class="nc">BigDecimal</span><span class="p">.</span><span class="nf">valueOf</span><span class="p">(</span><span class="mi">32</span><span class="p">))</span>
+                    <span class="p">.</span><span class="nf">multiply</span><span class="p">(</span><span class="nc">BigDecimal</span><span class="p">.</span><span class="nf">valueOf</span><span class="p">(</span><span class="mi">5</span> <span class="p">/</span> <span class="mf">9.0</span><span class="p">))</span>
+                    <span class="p">.</span><span class="nf">setScale</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="nc">RoundingMode</span><span class="p">.</span><span class="nc">FLOOR</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The picocli <code>@Command</code> annotation designates this class as a command.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><a href="https://picocli.info/#_options">Picocli @Option</a> must have one or more names.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td><a href="https://picocli.info/#_required_arguments">Options can be marked required</a> to make it mandatory for the user to specify them on the command line.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td><a href="https://picocli.info/#_completion_candidates_variable">It is possible to embed the completion candidates</a> in the description for an option by specifying the variable <code>${COMPLETION-CANDIDATES}</code> in the description text.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Field injection</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>Publish the MQTT Topic</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Replace the generated test with this:</p>
+</div>
+<div class="listingblock">
+<div class="title">cli/src/test/kotlin/example/micronaut/MicronautguideCommandTest.kt</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
+
+<span class="k">import</span> <span class="nn">io.micronaut.configuration.picocli.PicocliRunner</span>
+<span class="k">import</span> <span class="nn">io.micronaut.context.ApplicationContext</span>
+<span class="k">import</span> <span class="nn">io.micronaut.context.annotation.Requires</span>
+<span class="k">import</span> <span class="nn">io.micronaut.context.env.Environment</span>
+<span class="k">import</span> <span class="nn">io.micronaut.mqtt.annotation.MqttSubscriber</span>
+<span class="k">import</span> <span class="nn">io.micronaut.mqtt.annotation.Topic</span>
+<span class="k">import</span> <span class="nn">org.awaitility.Awaitility</span>
+<span class="k">import</span> <span class="nn">org.junit.jupiter.api.Assertions</span>
+<span class="k">import</span> <span class="nn">org.junit.jupiter.api.Test</span>
+<span class="k">import</span> <span class="nn">java.io.ByteArrayOutputStream</span>
+<span class="k">import</span> <span class="nn">java.io.OutputStream</span>
+<span class="k">import</span> <span class="nn">java.io.PrintStream</span>
+<span class="k">import</span> <span class="nn">java.math.BigDecimal</span>
+<span class="k">import</span> <span class="nn">java.nio.charset.StandardCharsets</span>
+<span class="k">import</span> <span class="nn">java.util.concurrent.TimeUnit</span>
+
+<span class="k">internal</span> <span class="kd">class</span> <span class="nc">MicronautguideCommandTest</span> <span class="p">{</span>
+
+    <span class="nd">@Test</span>
+    <span class="k">fun</span> <span class="nf">testWithCommandLineOption</span><span class="p">()</span> <span class="p">{</span>
+        <span class="kd">val</span> <span class="py">baos</span><span class="p">:</span> <span class="nc">OutputStream</span> <span class="p">=</span> <span class="nc">ByteArrayOutputStream</span><span class="p">()</span>
+        <span class="nc">System</span><span class="p">.</span><span class="nf">setOut</span><span class="p">(</span><span class="nc">PrintStream</span><span class="p">(</span><span class="n">baos</span><span class="p">))</span>
+        <span class="nc">ApplicationContext</span><span class="p">.</span><span class="nf">run</span><span class="p">(</span>
+            <span class="nf">mapOf</span><span class="p">(</span><span class="s">"spec.name"</span> <span class="n">to</span> <span class="s">"MicronautguideCommandTest"</span><span class="p">),</span>
+            <span class="nc">Environment</span><span class="p">.</span><span class="nc">CLI</span><span class="p">,</span> <span class="nc">Environment</span><span class="p">.</span><span class="nc">TEST</span>
+        <span class="p">).</span><span class="nf">use</span> <span class="p">{</span> <span class="n">ctx</span> <span class="p">-&gt;</span>
+            <span class="kd">val</span> <span class="py">listener</span><span class="p">:</span> <span class="nc">TemperatureListener</span> <span class="p">=</span> <span class="n">ctx</span><span class="p">.</span><span class="nf">getBean</span><span class="p">(</span><span class="nc">TemperatureListener</span><span class="o">::</span><span class="k">class</span><span class="p">.</span><span class="n">java</span><span class="p">)</span>
+            <span class="kd">val</span> <span class="py">args</span> <span class="p">=</span> <span class="nf">arrayOf</span><span class="p">(</span><span class="s">"-t"</span><span class="p">,</span> <span class="s">"212"</span><span class="p">,</span> <span class="s">"-s"</span><span class="p">,</span> <span class="s">"Fahrenheit"</span><span class="p">)</span>
+            <span class="nc">PicocliRunner</span><span class="p">.</span><span class="nf">run</span><span class="p">(</span><span class="nc">MicronautguideCommand</span><span class="o">::</span><span class="k">class</span><span class="p">.</span><span class="n">java</span><span class="p">,</span> <span class="n">ctx</span><span class="p">,</span> <span class="p">*</span><span class="n">args</span><span class="p">)</span>
+            <span class="nc">Assertions</span><span class="p">.</span><span class="nf">assertTrue</span><span class="p">(</span><span class="n">baos</span><span class="p">.</span><span class="nf">toString</span><span class="p">().</span><span class="nf">contains</span><span class="p">(</span><span class="s">"Topic published"</span><span class="p">))</span>
+
+            <span class="nc">Awaitility</span><span class="p">.</span><span class="nf">await</span><span class="p">().</span><span class="nf">atMost</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="nc">TimeUnit</span><span class="p">.</span><span class="nc">SECONDS</span><span class="p">)</span>
+                <span class="p">.</span><span class="nf">untilAsserted</span> <span class="p">{</span>
+                    <span class="nc">Assertions</span><span class="p">.</span><span class="nf">assertEquals</span><span class="p">(</span>
+                        <span class="nc">BigDecimal</span><span class="p">(</span><span class="s">"100.00"</span><span class="p">),</span>
+                        <span class="n">listener</span><span class="p">.</span><span class="n">temperature</span>
+                    <span class="p">)</span>
+                <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="nd">@Requires</span><span class="p">(</span><span class="n">property</span> <span class="p">=</span> <span class="s">"spec.name"</span><span class="p">,</span> <span class="n">value</span> <span class="p">=</span> <span class="s">"MicronautguideCommandTest"</span><span class="p">)</span>
+    <span class="nd">@MqttSubscriber</span> <i class="conum" data-value="1"></i><b>(1)</b>
+    <span class="kd">class</span> <span class="nc">TemperatureListener</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="py">temperature</span><span class="p">:</span> <span class="nc">BigDecimal</span><span class="p">?</span> <span class="p">=</span> <span class="k">null</span>
+
+        <span class="nd">@Topic</span><span class="p">(</span><span class="s">"house/livingroom/temperature"</span><span class="p">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
+        <span class="k">fun</span> <span class="nf">receive</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="nc">ByteArray</span><span class="p">?)</span> <span class="p">{</span>
+            <span class="n">temperature</span> <span class="p">=</span> <span class="nc">BigDecimal</span><span class="p">(</span><span class="nc">String</span><span class="p">(</span><span class="n">data</span><span class="o">!!</span><span class="p">,</span> <span class="nc">StandardCharsets</span><span class="p">.</span><span class="nc">UTF_8</span><span class="p">))</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Because it is annotated with <code>@MqttSubscriber</code>, Micronaut MQTT <a href="https://micronaut-projects.github.io/micronaut-mqtt/latest/guide/#consumer">listens for messages</a>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>To set the topic to listen to, apply the <code>@Topic</code> annotation to the method or an argument of the method.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The MQTT server URI is configured by referencing the properties when we used when we set up Mosquitto via <a href="#test-resources">Test Resources</a>:</p>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<a href="https://micronaut.io/2023/02/19/micronaut-framework-4-0-and-snakeyaml-transitive-dependency/">Since Micronaut Framework 4.0, to use YAML configuration, you have to add the YAML dependency</a>.
+</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title">cli/src/main/resources/application.yml</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="yaml"><span class="na">mqtt</span><span class="pi">:</span>
+  <span class="na">client</span><span class="pi">:</span>
+    <span class="na">server-uri</span><span class="pi">:</span> <span class="s">tcp://${mqtt.host}:${mqtt.port}</span>
+    <span class="na">client-id</span><span class="pi">:</span> <span class="s">${random.uuid}</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="writing-an-mqtt-subscriber-application">6. Writing an MQTT subscriber application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Create an application using the <a href="https://docs.micronaut.io/latest/guide/#cli">Micronaut Command Line Interface</a> or with <a href="https://launch.micronaut.io">Micronaut Launch</a>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">mn create-messaging-app example.micronaut.micronautguide <span class="se">\</span>
+    <span class="nt">--features</span><span class="o">=</span>yaml,mqtt,graalvm,awaitility <span class="se">\</span>
+    <span class="nt">--build</span><span class="o">=</span>gradle <span class="nt">--lang</span><span class="o">=</span>kotlin</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you don&#8217;t specify the <code>--build</code> argument, Gradle with the <a href="https://docs.gradle.org/current/userguide/kotlin_dsl.html">Kotlin DSL</a> is used as the build tool. <br/> If you don&#8217;t specify the <code>--lang</code> argument, Java is used as the language.<br/> If you don&#8217;t specify the <code>--test</code> argument, JUnit is used for Java and Kotlin, and Spock is used for Groovy.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The previous command creates a Micronaut application with the default package <code>example.micronaut</code> in a directory named <code>micronautguide</code>.</p>
+</div>
+<div class="paragraph">
+<p>Rename this <code>micronautguide</code> directory to <code>app</code>.</p>
+</div>
+<div class="paragraph">
+<p>If you use Micronaut Launch, select Micronaut Application as application type and add <code>yaml</code>, <code>mqtt</code>, <code>graalvm</code>, and <code>awaitility</code> features.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you have an existing Micronaut application and want to add the functionality described here, you can view the dependency and configuration changes from the specified features, and apply those changes to your application.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><a href="https://micronaut.io/launch?features=yaml&amp;features=mqtt&amp;features=graalvm&amp;features=awaitility&amp;features=kapt&amp;lang=KOTLIN&amp;build=GRADLE&amp;test=JUNIT&amp;name=cli&amp;type=CLI&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">Diff</a></p>
+</div>
+<div class="paragraph">
+<p><a href="https://guides.micronaut.io/latest/micronaut-intellij-idea-ide-setup.html">Setup IntelliJ IDEA to develop Micronaut Applications</a>.</p>
+</div>
+<div class="sect2">
+<h3 id="configuration">6.1. Configuration</h3>
+<div class="paragraph">
+<p>The MQTT server URI is configured by referencing the properties when we used when we set up Mosquitto via <a href="#test-resources">Test Resources</a>:</p>
+</div>
+<div class="listingblock">
+<div class="title">app/src/main/resources/application.yml</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="yaml"><span class="na">mqtt</span><span class="pi">:</span>
+  <span class="na">client</span><span class="pi">:</span>
+    <span class="na">server-uri</span><span class="pi">:</span> <span class="s">tcp://${mqtt.host}:${mqtt.port}</span>
+    <span class="na">client-id</span><span class="pi">:</span> <span class="s">${random.uuid}</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="create-subscriber">6.2. Create Subscriber</h3>
+<div class="listingblock">
+<div class="title">app/src/main/kotlin/example/micronaut/TemperatureListener.kt</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
+
+<span class="k">import</span> <span class="nn">io.micronaut.mqtt.annotation.MqttSubscriber</span>
+<span class="k">import</span> <span class="nn">io.micronaut.mqtt.annotation.Topic</span>
+<span class="k">import</span> <span class="nn">org.slf4j.LoggerFactory</span>
+<span class="k">import</span> <span class="nn">java.math.BigDecimal</span>
+<span class="k">import</span> <span class="nn">java.nio.charset.StandardCharsets.UTF_8</span>
+<span class="k">import</span> <span class="nn">io.micronaut.core.annotation.Nullable</span>
+
+<span class="nd">@MqttSubscriber</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">class</span> <span class="nc">TemperatureListener</span> <span class="p">{</span>
+
+    <span class="kd">var</span> <span class="py">temperature</span><span class="p">:</span> <span class="nc">BigDecimal</span><span class="p">?</span> <span class="p">=</span> <span class="k">null</span>
+
+    <span class="nd">@Topic</span><span class="p">(</span><span class="s">"house/livingroom/temperature"</span><span class="p">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="k">fun</span> <span class="nf">receive</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="nc">ByteArray</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">temperature</span> <span class="p">=</span> <span class="nc">BigDecimal</span><span class="p">(</span><span class="nc">String</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nc">UTF_8</span><span class="p">))</span>
+        <span class="nc">LOG</span><span class="p">.</span><span class="nf">info</span><span class="p">(</span><span class="s">"temperature: {}"</span><span class="p">,</span> <span class="n">temperature</span><span class="p">)</span>
+    <span class="p">}</span>
+
+    <span class="k">companion</span> <span class="k">object</span> <span class="p">{</span>
+        <span class="k">private</span> <span class="kd">val</span> <span class="py">LOG</span> <span class="p">=</span> <span class="nc">LoggerFactory</span><span class="p">.</span><span class="nf">getLogger</span><span class="p">(</span><span class="nc">TemperatureListener</span><span class="o">::</span><span class="k">class</span><span class="p">.</span><span class="n">java</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Because it is annotated with <code>@MqttSubscriber</code>, Micronaut MQTT <a href="https://micronaut-projects.github.io/micronaut-mqtt/latest/guide/#consumer">listens for messages</a>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>To set the topic to publish to, apply the <code>@Topic</code> annotation to the method or an argument of the method.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="add-test">6.3. Add test</h3>
+<div class="listingblock">
+<div class="title">app/src/test/kotlin/example/micronaut/SubscriptionTest.kt</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
+
+<span class="k">import</span> <span class="nn">io.micronaut.context.annotation.Property</span>
+<span class="k">import</span> <span class="nn">io.micronaut.context.annotation.Requires</span>
+<span class="k">import</span> <span class="nn">io.micronaut.mqtt.annotation.Topic</span>
+<span class="k">import</span> <span class="nn">io.micronaut.mqtt.annotation.v5.MqttPublisher</span>
+<span class="k">import</span> <span class="nn">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>
+<span class="k">import</span> <span class="nn">jakarta.inject.Inject</span>
+<span class="k">import</span> <span class="nn">org.awaitility.Awaitility.await</span>
+<span class="k">import</span> <span class="nn">org.junit.jupiter.api.Assertions</span>
+<span class="k">import</span> <span class="nn">org.junit.jupiter.api.Test</span>
+<span class="k">import</span> <span class="nn">java.math.BigDecimal</span>
+<span class="k">import</span> <span class="nn">java.nio.charset.StandardCharsets</span>
+<span class="k">import</span> <span class="nn">java.util.concurrent.TimeUnit</span>
+
+<span class="nd">@MicronautTest</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="nd">@Property</span><span class="p">(</span><span class="n">name</span> <span class="p">=</span> <span class="s">"spec.name"</span><span class="p">,</span> <span class="n">value</span> <span class="p">=</span> <span class="s">"SubscriptionTest"</span><span class="p">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="kd">class</span> <span class="nc">SubscriptionTest</span> <span class="p">{</span>
+
+    <span class="nd">@Inject</span>
+    <span class="k">lateinit</span> <span class="kd">var</span> <span class="py">client</span><span class="p">:</span> <span class="nc">TemperatureClient</span>
+
+    <span class="nd">@Inject</span>
+    <span class="k">lateinit</span> <span class="kd">var</span> <span class="py">listener</span><span class="p">:</span> <span class="nc">TemperatureListener</span>
+
+    <span class="nd">@Test</span>
+    <span class="k">fun</span> <span class="nf">checkSubscriptionsAreReceived</span><span class="p">()</span> <span class="p">{</span>
+        <span class="n">client</span><span class="p">.</span><span class="nf">publishLivingroomTemperature</span><span class="p">(</span><span class="s">"3.145"</span><span class="p">.</span><span class="nf">toByteArray</span><span class="p">(</span><span class="nc">StandardCharsets</span><span class="p">.</span><span class="nc">UTF_8</span><span class="p">))</span>
+        <span class="nf">await</span><span class="p">().</span><span class="nf">atMost</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="nc">TimeUnit</span><span class="p">.</span><span class="nc">SECONDS</span><span class="p">)</span>
+            <span class="p">.</span><span class="nf">untilAsserted</span> <span class="p">{</span>
+                <span class="nc">Assertions</span><span class="p">.</span><span class="nf">assertEquals</span><span class="p">(</span>
+                    <span class="nc">BigDecimal</span><span class="p">(</span><span class="s">"3.145"</span><span class="p">),</span>
+                    <span class="n">listener</span><span class="p">.</span><span class="n">temperature</span>
+                <span class="p">)</span>
+            <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="nd">@Requires</span><span class="p">(</span><span class="n">property</span> <span class="p">=</span> <span class="s">"spec.name"</span><span class="p">,</span> <span class="n">value</span> <span class="p">=</span> <span class="s">"SubscriptionTest"</span><span class="p">)</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="nd">@MqttPublisher</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="kd">interface</span> <span class="nc">TemperatureClient</span> <span class="p">{</span>
+
+        <span class="nd">@Topic</span><span class="p">(</span><span class="s">"house/livingroom/temperature"</span><span class="p">)</span> <i class="conum" data-value="5"></i><b>(5)</b>
+        <span class="k">fun</span> <span class="nf">publishLivingroomTemperature</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="nc">ByteArray</span><span class="p">?)</span>
+    <span class="p">}</span>
+<span class="p">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Annotate the class with <code>@MicronautTest</code> so the Micronaut framework will initialize the application context and the embedded server. <a href="https://micronaut-projects.github.io/micronaut-test/latest/guide/">More info</a>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Annotate the class with <code>@Property</code> to supply configuration to the test.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>This bean loads only if the specified property is defined.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Micronaut MQTT implements the interface automatically because it is annotated with <code>@MqttPublisher</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>To set the topic to publish to, apply the <code>@Topic</code> annotation to the method or an argument of the method.</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="running-the-application">7. Running the Application</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="run-the-subscriber-app">7.1. Run the Subscriber App</h3>
+<div class="paragraph">
+<p>To run the application, use the <code>./gradlew run</code> command, which starts the application on port 8080.</p>
+</div>
+<div class="paragraph">
+<p>Keep it running. Once you publish a topic with the CLI application, you will see a log entry.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="run-the-cli">7.2. Run the CLI</h3>
+<div class="paragraph">
+<p>Run the CLI command, which will publish a temperature at startup.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">./gradlew run <span class="nt">--args</span><span class="o">=</span><span class="s2">"-t 212 -s Fahrenheit"</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The subscriber receives the MQTT topics, as you will see in the logs:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">12:09:47.280 <span class="o">[</span>MQTT Call: 180d98b5-75b9-41be-a874-295289346592]
+    INFO  e.micronaut.TemperatureListener - temperature: 100.00</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="generate-a-micronaut-application-native-executable-with-graalvm">8. Generate a Micronaut Application Native Executable with GraalVM</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We will use <a href="https://www.graalvm.org/">GraalVM</a>, an advanced JDK with ahead-of-time Native Image compilation, to generate a native executable of this Micronaut application.</p>
+</div>
+<div class="paragraph">
+<p>Compiling Micronaut applications ahead of time with GraalVM significantly improves startup time and reduces the memory footprint of JVM-based applications.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Only Java and Kotlin projects support using GraalVM&#8217;s <code>native-image</code> tool. Groovy relies heavily on reflection, which is only partially supported by GraalVM.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="graalvm-installation">8.1. GraalVM Installation</h3>
+<div class="paragraph">
+<p>The easiest way to install <a href="https://www.graalvm.org">GraalVM</a> on Linux or Mac is to use <a href="https://sdkman.io/">SDKMan.io</a>.</p>
+</div>
+<div class="listingblock">
+<div class="title">Java 21</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">sdk <span class="nb">install </span>java 21.0.5-graal</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For installation on Windows, or for a manual installation on Linux or Mac, see the <a href="https://www.graalvm.org/latest/docs/getting-started/">GraalVM Getting Started</a> documentation.</p>
+</div>
+<div class="paragraph">
+<p>The previous command installs Oracle GraalVM, which is free to use in production and free to redistribute, at no cost, under the <a href="https://www.oracle.com/downloads/licenses/graal-free-license.html">GraalVM Free Terms and Conditions</a>.</p>
+</div>
+<div class="paragraph">
+<p>Alternatively, you can use the <a href="https://github.com/graalvm/graalvm-ce-builds/releases/">GraalVM Community Edition</a>:</p>
+</div>
+<div class="listingblock">
+<div class="title">Java 21</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">sdk <span class="nb">install </span>java 21.0.2-graalce</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="native-executable-generation">8.2. Native Executable Generation</h3>
+<div class="paragraph">
+<p>To generate a native executable using Gradle, run:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">./gradlew nativeCompile</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The native executable is created in <code>build/native/nativeCompile</code> directory and can be run with <code>build/native/nativeCompile/micronautguide</code>.</p>
+</div>
+<div class="paragraph">
+<p>It is possible to customize the name of the native executable or pass additional parameters to GraalVM:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="groovy"><span class="n">graalvmNative</span> <span class="o">{</span>
+    <span class="n">binaries</span> <span class="o">{</span>
+        <span class="n">main</span> <span class="o">{</span>
+            <span class="n">imageName</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="s1">'mn-graalvm-application'</span><span class="o">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+            <span class="n">buildArgs</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s1">'-Ob'</span><span class="o">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The native executable name will now be <code>mn-graalvm-application</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>It is possible to pass extra build arguments to <code>native-image</code>. For example, <code>-Ob</code> enables the quick build mode.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Generate GraalVM native executables for both the CLI and the messaging application, then execute both. Publish a temperature, and you will see it in the subscriber logs.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="next-steps">9. Next Steps</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Read more about <a href="https://micronaut-projects.github.io/micronaut-mqtt/latest/guide/">Micronaut MQTT</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="help-with-the-micronaut-framework">10. Help with the Micronaut Framework</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The <a href="https://micronaut.io/foundation/">Micronaut Foundation</a> sponsored the creation of this Guide. A variety of <a href="https://micronaut.io/commercial-support/">consulting and support services</a> are available.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="license">11. License</h2>
+<div class="sectionbody">
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+All guides are released with an <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache license 2.0 license</a> for the code and a <a href="https://creativecommons.org/licenses/by/4.0/deed.en">Creative Commons Attribution 4.0</a> license for the writing and media (images&#8230;&#8203;).
+</td>
+</tr>
+</table>
+</div>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer id="footer">
+    <div class="container">
+
+        <div class="row">
+            <div class="col-sm-5 footer-left">
+
+                <div id="text-14" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <a href="https://micronaut.io/foundation/"><img class="alignnone size-medium wp-image-3736" src="./images/micronaut_foundation_horizontal_white.svg" alt="Micronaut Foundation"/></a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-7 footer-right">
+
+                <ul class="meta">
+
+                    <li id="menu-item-2895" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2895">
+                        <a href="https://micronaut.io/brand-guidelines/">Brand Guidelines</a>
+                    </li>
+                    <li id="menu-item-2894" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2894">
+                        <a href="https://micronaut.io/community-guidelines/">Community Guidelines</a>
+                    </li>
+                    <li id="menu-item-3377" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-privacy-policy menu-item-3377">
+                        <a href="https://micronaut.io/privacy-policy/">Privacy Policy</a>
+                    </li>
+
+                </ul>
+
+                <div id="nav_menu-2" class="widget widget_nav_menu">
+                    <div class="menu-links-container">
+                        <ul id="menu-links" class="menu">
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="https://micronautpodcast.com"><i class="fa fa-podcast"><span class="sr-only">Podcast</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="https://micronaut.io/feed/rss/"><i class="fa fa-feed"><span class="sr-only">Feed</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="mailto:info@micronaut.io"><i class="fas fa-envelope"><span class="sr-only">Mail</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://twitter.com/micronautfw"><i class="fab fa-twitter"><span class="sr-only">Twitter</span></i></a></li>
+                            <li id="menu-item-6740" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-6740"><a href="https://fosstodon.org/@micronaut"><i class="fab fa-mastodon"><span class="sr-only">Mastodon</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://discord.gg/9xRFsHv98T"><i class="fab fa-discord"><span class="sr-only">Discord</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://github.com/micronaut-projects/"><i class="fab fa-github"><span class="sr-only">GitHub</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.youtube.com/@MicronautFramework"><i class="fab fa-youtube"><span class="sr-only">YouTube</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.linkedin.com/showcase/micronaut"><i class="fab fa-linkedin"><span class="sr-only">LinkedIn</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.twitch.tv/micronautfw"><i class="fab fa-twitch"><span class="sr-only">Twitch</span></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="text-5" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <small>Guides are licensed under <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> for the writing/media and <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache.2.0</a> for the code</small>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>
