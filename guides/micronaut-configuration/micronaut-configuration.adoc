@@ -12,17 +12,16 @@ common:create-app-features.adoc[]
 
 Imagine a feature where you can configure a sports team in a declarative manner. The team has a few attributes like team name, color, and players.
 
-common:yaml-dependency.adoc[]
 
-resource:application.yml[tag=teamConfig]
+resource:application.properties[tag=teamConfig]
 
-With the Micronaut framework, we can use the `@ConfigurationProperties` annotation to slurp the configuration into a bean. Each property that matches the configuration in the `application.yml` will call the setter in the bean. The bean will be subsequently available for injection in the application!
+With the Micronaut framework, we can use the `@ConfigurationProperties` annotation to slurp the configuration into a bean. Each property that matches the configuration in the `application.properties` will call the setter in the bean. The bean will be subsequently available for injection in the application!
 
 source:TeamConfiguration[tags=teamConfigClassNoBuilder|gettersandsetters]
 
 === Test @ConfigurationProperties
 
-Let's validate that the bean is available in the application context and is created with the values declared in the `application.yml`.
+Let's validate that the bean is available in the application context and is created with the values declared in the `application.properties`.
 
 test:TeamConfigurationTest[tag=teamConfigSpecNoBuilder]
 
@@ -35,7 +34,7 @@ https://dzone.com/articles/design-patterns-the-builder-pattern[DZone] article to
 
 Let's suppose we want to add team administrators to a team. The team administration is composed by using a builder pattern object. We can add a coach, manager and president to the team.
 
-resource:application.yml[tag=allTeamConfig]
+resource:application.properties[tag=allTeamConfig]
 
 <1> `manager` property is an example of an element that will be built
 
@@ -58,7 +57,7 @@ source:TeamConfiguration[]
 
 callout:serdeable[]
 <2> Mark the builder as being ignored during serialization.
-<3> `prefixes` tells the Micronaut framework to find methods that are prefixed by `with`; `configurationPrefix` allows the developer to customize the `application.yml` element
+<3> `prefixes` tells the Micronaut framework to find methods that are prefixed by `with`; `configurationPrefix` allows the developer to customize the `application.properties` element
 <4> Instantiate the builder object so it can be populated with configuration values.
 
 === Test @ConfigurationBuilder
@@ -69,13 +68,13 @@ test:TeamConfigurationTest[tag=teamConfigSpecBuilder]
 
 <1> Properties which will invoke the builder methods on `TeamAdmin.Builder`
 <2> The builder object is now configured, so we must run `build()` on it to create the `TeamAdmin` object
-<3> Verify the object is created with the `application.yml` properties
+<3> Verify the object is created with the `application.properties` properties
 
 == Stadiums with @EachProperty
 
 The Micronaut framework is also able to read a "list" of configurations that are related. Imagine we would like to declare stadiums and their attributes.
 
-resource:application.yml[tag=stadiumConfig]
+resource:application.properties[tag=stadiumConfig]
 
 <1> This element will be the name of the bean.
 
