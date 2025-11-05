@@ -242,7 +242,7 @@
 <div class="listingblock">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide <span class="se">\</span>
-    <span class="nt">--features</span><span class="o">=</span>yaml,views-thymeleaf,security-jwt,security-oauth2,graalvm <span class="se">\</span>
+    <span class="nt">--features</span><span class="o">=</span>views-thymeleaf,security-jwt,security-oauth2,graalvm <span class="se">\</span>
     <span class="nt">--build</span><span class="o">=</span>maven <span class="se">\</span>
     <span class="nt">--lang</span><span class="o">=</span>java <span class="se">\</span>
     <span class="nt">--test</span><span class="o">=</span>junit</code></pre>
@@ -264,7 +264,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle with the <a
 <p>The previous command creates a Micronaut application with the default package <code>example.micronaut</code> in a directory named <code>micronautguide</code>.</p>
 </div>
 <div class="paragraph">
-<p>If you use Micronaut Launch, select Micronaut Application as application type and add <code>yaml</code>, <code>views-thymeleaf</code>, <code>security-jwt</code>, <code>security-oauth2</code>, and <code>graalvm</code> features.</p>
+<p>If you use Micronaut Launch, select Micronaut Application as application type and add <code>views-thymeleaf</code>, <code>security-jwt</code>, <code>security-oauth2</code>, and <code>graalvm</code> features.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -279,7 +279,7 @@ If you have an existing Micronaut application and want to add the functionality 
 </table>
 </div>
 <div class="paragraph">
-<p><a href="https://micronaut.io/launch?features=yaml&amp;features=views-thymeleaf&amp;features=security-jwt&amp;features=security-oauth2&amp;features=graalvm&amp;lang=JAVA&amp;build=MAVEN&amp;test=JUNIT&amp;name=micronautguide&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">Diff</a></p>
+<p><a href="https://micronaut.io/launch?features=views-thymeleaf&amp;features=security-jwt&amp;features=security-oauth2&amp;features=graalvm&amp;lang=JAVA&amp;build=MAVEN&amp;test=JUNIT&amp;name=micronautguide&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">Diff</a></p>
 </div>
 <div class="paragraph">
 <p><a href="https://guides.micronaut.io/latest/micronaut-intellij-idea-ide-setup.html">Setup IntelliJ IDEA to develop Micronaut Applications</a>.</p>
@@ -319,17 +319,15 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="sect2">
 <h3 id="start-in-port-8081">5.2. Start in Port 8081</h3>
 <div class="paragraph">
-<p>Create <code>src/main/resources/application-dev.yml</code>. The Micronaut framework applies this configuration file only for the <code>dev</code> environment.</p>
+<p>Create <code>src/main/resources/application-dev.properties</code>. The Micronaut framework applies this configuration file only for the <code>dev</code> environment.</p>
 </div>
 <div class="paragraph">
 <p>Configure the application to start in port 8081:</p>
 </div>
 <div class="listingblock">
-<div class="title">src/main/resources/application-dev.yml</div>
+<div class="title">src/main/resources/application-dev.properties</div>
 <div class="content">
-<pre class="rouge highlight"><code data-lang="yaml"><span class="na">micronaut</span><span class="pi">:</span>
-  <span class="na">server</span><span class="pi">:</span>
-    <span class="na">port</span><span class="pi">:</span> <span class="m">8081</span></code></pre>
+<pre class="rouge highlight"><code data-lang="properties"><span class="py">micronaut.server.port</span><span class="p">=</span><span class="s">8081</span></code></pre>
 </div>
 </div>
 </div>
@@ -387,21 +385,18 @@ If you have an existing Micronaut application and want to add the functionality 
 <p>Add the following OAuth2 Configuration:</p>
 </div>
 <div class="listingblock">
-<div class="title">src/main/resources/application-dev.yml</div>
+<div class="title">src/main/resources/application-dev.properties</div>
 <div class="content">
-<pre class="rouge highlight"><code data-lang="yaml"><span class="na">micronaut</span><span class="pi">:</span>
-  <span class="na">security</span><span class="pi">:</span>
-    <span class="na">authentication</span><span class="pi">:</span> <span class="s">idtoken</span> <i class="conum" data-value="1"></i><b>(1)</b>
-    <span class="na">oauth2</span><span class="pi">:</span>
-      <span class="na">clients</span><span class="pi">:</span>
-        <span class="na">keycloak</span><span class="pi">:</span> <i class="conum" data-value="2"></i><b>(2)</b>
-          <span class="na">client-secret</span><span class="pi">:</span> <span class="s1">'</span><span class="s">${OAUTH_CLIENT_SECRET:secret}'</span> <i class="conum" data-value="3"></i><b>(3)</b>
-          <span class="na">client-id</span><span class="pi">:</span> <span class="s1">'</span><span class="s">${OAUTH_CLIENT_ID:myclient}'</span> <i class="conum" data-value="4"></i><b>(4)</b>
-          <span class="na">openid</span><span class="pi">:</span>
-            <span class="na">issuer</span><span class="pi">:</span> <span class="s1">'</span><span class="s">${OIDC_ISSUER_DOMAIN:`http://localhost:8080`}/realms/${KEYCLOAK_REALM:myrealm}'</span> <i class="conum" data-value="5"></i><b>(5)</b>
-    <span class="na">endpoints</span><span class="pi">:</span>
-      <span class="na">logout</span><span class="pi">:</span>
-        <span class="na">get-allowed</span><span class="pi">:</span> <span class="no">true</span> <i class="conum" data-value="6"></i><b>(6)</b></code></pre>
+<pre class="rouge highlight"><code data-lang="properties"><i class="conum" data-value="1"></i><b>(1)</b>
+<span class="py">micronaut.security.authentication</span><span class="p">=</span><span class="s">idtoken</span>
+<i class="conum" data-value="2"></i><b>(2)</b>
+<span class="py">micronaut.security.oauth2.clients.keycloak.client-secret</span><span class="p">=</span><span class="s">${OAUTH_CLIENT_SECRET:secret}</span>
+<i class="conum" data-value="3"></i><b>(3)</b>
+<span class="py">micronaut.security.oauth2.clients.keycloak.client-id</span><span class="p">=</span><span class="s">${OAUTH_CLIENT_ID:myclient}</span>
+<i class="conum" data-value="4"></i><b>(4)</b>
+<span class="py">micronaut.security.oauth2.clients.keycloak.openid.issuer</span><span class="p">=</span><span class="s">${OIDC_ISSUER_DOMAIN:`http://localhost:8080`}/realms/${KEYCLOAK_REALM:myrealm}</span>
+<i class="conum" data-value="5"></i><b>(5)</b>
+<span class="py">micronaut.security.endpoints.logout.get-allowed</span><span class="p">=</span><span class="s">true</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">

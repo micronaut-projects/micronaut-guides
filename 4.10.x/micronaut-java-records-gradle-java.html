@@ -230,7 +230,7 @@
 <div class="listingblock">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide <span class="se">\</span>
-    <span class="nt">--features</span><span class="o">=</span>yaml,data-jdbc,liquibase,postgres,serialization-jackson,validation,graalvm <span class="se">\</span>
+    <span class="nt">--features</span><span class="o">=</span>data-jdbc,liquibase,postgres,serialization-jackson,validation,graalvm <span class="se">\</span>
     <span class="nt">--build</span><span class="o">=</span>gradle <span class="se">\</span>
     <span class="nt">--lang</span><span class="o">=</span>java <span class="se">\</span>
     <span class="nt">--test</span><span class="o">=</span>junit</code></pre>
@@ -252,7 +252,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle with the <a
 <p>The previous command creates a Micronaut application with the default package <code>example.micronaut</code> in a directory named <code>micronautguide</code>.</p>
 </div>
 <div class="paragraph">
-<p>If you use Micronaut Launch, select Micronaut Application as application type and add <code>yaml</code>, <code>data-jdbc</code>, <code>liquibase</code>, <code>postgres</code>, <code>serialization-jackson</code>, <code>validation</code>, and <code>graalvm</code> features.</p>
+<p>If you use Micronaut Launch, select Micronaut Application as application type and add <code>data-jdbc</code>, <code>liquibase</code>, <code>postgres</code>, <code>serialization-jackson</code>, <code>validation</code>, and <code>graalvm</code> features.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -267,7 +267,7 @@ If you have an existing Micronaut application and want to add the functionality 
 </table>
 </div>
 <div class="paragraph">
-<p><a href="https://micronaut.io/launch?features=yaml&amp;features=data-jdbc&amp;features=liquibase&amp;features=postgres&amp;features=serialization-jackson&amp;features=validation&amp;features=graalvm&amp;lang=JAVA&amp;build=GRADLE&amp;test=JUNIT&amp;name=micronautguide&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">Diff</a></p>
+<p><a href="https://micronaut.io/launch?features=data-jdbc&amp;features=liquibase&amp;features=postgres&amp;features=serialization-jackson&amp;features=validation&amp;features=graalvm&amp;lang=JAVA&amp;build=GRADLE&amp;test=JUNIT&amp;name=micronautguide&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">Diff</a></p>
 </div>
 <div class="paragraph">
 <p><a href="https://guides.micronaut.io/latest/micronaut-intellij-idea-ide-setup.html">Setup IntelliJ IDEA to develop Micronaut Applications</a>.</p>
@@ -411,28 +411,13 @@ If you use <a href="https://launch.micronaut.io">Micronaut Launch</a>, select "M
 </div>
 </div>
 <div class="paragraph">
-<p>Configure the database migrations directory for <a href="http://www.liquibase.org">Liquibase</a> in <code>application.yml</code>.</p>
-</div>
-<div class="admonitionblock warning">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-warning" title="Warning"></i>
-</td>
-<td class="content">
-<a href="https://micronaut.io/2023/02/19/micronaut-framework-4-0-and-snakeyaml-transitive-dependency/">Since Micronaut Framework 4.0, to use YAML configuration, you have to add the YAML dependency</a>.
-</td>
-</tr>
-</table>
+<p>Configure the database migrations directory for <a href="http://www.liquibase.org">Liquibase</a> in <code>application.properties</code>.</p>
 </div>
 <div class="listingblock">
-<div class="title">src/main/resources/application.yml</div>
+<div class="title">src/main/resources/application.properties</div>
 <div class="content">
-<pre class="rouge highlight"><code data-lang="yaml"><span class="na">liquibase</span><span class="pi">:</span>
-  <span class="na">enabled</span><span class="pi">:</span> <span class="no">true</span>
-  <span class="na">datasources</span><span class="pi">:</span>
-    <span class="na">default</span><span class="pi">:</span>
-      <span class="na">change-log</span><span class="pi">:</span> <span class="s1">'</span><span class="s">classpath:db/liquibase-changelog.xml'</span></code></pre>
+<pre class="rouge highlight"><code data-lang="properties"><span class="py">liquibase.enabled</span><span class="p">=</span><span class="s">true</span>
+<span class="py">liquibase.datasources.default.change-log</span><span class="p">=</span><span class="s">classpath:db/liquibase-changelog.xml</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -862,16 +847,17 @@ If you use <a href="https://launch.micronaut.io">Micronaut Launch</a>, select "M
 <h2 id="datasource-configuration">6. Datasource configuration</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Although the URL is configured automatically via <a href="#test-resources">Test Resources</a>, we must configure the PostgreSQL driver and dialect in <code>application.yml</code>:</p>
+<p>Although the URL is configured automatically via <a href="#test-resources">Test Resources</a>, we must configure the PostgreSQL driver and dialect in <code>application.properties</code>:</p>
 </div>
 <div class="listingblock">
-<div class="title">src/main/resources/application.yml</div>
+<div class="title">src/main/resources/application.properties</div>
 <div class="content">
-<pre class="rouge highlight"><code data-lang="yaml"><span class="na">datasources</span><span class="pi">:</span>
-  <span class="na">default</span><span class="pi">:</span>
-    <span class="na">driverClassName</span><span class="pi">:</span> <span class="s">org.postgresql.Driver</span>  <i class="conum" data-value="1"></i><b>(1)</b>
-    <span class="na">dialect</span><span class="pi">:</span> <span class="s">POSTGRES</span> <i class="conum" data-value="2"></i><b>(2)</b>
-    <span class="na">schema-generate</span><span class="pi">:</span> <span class="s">NONE</span> <i class="conum" data-value="3"></i><b>(3)</b></code></pre>
+<pre class="rouge highlight"><code data-lang="properties"><i class="conum" data-value="1"></i><b>(1)</b>
+<span class="py">datasources.default.driver-class-name</span><span class="p">=</span><span class="s">org.postgresql.Driver</span>
+<i class="conum" data-value="2"></i><b>(2)</b>
+<span class="py">datasources.default.dialect</span><span class="p">=</span><span class="s">POSTGRES</span>
+<i class="conum" data-value="3"></i><b>(3)</b>
+<span class="py">datasources.default.schema-generate</span><span class="p">=</span><span class="s">NONE</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">

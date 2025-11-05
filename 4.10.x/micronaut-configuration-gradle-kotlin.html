@@ -221,7 +221,7 @@
 <div class="listingblock">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide <span class="se">\</span>
-    <span class="nt">--features</span><span class="o">=</span>yaml,serialization-jackson,graalvm,kapt <span class="se">\</span>
+    <span class="nt">--features</span><span class="o">=</span>serialization-jackson,graalvm,kapt <span class="se">\</span>
     <span class="nt">--build</span><span class="o">=</span>gradle <span class="se">\</span>
     <span class="nt">--lang</span><span class="o">=</span>kotlin <span class="se">\</span>
     <span class="nt">--test</span><span class="o">=</span>junit</code></pre>
@@ -243,7 +243,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle with the <a
 <p>The previous command creates a Micronaut application with the default package <code>example.micronaut</code> in a directory named <code>micronautguide</code>.</p>
 </div>
 <div class="paragraph">
-<p>If you use Micronaut Launch, select Micronaut Application as application type and add <code>yaml</code>, <code>serialization-jackson</code>, <code>graalvm</code>, and <code>kapt</code> features.</p>
+<p>If you use Micronaut Launch, select Micronaut Application as application type and add <code>serialization-jackson</code>, <code>graalvm</code>, and <code>kapt</code> features.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -258,7 +258,7 @@ If you have an existing Micronaut application and want to add the functionality 
 </table>
 </div>
 <div class="paragraph">
-<p><a href="https://micronaut.io/launch?features=yaml&amp;features=serialization-jackson&amp;features=graalvm&amp;features=kapt&amp;lang=KOTLIN&amp;build=GRADLE&amp;test=JUNIT&amp;name=micronautguide&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">Diff</a></p>
+<p><a href="https://micronaut.io/launch?features=serialization-jackson&amp;features=graalvm&amp;features=kapt&amp;lang=KOTLIN&amp;build=GRADLE&amp;test=JUNIT&amp;name=micronautguide&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">Diff</a></p>
 </div>
 <div class="paragraph">
 <p><a href="https://guides.micronaut.io/latest/micronaut-intellij-idea-ide-setup.html">Setup IntelliJ IDEA to develop Micronaut Applications</a>.</p>
@@ -271,31 +271,17 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="paragraph">
 <p>Imagine a feature where you can configure a sports team in a declarative manner. The team has a few attributes like team name, color, and players.</p>
 </div>
-<div class="admonitionblock warning">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-warning" title="Warning"></i>
-</td>
-<td class="content">
-<a href="https://micronaut.io/2023/02/19/micronaut-framework-4-0-and-snakeyaml-transitive-dependency/">Since Micronaut Framework 4.0, to use YAML configuration, you have to add the YAML dependency</a>.
-</td>
-</tr>
-</table>
-</div>
 <div class="listingblock">
-<div class="title">src/main/resources/application.yml</div>
+<div class="title">src/main/resources/application.properties</div>
 <div class="content">
-<pre class="rouge highlight"><code data-lang="yaml"><span class="na">team</span><span class="pi">:</span>
-  <span class="na">name</span><span class="pi">:</span> <span class="s1">'</span><span class="s">Steelers'</span>
-  <span class="na">color</span><span class="pi">:</span> <span class="s1">'</span><span class="s">Black'</span>
-  <span class="na">player-names</span><span class="pi">:</span>
-    <span class="pi">-</span> <span class="s1">'</span><span class="s">Mason</span><span class="nv"> </span><span class="s">Rudolph'</span>
-    <span class="pi">-</span> <span class="s1">'</span><span class="s">James</span><span class="nv"> </span><span class="s">Connor'</span></code></pre>
+<pre class="rouge highlight"><code data-lang="properties"><span class="py">team.name</span><span class="p">=</span><span class="s">Steelers</span>
+<span class="py">team.color</span><span class="p">=</span><span class="s">Black</span>
+<span class="err">team.player-names[0]=Mason</span> <span class="err">Rudolph</span>
+<span class="err">team.player-names[1]=James</span> <span class="err">Connor</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>With the Micronaut framework, we can use the <code>@ConfigurationProperties</code> annotation to slurp the configuration into a bean. Each property that matches the configuration in the <code>application.yml</code> will call the setter in the bean. The bean will be subsequently available for injection in the application!</p>
+<p>With the Micronaut framework, we can use the <code>@ConfigurationProperties</code> annotation to slurp the configuration into a bean. Each property that matches the configuration in the <code>application.properties</code> will call the setter in the bean. The bean will be subsequently available for injection in the application!</p>
 </div>
 <div class="listingblock">
 <div class="title">src/main/kotlin/example/micronaut/TeamConfiguration.kt</div>
@@ -310,7 +296,7 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="sect2">
 <h3 id="test-configurationproperties">5.1. Test @ConfigurationProperties</h3>
 <div class="paragraph">
-<p>Let&#8217;s validate that the bean is available in the application context and is created with the values declared in the <code>application.yml</code>.</p>
+<p>Let&#8217;s validate that the bean is available in the application context and is created with the values declared in the <code>application.properties</code>.</p>
 </div>
 <div class="listingblock">
 <div class="title">src/test/kotlin/example/micronaut/TeamConfigurationTest.kt</div>
@@ -359,18 +345,16 @@ If you have an existing Micronaut application and want to add the functionality 
 <p>Let&#8217;s suppose we want to add team administrators to a team. The team administration is composed by using a builder pattern object. We can add a coach, manager and president to the team.</p>
 </div>
 <div class="listingblock">
-<div class="title">src/main/resources/application.yml</div>
+<div class="title">src/main/resources/application.properties</div>
 <div class="content">
-<pre class="rouge highlight"><code data-lang="yaml"><span class="na">team</span><span class="pi">:</span>
-  <span class="na">name</span><span class="pi">:</span> <span class="s1">'</span><span class="s">Steelers'</span>
-  <span class="na">color</span><span class="pi">:</span> <span class="s1">'</span><span class="s">Black'</span>
-  <span class="na">player-names</span><span class="pi">:</span>
-    <span class="pi">-</span> <span class="s1">'</span><span class="s">Mason</span><span class="nv"> </span><span class="s">Rudolph'</span>
-    <span class="pi">-</span> <span class="s1">'</span><span class="s">James</span><span class="nv"> </span><span class="s">Connor'</span>
-  <span class="na">team-admin</span><span class="pi">:</span>
-    <span class="na">manager</span><span class="pi">:</span> <span class="s1">'</span><span class="s">Nirav</span><span class="nv"> </span><span class="s">Assar'</span> <i class="conum" data-value="1"></i><b>(1)</b>
-    <span class="na">coach</span><span class="pi">:</span> <span class="s1">'</span><span class="s">Mike</span><span class="nv"> </span><span class="s">Tomlin'</span>
-    <span class="na">president</span><span class="pi">:</span> <span class="s1">'</span><span class="s">Dan</span><span class="nv"> </span><span class="s">Rooney'</span></code></pre>
+<pre class="rouge highlight"><code data-lang="properties"><span class="py">team.name</span><span class="p">=</span><span class="s">Steelers</span>
+<span class="py">team.color</span><span class="p">=</span><span class="s">Black</span>
+<span class="err">team.player-names[0]=Mason</span> <span class="err">Rudolph</span>
+<span class="err">team.player-names[1]=James</span> <span class="err">Connor</span>
+<i class="conum" data-value="1"></i><b>(1)</b>
+<span class="py">team.team-admin.manager</span><span class="p">=</span><span class="s">Nirav Assar</span>
+<span class="py">team.team-admin.coach</span><span class="p">=</span><span class="s">Mike Tomlin</span>
+<span class="py">team.team-admin.president</span><span class="p">=</span><span class="s">Dan Rooney</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -482,7 +466,7 @@ We are using the builder only here, so we will have to call <code>builder.build(
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
-<td><code>prefixes</code> tells the Micronaut framework to find methods that are prefixed by <code>with</code>; <code>configurationPrefix</code> allows the developer to customize the <code>application.yml</code> element</td>
+<td><code>prefixes</code> tells the Micronaut framework to find methods that are prefixed by <code>with</code>; <code>configurationPrefix</code> allows the developer to customize the <code>application.properties</code> element</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
@@ -541,7 +525,7 @@ We are using the builder only here, so we will have to call <code>builder.build(
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>Verify the object is created with the <code>application.yml</code> properties</td>
+<td>Verify the object is created with the <code>application.properties</code> properties</td>
 </tr>
 </table>
 </div>
@@ -555,15 +539,13 @@ We are using the builder only here, so we will have to call <code>builder.build(
 <p>The Micronaut framework is also able to read a "list" of configurations that are related. Imagine we would like to declare stadiums and their attributes.</p>
 </div>
 <div class="listingblock">
-<div class="title">src/main/resources/application.yml</div>
+<div class="title">src/main/resources/application.properties</div>
 <div class="content">
-<pre class="rouge highlight"><code data-lang="yaml"><span class="na">stadium</span><span class="pi">:</span>
-  <span class="na">coors</span><span class="pi">:</span> <i class="conum" data-value="1"></i><b>(1)</b>
-    <span class="na">city</span><span class="pi">:</span> <span class="s1">'</span><span class="s">Denver'</span>
-    <span class="na">size</span><span class="pi">:</span> <span class="m">50000</span>
-  <span class="na">pnc</span><span class="pi">:</span>
-    <span class="na">city</span><span class="pi">:</span> <span class="s1">'</span><span class="s">Pittsburgh'</span>
-    <span class="na">size</span><span class="pi">:</span> <span class="m">35000</span></code></pre>
+<pre class="rouge highlight"><code data-lang="properties"><i class="conum" data-value="1"></i><b>(1)</b>
+<span class="py">stadium.coors.city</span><span class="p">=</span><span class="s">Denver</span>
+<span class="py">stadium.coors.size</span><span class="p">=</span><span class="s">50000</span>
+<span class="py">stadium.pnc.city</span><span class="p">=</span><span class="s">Pittsburgh</span>
+<span class="py">stadium.pnc.size</span><span class="p">=</span><span class="s">35000</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">

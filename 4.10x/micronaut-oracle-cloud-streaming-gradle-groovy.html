@@ -729,17 +729,16 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle with the <a
 </div>
 </div>
 <div class="paragraph">
-<p>Delete the <code>kafka.bootstrap.servers</code> config option from <code>application.yml</code> and move it to <code>application-dev.yml</code>.</p>
+<p>Delete the <code>kafka.bootstrap.servers</code> config option from <code>application.properties</code> and move it to <code>application-dev.properties</code>.</p>
 </div>
 <div class="paragraph">
-<p>Create <code>src/main/resources/application-dev.yml</code>. The Micronaut framework applies this configuration file only for the <code>dev</code> environment.</p>
+<p>Create <code>src/main/resources/application-dev.properties</code>. The Micronaut framework applies this configuration file only for the <code>dev</code> environment.</p>
 </div>
 <div class="listingblock">
-<div class="title">chess-game/src/main/resources/application-dev.yml</div>
+<div class="title">chess-game/src/main/resources/application-dev.properties</div>
 <div class="content">
-<pre class="rouge highlight"><code data-lang="yaml"><span class="na">kafka</span><span class="pi">:</span>
-  <span class="na">bootstrap</span><span class="pi">:</span>
-    <span class="na">servers</span><span class="pi">:</span> <span class="s">localhost:9092</span> <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+<pre class="rouge highlight"><code data-lang="properties"><i class="conum" data-value="1"></i><b>(1)</b>
+<span class="py">kafka.bootstrap.servers</span><span class="p">=</span><span class="s">localhost:9092</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -754,28 +753,13 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle with the <a
 <div class="sect3">
 <h4 id="static-resources">4.1.5. Static Resources</h4>
 <div class="paragraph">
-<p>Update <code>application.yml</code> to add static resource configuration:</p>
-</div>
-<div class="admonitionblock warning">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-warning" title="Warning"></i>
-</td>
-<td class="content">
-<a href="https://micronaut.io/2023/02/19/micronaut-framework-4-0-and-snakeyaml-transitive-dependency/">Since Micronaut Framework 4.0, to use YAML configuration, you have to add the YAML dependency</a>.
-</td>
-</tr>
-</table>
+<p>Update <code>application.properties</code> to add static resource configuration:</p>
 </div>
 <div class="listingblock">
-<div class="title">chess-game/src/main/resources/application.yml</div>
+<div class="title">chess-game/src/main/resources/application.properties</div>
 <div class="content">
-<pre class="rouge highlight"><code data-lang="yaml"><span class="na">micronaut</span><span class="pi">:</span>
-  <span class="na">router</span><span class="pi">:</span>
-    <span class="na">static-resources</span><span class="pi">:</span>
-      <span class="na">default</span><span class="pi">:</span>
-        <span class="na">paths</span><span class="pi">:</span> <span class="s">classpath:public</span> <i class="conum" data-value="1"></i><b>(1)</b></code></pre>
+<pre class="rouge highlight"><code data-lang="properties"><i class="conum" data-value="1"></i><b>(1)</b>
+<span class="py">micronaut.router.static-resources.default.paths</span><span class="p">=</span><span class="s">classpath:public</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -1051,15 +1035,12 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle with the <a
 <div class="sect3">
 <h4 id="flyway">4.2.1. Flyway</h4>
 <div class="paragraph">
-<p>Enable Flyway database migrations for all environments by adding this configuration to <code>application.yml</code>:</p>
+<p>Enable Flyway database migrations for all environments by adding this configuration to <code>application.properties</code>:</p>
 </div>
 <div class="listingblock">
-<div class="title">chess-listener/src/main/resources/application.yml</div>
+<div class="title">chess-listener/src/main/resources/application.properties</div>
 <div class="content">
-<pre class="rouge highlight"><code data-lang="yaml"><span class="na">flyway</span><span class="pi">:</span>
-  <span class="na">datasources</span><span class="pi">:</span>
-    <span class="na">default</span><span class="pi">:</span>
-      <span class="na">enabled</span><span class="pi">:</span> <span class="no">true</span></code></pre>
+<pre class="rouge highlight"><code data-lang="properties"><span class="py">flyway.datasources.default.enabled</span><span class="p">=</span><span class="s">true</span></code></pre>
 </div>
 </div>
 </div>
@@ -1548,33 +1529,24 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle with the <a
 </div>
 </div>
 <div class="paragraph">
-<p>Create <code>src/main/resources/application-dev.yml</code>. The Micronaut framework applies this configuration file only for the <code>dev</code> environment.</p>
+<p>Create <code>src/main/resources/application-dev.properties</code>. The Micronaut framework applies this configuration file only for the <code>dev</code> environment.</p>
 </div>
 <div class="listingblock">
-<div class="title">chess-listener/src/main/resources/application-dev.yml</div>
+<div class="title">chess-listener/src/main/resources/application-dev.properties</div>
 <div class="content">
-<pre class="rouge highlight"><code data-lang="yaml"><span class="na">micronaut</span><span class="pi">:</span>
-  <span class="na">server</span><span class="pi">:</span>
-    <span class="na">port</span><span class="pi">:</span> <span class="s">8081</span> <i class="conum" data-value="1"></i><b>(1)</b>
-
-<span class="na">datasources</span><span class="pi">:</span>
-  <span class="na">default</span><span class="pi">:</span>
-    <span class="na">url</span><span class="pi">:</span> <span class="s">jdbc:h2:mem:devDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE</span> <i class="conum" data-value="2"></i><b>(2)</b>
-    <span class="na">driverClassName</span><span class="pi">:</span> <span class="s">org.h2.Driver</span>
-    <span class="na">username</span><span class="pi">:</span> <span class="s">sa</span>
-    <span class="na">password</span><span class="pi">:</span> <span class="s1">'</span><span class="s">'</span>
-    <span class="na">schema-generate</span><span class="pi">:</span> <span class="s">none</span>
-    <span class="na">dialect</span><span class="pi">:</span> <span class="s">H2</span>
-
-<span class="na">kafka</span><span class="pi">:</span>
-  <span class="na">bootstrap</span><span class="pi">:</span>
-    <span class="na">servers</span><span class="pi">:</span> <span class="s">localhost:9092</span> <i class="conum" data-value="3"></i><b>(3)</b>
-
-<span class="na">flyway</span><span class="pi">:</span>
-  <span class="na">datasources</span><span class="pi">:</span>
-    <span class="na">default</span><span class="pi">:</span>
-      <span class="na">locations</span><span class="pi">:</span>
-        <span class="pi">-</span> <span class="s">classpath:db/migration/h2</span> <i class="conum" data-value="4"></i><b>(4)</b></code></pre>
+<pre class="rouge highlight"><code data-lang="properties"><i class="conum" data-value="1"></i><b>(1)</b>
+<span class="py">micronaut.server.port</span><span class="p">=</span><span class="s">8081</span>
+<i class="conum" data-value="2"></i><b>(2)</b>
+<span class="py">datasources.default.url</span><span class="p">=</span><span class="s">jdbc:h2:mem:devDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE</span>
+<span class="py">datasources.default.driverClassName</span><span class="p">=</span><span class="s">org.h2.Driver</span>
+<span class="py">datasources.default.username</span><span class="p">=</span><span class="s">sa</span>
+<span class="py">datasources.default.password</span><span class="p">=</span>
+<span class="py">datasources.default.schema-generate</span><span class="p">=</span><span class="s">none</span>
+<span class="py">datasources.default.dialect</span><span class="p">=</span><span class="s">H2</span>
+<i class="conum" data-value="3"></i><b>(3)</b>
+<span class="py">kafka.bootstrap.servers</span><span class="p">=</span><span class="s">localhost:9092</span>
+<i class="conum" data-value="4"></i><b>(4)</b>
+<span class="err">flyway.datasources.default.locations[0]=</span><span class="py">classpath</span><span class="p">:</span><span class="s">db/migration/h2</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -1585,11 +1557,11 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle with the <a
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Use an in-memory H2 database. Delete the <code>datasources</code> block so it&#8217;s only in <code>application-dev.yml</code></td>
+<td>Use an in-memory H2 database. Delete the <code>datasources</code> block so it&#8217;s only in <code>application-dev.properties</code></td>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>Use local Kafka. Delete the <code>kafka.bootstrap.servers</code> property so it&#8217;s only in <code>application-dev.yml</code></td>
+<td>Use local Kafka. Delete the <code>kafka.bootstrap.servers</code> property so it&#8217;s only in <code>application-dev.properties</code></td>
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
@@ -1789,27 +1761,22 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle with the <a
 <div class="sect3">
 <h4 id="configuration">7.1.2. Configuration</h4>
 <div class="paragraph">
-<p>Create <code>src/main/resources/application-oraclecloud.yml</code>. The Micronaut framework applies this configuration file only for the <code>oraclecloud</code> environment.</p>
+<p>Create <code>src/main/resources/application-oraclecloud.properties</code>. The Micronaut framework applies this configuration file only for the <code>oraclecloud</code> environment.</p>
 </div>
 <div class="listingblock">
-<div class="title">chess-listener/src/main/resources/application-oraclecloud.yml</div>
+<div class="title">chess-listener/src/main/resources/application-oraclecloud.properties</div>
 <div class="content">
-<pre class="rouge highlight"><code data-lang="yaml"><span class="na">datasources</span><span class="pi">:</span>
-  <span class="na">default</span><span class="pi">:</span>
-    <span class="na">ocid</span><span class="pi">:</span> <i class="conum" data-value="1"></i><b>(1)</b>
-    <span class="na">walletPassword</span><span class="pi">:</span> <i class="conum" data-value="2"></i><b>(2)</b>
-    <span class="na">username</span><span class="pi">:</span> <span class="s">micronautdemo</span>
-    <span class="na">password</span><span class="pi">:</span> <i class="conum" data-value="3"></i><b>(3)</b>
-
-<span class="na">oci</span><span class="pi">:</span>
-  <span class="na">config</span><span class="pi">:</span>
-    <span class="na">profile</span><span class="pi">:</span> <span class="s">DEFAULT</span> <i class="conum" data-value="4"></i><b>(4)</b>
-
-<span class="na">flyway</span><span class="pi">:</span>
-  <span class="na">datasources</span><span class="pi">:</span>
-    <span class="na">default</span><span class="pi">:</span>
-      <span class="na">locations</span><span class="pi">:</span>
-        <span class="pi">-</span> <span class="s">classpath:db/migration/oracle</span> <i class="conum" data-value="5"></i><b>(5)</b></code></pre>
+<pre class="rouge highlight"><code data-lang="properties"><i class="conum" data-value="1"></i><b>(1)</b>
+<span class="py">datasources.default.ocid</span><span class="p">=</span>
+<i class="conum" data-value="2"></i><b>(2)</b>
+<span class="py">datasources.default.walletPassword</span><span class="p">=</span>
+<span class="py">datasources.default.username</span><span class="p">=</span><span class="s">micronautdemo</span>
+<i class="conum" data-value="3"></i><b>(3)</b>
+<span class="py">datasources.default.password</span><span class="p">=</span>
+<i class="conum" data-value="4"></i><b>(4)</b>
+<span class="py">oci.config.profile</span><span class="p">=</span><span class="s">DEFAULT</span>
+<i class="conum" data-value="5"></i><b>(5)</b>
+<span class="err">flyway.datasources.default.locations[0]=</span><span class="py">classpath</span><span class="p">:</span><span class="s">db/migration/oracle</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -2113,27 +2080,24 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle with the <a
 <div class="sect3">
 <h4 id="application-configuration">7.2.4. Application configuration</h4>
 <div class="paragraph">
-<p>Create <code>src/main/resources/application-oraclecloud.yml</code> in the <code>chess-game</code> microservice. Add the following there, and also add it to the <code>application-oraclecloud.yml</code> you already created in the <code>chess-listener</code> microservice:</p>
+<p>Create <code>src/main/resources/application-oraclecloud.properties</code> in the <code>chess-game</code> microservice. Add the following there, and also add it to the <code>application-oraclecloud.properties</code> you already created in the <code>chess-listener</code> microservice:</p>
 </div>
 <div class="listingblock">
-<div class="title">chess-game/src/main/resources/application-oraclecloud.yml</div>
+<div class="title">chess-game/src/main/resources/application-oraclecloud.properties</div>
 <div class="content">
-<pre class="rouge highlight"><code data-lang="yaml"><span class="na">kafka</span><span class="pi">:</span>
-  <span class="na">bootstrap</span><span class="pi">:</span>
-    <span class="na">servers</span><span class="pi">:</span> <i class="conum" data-value="1"></i><b>(1)</b>
-  <span class="na">security</span><span class="pi">:</span>
-    <span class="na">protocol</span><span class="pi">:</span> <span class="s">SASL_SSL</span>
-  <span class="na">sasl</span><span class="pi">:</span>
-    <span class="na">mechanism</span><span class="pi">:</span> <span class="s">PLAIN</span>
-    <span class="na">jaas</span><span class="pi">:</span>
-      <span class="na">config</span><span class="pi">:</span>  <i class="conum" data-value="2"></i><b>(2)</b>
-  <span class="na">retries</span><span class="pi">:</span> <span class="m">3</span>
-  <span class="na">max</span><span class="pi">:</span>
-    <span class="na">request</span><span class="pi">:</span>
-      <span class="na">size</span><span class="pi">:</span> <span class="s">1048576</span> <i class="conum" data-value="3"></i><b>(3)</b>
-    <span class="na">partition</span><span class="pi">:</span>
-      <span class="na">fetch</span><span class="pi">:</span>
-        <span class="na">bytes</span><span class="pi">:</span> <span class="s">1048576</span> <i class="conum" data-value="4"></i><b>(4)</b></code></pre>
+<pre class="rouge highlight"><code data-lang="properties"><i class="conum" data-value="1"></i><b>(1)</b>
+<span class="py">kafka.bootstrap.servers</span><span class="p">=</span>
+
+<span class="py">kafka.security.protocol</span><span class="p">=</span><span class="s">SASL_SSL</span>
+<span class="py">kafka.sasl.mechanism</span><span class="p">=</span><span class="s">PLAIN</span>
+<i class="conum" data-value="2"></i><b>(2)</b>
+<span class="py">kafka.sasl.jaas.config</span><span class="p">=</span>
+
+<span class="py">kafka.retries</span><span class="p">=</span><span class="s">3</span>
+<i class="conum" data-value="3"></i><b>(3)</b>
+<span class="py">kafka.max.request.size</span><span class="p">=</span><span class="s">1048576</span>
+<i class="conum" data-value="4"></i><b>(4)</b>
+<span class="py">kafka.max.partition.fetch.bytes</span><span class="p">=</span><span class="s">1048576</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -2806,23 +2770,19 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle with the <a
 </table>
 </div>
 <div class="paragraph">
-<p>Create <code>application-test.yml</code> file in <code>src/test/resources</code> with this content:</p>
+<p>Create <code>application-test.properties</code> file in <code>src/test/resources</code> with this content:</p>
 </div>
 <div class="listingblock">
-<div class="title">chess-listener/src/test/resources/application-test.yml</div>
+<div class="title">chess-listener/src/test/resources/application-test.properties</div>
 <div class="content">
-<pre class="rouge highlight"><code data-lang="yaml"><span class="na">datasources</span><span class="pi">:</span>
-  <span class="na">default</span><span class="pi">:</span>
-    <span class="na">url</span><span class="pi">:</span> <span class="s">jdbc:tc:oracle:thin:@/xe</span>
-    <span class="na">driverClassName</span><span class="pi">:</span> <span class="s">org.testcontainers.jdbc.ContainerDatabaseDriver</span>
-    <span class="na">username</span><span class="pi">:</span> <span class="s">system</span>
-    <span class="na">password</span><span class="pi">:</span> <span class="s">oracle</span>
-<span class="na">flyway</span><span class="pi">:</span>
-  <span class="na">datasources</span><span class="pi">:</span>
-    <span class="na">default</span><span class="pi">:</span>
-      <span class="na">locations</span><span class="pi">:</span> <span class="s">classpath:db/migration/oracle</span>
-      <span class="na">baseline-version</span><span class="pi">:</span> <span class="m">0</span>
-      <span class="na">baseline-on-migrate</span><span class="pi">:</span> <span class="no">true</span></code></pre>
+<pre class="rouge highlight"><code data-lang="properties"><span class="py">datasources.default.url</span><span class="p">=</span><span class="s">jdbc:tc:oracle:thin:@/xe</span>
+<span class="py">datasources.default.driverClassName</span><span class="p">=</span><span class="s">org.testcontainers.jdbc.ContainerDatabaseDriver</span>
+<span class="py">datasources.default.username</span><span class="p">=</span><span class="s">system</span>
+<span class="py">datasources.default.password</span><span class="p">=</span><span class="s">oracle</span>
+
+<span class="py">flyway.datasources.default.locations</span><span class="p">=</span><span class="s">classpath:db/migration/oracle</span>
+<span class="py">flyway.datasources.default.baseline-version</span><span class="p">=</span><span class="s">0</span>
+<span class="py">flyway.datasources.default.baseline-on-migrate</span><span class="p">=</span><span class="s">true</span></code></pre>
 </div>
 </div>
 </div>
@@ -2854,7 +2814,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle with the <a
 <div class="sect2">
 <h3 id="instance-principal-authentication">10.1. Instance Principal authentication</h3>
 <div class="paragraph">
-<p>The current configuration in <code>application-oraclecloud.yml</code> works when running locally using OCI resources (ATP database and Cloud Streams) but won&#8217;t work when deploying the application because it doesn&#8217;t make sense to install the Oracle Cloud CLI in Compute instances. Instead, we&#8217;ll use <a href="https://micronaut-projects.github.io/micronaut-oracle-cloud/latest/guide/#instance-principals">Instance Principal authentication</a>.</p>
+<p>The current configuration in <code>application-oraclecloud.properties</code> works when running locally using OCI resources (ATP database and Cloud Streams) but won&#8217;t work when deploying the application because it doesn&#8217;t make sense to install the Oracle Cloud CLI in Compute instances. Instead, we&#8217;ll use <a href="https://micronaut-projects.github.io/micronaut-oracle-cloud/latest/guide/#instance-principals">Instance Principal authentication</a>.</p>
 </div>
 <div class="paragraph">
 <p>To use this, we need to update the config, create a dynamic group, and add policy statements granting permissions.</p>
@@ -2903,7 +2863,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle with the <a
 <div class="sect3">
 <h4 id="configuration-2">10.1.3. Configuration</h4>
 <div class="paragraph">
-<p>Edit <code>application-oraclecloud.yml</code> in the <code>chess-listener</code> microservice and replace</p>
+<p>Edit <code>application-oraclecloud.properties</code> in the <code>chess-listener</code> microservice and replace</p>
 </div>
 <div class="listingblock">
 <div class="content">
