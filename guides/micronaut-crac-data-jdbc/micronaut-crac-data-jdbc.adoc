@@ -1,0 +1,133 @@
+common:header-top.adoc[]
+
+common:crac.adoc[]
+
+common:requirements-testcontainers.adoc[]
+
+common:gettingStarted.adoc[]
+
+common:completesolution.adoc[]
+
+common:create-app-features.adoc[]
+
+common:data-jdbc-postgresql-configuration.adoc[]
+
+:leveloffset: +1
+
+== Micronaut CRaC Dependency
+
+Add the Micronaut CRaC dependency:
+
+dependency:micronaut-crac[groupId=io.micronaut.crac]
+
+It has a transitive dependency to https://github.com/CRaC/org.crac[org.crac:crac].
+
+== Configuration Allow Pool Suspension
+
+To use Hikari Datasources with Micronaut CRaC you need to allow suspension.
+
+resource:application.properties[tag=allow-pool-suspension]
+
+When a checkpoint is taken, the pool is suspended and the connections are closed. When the checkpoint is restored, the pool is resumed and the connections are re-established.
+
+== Entity
+
+common:mapped-entity-intro.adoc[]
+
+source:Message[]
+
+callout:mapped-entity[1]
+callout:mapped-entity-id[2]
+
+== Repository
+
+common:jdbc-repository-intro.adoc[]
+
+source:MessageRepository[]
+
+callout:jdbcrepository[1]
+callout:crudrepository[2]
+
+== ServerStartupEvent Event Listener
+
+Save a message on startup:
+
+source:ServerStartupEventListener[]
+callout:singleton[1]
+callout:application-event-listener-startup-event[2]
+callout:constructor-di[number=3,arg0=MessageRepository]
+callout:server-startup-event.adoc[4]
+
+== Controller
+
+common:helloworld-controller-intro.adoc[]
+
+Create a controller that uses the repository:
+
+source:HelloWorldController[]
+
+callout:controller[number=1,arg0=/]
+callout:constructor-di[number=2,arg0=MessageRepository]
+callout:get-generic[3]
+
+== Test
+
+To simplify testing, we create a utility class that allows you to run a test scenario before and after the checkpoint.
+
+test:CheckpointTestUtils[]
+
+You could write a test for the previous controller:
+
+test:HelloWorldControllerTest[]
+
+:leveloffset: -1
+
+== Testing
+
+:leveloffset: +1
+
+common:test-resources-postgres.adoc[]
+
+common:testApp.adoc[]
+
+:leveloffset: -1
+
+== Running the Application
+
+:leveloffset: +1
+
+== Run PostgreSQL with Docker
+
+common:run-postgres-with-docker.adoc[]
+
+common:dev-env.adoc[]
+
+common:crac-eagerly-initialize-singletons-intro.adoc[]
+
+common:default-dev-environment-application-dev-properties.adoc[]
+
+The above configuration allows the application, which we will run as a Docker image, to connect to the PostgreSQL instance, which we run as a Docker image as well.
+
+common:docker-crac.adoc[]
+
+== Run the Application with Docker
+
+The Docker Image entry point is the CRaC checkpoint, you can run it with:
+
+common:docker-run.adoc[]
+
+common:helloworld-curl.adoc[]
+
+:leveloffset: -1
+
+== Conclusion
+
+As you have seen in this guide, you can use Micronaut CRaC today with Netty runtime, Micronaut Data JDBC, and Hikari connection pool.
+You don't need to write any custom code.
+
+common:next.adoc[]
+
+Learn more about:
+
+* https://micronaut-projects.github.io/micronaut-crac/latest/guide/[Micronaut CRaC (Coordinated Restore at checkpoint)]
+* https://docs.azul.com/core/crac/crac-introduction[CRaC Introduction]
