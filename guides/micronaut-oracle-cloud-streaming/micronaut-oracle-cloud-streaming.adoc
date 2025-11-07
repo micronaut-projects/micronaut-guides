@@ -65,7 +65,7 @@ Create a `GameDTO` data-transfer object to represent game data:
 
 source:chess/dto/GameDTO[app=chess-game]
 
-callout:serdeable[]
+<1> callout:serdeable[]
 <2> Annotate with `@JsonTypeInfo` to include the class name without package in the `"_className"` property
 <3> Annotate with `@Creator` to indicate the constructor to use when deserializing from JSON
 
@@ -73,7 +73,7 @@ Create a `GameStateDTO` data-transfer object to represent game move data:
 
 source:chess/dto/GameStateDTO[app=chess-game]
 
-callout:serdeable[]
+<1> callout:serdeable[]
 <2> Annotate with `@JsonTypeInfo` to include the class name without package in the `"_className"` property
 
 ==== GameReporter
@@ -93,8 +93,8 @@ Create a `GameController` class to contain Ajax endpoints for the front end:
 
 source:chess/GameController[app=chess-game]
 
-callout:controller[arg0=/game]
-callout:executes-on[]
+<1> callout:controller[arg0=/game]
+<2> callout:executes-on[]
 <3> The method accepts HTTP POST requests to indicate a new game has started
 <4> The method accepts encoded form data (the two players' names)
 <5> The response will be plain text and contain the ID of the persisted `Game`
@@ -134,7 +134,7 @@ Update `application.properties` to add static resource configuration:
 
 resource:application.properties[app=chess-game,tag=static-resources]
 
-callout:static-resources[]
+<1> callout:static-resources[]
 
 ==== UI Resources
 
@@ -564,14 +564,14 @@ Create a test in the `chess-game` microservice to verify that Kafka message proc
 test:GameReporterTest[app=chess-game]
 
 <1> Use the `@Testcontainers` annotation to configure automatic container management (not necessary in Spock tests)
-callout:test-instance-per-class[]
+<2> callout:test-instance-per-class[]
 <3> Implementing `TestPropertyProvider` allows the test class to provide application configuration properties, in this case the dynamically allocated Kafka broker port
 <4> The Testcontainers instance for Kafka
 <5> Dependency injection for the `ChessListener` class declared below, a Kafka listener class that replicates the functionality of the class of the same name in the `chess-listener` microservice
 <6> Dependency injection for an HTTP client that the Micronaut framework will implement at compile time to make calls to `GameController`
 :exclude-for-languages:java,groovy
-callout:atfield[]
-callout:lateinit[]
+<7> callout:atfield[]
+<8> callout:lateinit[]
 <9> Wait a few seconds for the message to arrive; it should happen very quickly, but the message will be sent on a separate thread
 <10> Configure the Kafka broker port (it will be different unused port each time) so Micronaut Kafka clients and listeners connect to the test broker
 <11> Use a Map to hold form parameter names and values
@@ -595,7 +595,7 @@ Create a test in the `chess-listener` microservice to verify that Kafka message 
 test:GameServiceTest[app=chess-listener]
 
 <1> Use the `@Testcontainers` annotation to configure automatic container management (not necessary in Spock tests)
-callout:test-instance-per-class[]
+<2> callout:test-instance-per-class[]
 <3> Implementing `TestPropertyProvider` allows the test class to provide application configuration properties, in this case the dynamically allocated Kafka broker port
 <4> The Testcontainers instance for Kafka
 <5> Dependency injection for the `GameReporter` interface declared below, a Kafka producer interface that replicates the functionality of the class of the same name in the `chess-game` microservice

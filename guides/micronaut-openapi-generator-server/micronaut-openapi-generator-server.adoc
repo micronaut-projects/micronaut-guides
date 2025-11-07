@@ -305,8 +305,8 @@ We will now create `BookEntity` class. We will be retrieving data from the `book
 
 source:BookEntity[]
 
-callout:mapped-entity[]
-callout:mapped-entity-id[]
+<1> callout:mapped-entity[]
+<2> callout:mapped-entity-id[]
 
 === Writing a Repository
 
@@ -314,7 +314,7 @@ common:jdbc-repository-intro[]
 
 source:BookRepository[]
 
-callout:jdbcrepository[]
+<1> callout:jdbcrepository[]
 <2> `BookEntity`, the entity to treat as the root entity for the purposes of querying, is established either from the method signature or from the generic type parameter specified to the `CrudRepository` interface.
 <3> The `save` method will be used to store new entities in the database
 <4> Micronaut Data will generate the implementation of `findAllByAuthorContains` for us
@@ -352,12 +352,14 @@ We will now implement them in the controller.
 
 Using the Inversion of Control principle, we will inject `BookRepository` so it can be used in the methods. When initializing the controller, Micronaut will automatically provide an instance of the repository as a constructor argument:
 source:controller/BooksController[tag=inject,indent=0]
-callout:constructor-di[arg0=BookRepository]
+
+<1> callout:constructor-di[arg0=BookRepository]
 
 Next, keeping all the generated annotations, add this implementation for the `search` method:
 
 source:controller/BooksController[tag=search,indent=0]
-callout:executes-on[]
+
+<1> callout:executes-on[]
 <2> Define the `searchEntities` method that will manage the different combinations of desired search parameters.
 <3> Use the predicate we previously defined to search for substring in one column
 <4> Use the repository methods implemented automatically by Micronaut Data to perform a search
@@ -437,6 +439,7 @@ test:model/BookInfoTest[tag=imports]
 
 Add the following methods inside the `BookInfoTest` class:
 test:model/BookInfoTest[tag=requiredProperties]
+
 <1> Instruct Micronaut to inject an instance of the link:https://docs.micronaut.io/latest/guide/#beanValidation[Validator].
 `Validator` will automatically validate parameters and response bodies annotated with `@Valid` in the controller.
 We will use it to test the validations manually.
@@ -446,6 +449,7 @@ We will use it to test the validations manually.
 
 We will then write similar tests for other properties:
 test:model/BookInfoTest[tag=otherProperties]
+
 <1> Verify that there are no violations for both `null` or `"Lewis Carroll"` used as a value for the `author` property.
 <2> Verify that there is a violation if the name is too short (at least three characters are required).
 <3> Verify that there are no violations for valid values of the `ISBN` property.
@@ -453,6 +457,7 @@ test:model/BookInfoTest[tag=otherProperties]
 
 Finally, we will test JSON serialization and parsing by writing a simple controller and client:
 test:model/BookInfoTest[tags=annotations|jsonSerialization]
+
 <1> Create a simple controller that will respond to requests on the `/bookinfo` path.
 <2> Specify the `spec.name` property for this test class.
 <3> Use the link:https://docs.micronaut.io/latest/guide/#metaScopes[Requires] annotation to specify that
@@ -472,12 +477,12 @@ Create a `BooksControllerTest` with the following contents:
 
 test:controller/BooksControllerTest[]
 
-callout:micronaut-test[]
-callout:http-client[]
-callout:http-request[]
+<1> callout:micronaut-test[]
+<2> callout:http-client[]
+<3> callout:http-request[]
 <4> Verify that addition of book info was successful by checking the status code.
-callout:binding-json-array[]
-callout:body-method[]
+<5> callout:binding-json-array[]
+<6> callout:body-method[]
 <7> Verify that there are exactly two books with `"Guide"` substring in title.
 
 common:testApp-noheader.adoc[]

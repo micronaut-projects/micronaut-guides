@@ -60,9 +60,9 @@ add methods to find a product for a given code and update the price for the give
 
 source:ProductRepository[app=testcontainers]
 
-callout:repository[]
-callout:jparepository[]
-callout:at-query[]
+<1> callout:repository[]
+<2> callout:jparepository[]
+<3> callout:at-query[]
 
 == Create the event payload java bean
 
@@ -71,7 +71,7 @@ that we are going to receive from the Kafka topic.
 
 source:ProductPriceChangedEvent[app=testcontainers]
 
-callout:serdeable[]
+<1> callout:serdeable[]
 
 == Implement Kafka Listener
 
@@ -82,11 +82,11 @@ common:kafka-listener[]
 
 source:ProductPriceChangedEventHandler[app=testcontainers]
 
-callout:singleton[]
-callout:transactional[]
-callout:constructor-di[arg0=ProductRepository]
-callout:kafka-topic-listener[]
-callout:kafka-listener-offset-reset-earliest[]
+<1> callout:singleton[]
+<2> callout:transactional[]
+<3> callout:constructor-di[arg0=ProductRepository]
+<4> callout:kafka-topic-listener[]
+<5> callout:kafka-listener-offset-reset-earliest[]
 
 Let us assume that there is an agreement between the sender and receiver that the payload will be sent in the following JSON format:
 
@@ -111,21 +111,21 @@ Create a `@KafkaClient` to simplify publishing events in the test.
 
 test:ProductPriceChangesClient[app=testcontainers]
 
-callout:kafka-client.adoc[1]
-callout:kafka-topic-publisher.adoc[2]
-callout:kafka-key.adoc[3]
+<1> callout:kafka-client.adoc[1]
+<2> callout:kafka-topic-publisher.adoc[2]
+<3> callout:kafka-key.adoc[3]
 
 We will use the Testcontainers library to spin up a Kafka and the MySQL database instances as Docker containers
 and configure the application to talk to them as follows:
 
 test:ProductPriceChangedEventHandlerTest[app=testcontainers]
 
-callout:micronaut-test-transactional-false[]
+<1> callout:micronaut-test-transactional-false[]
 <2> Annotate the class with `@Property` to supply the driver class name configuration to the test.
 <3> We have configured the https://java.testcontainers.org/modules/databases/jdbc/[Testcontainers special JDBC URL] to spin up a MySQL container and configure it as a DataSource with Micronaut application context.
-callout:test-containers-disabled-without-docker[]
-callout:test-instance-per-class[]
-callout:test-property-provider[]
+<4> callout:test-containers-disabled-without-docker[]
+<5> callout:test-instance-per-class[]
+<6> callout:test-property-provider[]
 <7> We have used the Testcontainers JUnit 5 Extension annotations *@Testcontainers* and *@Container* to spin up a Kafka container and registered the *bootstrap-servers* location using *TestPropertyProvider* mechanism.
 <8> We have created a Product record in the database before sending the event.
 <9> During the test, we sent a message to the *product-price-changes* topic using *ProductPriceChangesClient* with productCode as key and *ProductPriceChangedEvent* instance as value.
@@ -159,7 +159,7 @@ Thanks to Test Resources, we can simplify the test as follows:
 
 test:ProductPriceChangedEventHandlerTest[app=testresources]
 
-callout:micronaut-test-transactional-false[]
+<1> callout:micronaut-test-transactional-false[]
 <2> We have created a Product record in the database before sending the event.
 <3> During the test, we sent a message to the *product-price-changes* topic using *ProductPriceChangesClient* with productCode as key and *ProductPriceChangedEvent* instance as value.
 <4> As Kafka message processing is an asynchronous process, we are using the *Awaitility* library to check whether the product price is updated in the database to the expected value or not with an interval of 3 seconds waiting up to a maximum of 10 seconds. If the message is consumed and processed within 10 seconds the test will pass, otherwise the test will fail.

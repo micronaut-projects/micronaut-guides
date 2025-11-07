@@ -27,6 +27,7 @@ resource:application.properties[]
 Create a JMS Producer interface.
 
 source:DemoProducer[]
+
 <1> The `JMSProducer` annotation defines this interface as a client that sends messages.
 <2> The `@Queue` annotation indicates which queue the message should be published to.
 <3> The `send` method accepts a single parameter which is the payload of a message.
@@ -36,6 +37,7 @@ source:DemoProducer[]
 Create a JMS Consumer class.
 
 source:DemoConsumer[]
+
 <1> The `@JMSListener` defines the bean as a message listener.
 <2> The `@Queue` annotation indicates which queue to subscribe to.
 <3> The `receive` method accepts a single parameter which is the payload of a message.
@@ -45,8 +47,9 @@ source:DemoConsumer[]
 Let’s create a Controller with an endpoint that we will call to verify that message has been sent by the JMS Producer (`DemoProducer`) and then finally received and consumed by the JMS Consumer (`DemoConsumer`).
 
 source:DemoController[]
-callout:controller[arg0=/]
-callout:constructor-di[arg0=DemoProducer]
+
+<1> callout:controller[arg0=/]
+<2> callout:constructor-di[arg0=DemoProducer]
 <3> Maps a `GET` request to `/demo` path, which attempts to publish a message to a SQS queue instance.
 <4> Calls `send` method on `DemoProducer` instances providing the message payload.
 
@@ -59,28 +62,31 @@ common:localstack-dependencies.adoc[]
 First, we create a configuration properties object to encapsulate the configuration of the SQS client, which we will provide via LocalStack.
 
 test:SqsConfig[]
-callout:configuration-properties[]
+
+<1> callout:configuration-properties[]
 
 Create a `BeanCreatedEventListener` to override the SQS client endpoint with the LocalStack endpoint.
 
 test:SqsClientBuilderListener[]
-callout:singleton[]
-callout:bean-created-event-listener[]
-callout:constructor-di[arg0=SqsConfig]
+
+<1> callout:singleton[]
+<2> callout:bean-created-event-listener[]
+<3> callout:constructor-di[arg0=SqsConfig]
 
 Create a `BeanCreatedEventListener` to create a SQS queue named `demo_queue`.
 
 test:SqsClientCreatedEventListener[]
-callout:singleton[]
-callout:bean-created-event-listener[]
+
+<1> callout:singleton[]
+<2> callout:bean-created-event-listener[]
 
 Create a test using the https://java.testcontainers.org/modules/localstack/[Testcontainers LocalStack] module to start a LocalStack container and verify that the message has been sent and received.
 
 test:MicronautguideTest[]
 
-callout:micronaut-test[]
-callout:test-instance-per-class[]
-callout:test-property-provider[]
+<1> callout:micronaut-test[]
+<2> callout:test-instance-per-class[]
+<3> callout:test-property-provider[]
 
 common:aws.adoc[]
 

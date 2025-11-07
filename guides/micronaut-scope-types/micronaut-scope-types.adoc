@@ -18,20 +18,22 @@ The following `@Controller` injects two collaborators.
 
 source:singleton/RobotController[tags=pkg|imports|controller|clazz]
 
-callout:controller[arg0=/]
-callout:constructor-di[arg0=RobotFather]
-callout:constructor-di[arg0=RobotMother]
-callout:get[arg0=children,arg1=/]
+<1> callout:controller[arg0=/]
+<2> callout:constructor-di[arg0=RobotFather]
+<3> callout:constructor-di[arg0=RobotMother]
+<4> callout:get[arg0=children,arg1=/]
 
 Each collaborator has an injection point for a bean of type `Robot`.
 
 source:singleton/RobotFather[]
-callout:singleton[]
-callout:constructor-di[arg0=Robot]
+
+<1> callout:singleton[]
+<2> callout:constructor-di[arg0=Robot]
 
 source:singleton/RobotMother[]
-callout:singleton[]
-callout:constructor-di[arg0=Robot]
+
+<1> callout:singleton[]
+<2> callout:constructor-di[arg0=Robot]
 
 Let's discuss how the application behaves depending on the scope used for the bean of type `Robot`.
 
@@ -44,7 +46,8 @@ To define a singleton, annotate a class with `jakarta.inject.Singleton` at the c
 The following class creates a unique identifier in the constructor. This identifier allows us to identify how many   `Robot` instances are used. 
 
 source:singleton/Robot[tags=pkg|clazz]
-callout:singleton[]
+
+<1> callout:singleton[]
 
 === Singleton Test
 
@@ -53,8 +56,9 @@ common:junit-params.adoc[]
 The following test verifies `@Singleton` behavior.
   
 test:SingletonScopeTest[tags=package|imports|testheader|test]
-callout:micronaut-test[]
-callout:http-client[]
+
+<1> callout:micronaut-test[]
+<2> callout:http-client[]
 <3> The same instance fulfills both injection points at `RobotFather` and `RobotMother`. 
 <4> Same instance is used upon subsequent requests.
 
@@ -65,15 +69,17 @@ callout:http-client[]
 Let's use `@Prototype` instead of `@Singleton`. 
 
 source:prototype/Robot[]
-callout:prototype[]
+
+<1> callout:prototype[]
 
 === Prototype Tests
 
 The following test verifies the behavior of `Prototype` scope. 
 
 test:PrototypeScopeTest[tags=package|imports|testheader|test]
-callout:micronaut-test[]
-callout:http-client[]
+
+<1> callout:micronaut-test[]
+<2> callout:http-client[]
 <3> A new instance is created to fulfill each injection point. Two instances - one for `RobotFather` and another for `RobotMother`. 
 <4> Instances remain upon subsequent requests.
 
@@ -82,16 +88,18 @@ callout:http-client[]
 **@RequestScope scope is a custom scope that indicates a new instance of the bean is created and associated with each HTTP request**
 
 source:request/Robot[]
-callout:request-scope[]
-callout:request-aware[]
+
+<1> callout:request-scope[]
+<2> callout:request-aware[]
 
 === Request Tests
 
 The following test verifies the behavior of `@RequestScope` scope. 
 
 test:RequestScopeTest[tags=package|imports|test]
-callout:micronaut-test[]
-callout:http-client[]
+
+<1> callout:micronaut-test[]
+<2> callout:http-client[]
 <3> Both injection points, `RobotFather` and `RobotMother`, are fulfilled with the same instance of `Robot`. An instance associated with the HTTP Request. 
 <4> Both injection points are fulfilled with the new instance of `Robot`.
 
@@ -101,7 +109,7 @@ callout:http-client[]
 
 source:refreshable/Robot[]
 
-callout:refreshable[]
+<1> callout:refreshable[]
 
 Your application needs the `management` dependency to enable the refresh endpoint.
 
@@ -112,10 +120,11 @@ dependency:micronaut-management[]
 The following test enables the https://docs.micronaut.io/latest/guide/#refreshEndpoint[refresh endpoint] and verifies the behavior of `@Refreshable`
 
 test:RefreshableScopeTest[tags=package|imports|test]
-callout:property[]
+
+<1> callout:property[]
 <2> The refresh endpoint is sensitive by default. To invoke it in the test, we set `endpoints.refresh.sensitive` to false.
-callout:micronaut-test[]
-callout:http-client[]
+<3> callout:micronaut-test[]
+<4> callout:http-client[]
 <5> The same instance fulfills both injection points at `RobotFather` and `RobotMother`.
 <6> The same instance serves a new request.
 <7> Hitting the refresh endpoint, publishes a https://docs.micronaut.io/latest/api/io/micronaut/runtime/context/scope/refresh/RefreshEvent.html[RefreshEvent], which invalidates the instance of `Robot`.
@@ -129,9 +138,9 @@ The following example uses `@Context` in combination with `@ConfigurationPropert
 
 source:context/MicronautConfiguration[]
 
-callout:context[]
-callout:configuration-properties[]
-callout:constraints[]
+<1> callout:context[]
+<2> callout:configuration-properties[]
+<3> callout:constraints[]
 
 The result is validation being performed on the Application Context start-up.
 
