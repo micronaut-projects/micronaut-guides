@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class HomeControllerTest {
 
     @Test
-    void homeControllerIsHidden(@Client("/") HttpClient httpClient) {
+    void homeControllerIsHidden(@Client("/") HttpClient httpClient) { // <3>
         BlockingHttpClient client = httpClient.toBlocking();
         String yml = assertDoesNotThrow(() -> client.retrieve("/swagger/micronaut-guides-1.0.yml"));
         assertFalse(yml.contains("operationId: home")); // <4>

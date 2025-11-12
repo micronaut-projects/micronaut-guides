@@ -20,7 +20,7 @@ import io.micronaut.core.annotation.Nullable;
 import io.micronaut.data.annotation.GeneratedValue;
 import io.micronaut.data.annotation.Id;
 import io.micronaut.data.annotation.MappedEntity;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank; // <4>
 
 @MappedEntity // <1>
 public record User(@Nullable

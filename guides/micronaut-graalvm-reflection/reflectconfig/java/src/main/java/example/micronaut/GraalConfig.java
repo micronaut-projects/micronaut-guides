@@ -17,7 +17,7 @@ package example.micronaut;
 
 import io.micronaut.core.annotation.ReflectionConfig;
 
-@ReflectionConfig(
+@ReflectionConfig( // <1>
         type = StringReverser.class,
         methods = {
                 @ReflectionConfig.ReflectiveMethodConfig(name = "reverse", parameterTypes = {String.class})

@@ -25,7 +25,7 @@ import java.util.Collections;
 import java.util.Map;
 
 @Refreshable // <1>
-@Controller("/time") // <1>
+@Controller("/time") // <2>
 class TimeController {
 
     private final String time;

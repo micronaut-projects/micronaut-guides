@@ -23,7 +23,7 @@ import jakarta.validation.constraints.PositiveOrZero;
 
 @Serdeable
 public record SortingAndOrderArguments(
-        @Nullable @PositiveOrZero Integer offset,
+        @Nullable @PositiveOrZero Integer offset, // <1>
         @Nullable @Positive Integer max,
         @Nullable @Pattern(regexp = "id|name") String sort,
         @Nullable @Pattern(regexp = "asc|ASC|desc|DESC") String order

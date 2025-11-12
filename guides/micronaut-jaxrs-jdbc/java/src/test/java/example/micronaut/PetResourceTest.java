@@ -93,7 +93,7 @@ public class PetResourceTest {
         Executable e = () -> httpClient.toBlocking()
                 .exchange(HttpRequest.GET(uri), Pet.class);
         HttpClientResponseException thrown = assertThrows(HttpClientResponseException.class, e);
-        assertEquals(HttpStatus.NOT_FOUND , thrown.getResponse().status()); // <2>
+        assertEquals(HttpStatus.NOT_FOUND , thrown.getResponse().status()); // <3>
 
         repository.deleteById(id);
     }
