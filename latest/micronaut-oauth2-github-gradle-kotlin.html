@@ -397,8 +397,8 @@ injects into the model a <code>security</code> map with the authenticated user. 
 <i class="conum" data-value="9"></i><b>(9)</b>
 <span class="py">micronaut.security.oauth2.clients.github.token.url</span><span class="p">=</span><span class="s">https://github.com/login/oauth/access_token</span>
 <span class="py">micronaut.security.oauth2.clients.github.token.auth-method</span><span class="p">=</span><span class="s">CLIENT_SECRET_POST</span>
-<span class="c"># &lt;10c
-</span><span class="py">micronaut.security.endpoints.logout.get-allowed</span><span class="p">=</span><span class="s">true</span></code></pre>
+<i class="conum" data-value="10"></i><b>(10)</b>
+<span class="py">micronaut.security.endpoints.logout.get-allowed</span><span class="p">=</span><span class="s">true</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -485,7 +485,30 @@ injects into the model a <code>security</code> map with the authenticated user. 
 <div class="listingblock">
 <div class="title">src/main/kotlin/example/micronaut/GithubApiClient.kt</div>
 <div class="content">
-<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span></code></pre>
+<pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
+
+
+<span class="k">import</span> <span class="nn">io.micronaut.core.annotation.Nullable</span>
+<span class="k">import</span> <span class="nn">io.micronaut.http.HttpHeaders</span>
+<span class="k">import</span> <span class="nn">io.micronaut.http.annotation.Get</span>
+<span class="k">import</span> <span class="nn">io.micronaut.http.annotation.Header</span>
+<span class="k">import</span> <span class="nn">io.micronaut.http.annotation.Headers</span>
+<span class="k">import</span> <span class="nn">io.micronaut.http.annotation.QueryValue</span>
+<span class="k">import</span> <span class="nn">io.micronaut.http.client.annotation.Client</span>
+<span class="k">import</span> <span class="nn">org.reactivestreams.Publisher</span>
+<span class="k">import</span> <span class="nn">jakarta.validation.constraints.Pattern</span>
+
+<span class="nd">@Headers</span><span class="p">(</span>
+    <span class="nc">Header</span><span class="p">(</span><span class="n">name</span> <span class="p">=</span> <span class="s">"User-Agent"</span><span class="p">,</span> <span class="n">value</span> <span class="p">=</span> <span class="s">"https://micronautguides.com"</span><span class="p">),</span>
+    <span class="nc">Header</span><span class="p">(</span><span class="n">name</span> <span class="p">=</span> <span class="s">"Accept"</span><span class="p">,</span> <span class="n">value</span> <span class="p">=</span> <span class="s">"application/vnd.github.v3+json, application/json"</span><span class="p">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="p">)</span>
+<span class="nd">@Client</span><span class="p">(</span><span class="n">id</span> <span class="p">=</span> <span class="s">"githubv3"</span><span class="p">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="kd">interface</span> <span class="nc">GithubApiClient</span> <span class="p">{</span>
+
+    <span class="nd">@Get</span><span class="p">(</span><span class="s">"/user"</span><span class="p">)</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="k">fun</span> <span class="nf">getUser</span><span class="p">(</span><span class="nd">@Header</span><span class="p">(</span><span class="nc">HttpHeaders</span><span class="p">.</span><span class="nc">AUTHORIZATION</span><span class="p">)</span> <i class="conum" data-value="5"></i><b>(5)</b>
+                <span class="n">authorization</span><span class="p">:</span> <span class="nc">String</span><span class="p">?):</span> <span class="nc">Publisher</span><span class="p">&lt;</span><span class="nc">GithubUser</span><span class="p">&gt;</span> <i class="conum" data-value="4"></i><b>(4)</b>
+<span class="p">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">

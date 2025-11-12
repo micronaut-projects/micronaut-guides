@@ -395,8 +395,8 @@ injects into the model a <code>security</code> map with the authenticated user. 
 <i class="conum" data-value="9"></i><b>(9)</b>
 <span class="py">micronaut.security.oauth2.clients.github.token.url</span><span class="p">=</span><span class="s">https://github.com/login/oauth/access_token</span>
 <span class="py">micronaut.security.oauth2.clients.github.token.auth-method</span><span class="p">=</span><span class="s">CLIENT_SECRET_POST</span>
-<span class="c"># &lt;10c
-</span><span class="py">micronaut.security.endpoints.logout.get-allowed</span><span class="p">=</span><span class="s">true</span></code></pre>
+<i class="conum" data-value="10"></i><b>(10)</b>
+<span class="py">micronaut.security.endpoints.logout.get-allowed</span><span class="p">=</span><span class="s">true</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -496,7 +496,30 @@ injects into the model a <code>security</code> map with the authenticated user. 
 <div class="listingblock">
 <div class="title">src/main/groovy/example/micronaut/GithubApiClient.groovy</div>
 <div class="content">
-<pre class="rouge highlight"><code data-lang="groovy"><span class="kn">package</span> <span class="nn">example.micronaut</span></code></pre>
+<pre class="rouge highlight"><code data-lang="groovy"><span class="kn">package</span> <span class="nn">example.micronaut</span>
+
+
+<span class="kn">import</span> <span class="nn">groovy.transform.CompileStatic</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.core.annotation.Nullable</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.HttpHeaders</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Get</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Header</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.QueryValue</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.client.annotation.Client</span>
+<span class="kn">import</span> <span class="nn">org.reactivestreams.Publisher</span>
+
+<span class="kn">import</span> <span class="nn">jakarta.validation.constraints.Pattern</span>
+
+<span class="nd">@CompileStatic</span>
+<span class="nd">@Header</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s1">'User-Agent'</span><span class="o">,</span> <span class="n">value</span> <span class="o">=</span> <span class="s1">'https://micronautguides.com'</span><span class="o">)</span>
+<span class="nd">@Header</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s1">'Accept'</span><span class="o">,</span> <span class="n">value</span> <span class="o">=</span> <span class="s1">'application/vnd.github.v3+json, application/json'</span><span class="o">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="nd">@Client</span><span class="o">(</span><span class="n">id</span> <span class="o">=</span> <span class="s1">'githubv3'</span><span class="o">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="kd">interface</span> <span class="nc">GithubApiClient</span> <span class="o">{</span>
+
+    <span class="nd">@Get</span><span class="o">(</span><span class="s1">'/user'</span><span class="o">)</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="n">Publisher</span><span class="o">&lt;</span><span class="n">GithubUser</span><span class="o">&gt;</span> <span class="n">getUser</span><span class="o">(</span> <i class="conum" data-value="4"></i><b>(4)</b>
+            <span class="nd">@Header</span><span class="o">(</span><span class="n">HttpHeaders</span><span class="o">.</span><span class="na">AUTHORIZATION</span><span class="o">)</span> <span class="n">String</span> <span class="n">authorization</span><span class="o">)</span> <i class="conum" data-value="5"></i><b>(5)</b>
+<span class="o">}</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">

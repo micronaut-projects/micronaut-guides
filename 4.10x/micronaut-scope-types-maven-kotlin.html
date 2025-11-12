@@ -436,38 +436,6 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="title">src/test/kotlin/example/micronaut/SingletonScopeTest.kt</div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
-<span class="p">*/</span>
-
-<span class="k">import</span> <span class="nn">io.micronaut.core.type.Argument</span>
-<span class="k">import</span> <span class="nn">io.micronaut.http.HttpRequest</span>
-<span class="k">import</span> <span class="nn">io.micronaut.http.client.HttpClient</span>
-<span class="k">import</span> <span class="nn">io.micronaut.http.client.annotation.Client</span>
-<span class="k">import</span> <span class="nn">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>
-<span class="k">import</span> <span class="nn">org.junit.jupiter.api.Assertions.assertEquals</span>
-<span class="k">import</span> <span class="nn">org.junit.jupiter.params.ParameterizedTest</span>
-<span class="k">import</span> <span class="nn">org.junit.jupiter.params.provider.ValueSource</span>
-
-
-<span class="nd">@MicronautTest</span> <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="kd">class</span> <span class="nc">SingletonScopeTest</span><span class="p">(</span><span class="nd">@Client</span><span class="p">(</span><span class="s">"/"</span><span class="p">)</span> <span class="kd">val</span> <span class="py">httpClient</span><span class="p">:</span> <span class="nc">HttpClient</span><span class="p">)</span> <span class="p">{</span> <i class="conum" data-value="2"></i><b>(2)</b>
-
-    <span class="nd">@ParameterizedTest</span>
-    <span class="nd">@ValueSource</span><span class="p">(</span><span class="n">strings</span> <span class="p">=</span> <span class="p">[</span><span class="s">"/singleton"</span><span class="p">])</span>
-    <span class="k">fun</span> <span class="nf">onlyOneInstanceOfTheBeanExistsForSingletonBeans</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nc">String</span><span class="p">)</span> <span class="p">{</span>
-        <span class="kd">val</span> <span class="py">responses</span> <span class="p">=</span> <span class="nf">executeRequest</span><span class="p">(</span><span class="n">httpClient</span><span class="p">,</span> <span class="n">path</span><span class="p">).</span><span class="nf">toMutableSet</span><span class="p">()</span>
-        <span class="nf">assertEquals</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">responses</span><span class="p">.</span><span class="n">size</span><span class="p">)</span> <i class="conum" data-value="3"></i><b>(3)</b>
-        <span class="n">responses</span><span class="p">.</span><span class="nf">addAll</span><span class="p">(</span><span class="nf">executeRequest</span><span class="p">(</span><span class="n">httpClient</span><span class="p">,</span> <span class="n">path</span><span class="p">))</span>
-        <span class="nf">assertEquals</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">responses</span><span class="p">.</span><span class="n">size</span><span class="p">)</span> <i class="conum" data-value="4"></i><b>(4)</b>
-    <span class="p">}</span>
-
-    <span class="k">private</span> <span class="k">fun</span> <span class="nf">executeRequest</span><span class="p">(</span><span class="n">client</span><span class="p">:</span> <span class="nc">HttpClient</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nc">String</span><span class="p">):</span> <span class="nc">List</span><span class="p">&lt;</span><span class="nc">String</span><span class="p">&gt;</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="n">client</span><span class="p">.</span><span class="nf">toBlocking</span><span class="p">().</span><span class="nf">retrieve</span><span class="p">(</span>
-            <span class="nc">HttpRequest</span><span class="p">.</span><span class="nc">GET</span><span class="p">&lt;</span><span class="nc">Any</span><span class="p">&gt;(</span><span class="n">path</span><span class="p">),</span>
-            <span class="nc">Argument</span><span class="p">.</span><span class="nf">listOf</span><span class="p">(</span><span class="nc">String</span><span class="o">::</span><span class="k">class</span><span class="p">.</span><span class="n">java</span><span class="p">)</span>
-        <span class="p">)</span>
-    <span class="p">}</span>
-
-<span class="p">}</span>
 
 
 <span class="k">import</span> <span class="nn">io.micronaut.core.type.Argument</span>
@@ -570,38 +538,6 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="title">src/test/kotlin/example/micronaut/PrototypeScopeTest.kt</div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
-<span class="p">*/</span>
-
-<span class="k">import</span> <span class="nn">io.micronaut.core.type.Argument</span>
-<span class="k">import</span> <span class="nn">io.micronaut.http.HttpRequest</span>
-<span class="k">import</span> <span class="nn">io.micronaut.http.client.HttpClient</span>
-<span class="k">import</span> <span class="nn">io.micronaut.http.client.annotation.Client</span>
-<span class="k">import</span> <span class="nn">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>
-<span class="k">import</span> <span class="nn">org.junit.jupiter.api.Assertions.assertEquals</span>
-<span class="k">import</span> <span class="nn">org.junit.jupiter.params.ParameterizedTest</span>
-<span class="k">import</span> <span class="nn">org.junit.jupiter.params.provider.ValueSource</span>
-
-<span class="nd">@MicronautTest</span> <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="kd">class</span> <span class="nc">PrototypeScopeTest</span><span class="p">(</span><span class="nd">@Client</span><span class="p">(</span><span class="s">"/"</span><span class="p">)</span> <span class="kd">val</span> <span class="py">httpClient</span><span class="p">:</span> <span class="nc">HttpClient</span><span class="p">)</span> <span class="p">{</span> <i class="conum" data-value="2"></i><b>(2)</b>
-
-    <span class="nd">@ParameterizedTest</span>
-    <span class="nd">@ValueSource</span><span class="p">(</span><span class="n">strings</span> <span class="p">=</span> <span class="p">[</span><span class="s">"/prototype"</span><span class="p">])</span>
-
-    <span class="k">fun</span> <span class="nf">prototypeScopeIndicatesThatANewInstanceOfTheBeanIsCreatedEachTimeItIsInjected</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nc">String</span><span class="p">)</span> <span class="p">{</span>
-        <span class="kd">val</span> <span class="py">responses</span> <span class="p">=</span> <span class="nf">executeRequest</span><span class="p">(</span><span class="n">httpClient</span><span class="p">,</span> <span class="n">path</span><span class="p">).</span><span class="nf">toMutableSet</span><span class="p">()</span>
-        <span class="nf">assertEquals</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">responses</span><span class="p">.</span><span class="n">size</span><span class="p">)</span> <i class="conum" data-value="3"></i><b>(3)</b>
-        <span class="n">responses</span><span class="p">.</span><span class="nf">addAll</span><span class="p">(</span><span class="nf">executeRequest</span><span class="p">(</span><span class="n">httpClient</span><span class="p">,</span> <span class="n">path</span><span class="p">))</span>
-        <span class="nf">assertEquals</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">responses</span><span class="p">.</span><span class="n">size</span><span class="p">)</span> <i class="conum" data-value="4"></i><b>(4)</b>
-    <span class="p">}</span>
-
-    <span class="k">private</span> <span class="k">fun</span> <span class="nf">executeRequest</span><span class="p">(</span><span class="n">client</span><span class="p">:</span> <span class="nc">HttpClient</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nc">String</span><span class="p">):</span> <span class="nc">List</span><span class="p">&lt;</span><span class="nc">String</span><span class="p">&gt;</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="n">client</span><span class="p">.</span><span class="nf">toBlocking</span><span class="p">().</span><span class="nf">retrieve</span><span class="p">(</span>
-            <span class="nc">HttpRequest</span><span class="p">.</span><span class="nc">GET</span><span class="p">&lt;</span><span class="nc">Any</span><span class="p">&gt;(</span><span class="n">path</span><span class="p">),</span>
-            <span class="nc">Argument</span><span class="p">.</span><span class="nf">listOf</span><span class="p">(</span><span class="nc">String</span><span class="o">::</span><span class="k">class</span><span class="p">.</span><span class="n">java</span><span class="p">)</span>
-        <span class="p">)</span>
-    <span class="p">}</span>
-
-<span class="p">}</span>
 
 
 <span class="k">import</span> <span class="nn">io.micronaut.core.type.Argument</span>
@@ -707,42 +643,6 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="title">src/test/kotlin/example/micronaut/RequestScopeTest.kt</div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
-<span class="p">*/</span>
-
-<span class="k">import</span> <span class="nn">io.micronaut.core.type.Argument</span>
-<span class="k">import</span> <span class="nn">io.micronaut.http.HttpRequest</span>
-<span class="k">import</span> <span class="nn">io.micronaut.http.client.HttpClient</span>
-<span class="k">import</span> <span class="nn">io.micronaut.http.client.annotation.Client</span>
-<span class="k">import</span> <span class="nn">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>
-<span class="k">import</span> <span class="nn">jakarta.inject.Inject</span>
-<span class="k">import</span> <span class="nn">org.junit.jupiter.api.Assertions.assertEquals</span>
-<span class="k">import</span> <span class="nn">org.junit.jupiter.params.ParameterizedTest</span>
-<span class="k">import</span> <span class="nn">org.junit.jupiter.params.provider.ValueSource</span>
-<span class="k">import</span> <span class="nn">java.util.UUID</span>
-
-<span class="nd">@MicronautTest</span> <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="kd">class</span> <span class="nc">RequestScopeTest</span><span class="p">(</span><span class="nd">@Client</span><span class="p">(</span><span class="s">"/"</span><span class="p">)</span> <span class="kd">val</span> <span class="py">httpClient</span><span class="p">:</span> <span class="nc">HttpClient</span><span class="p">)</span> <span class="p">{</span> <i class="conum" data-value="2"></i><b>(2)</b>
-
-    <span class="nd">@ParameterizedTest</span>
-    <span class="nd">@ValueSource</span><span class="p">(</span><span class="n">strings</span> <span class="p">=</span> <span class="p">[</span><span class="s">"/request"</span><span class="p">])</span>
-    <span class="k">fun</span> <span class="nf">requestScopeScopeIsACustomScopeThatIndicatesANewInstanceOfTheBeanIsCreatedAndAssociatedWithEachHTTPRequest</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nc">String</span><span class="p">)</span> <span class="p">{</span>
-        <span class="kd">val</span> <span class="py">responses</span> <span class="p">=</span> <span class="nf">executeRequest</span><span class="p">(</span><span class="n">httpClient</span><span class="p">,</span> <span class="nf">createRequest</span><span class="p">(</span><span class="n">path</span><span class="p">)).</span><span class="nf">toMutableSet</span><span class="p">()</span>
-        <span class="nf">assertEquals</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">responses</span><span class="p">.</span><span class="n">size</span><span class="p">)</span> <i class="conum" data-value="3"></i><b>(3)</b>
-        <span class="n">responses</span><span class="p">.</span><span class="nf">addAll</span><span class="p">(</span><span class="nf">executeRequest</span><span class="p">(</span><span class="n">httpClient</span><span class="p">,</span> <span class="nf">createRequest</span><span class="p">(</span><span class="n">path</span><span class="p">)))</span>
-        <span class="nf">assertEquals</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">responses</span><span class="p">.</span><span class="n">size</span><span class="p">)</span> <i class="conum" data-value="4"></i><b>(4)</b>
-    <span class="p">}</span>
-
-    <span class="k">private</span> <span class="k">fun</span> <span class="nf">executeRequest</span><span class="p">(</span><span class="n">client</span><span class="p">:</span> <span class="nc">HttpClient</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="nc">HttpRequest</span><span class="p">&lt;</span><span class="nc">Any</span><span class="p">&gt;):</span> <span class="nc">List</span><span class="p">&lt;</span><span class="nc">String</span><span class="p">&gt;</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="n">client</span><span class="p">.</span><span class="nf">toBlocking</span><span class="p">().</span><span class="nf">retrieve</span><span class="p">(</span>
-            <span class="n">request</span><span class="p">,</span>
-            <span class="nc">Argument</span><span class="p">.</span><span class="nf">listOf</span><span class="p">(</span><span class="nc">String</span><span class="o">::</span><span class="k">class</span><span class="p">.</span><span class="n">java</span><span class="p">)</span>
-        <span class="p">)</span>
-    <span class="p">}</span>
-
-    <span class="k">private</span> <span class="k">fun</span> <span class="nf">createRequest</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nc">String</span><span class="p">):</span> <span class="nc">HttpRequest</span><span class="p">&lt;</span><span class="nc">Any</span><span class="p">&gt;</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="nc">HttpRequest</span><span class="p">.</span><span class="nc">GET</span><span class="p">&lt;</span><span class="nc">Any</span><span class="p">&gt;(</span><span class="n">path</span><span class="p">).</span><span class="nf">header</span><span class="p">(</span><span class="s">"UUID"</span><span class="p">,</span> <span class="nc">UUID</span><span class="p">.</span><span class="nf">randomUUID</span><span class="p">().</span><span class="nf">toString</span><span class="p">())</span>
-    <span class="p">}</span>
-<span class="p">}</span>
 
 
 <span class="k">import</span> <span class="nn">io.micronaut.core.type.Argument</span>
@@ -858,53 +758,6 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="title">src/test/kotlin/example/micronaut/RefreshableScopeTest.kt</div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="kotlin"><span class="k">package</span> <span class="nn">example.micronaut</span>
-<span class="p">*/</span>
-
-<span class="k">import</span> <span class="nn">io.micronaut.context.annotation.Property</span>
-<span class="k">import</span> <span class="nn">io.micronaut.core.type.Argument</span>
-<span class="k">import</span> <span class="nn">io.micronaut.core.util.StringUtils</span>
-<span class="k">import</span> <span class="nn">io.micronaut.http.HttpRequest</span>
-<span class="k">import</span> <span class="nn">io.micronaut.http.client.HttpClient</span>
-<span class="k">import</span> <span class="nn">io.micronaut.http.client.annotation.Client</span>
-<span class="k">import</span> <span class="nn">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span>
-<span class="k">import</span> <span class="nn">org.junit.jupiter.api.Assertions.assertEquals</span>
-<span class="k">import</span> <span class="nn">org.junit.jupiter.params.ParameterizedTest</span>
-<span class="k">import</span> <span class="nn">org.junit.jupiter.params.provider.ValueSource</span>
-
-<span class="nd">@Property</span><span class="p">(</span><span class="n">name</span> <span class="p">=</span> <span class="s">"endpoints.refresh.enabled"</span><span class="p">,</span> <span class="n">value</span> <span class="p">=</span> <span class="nc">StringUtils</span><span class="p">.</span><span class="nc">TRUE</span><span class="p">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="nd">@Property</span><span class="p">(</span><span class="n">name</span> <span class="p">=</span> <span class="s">"endpoints.refresh.sensitive"</span><span class="p">,</span> <span class="n">value</span> <span class="p">=</span> <span class="nc">StringUtils</span><span class="p">.</span><span class="nc">FALSE</span><span class="p">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
-<span class="nd">@MicronautTest</span> <i class="conum" data-value="3"></i><b>(3)</b>
-<span class="kd">class</span> <span class="nc">RefreshableScopeTest</span><span class="p">(</span><span class="nd">@Client</span><span class="p">(</span><span class="s">"/"</span><span class="p">)</span> <span class="kd">val</span> <span class="py">httpClient</span><span class="p">:</span> <span class="nc">HttpClient</span><span class="p">)</span> <span class="p">{</span> <i class="conum" data-value="4"></i><b>(4)</b>
-
-    <span class="nd">@ParameterizedTest</span>
-    <span class="nd">@ValueSource</span><span class="p">(</span><span class="n">strings</span> <span class="p">=</span> <span class="p">[</span><span class="s">"/refreshable"</span><span class="p">])</span>
-    <span class="k">fun</span> <span class="nf">refreshableScopeIsACustomScopeThatAllowsABeansStateToBeRefreshedViaTheRefreshEndpoint</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nc">String</span><span class="p">)</span> <span class="p">{</span>
-        <span class="kd">val</span> <span class="py">responses</span> <span class="p">=</span> <span class="nf">executeRequest</span><span class="p">(</span><span class="n">httpClient</span><span class="p">,</span> <span class="n">path</span><span class="p">).</span><span class="nf">toMutableSet</span><span class="p">()</span>
-        <span class="nf">assertEquals</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">responses</span><span class="p">.</span><span class="n">size</span><span class="p">)</span> <i class="conum" data-value="5"></i><b>(5)</b>
-        <span class="n">responses</span><span class="p">.</span><span class="nf">addAll</span><span class="p">(</span><span class="nf">executeRequest</span><span class="p">(</span><span class="n">httpClient</span><span class="p">,</span> <span class="n">path</span><span class="p">))</span>
-        <span class="nf">assertEquals</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">responses</span><span class="p">.</span><span class="n">size</span><span class="p">)</span> <i class="conum" data-value="6"></i><b>(6)</b>
-        <span class="nf">refresh</span><span class="p">()</span> <i class="conum" data-value="7"></i><b>(7)</b>
-        <span class="n">responses</span><span class="p">.</span><span class="nf">addAll</span><span class="p">(</span><span class="nf">executeRequest</span><span class="p">(</span><span class="n">httpClient</span><span class="p">,</span> <span class="n">path</span><span class="p">))</span>
-        <span class="nf">assertEquals</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">responses</span><span class="p">.</span><span class="n">size</span><span class="p">)</span> <i class="conum" data-value="8"></i><b>(8)</b>
-    <span class="p">}</span>
-
-    <span class="k">private</span> <span class="k">fun</span> <span class="nf">executeRequest</span><span class="p">(</span><span class="n">client</span><span class="p">:</span> <span class="nc">HttpClient</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nc">String</span><span class="p">):</span> <span class="nc">List</span><span class="p">&lt;</span><span class="nc">String</span><span class="p">&gt;</span> <span class="p">{</span>
-        <span class="k">return</span> <span class="n">client</span><span class="p">.</span><span class="nf">toBlocking</span><span class="p">().</span><span class="nf">retrieve</span><span class="p">(</span>
-            <span class="nc">HttpRequest</span><span class="p">.</span><span class="nc">GET</span><span class="p">&lt;</span><span class="nc">Any</span><span class="p">&gt;(</span><span class="n">path</span><span class="p">),</span>
-            <span class="nc">Argument</span><span class="p">.</span><span class="nf">listOf</span><span class="p">(</span><span class="nc">String</span><span class="o">::</span><span class="k">class</span><span class="p">.</span><span class="n">java</span><span class="p">)</span>
-        <span class="p">)</span>
-    <span class="p">}</span>
-
-    <span class="k">private</span> <span class="k">fun</span> <span class="nf">refresh</span><span class="p">()</span> <span class="p">{</span>
-        <span class="n">httpClient</span><span class="p">.</span><span class="nf">toBlocking</span><span class="p">().</span><span class="n">exchange</span><span class="p">&lt;</span><span class="nc">Any</span><span class="p">,</span> <span class="nc">Any</span><span class="p">&gt;(</span>
-            <span class="nc">HttpRequest</span><span class="p">.</span><span class="nc">POST</span><span class="p">(</span>
-                <span class="s">"/refresh"</span><span class="p">,</span>
-                <span class="nf">mapOf</span><span class="p">(</span><span class="s">"force"</span> <span class="n">to</span> <span class="k">true</span><span class="p">)</span>
-            <span class="p">)</span>
-        <span class="p">)</span>
-    <span class="p">}</span>
-
-<span class="p">}</span>
 
 
 <span class="k">import</span> <span class="nn">io.micronaut.context.annotation.Property</span>
@@ -1047,7 +900,7 @@ If you have an existing Micronaut application and want to add the functionality 
 <span class="cm">/*
 //tag::package[]
 package example.micronaut
-//tag::package[]
+//end::package[]
 */</span>
 <span class="c1">//tag::imports[]</span>
 
