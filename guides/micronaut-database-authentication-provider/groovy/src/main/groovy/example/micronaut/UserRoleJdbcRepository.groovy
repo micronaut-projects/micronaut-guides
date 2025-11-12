@@ -27,6 +27,6 @@ interface UserRoleJdbcRepository extends CrudRepository<UserRole, UserRoleId> { 
     @Query("""SELECT role_.`authority` FROM `role` role_ 
     inner join `user_role` user_role_ ON user_role_.`user_role_id_role_id` = role_.`id` 
     inner join `user` user_ ON user_role_.`user_role_id_user_id` = user_.`id` 
-    where user_.`username` = :username""") // <2>
+    where user_.`username` = :username""") // <3>
     List<String> findAllAuthoritiesByUsername(String username)
 }
