@@ -31,10 +31,10 @@ import jakarta.validation.constraints.NotBlank
 //end::imports[]
 
 /*
-//tag::harcoded[]
+//tag::hardcoded[]
 @Client("http://localhost:8082") // <1>
 @Recoverable(api = BookInventoryOperations::class)
-//end::harcoded[]
+//end::hardcoded[]
 */
 //tag::eureka[]
 @Client(id = "bookinventory") // <1>
