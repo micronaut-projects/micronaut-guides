@@ -30,8 +30,8 @@ class PetResource(val petRepository: PetRepository) { // <2>
     fun all() = petRepository.findAll() // <4>
 
     @GET // <3>
-    @Path("/{name}") // <4>
-    fun byName(@PathParam("name") petsName: String) = petRepository.findByName(petsName) // <5>
+    @Path("/{name}") // <5>
+    fun byName(@PathParam("name") petsName: String) = petRepository.findByName(petsName) // <6>
 
     @POST
     @Status(HttpStatus.CREATED)

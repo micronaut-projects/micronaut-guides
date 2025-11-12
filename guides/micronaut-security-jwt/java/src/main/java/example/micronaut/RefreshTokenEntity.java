@@ -17,7 +17,7 @@ package example.micronaut;
 /*
 //tag::package[]
 package example.micronaut;
-//tag::package[]
+//end::package[]
 */
 //tag::clazzwithoutsettersandgetters[]
 

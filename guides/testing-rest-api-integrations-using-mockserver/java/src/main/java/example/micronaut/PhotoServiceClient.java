@@ -20,7 +20,7 @@ import io.micronaut.http.annotation.PathVariable;
 import io.micronaut.http.client.annotation.Client;
 
 import java.util.List;
-
+// <1>
 @Client(id = "photosapi")
 interface PhotoServiceClient {
 

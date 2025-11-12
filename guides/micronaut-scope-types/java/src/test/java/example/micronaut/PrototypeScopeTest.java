@@ -15,9 +15,9 @@
  */
 package example.micronaut;
 /*
-//tag::pkg[]
+//tag::package[]
 package example.micronaut;
-//end::pkg[]
+//end::package[]
 */
 //tag::imports[]
 

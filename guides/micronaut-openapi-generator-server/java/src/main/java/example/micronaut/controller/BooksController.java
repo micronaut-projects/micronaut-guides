@@ -14,7 +14,7 @@ package example.micronaut.controller;
 /*
 //tag::package[]
 package example.micronaut.controller;
-//tag::package[]
+//end::package[]
 */
 //tag::import[]
 
@@ -33,7 +33,10 @@ import java.util.List;
 
 //tag::clazz[]
 @Controller
-public class BooksController implements BooksApi {
+public class BooksController implements BooksApi
+//tag::header[]
+ {
+//end::header[]
 //end::clazz[]
 
     //tag::inject[]

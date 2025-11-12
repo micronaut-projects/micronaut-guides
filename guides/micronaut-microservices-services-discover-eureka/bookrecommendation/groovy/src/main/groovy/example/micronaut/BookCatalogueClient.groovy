@@ -28,10 +28,10 @@ import org.reactivestreams.Publisher
 //end::imports[]
 
 /*
-//tag::harcoded[]
+//tag::hardcoded[]
 @Client("http://localhost:8081") // <1>
 @Recoverable(api = BookCatalogueOperations)
-//end::harcoded[]
+//end::hardcoded[]
 */
 //tag::eureka[]
 @Client(id = "bookcatalogue") // <1>

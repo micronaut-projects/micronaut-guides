@@ -34,10 +34,10 @@ import static io.micronaut.http.MediaType.TEXT_PLAIN
 //end::imports[]
 
 /*
-//tag::harcoded[]
+//tag::hardcoded[]
 @Client("http://localhost:8082") // <1>
 @Recoverable(api = BookInventoryOperations)
-//end::harcoded[]
+//end::hardcoded[]
 */
 //tag::eureka[]
 @Client(id = "bookinventory") // <1>
