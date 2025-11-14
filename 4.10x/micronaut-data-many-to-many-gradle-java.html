@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'/>
+    <title>Many-To-Many with Micronaut Data JDBC and MySQL</title>
+    <link rel='stylesheet' id='wp-block-library-css' href='https://micronaut.io/wp-includes/css/dist/block-library/style.min.css' type='text/css' media='all'/>
+    <link rel='stylesheet' id='fonts-fira-sans-css' href='https://fonts.googleapis.com/css2?family=Fira+Sans%3Awght%40300%3B500&#038;display=swap&#038;ver=5.7' type='text/css' media='all'/>
+    <link rel='stylesheet' id='micronaut-style-css' href='https://micronaut.io/wp-content/themes/micronaut/style.min.css' type='text/css' media='all'/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link rel="shortcut icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link rel="alternate" type="application/rss+xml" title="Micronaut Guides RSS Feed" href="https://guides.micronaut.io/latest/rss.xml" />
+    <link rel="alternate" type="application/json" title="Micronaut Guides JSON Feed" href="https://guides.micronaut.io/latest/feed.json" />
+    <link href="coderay.css" rel="stylesheet" />
+    <link href="rouge-github.css" rel="stylesheet" />
+    <link href="guide.css" rel="stylesheet" />
+    <script src="lunr.js"></script>
+    <script src="guide.js"></script>
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:image" content="https://guides.micronaut.io/latest/images/cards/micronauttwittercard.png"/>
+    <meta name="twitter:creator" content="@micronautfw"/>
+    <meta name="twitter:site" content="@micronautfw"/>
+    <meta name="twitter:title" content="Many-To-Many with Micronaut Data JDBC and MySQL"/>
+    <meta name="twitter:description" content="Learn how to map a many-to-many association with Micronaut Data JDBC and MySQL."/>
+</head>
+<body class="page-template page-template-page-sidebar page-template-page-sidebar-php page page-parent guide">
+
+<header id="header">
+
+    <div class="container">
+
+        <nav class="navbar navbar-expand-lg navbar-dark">
+
+            <button class="collapsed" type="button" data-toggle="collapse" data-target="#nav" aria-expanded="false">
+                <span></span>
+            </button>
+
+            <a class="navbar-brand" href="https://micronaut.io">
+                <img src="https://micronaut.io/wp-content/uploads/2020/11/MIcronautLogo_Horizontal.svg" alt="Micronaut framework"/>
+            </a>
+
+            <div class="collapse navbar-collapse" id="nav">
+
+                <ul class="navbar-nav ml-auto">
+
+                    <li id="menu-item-2865" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2865 nav-item"><a href="https://micronaut.io/download/" class="nav-link">Download</a></li>
+                    <li id="menu-item-2868" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-2868 dropdown nav-item"><a href="https://micronaut.io/learn/" class="nav-link dropdown-toggle" data-toggle="dropdown">Learn</a><ul class="dropdown-menu">
+                        <li id="menu-item-4943" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4943"><a href="https://micronaut.io/learn/" class="dropdown-item">Overview</a></li>
+                        <li id="menu-item-5111" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-5111"><a href="https://docs.micronaut.io/index.html" class="dropdown-item">User Documentaton</a></li>
+                        <li id="menu-item-4510" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4510"><a href="https://micronaut.io/guides/" class="dropdown-item">Guides</a></li>
+                        <li id="menu-item-2896" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2896"><a href="https://micronaut.io/category/microcast/" class="dropdown-item">Microcasts</a></li>
+                        <li id="menu-item-2897" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2897"><a href="https://micronaut.io/category/webinar/" class="dropdown-item">Webinars</a></li>
+                        <li id="menu-item-2871" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2871"><a href="https://micronaut.io/professional-training/" class="dropdown-item">Professional Training</a></li>
+                        <li id="menu-item-6526" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-6526"><a href="https://micronaut-projects.github.io/micronaut-guides-mn3/latest/" class="dropdown-item">Guides for Micronaut Framework 3</a></li>
+                    </ul>
+                    </li>
+                    <li id="menu-item-2878" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item"><a href="https://micronaut.io/resources/" class="nav-link dropdown-toggle" data-toggle="dropdown">Resources</a><ul class="dropdown-menu">
+                        <li id="menu-item-4999" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4999"><a href="https://micronaut.io/upcoming-events/" class="dropdown-item">Upcoming Events</a></li>
+                        <li id="menu-item-2879" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2879"><a href="https://micronaut.io/blog/" class="dropdown-item">Blog</a></li>
+                        <li id="menu-item-6478" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-6478"><a href="https://micronaut.io/category/release-announcements/" class="dropdown-item">Releases</a></li>
+                        <li id="menu-item-6715" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-6715"><a href="https://micronaut.io/category/security-announcements/" class="dropdown-item">Security Announcements</a></li>
+                        <li id="menu-item-4499" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-4499"><a href="https://micronautpodcast.com/" class="dropdown-item">Podcast</a></li>
+                        <li id="menu-item-5798" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5798"><a href="https://micronaut.io/support/" class="dropdown-item">Commercial Support</a></li>
+                        <li id="menu-item-4186" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4186"><a href="https://micronaut.io/resources/community-support/" class="dropdown-item">Community Support</a></li>
+                        <li id="menu-item-2882" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2882"><a href="https://micronaut.io/faq/" class="dropdown-item">FAQ</a></li>
+                        <li id="menu-item-2883" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2883"><a href="https://micronaut.io/contact/" class="dropdown-item">Contact</a></li>
+                        <li id="menu-item-6479" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-6479"><a href="https://micronaut.io/micronaut-success-stories/" class="dropdown-item">Micronaut Success Stories</a></li>
+                    </ul>
+                    </li>
+                    <li id="menu-item-2872" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2872 dropdown nav-item"><a href="https://micronaut.io/foundation/" class="nav-link dropdown-toggle" data-toggle="dropdown">Foundation</a><ul class="dropdown-menu">
+                        <li id="menu-item-2877" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2877"><a href="https://micronaut.io/foundation/" class="dropdown-item">Overview</a></li>
+                        <li id="menu-item-2874" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2874"><a href="https://micronaut.io/foundation/corporate-sponsorship/" class="dropdown-item">Corporate Sponsorship</a></li>
+                        <li id="menu-item-2873" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2873"><a href="https://micronaut.io/foundation/community-sponsorship/" class="dropdown-item">Community Sponsorship</a></li>
+                        <li id="menu-item-2876" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2876"><a href="https://micronaut.io/foundation/sponsors/" class="dropdown-item">Sponsors</a></li>
+                        <li id="menu-item-3838" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-3838"><a href="https://micronaut.io/meeting-minutes/" class="dropdown-item">Meeting Minutes</a></li>
+                    </ul>
+                    </li>
+                    <li id="menu-item-2884" class="action menu-item menu-item-type-custom menu-item-object-custom menu-item-2884 nav-item"><a target="_blank" rel="noopener" href="https://micronaut.io/launch/" class="nav-link">Launch</a></li>
+
+                </ul>
+
+            </div>
+
+        </nav>
+
+    </div>
+</header>
+
+<div style="background: #fff;padding-top: 20px;padding-bottom: 20px;">
+    <div class="container" style="clear: both;">
+        <fieldset style="float: right;">
+            <input type="search" id="search-form-query"/>
+            <input type="submit" onclick="search()" value="Search">
+            <input type="submit" onclick="resetSearch()" value="Reset">
+        </fieldset>
+    </div>
+    <div class="container" style="clear: both;margin-top: -20px;">
+        <div class="guide-list" id="searchResults">
+        </div>
+    </div>
+</div>
+<div id="breadcrumbs"><div class="container"><a href="https://micronaut.io/">Home</a> » <a href="./index.html">Guides</a> » <a href="micronaut-data-many-to-many.html">Many-To-Many with Micronaut Data JDBC and MySQL</a> » <span class="breadcrumb_last" aria-current="page">gradle | java</span></div></div><!-- .breadcrumbs -->
+<main id="main">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+
+                <div class="toc">
+                    <div class="inner">
+                        <h1 class="title title_large first-word-bold first-word-break">Table of Contents</h1>
+                        <div class="underline"></div>
+                        
+<ul class="sectlevel1">
+<li><a href="#getting-started">1. Getting Started</a></li>
+<li><a href="#what-you-will-need">2. What you will need</a></li>
+<li><a href="#solution">3. Solution</a></li>
+<li><a href="#many-to-many-relationship">4. Many-To-Many Relationship</a></li>
+<li><a href="#writing-the-application">5. Writing the Application</a>
+<ul class="sectlevel2">
+<li><a href="#micronaut-data-jdbc">5.1. Micronaut Data JDBC</a></li>
+<li><a href="#mysql-driver">5.2. MySQL Driver</a></li>
+<li><a href="#database-configuration">5.3. Database Configuration</a></li>
+<li><a href="#database-migration-with-liquibase">5.4. Database Migration with Liquibase</a></li>
+<li><a href="#entities">5.5. Entities</a></li>
+<li><a href="#projection">5.6. Projection</a></li>
+<li><a href="#jdbc-repositories">5.7. JDBC Repositories</a></li>
+<li><a href="#test">5.8. Test</a></li>
+</ul>
+</li>
+<li><a href="#testing-the-application">6. Testing the Application</a></li>
+<li><a href="#native-tests">7. Native Tests</a></li>
+<li><a href="#next-steps">8. Next Steps</a></li>
+<li><a href="#license">9. License</a></li>
+</ul>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <h1>Many-To-Many with Micronaut Data JDBC and MySQL</h1>
+                <div class="underline"></div>
+<div class="sect1">
+<div class="sectionbody">
+
+<div class="paragraph">
+<p>Learn how to map a many-to-many association with Micronaut Data JDBC and MySQL.</p>
+</div>
+<div class="paragraph">
+<p>Authors: Sergio del Amo</p>
+</div>
+<div class="paragraph">
+<p>Micronaut Version: 4.9.1</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="getting-started">1. Getting Started</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this guide, we will create a Micronaut application written in Java.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="what-you-will-need">2. What you will need</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To complete this guide, you will need the following:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Some time on your hands</p>
+</li>
+<li>
+<p>A decent text editor or IDE (e.g. <a href="https://guides.micronaut.io/latest/micronaut-intellij-idea-ide-setup.html">IntelliJ IDEA</a>)</p>
+</li>
+<li>
+<p>JDK 21 or greater installed with <code>JAVA_HOME</code> <a href="https://www.baeldung.com/java-home-on-windows-7-8-10-mac-os-x-linux">configured appropriately</a></p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div></div><div class="row"><div class="col-md-12"><div class="sect1">
+<h2 id="solution">3. Solution</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We recommend that you follow the instructions in the next sections and create the application step by step. However, you can go right to the <strong>completed example</strong>.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="micronaut-data-many-to-many-gradle-java.zip">Download</a> and unzip the source</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="many-to-many-relationship">4. Many-To-Many Relationship</h2>
+<div class="sectionbody">
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>A relationship is a connection between two types of entities. In the case of a many-to-many relationship, both sides can relate to multiple instances of the other side.</p>
+</div>
+</blockquote>
+</div>
+<div class="paragraph">
+<p>In this guide, you are going to create a many-to-many relationship between <code>User</code> and <code>Role</code> entities using Micronaut Data JDBC.
+A user can have many roles and the same role can be applied to multiple users.</p>
+</div>
+<div class="paragraph">
+<p>The application consumes a database schema with the following structure:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/many-to-many.svg" alt="many to many">
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="writing-the-application">5. Writing the Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Create an application using the <a href="https://docs.micronaut.io/latest/guide/#cli">Micronaut Command Line Interface</a> or with <a href="https://launch.micronaut.io">Micronaut Launch</a>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide <span class="se">\</span>
+    <span class="nt">--features</span><span class="o">=</span>data-jdbc,liquibase,mysql,validation,graalvm <span class="se">\</span>
+    <span class="nt">--build</span><span class="o">=</span>gradle <span class="se">\</span>
+    <span class="nt">--lang</span><span class="o">=</span>java <span class="se">\</span>
+    <span class="nt">--test</span><span class="o">=</span>junit</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you don&#8217;t specify the <code>--build</code> argument, Gradle with the <a href="https://docs.gradle.org/current/userguide/kotlin_dsl.html">Kotlin DSL</a> is used as the build tool. <br/> If you don&#8217;t specify the <code>--lang</code> argument, Java is used as the language.<br/> If you don&#8217;t specify the <code>--test</code> argument, JUnit is used for Java and Kotlin, and Spock is used for Groovy.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The previous command creates a Micronaut application with the default package <code>example.micronaut</code> in a directory named <code>micronautguide</code>.</p>
+</div>
+<div class="paragraph">
+<p>If you use Micronaut Launch, select Micronaut Application as application type and add <code>data-jdbc</code>, <code>liquibase</code>, <code>mysql</code>, <code>validation</code>, and <code>graalvm</code> features.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you have an existing Micronaut application and want to add the functionality described here, you can view the dependency and configuration changes from the specified features, and apply those changes to your application.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><a href="https://micronaut.io/launch?features=data-jdbc&amp;features=liquibase&amp;features=mysql&amp;features=validation&amp;features=graalvm&amp;lang=JAVA&amp;build=GRADLE&amp;test=JUNIT&amp;name=micronautguide&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">Diff</a></p>
+</div>
+<div class="paragraph">
+<p><a href="https://guides.micronaut.io/latest/micronaut-intellij-idea-ide-setup.html">Setup IntelliJ IDEA to develop Micronaut Applications</a>.</p>
+</div>
+<div class="paragraph">
+<p>The previous command creates a Micronaut application with the default package <code>example.micronaut</code> in a directory named <code>micronautguide</code>.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you have an existing Micronaut application and want to add the functionality described here, you can view the dependency and configuration changes from the specified features, and apply those changes to your application.
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="micronaut-data-jdbc">5.1. Micronaut Data JDBC</h3>
+<div class="paragraph">
+<p>Add <a href="https://micronaut-projects.github.io/micronaut-data/latest/guide/#jdbc">Micronaut Data JDBC</a> dependencies to the project:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="groovy"><span class="n">annotationProcessor</span><span class="o">(</span><span class="s2">"io.micronaut.data:micronaut-data-processor"</span><span class="o">)</span>
+<span class="n">implementation</span><span class="o">(</span><span class="s2">"io.micronaut.data:micronaut-data-jdbc"</span><span class="o">)</span>
+<span class="n">implementation</span><span class="o">(</span><span class="s2">"io.micronaut.sql:micronaut-jdbc-hikari"</span><span class="o">)</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="mysql-driver">5.2. MySQL Driver</h3>
+<div class="paragraph">
+<p>Add also the MySQL Driver</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="groovy"><span class="n">runtimeOnly</span><span class="o">(</span><span class="s2">"com.mysql:mysql-connector-j"</span><span class="o">)</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="database-configuration">5.3. Database Configuration</h3>
+<div class="paragraph">
+<p>And the database configuration:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/application.properties</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="properties"><span class="py">datasources.default.schema-generate</span><span class="p">=</span><span class="s">NONE</span>
+<i class="conum" data-value="1"></i><b>(1)</b>
+<span class="py">datasources.default.driver-class-name</span><span class="p">=</span><span class="s">com.mysql.cj.jdbc.Driver</span>
+<i class="conum" data-value="2"></i><b>(2)</b>
+<span class="py">datasources.default.db-type</span><span class="p">=</span><span class="s">mysql</span>
+<i class="conum" data-value="3"></i><b>(3)</b>
+<span class="py">datasources.default.dialect</span><span class="p">=</span><span class="s">MYSQL</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Use MySQL driver.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Define MySQL as the DB type.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Configure the MySQL dialect.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="database-migration-with-liquibase">5.4. Database Migration with Liquibase</h3>
+<div class="paragraph">
+<p>We need a way to create the database schema. For that, we use
+<a href="https://micronaut-projects.github.io/micronaut-liquibase/latest/guide/">Micronaut integration with Liquibase</a>.</p>
+</div>
+<div class="paragraph">
+<p>Add the following snippet to include the necessary dependencies:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="groovy"><span class="n">implementation</span><span class="o">(</span><span class="s2">"io.micronaut.liquibase:micronaut-liquibase"</span><span class="o">)</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Configure the database migrations directory for <a href="http://www.liquibase.org">Liquibase</a> in <code>application.properties</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/application.properties</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="properties"><span class="py">liquibase.datasources.default.change-log</span><span class="p">=</span><span class="s">classpath</span><span class="se">\:</span><span class="s">db/liquibase-changelog.xml</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Create the following files with the database schema creation:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/db/liquibase-changelog.xml</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="xml"><span class="cp">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
+<span class="nt">&lt;databaseChangeLog</span>
+  <span class="na">xmlns=</span><span class="s">"http://www.liquibase.org/xml/ns/dbchangelog"</span>
+  <span class="na">xmlns:xsi=</span><span class="s">"http://www.w3.org/2001/XMLSchema-instance"</span>
+  <span class="na">xsi:schemaLocation=</span><span class="s">"http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;include</span> <span class="na">file=</span><span class="s">"changelog/01-schema.xml"</span> <span class="na">relativeToChangelogFile=</span><span class="s">"true"</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/databaseChangeLog&gt;</span></code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/db/changelog/01-schema.xml</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="xml"><span class="cp">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
+
+<span class="nt">&lt;databaseChangeLog</span>
+  <span class="na">xmlns=</span><span class="s">"http://www.liquibase.org/xml/ns/dbchangelog"</span>
+  <span class="na">xmlns:xsi=</span><span class="s">"http://www.w3.org/2001/XMLSchema-instance"</span>
+  <span class="na">xsi:schemaLocation=</span><span class="s">"http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;changeSet</span> <span class="na">id=</span><span class="s">"01"</span> <span class="na">author=</span><span class="s">"username"</span><span class="nt">&gt;</span>
+      <span class="nt">&lt;createTable</span> <span class="na">tableName=</span><span class="s">"user"</span><span class="nt">&gt;</span>
+          <span class="nt">&lt;column</span> <span class="na">name=</span><span class="s">"id"</span> <span class="na">type=</span><span class="s">"BIGINT"</span> <span class="na">autoIncrement=</span><span class="s">"true"</span><span class="nt">&gt;</span>
+              <span class="nt">&lt;constraints</span> <span class="na">primaryKey=</span><span class="s">"true"</span> <span class="na">primaryKeyName=</span><span class="s">"pk_user"</span> <span class="na">nullable=</span><span class="s">"false"</span><span class="nt">/&gt;</span>
+          <span class="nt">&lt;/column&gt;</span>
+          <span class="nt">&lt;column</span> <span class="na">name=</span><span class="s">"username"</span> <span class="na">type=</span><span class="s">"VARCHAR(255)"</span><span class="nt">&gt;</span>
+              <span class="nt">&lt;constraints</span> <span class="na">nullable=</span><span class="s">"false"</span> <span class="na">unique=</span><span class="s">"true"</span> <span class="na">uniqueConstraintName=</span><span class="s">"uk_user_username"</span><span class="nt">/&gt;</span>
+          <span class="nt">&lt;/column&gt;</span>
+      <span class="nt">&lt;/createTable&gt;</span>
+
+      <span class="nt">&lt;createTable</span> <span class="na">tableName=</span><span class="s">"role"</span><span class="nt">&gt;</span>
+          <span class="nt">&lt;column</span> <span class="na">name=</span><span class="s">"id"</span> <span class="na">type=</span><span class="s">"BIGINT"</span> <span class="na">autoIncrement=</span><span class="s">"true"</span><span class="nt">&gt;</span>
+              <span class="nt">&lt;constraints</span> <span class="na">primaryKey=</span><span class="s">"true"</span> <span class="na">primaryKeyName=</span><span class="s">"pk_role"</span> <span class="na">nullable=</span><span class="s">"false"</span><span class="nt">/&gt;</span>
+          <span class="nt">&lt;/column&gt;</span>
+          <span class="nt">&lt;column</span> <span class="na">name=</span><span class="s">"authority"</span> <span class="na">type=</span><span class="s">"VARCHAR(255)"</span><span class="nt">&gt;</span>
+              <span class="nt">&lt;constraints</span> <span class="na">nullable=</span><span class="s">"false"</span> <span class="na">unique=</span><span class="s">"true"</span> <span class="na">uniqueConstraintName=</span><span class="s">"uk_role_authority"</span><span class="nt">/&gt;</span>
+          <span class="nt">&lt;/column&gt;</span>
+      <span class="nt">&lt;/createTable&gt;</span>
+
+      <span class="nt">&lt;createTable</span> <span class="na">tableName=</span><span class="s">"user_role"</span><span class="nt">&gt;</span>
+          <span class="nt">&lt;column</span> <span class="na">name=</span><span class="s">"id_user_id"</span> <span class="na">type=</span><span class="s">"BIGINT"</span><span class="nt">&gt;</span>
+              <span class="nt">&lt;constraints</span> <span class="na">nullable=</span><span class="s">"false"</span><span class="nt">/&gt;</span>
+          <span class="nt">&lt;/column&gt;</span>
+          <span class="nt">&lt;column</span> <span class="na">name=</span><span class="s">"id_role_id"</span> <span class="na">type=</span><span class="s">"BIGINT"</span><span class="nt">&gt;</span>
+              <span class="nt">&lt;constraints</span> <span class="na">nullable=</span><span class="s">"false"</span><span class="nt">/&gt;</span>
+          <span class="nt">&lt;/column&gt;</span>
+      <span class="nt">&lt;/createTable&gt;</span>
+
+      <span class="nt">&lt;addPrimaryKey</span> <span class="na">tableName=</span><span class="s">"user_role"</span> <span class="na">constraintName=</span><span class="s">"pk_user_role"</span> <span class="na">columnNames=</span><span class="s">"id_user_id, id_role_id"</span><span class="nt">/&gt;</span>
+
+      <span class="nt">&lt;addForeignKeyConstraint</span>
+              <span class="na">baseTableName=</span><span class="s">"user_role"</span>
+              <span class="na">baseColumnNames=</span><span class="s">"id_user_id"</span>
+              <span class="na">constraintName=</span><span class="s">"fk_user_role_user"</span>
+              <span class="na">referencedTableName=</span><span class="s">"user"</span>
+              <span class="na">referencedColumnNames=</span><span class="s">"id"</span>
+              <span class="na">onDelete=</span><span class="s">"CASCADE"</span><span class="nt">/&gt;</span>
+
+      <span class="nt">&lt;addForeignKeyConstraint</span>
+              <span class="na">baseTableName=</span><span class="s">"user_role"</span>
+              <span class="na">baseColumnNames=</span><span class="s">"id_role_id"</span>
+              <span class="na">constraintName=</span><span class="s">"fk_user_role_role"</span>
+              <span class="na">referencedTableName=</span><span class="s">"role"</span>
+              <span class="na">referencedColumnNames=</span><span class="s">"id"</span>
+              <span class="na">onDelete=</span><span class="s">"CASCADE"</span><span class="nt">/&gt;</span>
+  <span class="nt">&lt;/changeSet&gt;</span>
+<span class="nt">&lt;/databaseChangeLog&gt;</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="entities">5.5. Entities</h3>
+<div class="sect3">
+<h4 id="user">5.5.1. User</h4>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/UserEntity.java</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">io.micronaut.core.annotation.Nullable</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.data.annotation.GeneratedValue</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.data.annotation.Id</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.data.annotation.MappedEntity</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.validation.constraints.NotBlank</span><span class="o">;</span>
+
+<span class="nd">@MappedEntity</span><span class="o">(</span><span class="s">"user"</span><span class="o">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">public</span> <span class="n">record</span> <span class="nf">UserEntity</span><span class="o">(</span><span class="nd">@Nullable</span>
+                   <span class="nd">@Id</span> <i class="conum" data-value="2"></i><b>(2)</b>
+                   <span class="nd">@GeneratedValue</span> <i class="conum" data-value="3"></i><b>(3)</b>
+                   <span class="nc">Long</span> <span class="n">id</span><span class="o">,</span>
+
+                   <span class="nd">@NotBlank</span> <i class="conum" data-value="4"></i><b>(4)</b>
+                   <span class="nc">String</span> <span class="n">username</span>
+                   <span class="o">)</span>  <span class="o">{</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Annotate the class with <code>@MappedEntity</code> to map the class to the table defined in the schema.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Specifies the ID of an entity</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Specifies that the property value is generated by the database and not included in inserts</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Use <code>jakarta.validation.constraints</code> Constraints to ensure the data matches your expectations.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="role">5.5.2. Role</h4>
+<div class="paragraph">
+<p>Create <code>Role</code> domain class to store authorities within our application.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/Role.java</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">io.micronaut.core.annotation.Nullable</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.data.annotation.GeneratedValue</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.data.annotation.Id</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.data.annotation.MappedEntity</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.validation.constraints.NotBlank</span><span class="o">;</span>
+
+<span class="nd">@MappedEntity</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">public</span> <span class="n">record</span> <span class="nf">Role</span><span class="o">(</span><span class="nd">@Nullable</span>
+                   <span class="nd">@Id</span> <i class="conum" data-value="2"></i><b>(2)</b>
+                   <span class="nd">@GeneratedValue</span> <i class="conum" data-value="3"></i><b>(3)</b>
+                   <span class="nc">Long</span> <span class="n">id</span><span class="o">,</span>
+
+                   <span class="nd">@NotBlank</span> <i class="conum" data-value="4"></i><b>(4)</b>
+                   <span class="nc">String</span> <span class="n">authority</span><span class="o">)</span> <span class="o">{</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Annotate the class with <code>@MappedEntity</code> to map the class to the table defined in the schema.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Specifies the ID of an entity</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Specifies that the property value is generated by the database and not included in inserts</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Use <code>jakarta.validation.constraints</code> Constraints to ensure the data matches your expectations.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="userrole">5.5.3. UserRole</h4>
+<div class="paragraph">
+<p>Create a <code>UserRole</code> which stores a many-to-many relationship between <code>User</code> and <code>Role</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/UserRole.java</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">io.micronaut.data.annotation.EmbeddedId</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.data.annotation.MappedEntity</span><span class="o">;</span>
+
+<span class="nd">@MappedEntity</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">UserRole</span> <span class="o">{</span>
+
+    <span class="nd">@EmbeddedId</span> <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">UserRoleId</span> <span class="n">id</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nf">UserRole</span><span class="o">(</span><span class="nc">UserRoleId</span> <span class="n">id</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">id</span> <span class="o">=</span> <span class="n">id</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nf">UserRole</span><span class="o">(</span><span class="nc">UserEntity</span> <span class="n">user</span><span class="o">,</span> <span class="nc">Role</span> <span class="n">role</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">(</span><span class="k">new</span> <span class="nc">UserRoleId</span><span class="o">(</span><span class="n">user</span><span class="o">,</span> <span class="n">role</span><span class="o">));</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nc">UserRoleId</span> <span class="nf">getId</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">id</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Annotate the class with <code>@MappedEntity</code> to map the class to the table defined in the schema.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Composite primary keys can be defined using <code>@EmbeddedId</code> annotation.</td>
+</tr>
+</table>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/UserRoleId.java</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">io.micronaut.data.annotation.Embeddable</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.data.annotation.Relation</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">java.util.Objects</span><span class="o">;</span>
+
+<span class="nd">@Embeddable</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">UserRoleId</span> <span class="o">{</span>
+
+    <span class="nd">@Relation</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="nc">Relation</span><span class="o">.</span><span class="na">Kind</span><span class="o">.</span><span class="na">MANY_TO_ONE</span><span class="o">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">UserEntity</span> <span class="n">user</span><span class="o">;</span>
+
+    <span class="nd">@Relation</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="nc">Relation</span><span class="o">.</span><span class="na">Kind</span><span class="o">.</span><span class="na">MANY_TO_ONE</span><span class="o">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">Role</span> <span class="n">role</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nf">UserRoleId</span><span class="o">(</span><span class="nc">UserEntity</span> <span class="n">user</span><span class="o">,</span> <span class="nc">Role</span> <span class="n">role</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">user</span> <span class="o">=</span> <span class="n">user</span><span class="o">;</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">role</span> <span class="o">=</span> <span class="n">role</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">equals</span><span class="o">(</span><span class="nc">Object</span> <span class="n">o</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="k">this</span> <span class="o">==</span> <span class="n">o</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="kc">true</span><span class="o">;</span>
+        <span class="o">}</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">o</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">||</span> <span class="n">getClass</span><span class="o">()</span> <span class="o">!=</span> <span class="n">o</span><span class="o">.</span><span class="na">getClass</span><span class="o">())</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="kc">false</span><span class="o">;</span>
+        <span class="o">}</span>
+        <span class="nc">UserRoleId</span> <span class="n">userRoleId</span> <span class="o">=</span> <span class="o">(</span><span class="nc">UserRoleId</span><span class="o">)</span> <span class="n">o</span><span class="o">;</span>
+        <span class="k">return</span> <span class="n">role</span><span class="o">.</span><span class="na">id</span><span class="o">().</span><span class="na">equals</span><span class="o">(</span><span class="n">userRoleId</span><span class="o">.</span><span class="na">getRole</span><span class="o">().</span><span class="na">id</span><span class="o">())</span> <span class="o">&amp;&amp;</span>
+                <span class="n">user</span><span class="o">.</span><span class="na">id</span><span class="o">().</span><span class="na">equals</span><span class="o">(</span><span class="n">userRoleId</span><span class="o">.</span><span class="na">getUser</span><span class="o">().</span><span class="na">id</span><span class="o">());</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">int</span> <span class="nf">hashCode</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="nc">Objects</span><span class="o">.</span><span class="na">hash</span><span class="o">(</span><span class="n">role</span><span class="o">.</span><span class="na">id</span><span class="o">(),</span> <span class="n">user</span><span class="o">.</span><span class="na">id</span><span class="o">());</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nc">UserEntity</span> <span class="nf">getUser</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">user</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nc">Role</span> <span class="nf">getRole</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">role</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Specifies that the bean is embeddable.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>You can specify a relationship (one-to-one, one-to-many, etc.) with the <code>@Relation</code> annotation.</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="projection">5.6. Projection</h3>
+<div class="paragraph">
+<p>Create <code>User</code> record which represents and user and his assigned roles.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/User.java</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">io.micronaut.core.annotation.Introspected</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.core.annotation.NonNull</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.core.annotation.Nullable</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.validation.constraints.NotBlank</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.List</span><span class="o">;</span>
+
+<span class="nd">@Introspected</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">public</span> <span class="n">record</span> <span class="nf">User</span><span class="o">(</span><span class="nd">@NonNull</span> <span class="nd">@NotBlank</span> <span class="nc">Long</span> <span class="n">id</span><span class="o">,</span>
+                   <span class="nd">@NonNull</span> <span class="nd">@NotBlank</span> <span class="nc">String</span> <span class="n">username</span><span class="o">,</span>
+                   <span class="nd">@Nullable</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="n">authorities</span><span class="o">)</span> <span class="o">{</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Annotate the class with <a href="https://docs.micronaut.io/latest/api/io/micronaut/core/annotation/Introspected.html"><code>@Introspected</code></a> to generate <code>BeanIntrospection</code> metadata at compilation time. This information can be used, for example, to render the POJO as JSON using Jackson without using reflection.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="jdbc-repositories">5.7. JDBC Repositories</h3>
+<div class="paragraph">
+<p>Create various JDBC Repositories:</p>
+</div>
+<div class="sect3">
+<h4 id="user-repository">5.7.1. User Repository</h4>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/UserJdbcRepository.java</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">io.micronaut.data.annotation.Query</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.data.jdbc.annotation.JdbcRepository</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.data.model.query.builder.sql.Dialect</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.data.repository.CrudRepository</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">java.util.Optional</span><span class="o">;</span>
+
+<span class="nd">@JdbcRepository</span><span class="o">(</span><span class="n">dialect</span> <span class="o">=</span> <span class="nc">Dialect</span><span class="o">.</span><span class="na">MYSQL</span><span class="o">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">UserJdbcRepository</span> <span class="kd">extends</span> <span class="nc">CrudRepository</span><span class="o">&lt;</span><span class="nc">UserEntity</span><span class="o">,</span> <span class="nc">Long</span><span class="o">&gt;</span> <span class="o">{</span> <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="nc">UserEntity</span> <span class="nf">save</span><span class="o">(</span><span class="nc">String</span> <span class="n">username</span><span class="o">);</span>
+
+    <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="nd">@Query</span><span class="o">(</span><span class="n">value</span> <span class="o">=</span> <span class="s">"""
+            SELECT 
+                u.id, 
+                u.username, 
+                GROUP_CONCAT(DISTINCT r.authority ORDER BY r.authority SEPARATOR ',') AS authorities 
+            FROM user AS u 
+            LEFT JOIN user_role AS ur ON ur.id_user_id = u.id 
+            LEFT JOIN role AS r ON r.id = ur.id_role_id 
+            WHERE u.username = :username 
+            GROUP BY u.id, u.username;
+            """</span><span class="o">)</span>
+    <span class="nc">Optional</span><span class="o">&lt;</span><span class="nc">User</span><span class="o">&gt;</span> <span class="nf">findByUsername</span><span class="o">(</span><span class="nc">String</span> <span class="n">username</span><span class="o">);</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>@JdbcRepository</code> with a specific dialect.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>By extending <code>CrudRepository</code> you enable automatic generation of CRUD (Create, Read, Update, Delete) operations.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>You can use the <code>@Query</code> annotation to specify an explicit query.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="role-repository">5.7.2. Role Repository</h4>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/RoleJdbcRepository.java</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">io.micronaut.data.jdbc.annotation.JdbcRepository</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.data.model.query.builder.sql.Dialect</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.data.repository.CrudRepository</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.Optional</span><span class="o">;</span>
+
+<span class="nd">@JdbcRepository</span><span class="o">(</span><span class="n">dialect</span> <span class="o">=</span> <span class="nc">Dialect</span><span class="o">.</span><span class="na">MYSQL</span><span class="o">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">RoleJdbcRepository</span> <span class="kd">extends</span> <span class="nc">CrudRepository</span><span class="o">&lt;</span><span class="nc">Role</span><span class="o">,</span> <span class="nc">Long</span><span class="o">&gt;</span> <span class="o">{</span> <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="nc">Role</span> <span class="nf">save</span><span class="o">(</span><span class="nc">String</span> <span class="n">authority</span><span class="o">);</span>
+
+    <span class="nc">Optional</span><span class="o">&lt;</span><span class="nc">Role</span><span class="o">&gt;</span> <span class="nf">findByAuthority</span><span class="o">(</span><span class="nc">String</span> <span class="n">authority</span><span class="o">);</span>
+
+    <span class="kt">void</span> <span class="nf">deleteByAuthority</span><span class="o">(</span><span class="nc">String</span> <span class="n">authority</span><span class="o">);</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>@JdbcRepository</code> with a specific dialect.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>By extending <code>CrudRepository</code> you enable automatic generation of CRUD (Create, Read, Update, Delete) operations.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="userrole-repository">5.7.3. UserRole Repository</h4>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/UserRoleJdbcRepository.java</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">io.micronaut.data.jdbc.annotation.JdbcRepository</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.data.model.query.builder.sql.Dialect</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.data.repository.CrudRepository</span><span class="o">;</span>
+
+<span class="nd">@JdbcRepository</span><span class="o">(</span><span class="n">dialect</span> <span class="o">=</span> <span class="nc">Dialect</span><span class="o">.</span><span class="na">MYSQL</span><span class="o">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">UserRoleJdbcRepository</span> <span class="kd">extends</span> <span class="nc">CrudRepository</span><span class="o">&lt;</span><span class="nc">UserRole</span><span class="o">,</span> <span class="nc">UserRoleId</span><span class="o">&gt;</span> <span class="o">{</span> <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>@JdbcRepository</code> with a specific dialect.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>By extending <code>CrudRepository</code> you enable automatic generation of CRUD (Create, Read, Update, Delete) operations.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>You can use the <code>@Query</code> annotation to specify an explicit query.</td>
+</tr>
+</table>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>A domain class fulfills the M in the Model View Controller (MVC) pattern and represents a persistent entity that is
+mapped onto an underlying database table.</p>
+</div>
+</blockquote>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="test">5.8. Test</h3>
+<div class="paragraph">
+<p>Add a test that verifies the many-to-many relationship:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/java/example/micronaut/ManyToManyTest.java</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.junit.jupiter.api.Test</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">java.util.List</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">junit</span><span class="o">.</span><span class="na">jupiter</span><span class="o">.</span><span class="na">api</span><span class="o">.</span><span class="na">Assertions</span><span class="o">.</span><span class="na">assertEquals</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">junit</span><span class="o">.</span><span class="na">jupiter</span><span class="o">.</span><span class="na">api</span><span class="o">.</span><span class="na">Assertions</span><span class="o">.</span><span class="na">assertFalse</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">junit</span><span class="o">.</span><span class="na">jupiter</span><span class="o">.</span><span class="na">api</span><span class="o">.</span><span class="na">Assertions</span><span class="o">.</span><span class="na">assertNotNull</span><span class="o">;</span>
+
+<span class="nd">@MicronautTest</span><span class="o">(</span><span class="n">startApplication</span> <span class="o">=</span> <span class="kc">false</span><span class="o">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">class</span> <span class="nc">ManyToManyTest</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="nc">String</span> <span class="no">ROLE_USER</span> <span class="o">=</span> <span class="s">"ROLE_USER"</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="nc">String</span> <span class="no">ROLE_ADMIN</span> <span class="o">=</span> <span class="s">"ROLE_ADMIN"</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="nc">String</span> <span class="no">U_SERGIO</span> <span class="o">=</span> <span class="s">"sergio"</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="nc">String</span> <span class="no">U_TIM</span> <span class="o">=</span> <span class="s">"tim"</span><span class="o">;</span>
+
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">testManyToManyPersistence</span><span class="o">(</span><span class="nc">RoleJdbcRepository</span> <span class="n">roleRepo</span><span class="o">,</span>
+              <span class="nc">UserJdbcRepository</span> <span class="n">userRepo</span><span class="o">,</span>
+              <span class="nc">UserRoleJdbcRepository</span> <span class="n">userRoleRepo</span><span class="o">)</span> <span class="o">{</span>
+        <span class="nc">Role</span> <span class="n">roleUser</span> <span class="o">=</span> <span class="n">roleRepo</span><span class="o">.</span><span class="na">save</span><span class="o">(</span><span class="no">ROLE_USER</span><span class="o">);</span>
+        <span class="nc">Role</span> <span class="n">roleAdmin</span> <span class="o">=</span> <span class="n">roleRepo</span><span class="o">.</span><span class="na">save</span><span class="o">(</span><span class="no">ROLE_ADMIN</span><span class="o">);</span>
+
+        <span class="n">assertFalse</span><span class="o">(</span><span class="n">userRepo</span><span class="o">.</span><span class="na">findByUsername</span><span class="o">(</span><span class="no">U_SERGIO</span><span class="o">).</span><span class="na">isPresent</span><span class="o">());</span>
+        <span class="nc">UserEntity</span> <span class="n">sergio</span> <span class="o">=</span> <span class="n">userRepo</span><span class="o">.</span><span class="na">save</span><span class="o">(</span><span class="no">U_SERGIO</span><span class="o">);</span>
+        <span class="n">assertUser</span><span class="o">(</span><span class="n">userRepo</span><span class="o">.</span><span class="na">findByUsername</span><span class="o">(</span><span class="no">U_SERGIO</span><span class="o">).</span><span class="na">orElse</span><span class="o">(</span><span class="kc">null</span><span class="o">),</span> <span class="no">U_SERGIO</span><span class="o">,</span> <span class="kc">null</span><span class="o">);</span>
+        <span class="n">userRoleRepo</span><span class="o">.</span><span class="na">save</span><span class="o">(</span><span class="k">new</span> <span class="nc">UserRole</span><span class="o">(</span><span class="n">sergio</span><span class="o">,</span> <span class="n">roleUser</span><span class="o">));</span>
+        <span class="n">userRoleRepo</span><span class="o">.</span><span class="na">save</span><span class="o">(</span><span class="k">new</span> <span class="nc">UserRole</span><span class="o">(</span><span class="n">sergio</span><span class="o">,</span> <span class="n">roleAdmin</span><span class="o">));</span>
+        <span class="n">assertUser</span><span class="o">(</span><span class="n">userRepo</span><span class="o">.</span><span class="na">findByUsername</span><span class="o">(</span><span class="no">U_SERGIO</span><span class="o">).</span><span class="na">orElse</span><span class="o">(</span><span class="kc">null</span><span class="o">),</span> <span class="no">U_SERGIO</span><span class="o">,</span> <span class="nc">List</span><span class="o">.</span><span class="na">of</span><span class="o">(</span><span class="no">ROLE_ADMIN</span><span class="o">,</span> <span class="no">ROLE_USER</span><span class="o">));</span>
+
+        <span class="nc">UserEntity</span> <span class="n">tim</span> <span class="o">=</span> <span class="n">userRepo</span><span class="o">.</span><span class="na">save</span><span class="o">(</span><span class="no">U_TIM</span><span class="o">);</span>
+        <span class="n">userRoleRepo</span><span class="o">.</span><span class="na">save</span><span class="o">(</span><span class="k">new</span> <span class="nc">UserRole</span><span class="o">(</span><span class="n">tim</span><span class="o">,</span> <span class="n">roleUser</span><span class="o">));</span>
+        <span class="n">assertUser</span><span class="o">(</span><span class="n">userRepo</span><span class="o">.</span><span class="na">findByUsername</span><span class="o">(</span><span class="no">U_TIM</span><span class="o">).</span><span class="na">orElse</span><span class="o">(</span><span class="kc">null</span><span class="o">),</span> <span class="no">U_TIM</span><span class="o">,</span> <span class="nc">List</span><span class="o">.</span><span class="na">of</span><span class="o">(</span><span class="no">ROLE_USER</span><span class="o">));</span>
+
+        <span class="n">userRoleRepo</span><span class="o">.</span><span class="na">delete</span><span class="o">(</span><span class="k">new</span> <span class="nc">UserRole</span><span class="o">(</span><span class="n">tim</span><span class="o">,</span> <span class="n">roleUser</span><span class="o">));</span>
+        <span class="n">userRoleRepo</span><span class="o">.</span><span class="na">delete</span><span class="o">(</span><span class="k">new</span> <span class="nc">UserRole</span><span class="o">(</span><span class="n">sergio</span><span class="o">,</span> <span class="n">roleUser</span><span class="o">));</span>
+        <span class="n">userRoleRepo</span><span class="o">.</span><span class="na">delete</span><span class="o">(</span><span class="k">new</span> <span class="nc">UserRole</span><span class="o">(</span><span class="n">sergio</span><span class="o">,</span> <span class="n">roleAdmin</span><span class="o">));</span>
+
+        <span class="n">userRepo</span><span class="o">.</span><span class="na">delete</span><span class="o">(</span><span class="n">sergio</span><span class="o">);</span>
+        <span class="n">userRepo</span><span class="o">.</span><span class="na">delete</span><span class="o">(</span><span class="n">tim</span><span class="o">);</span>
+
+        <span class="n">roleRepo</span><span class="o">.</span><span class="na">deleteByAuthority</span><span class="o">(</span><span class="no">ROLE_ADMIN</span><span class="o">);</span>
+        <span class="n">roleRepo</span><span class="o">.</span><span class="na">deleteByAuthority</span><span class="o">(</span><span class="no">ROLE_USER</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="kt">void</span> <span class="nf">assertUser</span><span class="o">(</span><span class="nc">User</span> <span class="n">user</span><span class="o">,</span> <span class="nc">String</span> <span class="n">expectedUsername</span><span class="o">,</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="n">expectedAuthorities</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">assertNotNull</span><span class="o">(</span><span class="n">user</span><span class="o">);</span>
+        <span class="n">assertNotNull</span><span class="o">(</span><span class="n">user</span><span class="o">.</span><span class="na">id</span><span class="o">());</span>
+        <span class="n">assertEquals</span><span class="o">(</span><span class="n">expectedUsername</span><span class="o">,</span> <span class="n">user</span><span class="o">.</span><span class="na">username</span><span class="o">());</span>
+        <span class="n">assertEquals</span><span class="o">(</span><span class="n">expectedAuthorities</span><span class="o">,</span> <span class="n">user</span><span class="o">.</span><span class="na">authorities</span><span class="o">());</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Annotate the class with <code>@MicronautTest</code> so the Micronaut framework will initialize the application context. This test does not need the embedded server. Set <code>startApplication</code> to <code>false</code> to avoid starting it.</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="testing-the-application">6. Testing the Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To run the tests:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">./gradlew <span class="nb">test</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then open <code>build/reports/tests/test/index.html</code> in a browser to see the results.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="native-tests">7. Native Tests</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The <code>io.micronaut.application</code> <a href="https://micronaut-projects.github.io/micronaut-gradle-plugin/latest/">Micronaut Gradle Plugin</a> automatically integrates with GraalVM by applying
+the <a href="https://graalvm.github.io/native-build-tools/latest/gradle-plugin.html#testing-support">Gradle plugin for GraalVM Native Image building</a>.</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>This plugin supports running tests on the JUnit Platform as native images. This means that tests will be compiled and executed as native code.</p>
+</div>
+</blockquote>
+</div>
+<div class="paragraph">
+<p>To execute the tests, execute:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">./gradlew nativeTest</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then open <code>build/reports/tests/test/index.html</code> in a browser to see the results.</p>
+</div>
+<div class="paragraph">
+<p>INFO: A test may be disabled within a GraalVM native image via the <a href="https://junit.org/junit5/docs/current/user-guide/#writing-tests-conditional-execution-native@DisabledInNativeImage">@DisabledInNativeImage</a> annotation.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="next-steps">8. Next Steps</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Explore more features with <a href="https://micronaut.io/guides/">Micronaut Guides</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="license">9. License</h2>
+<div class="sectionbody">
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+All guides are released with an <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache license 2.0 license</a> for the code and a <a href="https://creativecommons.org/licenses/by/4.0/deed.en">Creative Commons Attribution 4.0</a> license for the writing and media (images&#8230;&#8203;).
+</td>
+</tr>
+</table>
+</div>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer id="footer">
+    <div class="container">
+
+        <div class="row">
+            <div class="col-sm-5 footer-left">
+
+                <div id="text-14" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <a href="https://micronaut.io/foundation/"><img class="alignnone size-medium wp-image-3736" src="./images/micronaut_foundation_horizontal_white.svg" alt="Micronaut Foundation"/></a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-7 footer-right">
+
+                <ul class="meta">
+
+                    <li id="menu-item-2895" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2895">
+                        <a href="https://micronaut.io/brand-guidelines/">Brand Guidelines</a>
+                    </li>
+                    <li id="menu-item-2894" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2894">
+                        <a href="https://micronaut.io/community-guidelines/">Community Guidelines</a>
+                    </li>
+                    <li id="menu-item-3377" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-privacy-policy menu-item-3377">
+                        <a href="https://micronaut.io/privacy-policy/">Privacy Policy</a>
+                    </li>
+
+                </ul>
+
+                <div id="nav_menu-2" class="widget widget_nav_menu">
+                    <div class="menu-links-container">
+                        <ul id="menu-links" class="menu">
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="https://micronautpodcast.com"><i class="fa fa-podcast"><span class="sr-only">Podcast</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="https://micronaut.io/feed/rss/"><i class="fa fa-feed"><span class="sr-only">Feed</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="mailto:info@micronaut.io"><i class="fas fa-envelope"><span class="sr-only">Mail</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://twitter.com/micronautfw"><i class="fab fa-twitter"><span class="sr-only">Twitter</span></i></a></li>
+                            <li id="menu-item-6740" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-6740"><a href="https://fosstodon.org/@micronaut"><i class="fab fa-mastodon"><span class="sr-only">Mastodon</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://discord.gg/9xRFsHv98T"><i class="fab fa-discord"><span class="sr-only">Discord</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://github.com/micronaut-projects/"><i class="fab fa-github"><span class="sr-only">GitHub</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.youtube.com/@MicronautFramework"><i class="fab fa-youtube"><span class="sr-only">YouTube</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.linkedin.com/showcase/micronaut"><i class="fab fa-linkedin"><span class="sr-only">LinkedIn</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.twitch.tv/micronautfw"><i class="fab fa-twitch"><span class="sr-only">Twitch</span></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="text-5" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <small>Guides are licensed under <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> for the writing/media and <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache.2.0</a> for the code</small>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>
