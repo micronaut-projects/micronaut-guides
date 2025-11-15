@@ -149,7 +149,7 @@ class GuideAsciidocGenerator {
                 }
             }
 
-            String version = new File(projectDir, 'buildSrc/src/main/resources/version.txt').text.trim()
+            String version = new File(projectDir, 'version.txt').text.trim()
 
             String text = lines.join('\n')
             text = text.replace("{githubSlug}", metadata.slug())
