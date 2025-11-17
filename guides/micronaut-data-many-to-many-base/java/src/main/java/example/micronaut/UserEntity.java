@@ -21,7 +21,7 @@ import io.micronaut.data.annotation.Id;
 import io.micronaut.data.annotation.MappedEntity;
 import jakarta.validation.constraints.NotBlank;
 
-@MappedEntity("user") // <1>
+@MappedEntity("users") // <1>
 public record UserEntity(@Nullable
                    @Id // <2>
                    @GeneratedValue // <3>
