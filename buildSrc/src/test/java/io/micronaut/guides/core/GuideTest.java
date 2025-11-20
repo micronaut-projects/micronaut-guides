@@ -218,216 +218,158 @@ class GuideTest {
 
         String schema = reader.lines().collect(Collectors.joining("\n"));
         String expected = """
-            {
-              "$schema": "https://json-schema.org/draft/2020-12/schema",
-              "$id": "https://guides.micronaut.io/schemas/guide.schema.json",
-              "title": "Guide",
-              "type": [
-                "object"
-              ],
-              "properties": {
-                "apps": {
-                  "description": "Applications created for the guide",
-                  "type": [
-                    "array"
-                  ],
-                  "items": {
-                    "$ref": "https://guides.micronaut.io/schemas/app.schema.json"
-                  },
-                  "minItems": 1
-                },
-                "asciidoctor": {
-                  "description": "The guide asciidoc file. If not specified, the guide slug followed by the .adoc suffix is used",
-                  "type": [
-                    "string"
-                  ]
-                },
-                "authors": {
-                  "description": "The guide's authors",
-                  "type": [
-                    "array"
-                  ],
-                  "items": {
-                    "type": [
-                      "string"
-                    ]
-                  },
-                  "minItems": 1
-                },
-                "base": {
-                  "description": "Defaults to null; if set, indicates directory name of the base guide to copy before copying the current one",
-                  "type": [
-                    "string"
-                  ]
-                },
-                "buildTools": {
-                  "description": "By default the code in the guide is generated for Gradle and Maven. If a guide is specific only for a build tool, define it here",
-                  "type": [
-                    "array"
-                  ],
-                  "items": {
-                    "type": [
-                      "string"
-                    ],
-                    "enum": [
-                      "GRADLE",
-                      "GRADLE_KOTLIN",
-                      "MAVEN"
-                    ]
-                  }
-                },
-                "categories": {
-                  "description": "The guide's categories",
-                  "type": [
-                    "array"
-                  ],
-                  "items": {
-                    "type": [
-                      "string"
-                    ]
-                  },
-                  "minItems": 1
-                },
-                "cloud": {
-                  "description": "The acronym for the cloud service provider of the guide. For example, OCI for Oracle Cloud Infrastructure",
-                  "type": [
-                    "string"
-                  ],
-                  "enum": [
-                    "OCI",
-                    "AWS",
-                    "AZURE",
-                    "GCP"
-                  ]
-                },
-                "env": {
-                  "description": "The guide's environment variables",
-                  "type": [
-                    "object"
-                  ],
-                  "additionalProperties": {
-                    "type": [
-                      "string"
-                    ]
-                  }
-                },
-                "intro": {
-                  "description": "The guide introduction",
-                  "type": [
-                    "string"
-                  ],
-                  "minLength": 1
-                },
-                "languages": {
-                  "description": "The guide supported languages",
-                  "type": [
-                    "array"
-                  ],
-                  "items": {
-                    "type": [
-                      "string"
-                    ],
-                    "enum": [
-                      "JAVA",
-                      "GROOVY",
-                      "KOTLIN"
-                    ]
-                  }
-                },
-                "maximumJavaVersion": {
-                  "description": "If the guide needs a maximum Java version, define it here",
-                  "type": [
-                    "integer"
-                  ]
-                },
-                "minimumJavaVersion": {
-                  "description": "If the guide needs a minimum Java version, define it here",
-                  "type": [
-                    "integer"
-                  ]
-                },
-                "publicationDate": {
-                  "description": "The guide publication date. It should follow the format YYYY-MM-DD",
-                  "type": [
-                    "string"
-                  ],
-                  "format": "date"
-                },
-                "publish": {
-                  "description": "Whether the guide should be published, it defaults to true. You can set it to false for draft or base guides",
-                  "type": [
-                    "boolean"
-                  ]
-                },
-                "skipGradleTests": {
-                  "description": "Set it to true to skip running the tests for the Gradle applications for the guide",
-                  "type": [
-                    "boolean"
-                  ]
-                },
-                "skipMavenTests": {
-                  "description": "Set it to true to skip running the tests for the Maven applications for the guide",
-                  "type": [
-                    "boolean"
-                  ]
-                },
-                "slug": {
-                  "description": "The guide's slug. If not specified, the guides folder is used",
-                  "type": [
-                    "string"
-                  ]
-                },
-                "tags": {
-                  "description": "List of tags added to the guide. features are added automatically as tags. No need to repeat them here",
-                  "type": [
-                    "array"
-                  ],
-                  "items": {
-                    "type": [
-                      "string"
-                    ]
-                  }
-                },
-                "testFramework": {
-                  "description": "The guide's test framework. By default Java and Kotlin applications are tested with JUnit5 and Groovy applications with Spock",
-                  "type": [
-                    "string"
-                  ],
-                  "enum": [
-                    "JUNIT",
-                    "SPOCK",
-                    "KOTLINTEST",
-                    "KOTEST"
-                  ]
-                },
-                "title": {
-                  "description": "The guide's title",
-                  "type": [
-                    "string"
-                  ],
-                  "minLength": 1
-                },
-                "zipIncludes": {
-                  "description": "List of additional files with a relative path to include in the generated zip file for the guide",
-                  "type": [
-                    "array"
-                  ],
-                  "items": {
-                    "type": [
-                      "string"
-                    ]
-                  }
-                }
-              },
-              "required": [
-                "title",
-                "intro",
-                "authors",
-                "categories",
-                "publicationDate",
-                "apps"
-              ]
-            }
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://guides.micronaut.io/schemas/guide.schema.json",
+  "title": "Guide",
+  "type": "object",
+  "properties": {
+    "apps": {
+      "description": "Applications created for the guide",
+      "type": "array",
+      "items": {
+        "$ref": "https://guides.micronaut.io/schemas/app.schema.json"
+      },
+      "minItems": 1
+    },
+    "asciidoctor": {
+      "description": "The guide asciidoc file. If not specified, the guide slug followed by the .adoc suffix is used",
+      "type": "string"
+    },
+    "authors": {
+      "description": "The guide's authors",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1
+    },
+    "base": {
+      "description": "Defaults to null; if set, indicates directory name of the base guide to copy before copying the current one",
+      "type": "string"
+    },
+    "buildTools": {
+      "description": "By default the code in the guide is generated for Gradle and Maven. If a guide is specific only for a build tool, define it here",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "GRADLE",
+          "GRADLE_KOTLIN",
+          "MAVEN"
+        ]
+      }
+    },
+    "categories": {
+      "description": "The guide's categories",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1
+    },
+    "cloud": {
+      "description": "The acronym for the cloud service provider of the guide. For example, OCI for Oracle Cloud Infrastructure",
+      "type": "string",
+      "enum": [
+        "OCI",
+        "AWS",
+        "AZURE",
+        "GCP"
+      ]
+    },
+    "env": {
+      "description": "The guide's environment variables",
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "intro": {
+      "description": "The guide introduction",
+      "type": "string",
+      "minLength": 1
+    },
+    "languages": {
+      "description": "The guide supported languages",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "JAVA",
+          "GROOVY",
+          "KOTLIN"
+        ]
+      }
+    },
+    "maximumJavaVersion": {
+      "description": "If the guide needs a maximum Java version, define it here",
+      "type": "integer"
+    },
+    "minimumJavaVersion": {
+      "description": "If the guide needs a minimum Java version, define it here",
+      "type": "integer"
+    },
+    "publicationDate": {
+      "description": "The guide publication date. It should follow the format YYYY-MM-DD",
+      "type": "string",
+      "format": "date"
+    },
+    "publish": {
+      "description": "Whether the guide should be published, it defaults to true. You can set it to false for draft or base guides",
+      "type": "boolean"
+    },
+    "skipGradleTests": {
+      "description": "Set it to true to skip running the tests for the Gradle applications for the guide",
+      "type": "boolean"
+    },
+    "skipMavenTests": {
+      "description": "Set it to true to skip running the tests for the Maven applications for the guide",
+      "type": "boolean"
+    },
+    "slug": {
+      "description": "The guide's slug. If not specified, the guides folder is used",
+      "type": "string"
+    },
+    "tags": {
+      "description": "List of tags added to the guide. features are added automatically as tags. No need to repeat them here",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "testFramework": {
+      "description": "The guide's test framework. By default Java and Kotlin applications are tested with JUnit5 and Groovy applications with Spock",
+      "type": "string",
+      "enum": [
+        "JUNIT",
+        "SPOCK",
+        "KOTLINTEST",
+        "KOTEST"
+      ]
+    },
+    "title": {
+      "description": "The guide's title",
+      "type": "string",
+      "minLength": 1
+    },
+    "zipIncludes": {
+      "description": "List of additional files with a relative path to include in the generated zip file for the guide",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "title",
+    "intro",
+    "authors",
+    "categories",
+    "publicationDate",
+    "apps"
+  ]
+}
         """;
         System.out.println(schema);
         JSONAssert.assertEquals(expected, schema, JSONCompareMode.LENIENT);

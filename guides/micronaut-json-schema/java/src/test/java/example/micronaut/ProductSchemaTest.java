@@ -43,25 +43,25 @@ class ProductSchemaTest {
   "$id": "http://localhost:8080/schemas/product.schema.json",
   "title": "Product",
   "description": "A product from Acme's catalog",
-  "type": ["object"],
+  "type": "object",
   "properties": {
     "productId": {
       "description": "The unique identifier for a product // <1>",
-      "type": ["integer"]
+      "type": "integer"
     },
     "productName": {
       "description": "Name of the product",
-      "type": ["string"]
+      "type": "string"
     },
     "price": {
       "description": "The price of the product",
-      "type": ["number"],
+      "type": "number",
       "exclusiveMinimum": 0
     },
     "tags": {
-      "type": ["array"],
+      "type": "array",
       "items": {
-        "type": ["string"]
+        "type": "string"
       },
       "minItems": 1,
       "uniqueItems": true

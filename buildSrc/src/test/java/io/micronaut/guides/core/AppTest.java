@@ -90,146 +90,104 @@ class AppTest {
 
         String schema = reader.lines().collect(Collectors.joining("\n"));
         String expected = """
-            {
-              "$schema": "https://json-schema.org/draft/2020-12/schema",
-              "$id": "https://guides.micronaut.io/schemas/app.schema.json",
-              "title": "App",
-              "type": [
-                "object"
-              ],
-              "properties": {
-                "applicationType": {
-                  "description": "The app type.  If you don't specify, default is used",
-                  "type": [
-                    "string"
-                  ],
-                  "enum": [
-                    "DEFAULT",
-                    "CLI",
-                    "FUNCTION",
-                    "GRPC",
-                    "MESSAGING"
-                  ]
-                },
-                "excludeSource": {
-                  "description": "The source files that should not be included",
-                  "type": [
-                    "array"
-                  ],
-                  "items": {
-                    "type": [
-                      "string"
-                    ]
-                  }
-                },
-                "excludeTest": {
-                  "description": "The tests that should not be run",
-                  "type": [
-                    "array"
-                  ],
-                  "items": {
-                    "type": [
-                      "string"
-                    ]
-                  }
-                },
-                "features": {
-                  "description": "The Micronaut Starter features' name that the app requires",
-                  "type": [
-                    "array"
-                  ],
-                  "items": {
-                    "type": [
-                      "string"
-                    ]
-                  }
-                },
-                "framework": {
-                  "description": "The app's framework. Default is Micronaut but Spring Boot is also supported",
-                  "type": [
-                    "string"
-                  ]
-                },
-                "groovyFeatures": {
-                  "description": "The app's Groovy features",
-                  "type": [
-                    "array"
-                  ],
-                  "items": {
-                    "type": [
-                      "string"
-                    ]
-                  }
-                },
-                "invisibleFeatures": {
-                  "description": "The app's invisible features",
-                  "type": [
-                    "array"
-                  ],
-                  "items": {
-                    "type": [
-                      "string"
-                    ]
-                  }
-                },
-                "javaFeatures": {
-                  "description": "The app's Java features",
-                  "type": [
-                    "array"
-                  ],
-                  "items": {
-                    "type": [
-                      "string"
-                    ]
-                  }
-                },
-                "kotlinFeatures": {
-                  "description": "The app's Kotlin features",
-                  "type": [
-                    "array"
-                  ],
-                  "items": {
-                    "type": [
-                      "string"
-                    ]
-                  }
-                },
-                "name": {
-                  "description": "The app's name. For single application guides, the application needs to be named default",
-                  "type": [
-                    "string"
-                  ],
-                  "minLength": 1
-                },
-                "packageName": {
-                  "description": "The app's package name. If you don't specify, the package name example.micronaut is used",
-                  "type": [
-                    "string"
-                  ]
-                },
-                "testFramework": {
-                  "description": "The app's test framework",
-                  "type": [
-                    "string"
-                  ],
-                  "enum": [
-                    "JUNIT",
-                    "SPOCK",
-                    "KOTLINTEST",
-                    "KOTEST"
-                  ]
-                },
-                "validateLicense": {
-                  "description": "To enable Spotless code check",
-                  "type": [
-                    "boolean"
+                {
+                  "$schema": "https://json-schema.org/draft/2020-12/schema",
+                  "$id": "https://guides.micronaut.io/schemas/app.schema.json",
+                  "title": "App",
+                  "type": "object",
+                  "properties": {
+                    "applicationType": {
+                      "description": "The app type.  If you don't specify, default is used",
+                      "type": "string",
+                      "enum": [
+                        "DEFAULT",
+                        "CLI",
+                        "FUNCTION",
+                        "GRPC",
+                        "MESSAGING"
+                      ]
+                    },
+                    "excludeSource": {
+                      "description": "The source files that should not be included",
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "excludeTest": {
+                      "description": "The tests that should not be run",
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "features": {
+                      "description": "The Micronaut Starter features' name that the app requires",
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "framework": {
+                      "description": "The app's framework. Default is Micronaut but Spring Boot is also supported",
+                      "type": "string"
+                    },
+                    "groovyFeatures": {
+                      "description": "The app's Groovy features",
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "invisibleFeatures": {
+                      "description": "The app's invisible features",
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "javaFeatures": {
+                      "description": "The app's Java features",
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "kotlinFeatures": {
+                      "description": "The app's Kotlin features",
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "name": {
+                      "description": "The app's name. For single application guides, the application needs to be named default",
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "packageName": {
+                      "description": "The app's package name. If you don't specify, the package name example.micronaut is used",
+                      "type": "string"
+                    },
+                    "testFramework": {
+                      "description": "The app's test framework",
+                      "type": "string",
+                      "enum": [
+                        "JUNIT",
+                        "SPOCK",
+                        "KOTLINTEST",
+                        "KOTEST"
+                      ]
+                    },
+                    "validateLicense": {
+                      "description": "To enable Spotless code check",
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "name"
                   ]
                 }
-              },
-              "required": [
-                "name"
-              ]
-            }
         """;
         JSONAssert.assertEquals(expected, schema, JSONCompareMode.LENIENT);
     }
