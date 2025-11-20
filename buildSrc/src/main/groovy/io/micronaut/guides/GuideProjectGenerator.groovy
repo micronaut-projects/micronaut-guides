@@ -262,10 +262,6 @@ class GuideProjectGenerator implements AutoCloseable {
 
         for (BuildTool buildTool : buildTools) {
             for (Language language : Language.values()) {
-                if (GuideUtils.shouldSkip(guideMetadata,buildTool)) {
-                    LOG.info("Skipping index guide for $buildTool and $language")
-                    continue
-                }
                 if (languages.contains(language)) {
                     guidesOptionList << createGuidesOption(buildTool, language, testFramework)
                 }
