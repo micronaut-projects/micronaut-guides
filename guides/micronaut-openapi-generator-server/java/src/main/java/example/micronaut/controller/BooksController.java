@@ -9,13 +9,11 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-package example.micronaut.controller;
-
-/*
+//tag::header[]
 //tag::package[]
 package example.micronaut.controller;
 //end::package[]
-*/
+
 //tag::import[]
 
 import example.micronaut.BookEntity;
@@ -34,9 +32,7 @@ import java.util.List;
 //tag::clazz[]
 @Controller
 public class BooksController implements BooksApi
-//tag::header[]
  {
-//end::header[]
 //end::clazz[]
 
     //tag::inject[]
@@ -90,6 +86,7 @@ public class BooksController implements BooksApi
         }
     }
     //end::search[]
-//tag::footer[]
 }
+//end::header[]
+//tag::footer[]
 //end::footer[]
