@@ -11,71 +11,74 @@ public enum Category implements Ordered {
     DEVELOPMENT("Development", 4),
     TEST("Testing", 5),
 
+    // AI
+    MCP("MCP", 6),
+
     // BEYOND THE BASICS
-    OBJECT_STORAGE("Object Storage", 6),
-    EMAIL("Email", 7),
-    MESSAGING("Messaging", 8),
-    LOGGING("Logging", 9),
-    SCHEDULING("Scheduling", 10),
-    CACHE("Cache", 11),
-    PATTERNS("Patterns", 12),
-    INTERNATIONALIZATION("i18n", 13),
+    OBJECT_STORAGE("Object Storage", 7),
+    EMAIL("Email", 8),
+    MESSAGING("Messaging", 9),
+    LOGGING("Logging", 10),
+    SCHEDULING("Scheduling", 11),
+    CACHE("Cache", 12),
+    PATTERNS("Patterns", 13),
+    INTERNATIONALIZATION("i18n", 14),
 
     // DATA ACCESS
-    DATABASE_MODELING("Database Modeling", 14),
-    DATA_JDBC("Data JDBC", 15),
-    DATA_JPA("Data JPA", 16),
-    SCHEMA_MIGRATION("Schema Migration", 17),
-    DATA_RDBC("Data R2DBC", 18),
-    DATA_MONGO("MongoDB", 19),
-    DATA_ACCESS("Data Access", 20),
+    DATABASE_MODELING("Database Modeling", 15),
+    DATA_JDBC("Data JDBC", 16),
+    DATA_JPA("Data JPA", 17),
+    SCHEMA_MIGRATION("Schema Migration", 18),
+    DATA_RDBC("Data R2DBC", 19),
+    DATA_MONGO("MongoDB", 20),
+    DATA_ACCESS("Data Access", 21),
 
     // SECURITY
-    SECURITY("Micronaut Security", 21),
-    AUTHORIZATION_CODE("Authorization Code", 22),
-    CLIENT_CREDENTIALS("Client Credentials", 23),
-    SECRETS_MANAGER("Secrets Manager", 24),
+    SECURITY("Micronaut Security", 22),
+    AUTHORIZATION_CODE("Authorization Code", 23),
+    CLIENT_CREDENTIALS("Client Credentials", 24),
+    SECRETS_MANAGER("Secrets Manager", 25),
 
     // HTTP & API
-    HTTP("HTTP Server", 25),
-    HTTP_CLIENT("HTTP Client", 26),
-    BEYOND_JSON("Beyond JSON", 27),
-    JAX_RS("JAX-RS", 28),
-    WEBSOCKETS("WebSockets", 29),
-    GRAPHQL("GraphQL", 30),
-    OPEN_API("OpenAPI", 31),
-    JSON_SCHEMA("JSON Schema", 32),
+    HTTP("HTTP Server", 26),
+    HTTP_CLIENT("HTTP Client", 27),
+    BEYOND_JSON("Beyond JSON", 28),
+    JAX_RS("JAX-RS", 29),
+    WEBSOCKETS("WebSockets", 30),
+    GRAPHQL("GraphQL", 31),
+    OPEN_API("OpenAPI", 32),
+    JSON_SCHEMA("JSON Schema", 33),
 
     // DISTRIBUTED SYSTEMS
-    DISTRIBUTED_TRACING("Distributed Tracing", 33),
-    SERVICE_DISCOVERY("Service Discovery", 34),
-    DISTRIBUTED_CONFIGURATION("Distributed Configuration", 35),
-    METRICS("Metrics", 36),
+    DISTRIBUTED_TRACING("Distributed Tracing", 34),
+    SERVICE_DISCOVERY("Service Discovery", 35),
+    DISTRIBUTED_CONFIGURATION("Distributed Configuration", 36),
+    METRICS("Metrics", 37),
 
     // DISTRIBUTION
-    DISTRIBUTION("Distribution", 37),
-    REGISTRY("Registry", 38),
-    GRAALVM("GraalVM", 39),
-    CRAC("Coordinated Restore at Checkpoint", 40),
-    KUBERNETES("Kubernetes", 41),
+    DISTRIBUTION("Distribution", 38),
+    REGISTRY("Registry", 39),
+    GRAALVM("GraalVM", 40),
+    CRAC("Coordinated Restore at Checkpoint", 41),
+    KUBERNETES("Kubernetes", 42),
 
     // CLOUD
-    SERVERLESS("Serverless", 42),
-    AWS_LAMBDA("AWS Lambda", 43),
-    SCALE_TO_ZERO_CONTAINERS("Scale to Zero Containers", 44),
+    SERVERLESS("Serverless", 43),
+    AWS_LAMBDA("AWS Lambda", 44),
+    SCALE_TO_ZERO_CONTAINERS("Scale to Zero Containers", 45),
 
     // SERVER-SIDE HTML
-    VIEWS("Views", 45),
-    TURBO("Turbo", 46),
-    STATIC_RESOURCES("Static Resources", 47),
+    VIEWS("Views", 46),
+    TURBO("Turbo", 47),
+    STATIC_RESOURCES("Static Resources", 48),
 
     // LANGUAGES
-    KOTLIN("Kotlin", 48),
-    GRAALPY("GraalPy", 49),
+    KOTLIN("Kotlin", 49),
+    GRAALPY("GraalPy", 50),
 
     // FRAMEWORKS
-    SPRING("Spring Boot", 50),
-    SPRING_BOOT_TO_MICRONAUT_BUILDING_A_REST_API("Boot to Micronaut Building a REST API", 51);
+    SPRING("Spring Boot", 51),
+    SPRING_BOOT_TO_MICRONAUT_BUILDING_A_REST_API("Boot to Micronaut Building a REST API", 52);
 
     private final String val;
     private final int order;
