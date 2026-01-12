@@ -15,8 +15,11 @@
  */
 package example.micronaut;
 
-public class AnswerNotRelevantException extends RuntimeException {
-    public AnswerNotRelevantException(String question, String answer) {
-        super("The answer '" + answer + "' is not relevant to the question '" + question + "'.");
-    }
+import io.micronaut.serde.annotation.Serdeable;
+import jakarta.validation.constraints.NotBlank;
+
+@Serdeable // <1>
+public record Question(
+        @NotBlank(message = "Game title is required") String gameTitle,
+        @NotBlank(message = "Question is required") String question) {
 }
