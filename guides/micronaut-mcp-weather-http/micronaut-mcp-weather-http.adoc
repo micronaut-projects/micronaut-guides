@@ -1,0 +1,91 @@
+common:header.adoc[]
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+common:cli-or-launch.adoc[]
+
+In this guide, we will create an MCP Server with Micronaut as the one described in the https://modelcontextprotocol.io/docs/develop/build-server[Build an MCP server tutorial] on the Model Context Protocol website.
+
+external:micronaut-mcp-diskspace/dependency.adoc[]
+
+common:json-schema-dependencies.adoc[]
+
+external:micronaut-mcp-diskspace/configuration.adoc[]
+
+<.> https://modelcontextprotocol.io/specification/2025-11-25/basic/transports#stdio[To use STDIO] transport.
+
+== JSON Schema Generation
+
+An MCP Tool can define its https://modelcontextprotocol.io/specification/2025-11-25/server/tools#output-schema[input schema] using JSON Schema.
+
+Thanks to Micronaut JSON Schema, we can generate the JSON Schema at compile-time given a Java file:
+
+source:GetAlertInput[]
+
+callout:introspected[]
+callout:jsonschema[]
+
+== MCP Tool
+
+The MCP Server exposes two tools: `getWeatherForecastByLocation` and `getAlerts`.
+
+The latter uses the generated JSON Schema for `GetAlertInput` as the tool input schema.
+
+source:Tools[]
+
+callout:singleton[]
+callout:constructor-di[arg0=WeatherClient]
+callout:mcp-tool[]
+
+`WeatherClient` is a Micronaut bean which uses the https://docs.micronaut.io/latest/guide/#httpClient[Micronaut HTTP Client] to consume
+https://api.weather.gov API. Please, link:@sourceDir@.zip[download] the complete project to check the code.
+
+== STDOUT
+
+When using the STDIO transport, it is important to ensure that the application does not write any logs or other output to `stdout`, as this would interfere with the MCP protocol communication.
+
+Disable the Micronaut banner
+
+source:Application[]
+
+Configure Logback not to log to stdout. For example, you can configure Logback to log to a file or to stderr (see `<target>System.err</target>` in the configuration file below):
+
+resource:logback.xml[]
+
+== Executable JAR
+
+common:executable-jar.adoc[]
+
+== MCP Inspector
+
+To test the MCP Server, run the https://modelcontextprotocol.io/docs/tools/inspector[MCP inspector].
+
+Select `STDIO` as `Transport type`.
+
+Enter `java` as `Command`.
+
+:exclude-for-build:maven
+
+Enter `-jar PATH_TO_YOUR_PROJECT/build/libs/default-0.1-all.jar` as `Arguments`.
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+Enter `-jar PATH_TO_YOUR_PROJECT/target/default-0.1.jar` as `Arguments`.
+
+:exclude-for-build:gradle
+
+Click connect.
+
+You will be able to list tools and invoke the `getWeatherForecastByLocation` tool.
+
+NOTE: The https://api.weather.gov API works only for US locations.
+
+and the `getAlerts` tool.
+
+image::mcp/mcp-weather-stdio.png[]
+
+external:micronaut-mcp-diskspace/next.adoc[]
