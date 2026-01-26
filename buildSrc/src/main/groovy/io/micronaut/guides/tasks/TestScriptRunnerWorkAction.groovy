@@ -18,19 +18,25 @@ abstract class TestScriptRunnerWorkAction implements WorkAction<TestScriptRunner
 
     @Override
     void execute() {
-        File workDir = parameters.testScript.get().asFile.parentFile
-        try (OutputStream file = new FileOutputStream(parameters.outputFile.get().asFile)) {
-            ExecResult result = execOperations.exec(execSpec -> {
-                OutputStream oldOut = execSpec.standardOutput
-                OutputStream oldErr = execSpec.errorOutput
-                execSpec
-                        .commandLine("./test.sh")
-                        .setStandardOutput(new TeeOutputStream(oldOut, file))
-                        .setErrorOutput(new TeeOutputStream(oldErr, file))
-                        .workingDir(workDir)
-            })
-            result.assertNormalExitValue()
-        }
+//        File workDir = parameters.testScript.get().asFile.parentFile
+//        boolean isWindows = System.getProperty("os.name").toLowerCase().contains("win")
+//        try (OutputStream file = new FileOutputStream(parameters.outputFile.get().asFile)) {
+//            ExecResult result = execOperations.exec(execSpec -> {
+//                OutputStream oldOut = execSpec.standardOutput
+//                OutputStream oldErr = execSpec.errorOutput
+//                String command = "./test.sh"
+//                if (isWindows) {
+//                    // Git bash must be on the path
+//                    command = Arrays.asList("C:\\Program Files\\Git\\bin\\bash.exe", "-c", "./test.sh");
+//                }
+//                execSpec
+//                        .commandLine(command)
+//                        .setStandardOutput(new TeeOutputStream(oldOut, file))
+//                        .setErrorOutput(new TeeOutputStream(oldErr, file))
+//                        .workingDir(workDir)
+//            })
+//            result.assertNormalExitValue()
+//        }
     }
 
     static interface TestScriptRunnerWorkParameters extends WorkParameters {

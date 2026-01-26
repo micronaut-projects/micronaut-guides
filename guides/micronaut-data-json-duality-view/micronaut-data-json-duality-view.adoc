@@ -1,0 +1,87 @@
+common:header.adoc[]
+
+This guide is about JSON duality view feature in Micronaut.
+The application includes classes that represent a JSON duality view in Oracle database.
+In the background, SQL create statement for the described view will be created and executed.
+
+=== What is JSON Duality View
+
+JSON Duality View in Oracle Database lets you map relational tables to JSON documents. This creates a document-style interface for data stored relationally.
+
+=== Usage
+
+Applications can read and update data as JSON, while Oracle manages the conversion to and from relational tables behind the scenes.
+
+== What you will need
+
+To complete this guide, you will need the following:
+
+* Some time on your hands
+* A decent text editor or IDE
+* JDK 1.8 or greater installed with `JAVA_HOME` configured appropriately
+* https://www.docker.io/gettingstarted/#h_installation[Docker] installed to run MySQL and to run tests using https://www.testcontainers.org[Testcontainers].
+
+== Writing the application
+
+In Micronaut, users don't have to use SQL to create JSON duality views and execute CRUD operations on them. By annotating classes with `@JsonView`, users specify which views to generate. CRUD operations are executed via `PageableRepositories`.
+
+In this guide, we will be generating a JSON duality view for the given `Student` table:
+
+resource:db/V1__create_student.sql[]
+
+=== Writing an entity class
+
+For every table in the database, we can create a corresponding entity class. For the given `Student` table, we can create such a class:
+
+source:domain/Student[]
+
+=== Writing a view class
+
+A class annotated with `@JsonView` will generate the corresponding JSON duality view. `@JsonView` annotation has an `entity` field,
+which represents the class for which the view will be created, in our case it is `Student.class`. It is a required field.
+
+Here is an example view class:
+
+source:domain/StudentView[]
+
+=== Writing a sub view class
+
+As you can see from the `StudentView.classes` relation, JSON duality views supports table joins. They are specified by using
+`@Relation` annotation.
+
+For every relation, the sub view is created. A sub view class has to be created for every relation. To specify a sub view class,
+we use the `@JsonSubView` annotation. `@JsonSubView` also has an `entity` field, with same meaning, it's required as well. These classes represent sub views, so create statements are generated only for classes annotated with `@JsonView`.
+
+Here is an example sub view class:
+
+source:domain/ClassSubView[]
+
+This is the corresponding entity class:
+
+source:domain/Class[]
+
+=== The resulting SQL create statement
+
+The provided classes will generate this view:
+
+resource:db/V1__create_student_view.sql[]
+
+== Writing Tests
+
+This is a sample repository that uses `StudentView` class:
+
+source:StudentViewRepository[]
+
+Create a test to verify CRUD operations using the `StudentViewRepository`:
+
+test:TestStudentViewRepository[]
+
+common:testApp.adoc[]
+
+common:runapp.adoc[]
+
+== Next Steps
+
+Read more about https://micronaut-projects.github.io/micronaut-data/latest/guide/[Micronaut Data].
+
+common:helpWithMicronaut.adoc[]
