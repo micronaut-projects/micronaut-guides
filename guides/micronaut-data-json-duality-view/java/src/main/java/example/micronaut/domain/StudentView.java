@@ -10,15 +10,15 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@JsonView(entity = Student.class)
+@JsonView(entity = Student.class) // <1>
 public class StudentView {
-    @Id
-    @GeneratedValue(GeneratedValue.Type.IDENTITY)
+    @Id // <2>
+    @GeneratedValue(GeneratedValue.Type.IDENTITY) // <3>
     private Long id;
 
     private String name;
 
-    @Relation(Relation.Kind.ONE_TO_MANY)
+    @Relation(Relation.Kind.ONE_TO_MANY) // <4>
     private List<StudentScheduleSubView> classes;
 
     public Long getId() {
