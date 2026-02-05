@@ -8,32 +8,11 @@ import io.micronaut.serde.annotation.Serdeable;
 
 @Serdeable
 @JsonSubView(entity = StudentClass.class)
-public class StudentScheduleSubView {
-    @Id
-    private Long id;
+public record StudentScheduleSubView (
+        @Id
+        Long id,
 
-    @JsonProperty("class")
-    @Relation(Relation.Kind.ONE_TO_ONE)
-    private StudentScheduleClassSubView clazz;
-
-    public StudentScheduleSubView(StudentScheduleClassSubView clazz) {
-        this.id = null;
-        this.clazz = clazz;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public StudentScheduleClassSubView getClazz() {
-        return clazz;
-    }
-
-    public void setClazz(StudentScheduleClassSubView clazz) {
-        this.clazz = clazz;
-    }
-}
+        @JsonProperty("class")
+        @Relation(Relation.Kind.ONE_TO_ONE)
+        StudentScheduleClassSubView clazz
+) {}

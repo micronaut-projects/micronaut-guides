@@ -11,37 +11,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @JsonView(entity = Student.class) // <1>
-public class StudentView {
-    @Id // <2>
-    @GeneratedValue(GeneratedValue.Type.IDENTITY) // <3>
-    private Long id;
+public record StudentView (
+        @Id // <2>
+        @GeneratedValue(GeneratedValue.Type.IDENTITY) // <3>
+        Long id,
 
-    private String name;
+        String name,
 
-    @Relation(Relation.Kind.ONE_TO_MANY) // <4>
-    private List<StudentScheduleSubView> classes;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public List<StudentScheduleSubView> getClasses() {
-        return classes;
-    }
-
-    public void setClasses(List<StudentScheduleSubView> classes) {
-        this.classes = classes;
-    }
-}
+        @Relation(Relation.Kind.ONE_TO_MANY) // <4>
+        List<StudentScheduleSubView> classes
+) {}

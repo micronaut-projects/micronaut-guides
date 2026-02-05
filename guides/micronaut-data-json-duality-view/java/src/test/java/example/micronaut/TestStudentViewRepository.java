@@ -7,6 +7,7 @@ import example.micronaut.domain.StudentView;
 import example.micronaut.domain.StudentScheduleClassSubView;
 import example.micronaut.domain.StudentScheduleSubView;
 import example.micronaut.domain.Class;
+import java.util.Optional;
 
 import java.time.LocalTime;
 import java.util.List;
@@ -25,21 +26,12 @@ class TestStudentViewRepository {
 
     @Test
     void testCreateStudentView() {
-        Class mathClass = classRepository.save(new Class("Math"));
-
-        StudentView studentView = new StudentView();
-        studentView.setName("John");
-
-        StudentScheduleClassSubView studentScheduleClassSubView = new StudentScheduleClassSubView();
-
-        StudentScheduleSubView studentScheduleSubView = new StudentScheduleSubView(studentScheduleClassSubView);
-        studentScheduleClassSubView.setClassID(mathClass.getId());
-
-        List<StudentScheduleSubView> studentClasses = new ArrayList<>();
-        studentClasses.add(studentScheduleSubView);
-        studentView.setClasses(studentClasses);
-
+        Class mathClass = classRepository.save(new Class(null, "Math"));
+        StudentView studentView = new StudentView(null, "John", new ArrayList<>());
+        StudentScheduleClassSubView studentScheduleClassSubView = new StudentScheduleClassSubView(null, mathClass.name());
+        StudentScheduleSubView studentScheduleSubView = new StudentScheduleSubView(null, studentScheduleClassSubView);
         studentViewRepository.save(studentView);
-        assertNotNull(studentViewRepository.findById(studentView.getId()));
+        Optional<StudentView> student = studentViewRepository.findByName(studentView.name());
+        assertNotNull(student);
     }
 }

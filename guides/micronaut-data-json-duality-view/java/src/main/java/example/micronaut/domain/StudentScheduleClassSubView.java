@@ -11,27 +11,10 @@ import java.time.LocalTime;
 
 @Embeddable
 @JsonSubView(entity = Class.class)
-public class StudentScheduleClassSubView {
+public record StudentScheduleClassSubView (
+        @Id
+        @MappedProperty(value = "id")
+        Long classID,
 
-    @Id
-    @MappedProperty(value = "id")
-    private Long classID;
-
-    private String name;
-
-    public Long getClassID() {
-        return classID;
-    }
-
-    public void setClassID(Long classID) {
-        this.classID = classID;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-}
+        String name
+) {}
