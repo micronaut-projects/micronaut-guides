@@ -1,22 +1,22 @@
 common:header.adoc[]
 
-In this guide we will set up and use Oracle JSON relational duality view with Micronaut data
-The application includes classes that represent a JSON duality view in Oracle database.
-In the background, SQL create statement for the described view will be created and executed.
+In this guide, we will set up and use an Oracle JSON Relational Duality view with Micronaut Data.
+The application includes classes that represent a JSON Relational Duality view in Oracle Database.
+In the background, the SQL CREATE statement for the view is generated and executed.
 
-=== What is JSON Duality View
+=== What is a JSON Relational Duality view
 
-JSON Duality View in Oracle Database lets you map relational tables to JSON documents. This creates a document-style interface for data stored relationally.
+A JSON Relational Duality view in Oracle Database lets you map relational tables to JSON documents. This creates a document-style interface for data stored relationally.
 
 ____
 JSON Relational Duality is a new data modeling capability that features updatable and consistent JSON document views over relational data. This allows data that is stored efficiently in relational tables to be accessed as simple JSON documents. JSON Relational Duality Views can be accessed with document APIs, such as MongoDB-compatible APIs, REST, and SQL.
 ____
 
-Link to documentation: https://www.oracle.com/database/json-relational-duality/[link]
+Link to the documentation: https://www.oracle.com/database/json-relational-duality/[link]
 
 === Usage
 
-In Micronaut, JSON duality view is supported by defining the `@JsonView` annotation on an entity.
+In Micronaut, JSON duality views are supported by annotating an entity with `@JsonView`.
 
 == What you will need
 
@@ -31,37 +31,34 @@ To complete this guide, you will need the following:
 
 In Micronaut, users don't have to use SQL to create JSON duality views and execute CRUD operations on them. By annotating classes with `@JsonView`, users specify which views to generate. CRUD operations are executed via `PageableRepositories`.
 
-=== High-level diagram of classes used
+=== High-level diagram of the classes used
 
 image:JsonView.png[]
 
 === Writing an entity class
 
-For every table in the database, we can create a corresponding entity class. For the given `Student` table, we can create such a class:
+For each table in the database, we can create a corresponding entity class. For the `Student` table, we can create the following class:
 
 source:domain/Student[]
 
 === Writing a view class
 
-A class annotated with `@JsonView` will generate the corresponding JSON duality view. `@JsonView` annotation has an `entity` field,
-which represents the class for which the view will be created, in our case it is `Student.class`. It is a required field.
+A class annotated with `@JsonView` generates the corresponding JSON duality view. The `@JsonView` annotation has an `entity` field, which represents the class for which the view will be created; in our case, `Student.class`. It is a required field.
 
 Here is an example view class:
 
 source:domain/StudentView[]
 
-<1> `@JsonView` annotation with specified entity class
-<2> `@Id` annotation to specify primary key
-<3> `@GeneratedValue` annotation to specify it is auto increment field
+<1> `@JsonView` annotation with the specified entity class
+<2> `@Id` annotation to specify the primary key
+<3> `@GeneratedValue` annotation to specify that it is an auto-increment field
 <4> `@Relation` annotation to specify an association
 
 === Writing sub view classes
 
-As you can see from the `StudentView.classes` relation, JSON duality views supports table joins. They are specified by using
-`@Relation` annotation.
+As you can see from the `StudentView.classes` relation, JSON duality views support table joins. They are specified by using the `@Relation` annotation.
 
-For every relation, the sub view is created. A sub view class has to be created for every relation. To specify a sub view class,
-we use the `@JsonSubView` annotation. `@JsonSubView` also has an `entity` field, with same meaning, it's required as well. These classes represent sub views, so create statements are generated only for classes annotated with `@JsonView`.
+For every relation, a sub view is created. A sub view class must be created for each relation. To specify a sub view class, we use the `@JsonSubView` annotation. `@JsonSubView` also has an `entity` field with the same meaning; it is required as well. These classes represent sub views; CREATE statements are generated only for classes annotated with `@JsonView`.
 
 Here are some example entity classes and their corresponding sub view classes:
 
@@ -77,15 +74,15 @@ source:domain/StudentScheduleSubView[]
 
 source:domain/StudentScheduleClassSubView[]
 
-=== The resulting SQL create statement
+=== The resulting SQL CREATE statement
 
-The provided classes will generate this view:
+The provided classes will generate the following view:
 
 resource:db/V1__create_student_view.sql[]
 
 == Writing Tests
 
-This is a sample repository that uses `StudentView` class:
+This is a sample repository that uses the `StudentView` class:
 
 source:StudentViewRepository[]
 
