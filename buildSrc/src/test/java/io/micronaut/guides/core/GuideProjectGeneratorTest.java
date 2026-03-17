@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @MicronautTest(startApplication = false)
-public class GuideProjectGeneratorTest {
+class GuideProjectGeneratorTest {
 
     @Inject
     GuideParser guideParser;
