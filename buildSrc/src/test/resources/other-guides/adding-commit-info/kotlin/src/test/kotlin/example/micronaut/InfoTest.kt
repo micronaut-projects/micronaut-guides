@@ -37,6 +37,6 @@ class InfoTest {
         assertEquals(200, rsp.status().code)
         val info = rsp.body() // <4>
         assertNotNull(info)
-        assertNotNull(info.get("git"))
+        assertNotNull(info!!.get("git"))
     }
 }
