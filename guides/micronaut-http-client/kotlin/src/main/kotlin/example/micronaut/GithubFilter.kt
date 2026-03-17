@@ -26,6 +26,8 @@ class GithubFilter(val configuration: GithubConfiguration) { // <3>
 
     @RequestFilter // <4>
     fun doFilter(request: MutableHttpRequest<*>) {
-        request.basicAuth(configuration.username, configuration.token) // <5>
+        val username = configuration.username ?: return
+        val password = configuration.token ?: return
+        request.basicAuth(username, password) // <5>
     }
 }
