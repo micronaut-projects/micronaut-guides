@@ -121,10 +121,11 @@ public class GuideProjectGeneratorTest {
                 application {
                     mainClass = "example.micronaut.CliCommand"
                 }
+                
                 java {
-                    sourceCompatibility = JavaVersion.toVersion("21")
-                    targetCompatibility = JavaVersion.toVersion("21")
-                }""".replace("21", javaVersion)));
+                    sourceCompatibility = JavaVersion.toVersion("25")
+                    targetCompatibility = JavaVersion.toVersion("25")
+                }""".replace("25", javaVersion)));
 
     }
 
