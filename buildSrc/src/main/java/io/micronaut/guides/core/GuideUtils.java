@@ -118,7 +118,8 @@ public final class GuideUtils {
                 guide.publish(),
                 guide.base(),
                 guide.env() == null ? base.env() : guide.env(),
-                mergeApps(base.apps(), guide.apps())
+                mergeApps(base.apps(), guide.apps()),
+                (guide.requiresDocker() == null ? (base.requiresDocker() != null ? base.requiresDocker() : false) : guide.requiresDocker())
         );
     }
 

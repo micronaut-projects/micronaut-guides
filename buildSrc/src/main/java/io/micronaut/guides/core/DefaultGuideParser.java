@@ -130,7 +130,8 @@ public class DefaultGuideParser implements GuideParser {
                 publish,
                 raw.base(),
                 raw.env() != null ? raw.env() : new HashMap<>(),
-                apps
+                apps,
+                raw.requiresDocker() != null ? raw.requiresDocker() : false
         ));
     }
 }

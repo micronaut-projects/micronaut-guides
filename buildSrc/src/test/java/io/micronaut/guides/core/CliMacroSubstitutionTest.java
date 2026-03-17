@@ -67,7 +67,8 @@ public class CliMacroSubstitutionTest {
                 true,
                 null,
                 Map.of(),
-                List.of(app)
+                List.of(app),
+                false
         );
         String str = """
                 [source,bash]
@@ -122,7 +123,8 @@ public class CliMacroSubstitutionTest {
                 true,
                 null,
                 Map.of(),
-                List.of(app)
+                List.of(app),
+                false
         );
         String str = """
                 [source,bash]

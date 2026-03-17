@@ -47,7 +47,8 @@ public class PlaceholderMacroSubstitutionTest {
                 true,
                 null,
                 Map.of(),
-                null
+                null,
+                false
         );
         option = new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.JUNIT);
     }
