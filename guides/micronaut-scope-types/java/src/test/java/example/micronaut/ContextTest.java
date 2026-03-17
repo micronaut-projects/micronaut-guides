@@ -28,7 +28,7 @@ class ContextTest {
 
     @Test
     void lifeCycleOfClassesAnnotatedWithAtContextIsBoundToThatOfTheBeanContext() {
-        Executable e = () -> ApplicationContext.run(Collections.singletonMap("micronaut.language", "scala"));
+        Executable e = () -> ApplicationContext.run(Collections.singletonMap("framework.language", "scala"));
         BeanInstantiationException thrown = assertThrows(BeanInstantiationException.class, e);
         assertTrue(thrown.getMessage().contains("language - must match \"groovy|java|kotlin\""));
     }

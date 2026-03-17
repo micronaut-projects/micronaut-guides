@@ -33,7 +33,7 @@ class ContextTest {
     fun lifeCycleOfClassesAnnotatedWithAtContextIsBoundToThatOfTheBeanContext() {
 
         val thrown =
-            assertThrows<BeanInstantiationException> { ApplicationContext.run(mapOf("micronaut.language" to "scala")) }
+            assertThrows<BeanInstantiationException> { ApplicationContext.run(mapOf("framework.language" to "scala")) }
         assertTrue(thrown.message!!.contains("must match \"groovy|java|kotlin\""))
     }
 }

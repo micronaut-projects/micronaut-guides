@@ -13,24 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package example.micronaut.context;
+package example.micronaut.context
 
-import io.micronaut.context.annotation.ConfigurationProperties;
-import io.micronaut.context.annotation.Context;
-import jakarta.validation.constraints.Pattern;
+import io.micronaut.context.annotation.ConfigurationProperties
+import io.micronaut.context.annotation.Context
+import jakarta.validation.constraints.Pattern
 
 @Context // <1>
-@ConfigurationProperties("micronaut") // <2>
-public class MicronautConfiguration {
+@ConfigurationProperties("framework") // <2>
+class FrameworkConfiguration {
 
-    @Pattern(regexp = "groovy|java|kotlin") // <3>
-    private String language;
+    @field:Pattern(regexp = "groovy|java|kotlin") // <3>
+    var language: String? = null
 
-    public String getLanguage() {
-        return language;
-    }
-
-    public void setLanguage(String language) {
-        this.language = language;
-    }
 }
