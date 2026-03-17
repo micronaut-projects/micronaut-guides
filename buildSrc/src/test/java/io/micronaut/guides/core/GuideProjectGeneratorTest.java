@@ -102,7 +102,8 @@ public class GuideProjectGeneratorTest {
                     implementation("io.micronaut.serde:micronaut-serde-jackson")
                     runtimeOnly("ch.qos.logback:logback-classic")
                     runtimeOnly("org.yaml:snakeyaml")
-                }"""));
+                    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+                }"""), result);
         assertTrue(result.contains("""
                 micronaut {
                     testRuntime("junit5")
