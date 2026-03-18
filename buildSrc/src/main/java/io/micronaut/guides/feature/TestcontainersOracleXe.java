@@ -7,7 +7,7 @@ import jakarta.inject.Singleton;
 public class TestcontainersOracleXe extends AbstractFeature {
 
     public TestcontainersOracleXe() {
-        super("testcontainers-oracle-xe", "oracle-xe");
+        super("testcontainers-oracle-xe", "testcontainers-oracle-xe");
     }
 
     @Override
