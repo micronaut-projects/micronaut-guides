@@ -71,6 +71,6 @@ class GraphQLControllerTest(@Client("/") private val client: HttpClient) {
             )
         )
         assertEquals(HttpStatus.OK, rsp.status())
-        return rsp.body()
+        return rsp.body() ?: emptyMap()
     }
 }

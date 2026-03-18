@@ -32,6 +32,8 @@ import io.micronaut.http.client.multipart.MultipartBody
 import io.micronaut.test.annotation.MockBean
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import jakarta.inject.Named
+import jakarta.mail.Message
+import jakarta.validation.Valid
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -40,8 +42,6 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.nio.charset.StandardCharsets.UTF_8
 import java.util.function.Consumer
-import jakarta.mail.Message
-import jakarta.validation.Valid
 
 @MicronautTest // <1>
 class EmailControllerTest(@Client("/") val client: HttpClient) { // <2>
@@ -56,8 +56,9 @@ class EmailControllerTest(@Client("/") val client: HttpClient) { // <2>
     @Test
     fun testBasic() {
 
-        val response: HttpResponse<*> = client.toBlocking().exchange<Any, Any>(
-            HttpRequest.POST("/email/basic", null)
+        val response: HttpResponse<String> = client.toBlocking().exchange(
+            HttpRequest.POST("/email/basic", ""),
+            String::class.java
         )
         assertEquals(response.status(), OK)
 
@@ -69,9 +70,9 @@ class EmailControllerTest(@Client("/") val client: HttpClient) { // <2>
         assertNull(email.replyTo)
 
         assertNotNull(email.to)
-        assertEquals(1, email.to.size)
-        assertEquals("basic@domain.com", email.to.iterator().next().email)
-        assertNull(email.to.iterator().next().name)
+        assertEquals(1, email.to!!.size)
+        assertEquals("basic@domain.com", email.to!!.iterator().next().email)
+        assertNull(email.to!!.iterator().next().name)
 
         assertNull(email.cc)
 
@@ -81,16 +82,16 @@ class EmailControllerTest(@Client("/") val client: HttpClient) { // <2>
 
         assertNull(email.attachments)
 
-        assertNotNull(email.body)
-        val body = email.body[TEXT]
-        assertEquals("Basic email", body.orElseThrow())
+        val body = email.body?.get(TEXT)
+        assertEquals("Basic email", body?.orElseThrow())
     }
 
     @Test
     fun testTemplate() {
 
-        val response: HttpResponse<*> = client.toBlocking().exchange<Any, Any>(
-            HttpRequest.POST("/email/template/testingtesting", null)
+        val response: HttpResponse<String> = client.toBlocking().exchange(
+            HttpRequest.POST("/email/template/testingtesting", ""),
+            String::class.java
         )
         assertEquals(response.status(), OK)
 
@@ -102,9 +103,9 @@ class EmailControllerTest(@Client("/") val client: HttpClient) { // <2>
         assertNull(email.replyTo)
 
         assertNotNull(email.to)
-        assertEquals(1, email.to.size)
-        assertEquals("template@domain.com", email.to.iterator().next().email)
-        assertNull(email.to.iterator().next().name)
+        assertEquals(1, email.to!!.size)
+        assertEquals("template@domain.com", email.to!!.iterator().next().email)
+        assertNull(email.to!!.iterator().next().name)
 
         assertNull(email.cc)
 
@@ -114,9 +115,8 @@ class EmailControllerTest(@Client("/") val client: HttpClient) { // <2>
 
         assertNull(email.attachments)
 
-        assertNotNull(email.body)
-        val body = email.body[BodyType.HTML]
-        assertTrue(body.orElseThrow().contains("Hello, <span>testingtesting</span>!"))
+        val body = email.body?.get(BodyType.HTML)
+        assertTrue(body?.orElseThrow()?.contains("Hello, <span>testingtesting</span>!") == true)
     }
 
     @Test
@@ -140,9 +140,9 @@ class EmailControllerTest(@Client("/") val client: HttpClient) { // <2>
         assertNull(email.replyTo)
 
         assertNotNull(email.to)
-        assertEquals(1, email.to.size)
-        assertEquals("attachment@domain.com", email.to.iterator().next().email)
-        assertNull(email.to.iterator().next().name)
+        assertEquals(1, email.to!!.size)
+        assertEquals("attachment@domain.com", email.to!!.iterator().next().email)
+        assertNull(email.to!!.iterator().next().name)
 
         assertNull(email.cc)
 
@@ -151,15 +151,14 @@ class EmailControllerTest(@Client("/") val client: HttpClient) { // <2>
         assertTrue(email.subject.startsWith("Micronaut Email Attachment Test: "))
 
         assertNotNull(email.attachments)
-        assertEquals(1, email.attachments.size)
-        val attachment = email.attachments[0]
+        assertEquals(1, email.attachments!!.size)
+        val attachment = email.attachments!![0]
         assertEquals("test.csv", attachment.filename)
         assertTrue(attachment.contentType.contains(TEXT_CSV), attachment.contentType)
         assertEquals("test,email", String(attachment.content))
 
-        assertNotNull(email.body)
-        val body = email.body[TEXT]
-        assertEquals("Attachment email", body.orElseThrow())
+        val body = email.body?.get(TEXT)
+        assertEquals("Attachment email", body?.orElseThrow())
     }
 
     @MockBean(TransactionalEmailSender::class)
