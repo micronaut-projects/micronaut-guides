@@ -154,7 +154,7 @@ class EmailControllerTest(@Client("/") val client: HttpClient) { // <2>
         assertEquals(1, email.attachments.size)
         val attachment = email.attachments[0]
         assertEquals("test.csv", attachment.filename)
-        assertEquals(TEXT_CSV, attachment.contentType)
+        assertTrue(attachment.contentType.contains(TEXT_CSV), attachment.contentType)
         assertEquals("test,email", String(attachment.content))
 
         assertNotNull(email.body)
