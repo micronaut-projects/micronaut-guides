@@ -49,7 +49,7 @@ open class GenreController(val genreRepository: GenreRepository) { // <2>
     }
 
     @Get(value = "/list{?args*}") // <8>
-    open fun list(@Valid args: SortingAndOrderArguments): Publisher<Genre?> {
+    open fun list(@Valid args: SortingAndOrderArguments): Publisher<Genre> {
         return genreRepository.findAll(args)
     }
 
@@ -68,15 +68,15 @@ open class GenreController(val genreRepository: GenreRepository) { // <2>
 
     @Post("/ex") // <10>
     @SingleResult
-    open fun saveExceptions(@Valid @Body cmd: GenreSaveCommand): Publisher<MutableHttpResponse<Genre?>> {
+    open fun saveExceptions(@Valid @Body cmd: GenreSaveCommand): Publisher<MutableHttpResponse<Genre>> {
         return Mono.from(genreRepository.saveWithException(cmd.name))
-            .map { genre: Genre? ->
+            .map { genre: Genre ->
                 HttpResponse
                     .created(genre)
                     .headers { headers: MutableHttpHeaders ->
                         headers.location(
                             location(
-                                genre!!.id!!
+                                genre.id!!
                             )
                         )
                     }
