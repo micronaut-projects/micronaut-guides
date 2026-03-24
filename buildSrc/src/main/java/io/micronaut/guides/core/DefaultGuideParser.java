@@ -1,7 +1,7 @@
 package io.micronaut.guides.core;
 
 import com.networknt.schema.InputFormat;
-import com.networknt.schema.ValidationMessage;
+import com.networknt.schema.Error;
 import groovy.json.JsonSlurper;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.json.JsonMapper;
@@ -73,7 +73,7 @@ public class DefaultGuideParser implements GuideParser {
         boolean publish = config.get("publish") == null || (Boolean) config.get("publish");
 
         if (publish) {
-            Set<ValidationMessage> assertions = jsonSchemaProvider.getSchema().validate(content, InputFormat.JSON);
+            List<Error> assertions = jsonSchemaProvider.getSchema().validate(content, InputFormat.JSON);
 
             if (!assertions.isEmpty()) {
                 LOG.trace("Guide metadata {} does not validate the JSON Schema. Skipping guide.", configFile);
