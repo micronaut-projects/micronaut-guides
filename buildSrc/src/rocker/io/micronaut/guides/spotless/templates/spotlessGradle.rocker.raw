@@ -1,7 +1,8 @@
 @option discardLogicWhitespace=true
 @import io.micronaut.starter.options.Language
 @import java.util.List
-@args (List<Language> languages)
+@import io.micronaut.starter.build.gradle.GradleDsl
+@args(GradleDsl dsl, List<Language> languages)
 spotless {
 @if(languages.contains(Language.JAVA)) {
     java {
@@ -17,5 +18,14 @@ spotless {
     groovy {
         licenseHeaderFile(file("LICENSEHEADER"))
     }
+}
+}
+@if (dsl == GradleDsl.GROOVY) {
+tasks.withType(io.micronaut.gradle.testresources.StartTestResourcesService).configureEach {
+    useClassDataSharing = false
+}
+} else {
+tasks.withType<io.micronaut.gradle.testresources.StartTestResourcesService>().configureEach {
+      useClassDataSharing.set(false)
 }
 }

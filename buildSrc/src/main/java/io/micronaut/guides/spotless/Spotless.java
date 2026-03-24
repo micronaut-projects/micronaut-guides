@@ -9,6 +9,7 @@ import io.micronaut.starter.application.ApplicationType;
 import io.micronaut.starter.application.generator.GeneratorContext;
 import io.micronaut.starter.build.BuildPlugin;
 import io.micronaut.starter.build.dependencies.Coordinate;
+import io.micronaut.starter.build.gradle.GradleDsl;
 import io.micronaut.starter.build.gradle.GradlePlugin;
 import io.micronaut.starter.build.maven.MavenPlugin;
 import io.micronaut.starter.feature.Category;
@@ -98,7 +99,7 @@ public class Spotless implements Feature {
             gradlePlugin.lookupArtifactId("spotless-plugin-gradle");
         }
         return gradlePlugin
-                .extension(new RockerWritable(spotlessGradle.template(languages(generatorContext))))
+                .extension(new RockerWritable(spotlessGradle.template(generatorContext.getBuildTool().getGradleDsl().orElse(GradleDsl.KOTLIN), languages(generatorContext))))
                 .build();
     }
 
