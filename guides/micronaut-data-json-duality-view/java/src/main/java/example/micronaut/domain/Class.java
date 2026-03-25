@@ -9,12 +9,12 @@ import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalTime;
 
-@MappedEntity(value = "TBL_CLASS", alias = "c")
+@MappedEntity(value = "TBL_CLASS", alias = "c") // <1>
 public record Class (
-    @Id
-    @GeneratedValue(GeneratedValue.Type.IDENTITY)
+    @Id // <2>
+    @GeneratedValue(GeneratedValue.Type.IDENTITY) // <3>
     Long id,
 
-    @NotNull
+    @NotNull // <4>
     String name
 ) {}

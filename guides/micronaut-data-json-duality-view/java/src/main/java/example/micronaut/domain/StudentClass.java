@@ -6,14 +6,14 @@ import io.micronaut.data.annotation.MappedEntity;
 import io.micronaut.data.annotation.MappedProperty;
 import io.micronaut.data.annotation.Relation;
 
-@MappedEntity(value = "TBL_STUDENT_CLASSES", alias = "sc")
+@MappedEntity(value = "TBL_STUDENT_CLASSES", alias = "sc") // <1>
 public record StudentClass (
-        @Id
-        @GeneratedValue(GeneratedValue.Type.IDENTITY)
+        @Id // <2>
+        @GeneratedValue(GeneratedValue.Type.IDENTITY) // <3>
         Long id,
-        @Relation(Relation.Kind.MANY_TO_ONE)
+        @Relation(Relation.Kind.MANY_TO_ONE) // <4>
         Student student,
-        @Relation(Relation.Kind.MANY_TO_ONE)
-        @MappedProperty("CLASS_ID")
+        @Relation(Relation.Kind.MANY_TO_ONE) // <4>
+        @MappedProperty("CLASS_ID") // <5>
         Class clazz
 ) {}

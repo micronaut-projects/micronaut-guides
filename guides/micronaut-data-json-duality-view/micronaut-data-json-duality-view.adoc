@@ -6,11 +6,7 @@ In the background, the SQL CREATE statement for the view is generated and execut
 
 === What is a JSON Relational Duality view
 
-A JSON Relational Duality view in Oracle Database lets you map relational tables to JSON documents. This creates a document-style interface for data stored relationally.
-
-____
-JSON Relational Duality is a new data modeling capability that features updatable and consistent JSON document views over relational data. This allows data that is stored efficiently in relational tables to be accessed as simple JSON documents. JSON Relational Duality Views can be accessed with document APIs, such as MongoDB-compatible APIs, REST, and SQL.
-____
+A https://docs.oracle.com/en/database/oracle/oracle-database/26/jsnvu/overview-json-relational-duality-views.html[JSON Relational Duality view] in Oracle Database lets you map relational tables to JSON documents. This creates a document-style interface for data stored relationally.
 
 Link to the documentation: https://www.oracle.com/database/json-relational-duality/[link]
 
@@ -41,6 +37,12 @@ For each table in the database, we can create a corresponding entity class. For 
 
 source:domain/Student[]
 
+<1> `@MappedEntity` annotation to specify the corresponding table name
+<2> `@Id` annotation to specify the primary key
+<3> `@GeneratedValue` annotation to specify that it is an auto-increment field
+<4> `@JoinTable` annotation to specify the correspondin join table
+<5> `@Relation` annotation to specify an association
+
 === Writing a view class
 
 A class annotated with `@JsonView` generates the corresponding JSON duality view. The `@JsonView` annotation has an `entity` field, which represents the class for which the view will be created; in our case, `Student.class`. It is a required field.
@@ -64,9 +66,22 @@ Here are some example entity classes and their corresponding sub view classes:
 
 ==== Entity classes
 
+A student can enroll in multiple classes, and each class can include multiple students, so we model this many-to-many relationship using a join table represented by StudentClass that links Student and Class. That's why we have two `MANY_TO_ONE` relations in StudentClass.
+
 source:domain/StudentClass[]
 
+<1> `@MappedEntity` annotation to specify the corresponding table name
+<2> `@Id` annotation to specify the primary key
+<3> `@GeneratedValue` annotation to specify that it is an auto-increment field
+<4> `@Relation` annotation to specify an association
+<5> `MappedProperty` annotation to specify the corresponding table's column name
+
 source:domain/Class[]
+
+<1> `@MappedEntity` annotation to specify the corresponding table name
+<2> `@Id` annotation to specify the primary key
+<3> `@GeneratedValue` annotation to specify that it is an auto-increment field
+<4> `@NotNull` annotation to specify a required property
 
 ==== Sub view classes
 
@@ -76,7 +91,7 @@ source:domain/StudentScheduleClassSubView[]
 
 === The resulting SQL CREATE statement
 
-The provided classes will generate the following view:
+The provided classes will generate the following view during build time:
 
 resource:db/V1__create_student_view.sql[]
 
@@ -96,6 +111,6 @@ common:runapp.adoc[]
 
 == Next Steps
 
-Read more about https://micronaut-projects.github.io/micronaut-data/latest/guide/[Micronaut Data].
+Read more about https://micronaut-projects.github.io/micronaut-data/latest/guide/[Micronaut Data] and https://docs.oracle.com/en/database/oracle/oracle-database/26/jsnvu/overview-json-relational-duality-views.html[JSON Duality Views].
 
 common:helpWithMicronaut.adoc[]

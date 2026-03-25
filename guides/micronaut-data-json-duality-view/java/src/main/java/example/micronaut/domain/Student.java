@@ -12,14 +12,14 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
-@MappedEntity(value = "TBL_STUDENT", alias = "s")
+@MappedEntity(value = "TBL_STUDENT", alias = "s") // <1>
 public record Student (
-        @Id
-        @GeneratedValue(GeneratedValue.Type.IDENTITY)
+        @Id // <2>
+        @GeneratedValue(GeneratedValue.Type.IDENTITY) // <3>
         Long id,
         String name,
 
-        @JoinTable(name = "TBL_STUDENT_CLASSES", alias = "sc")
-        @Relation(Relation.Kind.MANY_TO_MANY)
+        @JoinTable(name = "TBL_STUDENT_CLASSES", alias = "sc") // <4>
+        @Relation(Relation.Kind.MANY_TO_MANY) // <5>
         List<Class> classes
 ) {}
