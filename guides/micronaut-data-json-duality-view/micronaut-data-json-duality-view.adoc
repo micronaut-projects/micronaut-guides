@@ -1,14 +1,16 @@
 common:header.adoc[]
 
-In this guide, we will set up and use an Oracle JSON Relational Duality view with Micronaut Data.
-The application includes classes that represent a JSON Relational Duality view in Oracle Database.
+In this guide, we will set up and use an Oracle JSON Relational Duality View with Micronaut Data.
+The application includes classes that represent a JSON Relational Duality View in Oracle Database.
 In the background, the SQL CREATE statement for the view is generated and executed.
 
-=== What is a JSON Relational Duality view
+=== What Is a JSON Relational Duality View
 
-A https://docs.oracle.com/en/database/oracle/oracle-database/26/jsnvu/overview-json-relational-duality-views.html[JSON Relational Duality view] in Oracle Database lets you map relational tables to JSON documents. This creates a document-style interface for data stored relationally.
+A JSON Relational Duality View in Oracle Database lets you map relational tables to JSON documents. This creates a document-style interface for data stored relationally.
 
-Link to the documentation: https://www.oracle.com/database/json-relational-duality/[link]
+____
+https://www.oracle.com/database/json-relational-duality/[JSON Relational Duality] is a new data modeling capability that features updatable and consistent JSON document views over relational data. This allows data that is stored efficiently in relational tables to be accessed as simple JSON documents. JSON Relational Duality Views can be accessed with document APIs, such as MongoDB-compatible APIs, REST, and SQL.
+____
 
 === Usage
 
@@ -25,7 +27,7 @@ To complete this guide, you will need the following:
 
 == Writing the application
 
-In Micronaut, users don't have to use SQL to create JSON duality views and execute CRUD operations on them. By annotating classes with `@JsonView`, users specify which views to generate. CRUD operations are executed via `PageableRepositories`.
+In Micronaut, users don't have to use SQL to create JSON duality views and execute CRUD operations on them. By annotating classes with `@JsonView`, users specify which views to generate. CRUD operations are executed via `PageableRepository`.
 
 === High-level diagram of the classes used
 
@@ -40,7 +42,7 @@ source:domain/Student[]
 <1> `@MappedEntity` annotation to specify the corresponding table name
 <2> `@Id` annotation to specify the primary key
 <3> `@GeneratedValue` annotation to specify that it is an auto-increment field
-<4> `@JoinTable` annotation to specify the correspondin join table
+<4> `@JoinTable` annotation to specify the corresponding join table
 <5> `@Relation` annotation to specify an association
 
 === Writing a view class
@@ -56,13 +58,13 @@ source:domain/StudentView[]
 <3> `@GeneratedValue` annotation to specify that it is an auto-increment field
 <4> `@Relation` annotation to specify an association
 
-=== Writing sub view classes
+=== Writing subview classes
 
 As you can see from the `StudentView.classes` relation, JSON duality views support table joins. They are specified by using the `@Relation` annotation.
 
-For every relation, a sub view is created. A sub view class must be created for each relation. To specify a sub view class, we use the `@JsonSubView` annotation. `@JsonSubView` also has an `entity` field with the same meaning; it is required as well. These classes represent sub views; CREATE statements are generated only for classes annotated with `@JsonView`.
+For every relation, a subview is created. A subview class must be created for each relation. To specify a subview class, we use the `@JsonSubView` annotation. `@JsonSubView` also has an `entity` field with the same meaning; it is required as well. These classes represent subviews; CREATE statements are generated only for classes annotated with `@JsonView`.
 
-Define the following entity and corresponding sub view classes:
+Define the following entity and corresponding subview classes:
 
 ==== Entity classes
 
@@ -74,7 +76,7 @@ source:domain/StudentClass[]
 <2> `@Id` annotation to specify the primary key
 <3> `@GeneratedValue` annotation to specify that it is an auto-increment field
 <4> `@Relation` annotation to specify an association
-<5> `MappedProperty` annotation to specify the corresponding table's column name
+<5> `@MappedProperty` annotation to specify the corresponding table's column name
 
 source:domain/Class[]
 
@@ -83,7 +85,7 @@ source:domain/Class[]
 <3> `@GeneratedValue` annotation to specify that it is an auto-increment field
 <4> `@NotNull` annotation to specify a required property
 
-==== Sub view classes
+==== Subview classes
 
 source:domain/StudentScheduleSubView[]
 
@@ -91,7 +93,7 @@ source:domain/StudentScheduleClassSubView[]
 
 === The resulting SQL CREATE statement
 
-The provided classes will generate the following view during build time:
+The provided classes will generate the following view at build time:
 
 resource:db/V1__create_student_view.sql[]
 
