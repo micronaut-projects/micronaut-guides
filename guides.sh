@@ -320,11 +320,11 @@ fi
 
 
 # Distributed Configuration
-./gradlew micronautAwsParameterStoreBuild || EXIT_STATUS=$?
-
-if [ $EXIT_STATUS -ne 0 ]; then
-  exit $EXIT_STATUS
-fi
+#./gradlew micronautAwsParameterStoreBuild || EXIT_STATUS=$?
+#
+#if [ $EXIT_STATUS -ne 0 ]; then
+#  exit $EXIT_STATUS
+#fi
 
 
 ./gradlew micronautK8sBuild || EXIT_STATUS=$?
