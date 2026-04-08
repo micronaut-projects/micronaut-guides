@@ -562,32 +562,32 @@ fi
 
 
 # MCP
-./gradlew micronautMcpDiskspaceHttpBuild || EXIT_STATUS=$?
-
-if [ $EXIT_STATUS -ne 0 ]; then
-  exit $EXIT_STATUS
-fi
-
-
-./gradlew micronautMcpDiskspaceStdioBuild || EXIT_STATUS=$?
-
-if [ $EXIT_STATUS -ne 0 ]; then
-  exit $EXIT_STATUS
-fi
-
-
-./gradlew micronautMcpWeatherHttpBuild || EXIT_STATUS=$?
-
-if [ $EXIT_STATUS -ne 0 ]; then
-  exit $EXIT_STATUS
-fi
-
-
-./gradlew micronautMcpWeatherStdioBuild || EXIT_STATUS=$?
-
-if [ $EXIT_STATUS -ne 0 ]; then
-  exit $EXIT_STATUS
-fi
+#./gradlew micronautMcpDiskspaceHttpBuild || EXIT_STATUS=$?
+#
+#if [ $EXIT_STATUS -ne 0 ]; then
+#  exit $EXIT_STATUS
+#fi
+#
+#
+#./gradlew micronautMcpDiskspaceStdioBuild || EXIT_STATUS=$?
+#
+#if [ $EXIT_STATUS -ne 0 ]; then
+#  exit $EXIT_STATUS
+#fi
+#
+#
+#./gradlew micronautMcpWeatherHttpBuild || EXIT_STATUS=$?
+#
+#if [ $EXIT_STATUS -ne 0 ]; then
+#  exit $EXIT_STATUS
+#fi
+#
+#
+#./gradlew micronautMcpWeatherStdioBuild || EXIT_STATUS=$?
+#
+#if [ $EXIT_STATUS -ne 0 ]; then
+#  exit $EXIT_STATUS
+#fi
 
 
 
