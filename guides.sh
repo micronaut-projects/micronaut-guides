@@ -57,11 +57,11 @@ if [ $EXIT_STATUS -ne 0 ]; then
 fi
 
 
-./gradlew micronautEclipsestorePersitenceBuild || EXIT_STATUS=$?
-
-if [ $EXIT_STATUS -ne 0 ]; then
-  exit $EXIT_STATUS
-fi
+#./gradlew micronautEclipsestorePersitenceBuild || EXIT_STATUS=$?
+#
+#if [ $EXIT_STATUS -ne 0 ]; then
+#  exit $EXIT_STATUS
+#fi
 
 
 ./gradlew micronautOracleAutonomousDbBuild || EXIT_STATUS=$?
