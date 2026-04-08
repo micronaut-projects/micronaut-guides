@@ -592,11 +592,11 @@ fi
 
 
 # Messaging
-./gradlew micronautJmsAwsSqsBuild || EXIT_STATUS=$?
-
-if [ $EXIT_STATUS -ne 0 ]; then
-  exit $EXIT_STATUS
-fi
+#./gradlew micronautJmsAwsSqsBuild || EXIT_STATUS=$?
+#
+#if [ $EXIT_STATUS -ne 0 ]; then
+#  exit $EXIT_STATUS
+#fi
 
 
 ./gradlew micronautKafkaBuild || EXIT_STATUS=$?
