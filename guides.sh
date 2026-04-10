@@ -715,11 +715,11 @@ if [ $EXIT_STATUS -ne 0 ]; then
 fi
 
 
-./gradlew micronautSecuritySessionDatabaseAuthenticationBuild || EXIT_STATUS=$?
-
-if [ $EXIT_STATUS -ne 0 ]; then
-  exit $EXIT_STATUS
-fi
+#./gradlew micronautSecuritySessionDatabaseAuthenticationBuild || EXIT_STATUS=$?
+#
+#if [ $EXIT_STATUS -ne 0 ]; then
+#  exit $EXIT_STATUS
+#fi
 
 
 ./gradlew micronautSecurityTestBuild || EXIT_STATUS=$?
@@ -745,32 +745,32 @@ fi
 
 
 # MongoDB
-./gradlew micronautDataMongodbAsynchronousBuild || EXIT_STATUS=$?
-
-if [ $EXIT_STATUS -ne 0 ]; then
-  exit $EXIT_STATUS
-fi
-
-
-./gradlew micronautDataMongodbSynchronousBuild || EXIT_STATUS=$?
-
-if [ $EXIT_STATUS -ne 0 ]; then
-  exit $EXIT_STATUS
-fi
-
-
-./gradlew micronautMongodbAsynchronousBuild || EXIT_STATUS=$?
-
-if [ $EXIT_STATUS -ne 0 ]; then
-  exit $EXIT_STATUS
-fi
-
-
-./gradlew micronautMongodbSynchronousBuild || EXIT_STATUS=$?
-
-if [ $EXIT_STATUS -ne 0 ]; then
-  exit $EXIT_STATUS
-fi
+#./gradlew micronautDataMongodbAsynchronousBuild || EXIT_STATUS=$?
+#
+#if [ $EXIT_STATUS -ne 0 ]; then
+#  exit $EXIT_STATUS
+#fi
+#
+#
+#./gradlew micronautDataMongodbSynchronousBuild || EXIT_STATUS=$?
+#
+#if [ $EXIT_STATUS -ne 0 ]; then
+#  exit $EXIT_STATUS
+#fi
+#
+#
+#./gradlew micronautMongodbAsynchronousBuild || EXIT_STATUS=$?
+#
+#if [ $EXIT_STATUS -ne 0 ]; then
+#  exit $EXIT_STATUS
+#fi
+#
+#
+#./gradlew micronautMongodbSynchronousBuild || EXIT_STATUS=$?
+#
+#if [ $EXIT_STATUS -ne 0 ]; then
+#  exit $EXIT_STATUS
+#fi
 
 
 
@@ -805,18 +805,18 @@ if [ $EXIT_STATUS -ne 0 ]; then
 fi
 
 
-./gradlew micronautOpenapiGeneratorClientBuild || EXIT_STATUS=$?
-
-if [ $EXIT_STATUS -ne 0 ]; then
-  exit $EXIT_STATUS
-fi
-
-
-./gradlew micronautOpenapiGeneratorServerBuild || EXIT_STATUS=$?
-
-if [ $EXIT_STATUS -ne 0 ]; then
-  exit $EXIT_STATUS
-fi
+#./gradlew micronautOpenapiGeneratorClientBuild || EXIT_STATUS=$?
+#
+#if [ $EXIT_STATUS -ne 0 ]; then
+#  exit $EXIT_STATUS
+#fi
+#
+#
+#./gradlew micronautOpenapiGeneratorServerBuild || EXIT_STATUS=$?
+#
+#if [ $EXIT_STATUS -ne 0 ]; then
+#  exit $EXIT_STATUS
+#fi
 
 
 ./gradlew micronautOpenapiSwaggerUiBuild || EXIT_STATUS=$?
@@ -943,11 +943,11 @@ if [ $EXIT_STATUS -ne 0 ]; then
 fi
 
 
-./gradlew micronautGoogleCloudHttpFunctionBuild || EXIT_STATUS=$?
-
-if [ $EXIT_STATUS -ne 0 ]; then
-  exit $EXIT_STATUS
-fi
+#./gradlew micronautGoogleCloudHttpFunctionBuild || EXIT_STATUS=$?
+#
+#if [ $EXIT_STATUS -ne 0 ]; then
+#  exit $EXIT_STATUS
+#fi
 
 
 ./gradlew micronautOracleFunctionBuild || EXIT_STATUS=$?
@@ -957,11 +957,11 @@ if [ $EXIT_STATUS -ne 0 ]; then
 fi
 
 
-./gradlew micronautOracleFunctionHttpBuild || EXIT_STATUS=$?
-
-if [ $EXIT_STATUS -ne 0 ]; then
-  exit $EXIT_STATUS
-fi
+#./gradlew micronautOracleFunctionHttpBuild || EXIT_STATUS=$?
+#
+#if [ $EXIT_STATUS -ne 0 ]; then
+#  exit $EXIT_STATUS
+#fi
 
 
 

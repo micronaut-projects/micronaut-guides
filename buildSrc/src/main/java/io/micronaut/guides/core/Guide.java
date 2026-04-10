@@ -39,7 +39,6 @@ import java.util.Map;
  * @param base               Defaults to null; if set, indicates directory name of the base guide to copy before copying the current one
  * @param env                The guide's environment variables
  * @param apps               Applications created for the guide
- * @param requiresDocker     Set it to true if the guide requires Docker to run its tests (e.g. database or messaging guides)
  */
 @JsonSchema
 @Serdeable
@@ -114,10 +113,6 @@ public record Guide(
 
         @NotEmpty
         @NonNull
-        List<App> apps,
-
-        @JsonProperty(defaultValue = StringUtils.FALSE)
-        @Nullable
-        Boolean requiresDocker
+        List<App> apps
 ) {
 }
