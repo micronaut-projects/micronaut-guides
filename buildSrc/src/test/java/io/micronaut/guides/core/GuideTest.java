@@ -100,7 +100,7 @@ class GuideTest {
         List<App> apps = new ArrayList<>();
         apps.add(new App("springboot", null, null, null, null, null, null, null, null, null, null, null,false));
         Set<ConstraintViolation<Guide>> violations = validator.validate(
-                new Guide(title,intro, authors, categories, publicationDate, null, null, null,false,false,null,null,null,null,null,null,null,true,null,null,apps, false));
+                new Guide(title,intro, authors, categories, publicationDate, null, null, null,false,false,null,null,null,null,null,null,null,true,null,null,apps));
         assertTrue(violations.isEmpty());
     }
 
@@ -204,7 +204,7 @@ class GuideTest {
 
     @Test
     void defaultValuesAreSetCorrectly() {
-        Guide guide = new Guide(null,null, null, null, null, null, null, null,false,false,null,null,null,null,null,null,null,true,null,null,null, false);
+        Guide guide = new Guide(null,null, null, null, null, null, null, null,false,false,null,null,null,null,null,null,null,true,null,null,null);
 
         assertEquals(guide.publish(),true);
     }

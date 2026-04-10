@@ -59,8 +59,7 @@ public class FeaturesMacroSubstitutionTest {
                 true,
                 null,
                 Map.of(),
-                List.of(app),
-                false
+                List.of(app)
         );
         String str = """
                 common:cli-or-launch.adoc[]

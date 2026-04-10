@@ -59,8 +59,7 @@ public class FeaturesWordsMacroSubstitutionTest {
                 true,
                 null,
                 Map.of(),
-                List.of(app),
-                false
+                List.of(app)
         );
         String str = """
                 Rename this `micronautguide` directory to `cli`.

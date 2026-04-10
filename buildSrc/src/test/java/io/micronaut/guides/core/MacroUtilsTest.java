@@ -84,7 +84,7 @@ class MacroUtilsTest {
                 :dependencies:""", """
                 :dependencies:
                 
-                dependency:geb-spock[groupId=org.gebish,scope=testImplementation,version=@geb-spockVersion@]
+                dependency:geb-spock[groupId=org.apache.groovy.geb,scope=testImplementation,version=@geb-spockVersion@]
                 dependency:htmlunit-driver[groupId=org.seleniumhq.selenium,scope=testImplementation,version=@htmlunit-driverVersion@]
                 
                 :dependencies:""");

@@ -68,8 +68,7 @@ class GuideProjectGeneratorTest {
                 true,
                 null,
                 Map.of(),
-                List.of(app),
-                false
+                List.of(app)
         );
 
         assertDoesNotThrow(() -> guideProjectGenerator.generate(outputDirectory, guide));
