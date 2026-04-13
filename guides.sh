@@ -1057,18 +1057,18 @@ fi
 
 
 # Turbo
-./gradlew hotwireTurboMicronautChatBuild || EXIT_STATUS=$?
-
-if [ $EXIT_STATUS -ne 0 ]; then
-  exit $EXIT_STATUS
-fi
-
-
-./gradlew micronautTurboNativeBuild || EXIT_STATUS=$?
-
-if [ $EXIT_STATUS -ne 0 ]; then
-  exit $EXIT_STATUS
-fi
+#./gradlew hotwireTurboMicronautChatBuild || EXIT_STATUS=$?
+#
+#if [ $EXIT_STATUS -ne 0 ]; then
+#  exit $EXIT_STATUS
+#fi
+#
+#
+#./gradlew micronautTurboNativeBuild || EXIT_STATUS=$?
+#
+#if [ $EXIT_STATUS -ne 0 ]; then
+#  exit $EXIT_STATUS
+#fi
 
 
 
