@@ -2,7 +2,7 @@
 @import io.micronaut.starter.options.Language
 @import java.util.List
 @import io.micronaut.starter.build.gradle.GradleDsl
-@args(GradleDsl dsl, List<Language> languages)
+@args(GradleDsl dsl, List<Language> languages, String framework)
 spotless {
 @if(languages.contains(Language.JAVA)) {
     java {
@@ -20,6 +20,7 @@ spotless {
     }
 }
 }
+@if (framework == "Micronaut") {
 @if (dsl == GradleDsl.GROOVY) {
 tasks.withType(io.micronaut.gradle.testresources.StartTestResourcesService).configureEach {
     useClassDataSharing = false
@@ -27,5 +28,6 @@ tasks.withType(io.micronaut.gradle.testresources.StartTestResourcesService).conf
 } else {
 tasks.withType<io.micronaut.gradle.testresources.StartTestResourcesService>().configureEach {
       useClassDataSharing.set(false)
+}
 }
 }

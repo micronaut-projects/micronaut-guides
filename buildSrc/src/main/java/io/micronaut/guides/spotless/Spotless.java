@@ -99,7 +99,7 @@ public class Spotless implements Feature {
             gradlePlugin.lookupArtifactId("spotless-plugin-gradle");
         }
         return gradlePlugin
-                .extension(new RockerWritable(spotlessGradle.template(generatorContext.getBuildTool().getGradleDsl().orElse(GradleDsl.KOTLIN), languages(generatorContext))))
+                .extension(new RockerWritable(spotlessGradle.template(generatorContext.getBuildTool().getGradleDsl().orElse(GradleDsl.KOTLIN), languages(generatorContext), generatorContext.getFramework())))
                 .build();
     }
 
