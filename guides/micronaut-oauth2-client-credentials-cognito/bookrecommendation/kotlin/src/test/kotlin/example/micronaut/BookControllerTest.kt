@@ -39,7 +39,7 @@ class BookControllerTest {
                 .from(client.jsonStream(HttpRequest.GET<Any>("/books"), BookRecommendation::class.java))
                 .collectList()
                 .block()
-        assertEquals(1, books.size)
+        assertEquals(1, books!!.size)
         assertEquals("Building Microservices", books[0].name)
     }
 }
