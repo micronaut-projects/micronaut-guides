@@ -17,44 +17,63 @@ package example.micronaut;
 
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.resttestclient.TestRestTemplate;
-import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureTestRestTemplate;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.test.web.servlet.client.EntityExchangeResult;
+import org.springframework.test.web.servlet.client.RestTestClient;
 
 import java.net.URI;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT) // <1>
-@AutoConfigureTestRestTemplate
 class SaasSubscriptionPostControllerTest {
 
-    @Autowired // <2>
-    TestRestTemplate restTemplate;  // <3>
+    @LocalServerPort // <2>
+    int port;
+
+    RestTestClient restTestClient;  // <3>
+
+    @BeforeEach
+    void setUp() {
+        restTestClient = RestTestClient.bindToServer()
+                .baseUrl("http://localhost:" + port)
+                .build();
+    }
 
     @Test
     void shouldCreateANewSaasSubscription() {
         SaasSubscriptionSave subscription = new SaasSubscriptionSave( "Advanced", 2500);
-        ResponseEntity<Void> createResponse = restTemplate
-                .withBasicAuth("sarah1", "abc123")
-                .postForEntity("/subscriptions", subscription, Void.class);
-        assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        EntityExchangeResult<Void> createResponse = withBasicAuth("sarah1", "abc123")
+                .post()
+                .uri("/subscriptions")
+                .body(subscription)
+                .exchange()
+                .returnResult(Void.class);
+        assertThat(createResponse.getStatus()).isEqualTo(HttpStatus.CREATED);
 
-        URI locationOfNewSaasSubscription = createResponse.getHeaders().getLocation();
-        ResponseEntity<String> getResponse = restTemplate
-                .withBasicAuth("sarah1", "abc123")
-                .getForEntity(locationOfNewSaasSubscription, String.class);
-        assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+        URI locationOfNewSaasSubscription = createResponse.getResponseHeaders().getLocation();
+        EntityExchangeResult<String> getResponse = withBasicAuth("sarah1", "abc123")
+                .get()
+                .uri(locationOfNewSaasSubscription)
+                .exchange()
+                .returnResult(String.class);
+        assertThat(getResponse.getStatus()).isEqualTo(HttpStatus.OK);
 
-        DocumentContext documentContext = JsonPath.parse(getResponse.getBody());
+        DocumentContext documentContext = JsonPath.parse(getResponse.getResponseBody());
         Number id = documentContext.read("$.id");
         assertThat(id).isNotNull();
 
         Integer cents = documentContext.read("$.cents");
         assertThat(cents).isEqualTo(2500);
+    }
+
+    private RestTestClient withBasicAuth(String username, String password) {
+        return restTestClient.mutate()
+                .defaultHeaders(headers -> headers.setBasicAuth(username, password))
+                .build();
     }
 }

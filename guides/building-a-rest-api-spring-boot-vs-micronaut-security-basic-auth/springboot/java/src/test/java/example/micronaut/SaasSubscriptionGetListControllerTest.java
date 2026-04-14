@@ -18,67 +18,83 @@ package example.micronaut;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import net.minidev.json.JSONArray;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.resttestclient.TestRestTemplate;
-import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureTestRestTemplate;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.web.servlet.client.EntityExchangeResult;
+import org.springframework.test.web.servlet.client.RestTestClient;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT) // <1>
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD) // <2>
-@AutoConfigureTestRestTemplate
 class SaasSubscriptionGetListControllerTest {
 
-    @Autowired // <3>
-    TestRestTemplate restTemplate; // <4>
+    @LocalServerPort // <3>
+    int port;
+
+    RestTestClient restTestClient; // <4>
+
+    @BeforeEach
+    void setUp() {
+        restTestClient = RestTestClient.bindToServer()
+                .baseUrl("http://localhost:" + port)
+                .build();
+    }
 
     @Test
     void shouldReturnASortedPageOfSaasSubscriptions() {
-        ResponseEntity<String> response = restTemplate
-                .withBasicAuth("sarah1", "abc123")
-                .getForEntity("/subscriptions?page=0&size=1&sort=cents,desc", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        EntityExchangeResult<String> response = withBasicAuth("sarah1", "abc123")
+                .get()
+                .uri("/subscriptions?page=0&size=1&sort=cents,desc")
+                .exchange()
+                .returnResult(String.class);
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK);
 
-        DocumentContext documentContext = JsonPath.parse(response.getBody());
+        DocumentContext documentContext = JsonPath.parse(response.getResponseBody());
         JSONArray read = documentContext.read("$[*]");
         assertThat(read.size()).isEqualTo(1);
 
         Integer cents = documentContext.read("$[0].cents");
         assertThat(cents).isEqualTo(4900);
 
-        response = restTemplate
-                .withBasicAuth("sarah1", "abc123")
-                .getForEntity("/subscriptions?page=0&size=1", String.class);
-        documentContext = JsonPath.parse(response.getBody());
+        response = withBasicAuth("sarah1", "abc123")
+                .get()
+                .uri("/subscriptions?page=0&size=1")
+                .exchange()
+                .returnResult(String.class);
+        documentContext = JsonPath.parse(response.getResponseBody());
         cents = documentContext.read("$[0].cents");
         assertThat(cents).isEqualTo(1400);
     }
 
     @Test
     void shouldReturnAPageOfSaasSubscriptions() {
-        ResponseEntity<String> response = restTemplate
-                .withBasicAuth("sarah1", "abc123")
-                .getForEntity("/subscriptions?page=0&size=1", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        EntityExchangeResult<String> response = withBasicAuth("sarah1", "abc123")
+                .get()
+                .uri("/subscriptions?page=0&size=1")
+                .exchange()
+                .returnResult(String.class);
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK);
 
-        DocumentContext documentContext = JsonPath.parse(response.getBody());
+        DocumentContext documentContext = JsonPath.parse(response.getResponseBody());
         JSONArray page = documentContext.read("$[*]");
         assertThat(page.size()).isEqualTo(1);
     }
 
     @Test
     void shouldReturnAllSaasSubscriptionsWhenListIsRequested() {
-        ResponseEntity<String> response = restTemplate
-                .withBasicAuth("sarah1", "abc123")
-                .getForEntity("/subscriptions", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        EntityExchangeResult<String> response = withBasicAuth("sarah1", "abc123")
+                .get()
+                .uri("/subscriptions")
+                .exchange()
+                .returnResult(String.class);
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK);
 
-        DocumentContext documentContext = JsonPath.parse(response.getBody());
+        DocumentContext documentContext = JsonPath.parse(response.getResponseBody());
         int saasSubscriptionCount = documentContext.read("$.length()");
         assertThat(saasSubscriptionCount).isEqualTo(3);
 
@@ -87,5 +103,11 @@ class SaasSubscriptionGetListControllerTest {
 
         JSONArray cents = documentContext.read("$..cents");
         assertThat(cents).containsExactlyInAnyOrder(1400, 2900, 4900);
+    }
+
+    private RestTestClient withBasicAuth(String username, String password) {
+        return restTestClient.mutate()
+                .defaultHeaders(headers -> headers.setBasicAuth(username, password))
+                .build();
     }
 }
