@@ -12,9 +12,9 @@ CREATE TABLE "user" (
     password_expired BOOLEAN NOT NULL
 );
 CREATE TABLE user_role(
-    id_role_id BIGINT NOT NULL,
-    id_user_id BIGINT NOT NULL,
-    FOREIGN KEY (id_role_id) REFERENCES role(id),
-    FOREIGN KEY (id_user_id) REFERENCES "user"(id),
-    PRIMARY KEY (id_role_id, id_user_id)
+    role_id BIGINT NOT NULL,
+    user_id BIGINT NOT NULL,
+    FOREIGN KEY (role_id) REFERENCES role(id),
+    FOREIGN KEY (user_id) REFERENCES "user"(id),
+    PRIMARY KEY (role_id, user_id)
 );

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package example.micronaut.advanced.auth
+package example.micronaut
 
 import io.micronaut.http.HttpRequest
 import io.micronaut.security.authentication.AuthenticationFailureReason
@@ -23,9 +23,11 @@ import io.micronaut.security.authentication.provider.HttpRequestAuthenticationPr
 import jakarta.inject.Singleton
 
 @Singleton // <1>
-class AuthProvider<B> : HttpRequestAuthenticationProvider<B> { // <2>
-    override fun authenticate(httpRequest: HttpRequest<B>?,
-                              authenticationRequest: AuthenticationRequest<String, String>): AuthenticationResponse {
-        return AuthenticationResponse.success(authenticationRequest.identity)
+class AuthenticationProviderUserPassword<B : Any> : HttpRequestAuthenticationProvider<B> { // <2>
+    override fun authenticate(
+        requestContext: HttpRequest<B>?,
+        authenticationRequest: AuthenticationRequest<String?, String?>
+    ): AuthenticationResponse {
+        return AuthenticationResponse.success(authenticationRequest.identity!!)
     }
 }

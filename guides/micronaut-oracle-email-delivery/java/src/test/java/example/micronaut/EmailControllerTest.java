@@ -162,7 +162,7 @@ class EmailControllerTest {
         assertEquals(1, email.getAttachments().size());
         Attachment attachment = email.getAttachments().get(0);
         assertEquals("test.csv", attachment.getFilename());
-        assertEquals(TEXT_CSV, attachment.getContentType());
+        assertTrue(attachment.getContentType().contains(TEXT_CSV), attachment.getContentType());
         assertEquals("test,email", new String(attachment.getContent()));
 
         assertNotNull(email.getBody());

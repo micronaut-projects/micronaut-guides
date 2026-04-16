@@ -23,7 +23,7 @@ import io.micronaut.runtime.http.scope.RequestScope
 class Robot : RequestAware { // <2>
     private var serialNumber: String? = null
 
-    override fun setRequest(request: HttpRequest<*>?) {
+    override fun setRequest(request: HttpRequest<*>) {
         this.serialNumber = request!!.headers.get("UUID")
     }
 

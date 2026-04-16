@@ -52,7 +52,7 @@ internal class OauthAccessTokenTest(@Client("/") val client: HttpClient) {
 
         Thread.sleep(1000) // sleep for one second to give time for the issued at `iat` Claim to change
         val refreshResponse = client.toBlocking().retrieve(HttpRequest.POST("/oauth/access_token",
-                TokenRefreshRequest(TokenRefreshRequest.GRANT_TYPE_REFRESH_TOKEN, rsp.refreshToken)), AccessRefreshToken::class.java) // <1>
+                TokenRefreshRequest(TokenRefreshRequest.GRANT_TYPE_REFRESH_TOKEN, rsp.refreshToken!!)), AccessRefreshToken::class.java) // <1>
 
         assertNotNull(refreshResponse.accessToken)
         assertNotEquals(rsp.accessToken, refreshResponse.accessToken) // <2>

@@ -28,6 +28,8 @@ import io.micronaut.http.MutableHttpResponse;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Part;
 import io.micronaut.http.annotation.Post;
+import io.micronaut.http.server.util.HttpHostResolver;
+import io.micronaut.http.server.util.locale.HttpLocaleResolver;
 import io.micronaut.security.authentication.Authentication;
 import io.micronaut.security.authentication.AuthenticationRequest;
 import io.micronaut.security.authentication.Authenticator;
@@ -38,6 +40,8 @@ import io.micronaut.security.handlers.LoginHandler;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 
+import java.util.Locale;
+
 @Replaces(LoginController.class)
 @Controller("/login")
 class AuthLoginController {
@@ -45,8 +49,12 @@ class AuthLoginController {
     private final Authenticator<HttpRequest<?>> authenticator;
     private final LoginHandler<HttpRequest<?>, MutableHttpResponse<?>> loginHandler;
     private final ApplicationEventPublisher<ApplicationEvent> eventPublisher;
+    private final HttpHostResolver httpHostResolver;
+    private final HttpLocaleResolver httpLocaleResolver;
 
     AuthLoginController(
+            HttpHostResolver httpHostResolver,
+            HttpLocaleResolver httpLocaleResolver,
             Authenticator<HttpRequest<?>> authenticator,
             LoginHandler<HttpRequest<?>, MutableHttpResponse<?>> loginHandler,
             ApplicationEventPublisher<ApplicationEvent> eventPublisher
@@ -54,6 +62,8 @@ class AuthLoginController {
         this.authenticator = authenticator;
         this.loginHandler = loginHandler;
         this.eventPublisher = eventPublisher;
+        this.httpHostResolver = httpHostResolver;
+        this.httpLocaleResolver = httpLocaleResolver;
     }
 
     @SingleResult
@@ -73,12 +83,14 @@ class AuthLoginController {
 
         return Flux.from(authenticator.authenticate(request, auth))
                 .map(authenticationResponse -> {
+                    Locale locale = httpLocaleResolver.resolveOrDefault(request);
+                    String host = httpHostResolver.resolve(request);
                     if (authenticationResponse.isAuthenticated() && authenticationResponse.getAuthentication().isPresent()) {
                         Authentication authentication = authenticationResponse.getAuthentication().get();
-                        eventPublisher.publishEvent(new LoginSuccessfulEvent(auth));
+                        eventPublisher.publishEvent(new LoginSuccessfulEvent(auth, host, locale));
                         return loginHandler.loginSuccess(authentication, request);
                     } else {
-                        this.eventPublisher.publishEvent(new LoginFailedEvent(auth));
+                        this.eventPublisher.publishEvent(new LoginFailedEvent(authenticationResponse, auth, host, locale));
                         return loginHandler.loginFailed(authenticationResponse, request);
                     }
                 }).defaultIfEmpty(HttpResponse.status(HttpStatus.UNAUTHORIZED));

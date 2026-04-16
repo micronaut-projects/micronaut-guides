@@ -34,7 +34,7 @@ class HelloWorldControllerTest {
     @Test
     fun useOfLocalizedMessageSource() {
         val client = httpClient.toBlocking()
-        var request: HttpRequest<*>? = HttpRequest.GET<Any>("/")
+        var request: HttpRequest<*> = HttpRequest.GET<Any>("/")
             .header(HttpHeaders.ACCEPT_LANGUAGE, "es") // <3>
         assertEquals("Hola Mundo", client.retrieve(request))
         request = HttpRequest.GET<Any>("/")

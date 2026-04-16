@@ -1,7 +1,7 @@
 plugins {
     id "java-gradle-plugin"
     id 'groovy'
-    id 'nu.studer.rocker' version '3.0.4'
+    id 'nu.studer.rocker' version '3.3'
 }
 
 ext {
@@ -35,6 +35,10 @@ repositories {
     }
 }
 
+ext {
+    micronautStarterVersion = "5.0.0-SNAPSHOT"
+}
+
 dependencies {
     annotationProcessor(platform("io.micronaut.platform:micronaut-platform:$micronautVersion"))
     annotationProcessor("io.micronaut:micronaut-inject-java")
@@ -46,7 +50,7 @@ dependencies {
     implementation("io.micronaut.validation:micronaut-validation")
     annotationProcessor("io.micronaut.serde:micronaut-serde-processor")
     implementation("io.micronaut.serde:micronaut-serde-jackson")
-    implementation("io.micronaut.starter:micronaut-starter-api:$micronautVersion")
+    implementation("io.micronaut.starter:micronaut-starter-api:$micronautStarterVersion")
     testImplementation(platform("io.micronaut.platform:micronaut-platform:$micronautVersion"))
     testImplementation("io.micronaut.test:micronaut-test-junit5")
     testImplementation("org.junit.jupiter:junit-jupiter-engine")
@@ -63,24 +67,16 @@ dependencies {
     testImplementation("org.skyscreamer:jsonassert:1.5.3")
 }
 
-sourceSets {
-    main {
-        java {
-            srcDir 'src/generated/rocker'
-        }
-    }
-}
-
 rocker {
-    configurations {
+    version = rockerVersion
+    configurations{
         main {
-            templateDir = file('src/main/java')
+            discardLogicWhitespace = true
+            templateDir = file('src/rocker')
             outputDir = file('src/generated/rocker')
-            optimize = true
         }
     }
 }
-
 
 tasks.named('test', Test) {
     useJUnitPlatform()

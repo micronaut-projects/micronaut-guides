@@ -28,5 +28,5 @@ interface GameStateRepository : CrudRepository<GameState, UUID> {
 
     @NonNull
     @Join(value = "game", type = FETCH) // <1>
-    override fun findById(@NotNull @NonNull id: UUID): Optional<GameState?>
+    override fun findById(@NotNull @NonNull id: UUID): Optional<GameState>
 }

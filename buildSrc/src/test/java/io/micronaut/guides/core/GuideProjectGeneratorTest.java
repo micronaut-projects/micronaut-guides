@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @MicronautTest(startApplication = false)
-public class GuideProjectGeneratorTest {
+class GuideProjectGeneratorTest {
 
     @Inject
     GuideParser guideParser;
@@ -101,7 +101,8 @@ public class GuideProjectGeneratorTest {
                     implementation("io.micronaut.serde:micronaut-serde-jackson")
                     runtimeOnly("ch.qos.logback:logback-classic")
                     runtimeOnly("org.yaml:snakeyaml")
-                }"""));
+                    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+                }"""), result);
         assertTrue(result.contains("""
                 micronaut {
                     testRuntime("junit5")
@@ -120,10 +121,11 @@ public class GuideProjectGeneratorTest {
                 application {
                     mainClass = "example.micronaut.CliCommand"
                 }
+                
                 java {
-                    sourceCompatibility = JavaVersion.toVersion("21")
-                    targetCompatibility = JavaVersion.toVersion("21")
-                }""".replace("21", javaVersion)));
+                    sourceCompatibility = JavaVersion.toVersion("25")
+                    targetCompatibility = JavaVersion.toVersion("25")
+                }""".replace("25", javaVersion)));
 
     }
 

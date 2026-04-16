@@ -171,7 +171,7 @@ class GuideAsciidocGenerator {
                 String app = matches[1] ?: 'default'
                 cliCommandForApp(metadata, app)
                         .orElseThrow {
-                            new GradleException("No CLI command found for app: $app -- should be one of ${metadata.apps().stream().flatMap { "@$it:cli-command@" }.collect(Collectors.joining(", "))}")
+                            new GradleException("No CLI command found for app: $app -- should be one of ${String.join(", ", metadata.apps().stream().map(App::name).map(n -> "@${n}:cli-command@").toList())}")
                         }
             }
 

@@ -16,28 +16,20 @@
 package example.micronaut
 
 import io.micronaut.http.HttpRequest
+import io.micronaut.security.authentication.AuthenticationFailureReason
 import io.micronaut.security.authentication.AuthenticationRequest
 import io.micronaut.security.authentication.AuthenticationResponse
-import io.micronaut.security.authentication.provider.HttpRequestReactiveAuthenticationProvider
+import io.micronaut.security.authentication.provider.HttpRequestAuthenticationProvider
 import jakarta.inject.Singleton
-import org.reactivestreams.Publisher
-import reactor.core.publisher.Flux
-import reactor.core.publisher.FluxSink
 
 @Singleton // <1>
-class AuthenticationProviderUserPassword<B> : HttpRequestReactiveAuthenticationProvider<B> { // <2>
-
+class AuthenticationProviderUserPassword<B : Any> : HttpRequestAuthenticationProvider<B> { // <2>
     override fun authenticate(
-        httpRequest: HttpRequest<B>?,
-        authenticationRequest: AuthenticationRequest<String, String>
-    ): Publisher<AuthenticationResponse> {
-        return Flux.create({ emitter: FluxSink<AuthenticationResponse> ->
-            if (authenticationRequest.identity == "sherlock" && authenticationRequest.secret == "password") {
-                emitter.next(AuthenticationResponse.success(authenticationRequest.identity as String))
-                emitter.complete()
-            } else {
-                emitter.error(AuthenticationResponse.exception())
-            }
-        }, FluxSink.OverflowStrategy.ERROR)
+        requestContext: HttpRequest<B>?,
+        authenticationRequest: AuthenticationRequest<String?, String?>
+    ): AuthenticationResponse {
+        return if (authenticationRequest.identity == "sherlock" && authenticationRequest.secret == "password")
+            AuthenticationResponse.success(authenticationRequest.identity!!) else
+            AuthenticationResponse.failure(AuthenticationFailureReason.CREDENTIALS_DO_NOT_MATCH)
     }
 }

@@ -36,7 +36,7 @@ class BooksControllerTest(@Client("/") val httpClient: HttpClient) {
         val rsp = httpClient.toBlocking().exchange(
                 HttpRequest.GET<Any>("/books/stock/1491950358"), Boolean::class.java)
         assertEquals(OK, rsp.status())
-        assertTrue(rsp.body())
+        assertTrue(rsp.body() == true)
     }
 
     @Test

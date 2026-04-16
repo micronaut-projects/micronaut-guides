@@ -52,7 +52,7 @@ class PetResourceTest {
         assertEquals(HttpStatus.OK, response.status)
         val petNames = response.body()
         assertNotNull(petNames)
-        assertEquals(3, petNames.size)
+        assertEquals(3, petNames!!.size)
         repository.deleteAll()
     }
     

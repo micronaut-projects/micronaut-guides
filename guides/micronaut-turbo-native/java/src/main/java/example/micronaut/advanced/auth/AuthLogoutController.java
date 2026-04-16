@@ -24,11 +24,14 @@ import io.micronaut.http.MediaType;
 import io.micronaut.http.MutableHttpResponse;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Post;
+import io.micronaut.http.server.util.HttpHostResolver;
+import io.micronaut.http.server.util.locale.HttpLocaleResolver;
 import io.micronaut.security.endpoints.LogoutController;
 import io.micronaut.security.event.LogoutEvent;
 import io.micronaut.security.handlers.LogoutHandler;
 
 import java.security.Principal;
+import java.util.Locale;
 
 @Replaces(LogoutController.class)
 @Controller("/signout")
@@ -36,16 +39,25 @@ class AuthLogoutController {
 
     private final LogoutHandler<HttpRequest<?>, MutableHttpResponse<?>> logoutHandler;
     private final ApplicationEventPublisher<ApplicationEvent> eventPublisher;
+    private final HttpHostResolver httpHostResolver;
+    private final HttpLocaleResolver httpLocaleResolver;
 
-    AuthLogoutController(LogoutHandler<HttpRequest<?>, MutableHttpResponse<?>> logoutHandler, ApplicationEventPublisher<ApplicationEvent> eventPublisher) {
+    AuthLogoutController(HttpHostResolver httpHostResolver,
+                         HttpLocaleResolver httpLocaleResolver,
+                         LogoutHandler<HttpRequest<?>, MutableHttpResponse<?>> logoutHandler,
+                         ApplicationEventPublisher<ApplicationEvent> eventPublisher) {
         this.logoutHandler = logoutHandler;
         this.eventPublisher = eventPublisher;
+        this.httpHostResolver = httpHostResolver;
+        this.httpLocaleResolver = httpLocaleResolver;
     }
 
     @Post(consumes = {MediaType.TEXT_HTML, MediaType.APPLICATION_FORM_URLENCODED}, produces = {MediaType.TEXT_HTML})
     MutableHttpResponse<?> logout(HttpRequest<?> request, @Nullable Principal principal) {
         if (principal != null) {
-            eventPublisher.publishEvent(new LogoutEvent(principal));
+            Locale locale = httpLocaleResolver.resolveOrDefault(request);
+            String host = httpHostResolver.resolve(request);
+            eventPublisher.publishEvent(new LogoutEvent(principal, host, locale));
         }
         return logoutHandler.logout(request);
     }

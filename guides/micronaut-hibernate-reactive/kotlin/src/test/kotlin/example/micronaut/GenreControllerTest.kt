@@ -70,7 +70,7 @@ class GenreControllerTest {
     @Test
     fun testGenreCrudOperations() {
         val genreIds = mutableListOf<Long?>()
-        var request: HttpRequest<*>? = HttpRequest.POST("/genres", GenreSaveCommand("DevOps")) // <4>
+        var request: HttpRequest<*> = HttpRequest.POST("/genres", GenreSaveCommand("DevOps")) // <4>
         var response: HttpResponse<Genre> = blockingClient!!.exchange(request)
         genreIds.add(entityId(response))
         Assertions.assertEquals(HttpStatus.CREATED, response.status)

@@ -46,7 +46,7 @@ class MailController(private val emailSender: AsyncEmailSender<SesRequest, SesRe
                         LOG.info("message id: {}", rsp.messageId())
                     }
                 }.onErrorMap(EmailException::class.java) { t: EmailException? -> HttpStatusException(UNPROCESSABLE_ENTITY, "Email could not be sent") }
-                .map { rsp: SesResponse? -> HttpResponse.accepted<Any?>() } // <5>
+                .map { rsp: SesResponse? -> HttpResponse.accepted<Any>() } // <5>
     }
 
     companion object {
