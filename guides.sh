@@ -1,25 +1,25 @@
-#!/bin/bash
+####!/bin/bash
 EXIT_STATUS=0
 
 if [ $EXIT_STATUS -ne 0 ]; then
   exit $EXIT_STATUS
 fi
 
-# Getting Started
+#### Getting Started
 ./gradlew creatingYourFirstMicronautAppBuild || EXIT_STATUS=$?
 
 if [ $EXIT_STATUS -ne 0 ]; then
   exit $EXIT_STATUS
 fi
 
-# Cache
+#### Cache
 ./gradlew micronautCacheBuild || EXIT_STATUS=$?
 
 if [ $EXIT_STATUS -ne 0 ]; then
   exit $EXIT_STATUS
 fi
 
-# Core Basics
+#### Core Basics
 ./gradlew micronautConfigurationBuild || EXIT_STATUS=$?
 
 if [ $EXIT_STATUS -ne 0 ]; then
@@ -42,7 +42,7 @@ fi
 
 
 
-# Data Access
+#### Data Access
 ./gradlew micronautDataAccessMybatisBuild || EXIT_STATUS=$?
 
 if [ $EXIT_STATUS -ne 0 ]; then
@@ -57,11 +57,11 @@ if [ $EXIT_STATUS -ne 0 ]; then
 fi
 
 
-#./gradlew micronautEclipsestorePersitenceBuild || EXIT_STATUS=$?
-#
-#if [ $EXIT_STATUS -ne 0 ]; then
-#  exit $EXIT_STATUS
-#fi
+####./gradlew micronautEclipsestorePersitenceBuild || EXIT_STATUS=$?
+####
+####if [ $EXIT_STATUS -ne 0 ]; then
+####  exit $EXIT_STATUS
+####fi
 
 
 ./gradlew micronautOracleAutonomousDbBuild || EXIT_STATUS=$?
@@ -72,7 +72,7 @@ fi
 
 
 
-# Data JDBC
+#### Data JDBC
 ./gradlew micronautCloudDatabaseAwsBuild || EXIT_STATUS=$?
 
 if [ $EXIT_STATUS -ne 0 ]; then
@@ -116,7 +116,7 @@ fi
 
 
 
-# Data JPA
+#### Data JPA
 ./gradlew micronautDataHibernateReactiveBuild || EXIT_STATUS=$?
 
 if [ $EXIT_STATUS -ne 0 ]; then
@@ -139,7 +139,7 @@ fi
 
 
 
-# Data R2DBC
+#### Data R2DBC
 ./gradlew micronautDataR2dbcRepositoryBuild || EXIT_STATUS=$?
 
 if [ $EXIT_STATUS -ne 0 ]; then
@@ -148,7 +148,7 @@ fi
 
 
 
-# Database Modeling
+#### Database Modeling
 ./gradlew micronautDataManyToManyMysqlBuild || EXIT_STATUS=$?
 
 if [ $EXIT_STATUS -ne 0 ]; then
@@ -171,7 +171,7 @@ fi
 
 
 
-# Development
+#### Development
 ./gradlew addingCommitInfoBuild || EXIT_STATUS=$?
 
 if [ $EXIT_STATUS -ne 0 ]; then
@@ -188,7 +188,7 @@ fi
 
 
 
-# HTTP Client
+#### HTTP Client
 ./gradlew micronautHttpClientBuild || EXIT_STATUS=$?
 
 if [ $EXIT_STATUS -ne 0 ]; then
@@ -204,7 +204,7 @@ fi
 
 
 
-# HTTP Server
+#### HTTP Server
 ./gradlew micronautContentNegotiationBuild || EXIT_STATUS=$?
 
 if [ $EXIT_STATUS -ne 0 ]; then
@@ -227,7 +227,7 @@ fi
 
 
 
-# JAXRS
+#### JAXRS
 ./gradlew micronautJaxrsJdbcBuild || EXIT_STATUS=$?
 
 if [ $EXIT_STATUS -ne 0 ]; then
@@ -236,7 +236,7 @@ fi
 
 
 
-# JSON Schema
+#### JSON Schema
 ./gradlew micronautJsonSchemaBuild || EXIT_STATUS=$?
 
 if [ $EXIT_STATUS -ne 0 ]; then
@@ -247,7 +247,7 @@ fi
 
 
 
-# Distribution
+#### Distribution
 ./gradlew executableJarBuild || EXIT_STATUS=$?
 
 if [ $EXIT_STATUS -ne 0 ]; then
@@ -319,12 +319,12 @@ fi
 
 
 
-# Distributed Configuration
-#./gradlew micronautAwsParameterStoreBuild || EXIT_STATUS=$?
-#
-#if [ $EXIT_STATUS -ne 0 ]; then
-#  exit $EXIT_STATUS
-#fi
+#### Distributed Configuration
+####./gradlew micronautAwsParameterStoreBuild || EXIT_STATUS=$?
+####
+####if [ $EXIT_STATUS -ne 0 ]; then
+####  exit $EXIT_STATUS
+####fi
 
 
 ./gradlew micronautK8sBuild || EXIT_STATUS=$?
@@ -356,7 +356,7 @@ fi
 
 
 
-# Distributed Tracing
+#### Distributed Tracing
 ./gradlew micronautCloudTraceGoogleBuild || EXIT_STATUS=$?
 
 if [ $EXIT_STATUS -ne 0 ]; then
@@ -407,7 +407,7 @@ fi
 
 
 
-# Email
+#### Email
 
 ./gradlew micronautEmailAmazonSesBuild || EXIT_STATUS=$?
 
@@ -431,7 +431,7 @@ fi
 
 
 
-# GraalPy
+#### GraalPy
 ./gradlew micronautGraalpyBuild || EXIT_STATUS=$?
 
 if [ $EXIT_STATUS -ne 0 ]; then
@@ -447,7 +447,7 @@ fi
 
 
 
-# GraalVM
+#### GraalVM
 ./gradlew micronautCreatingFirstGraalAppBuild || EXIT_STATUS=$?
 
 if [ $EXIT_STATUS -ne 0 ]; then
@@ -491,7 +491,7 @@ fi
 
 
 
-# GraphQL
+#### GraphQL
 ./gradlew micronautGraphqlBuild || EXIT_STATUS=$?
 
 if [ $EXIT_STATUS -ne 0 ]; then
@@ -506,7 +506,7 @@ if [ $EXIT_STATUS -ne 0 ]; then
 fi
 
 
-# Kotlin
+#### Kotlin
 ./gradlew micronautKotlinExtensionFnsBuild || EXIT_STATUS=$?
 
 if [ $EXIT_STATUS -ne 0 ]; then
@@ -515,7 +515,7 @@ fi
 
 
 
-# Kubernetes
+#### Kubernetes
 ./gradlew micronautK8sBuild || EXIT_STATUS=$?
 
 if [ $EXIT_STATUS -ne 0 ]; then
@@ -545,7 +545,7 @@ fi
 
 
 
-# Logging
+#### Logging
 ./gradlew micronautAzureLoggingBuild || EXIT_STATUS=$?
 
 if [ $EXIT_STATUS -ne 0 ]; then
@@ -561,42 +561,42 @@ fi
 
 
 
-# MCP
-#./gradlew micronautMcpDiskspaceHttpBuild || EXIT_STATUS=$?
-#
-#if [ $EXIT_STATUS -ne 0 ]; then
-#  exit $EXIT_STATUS
-#fi
-#
-#
-#./gradlew micronautMcpDiskspaceStdioBuild || EXIT_STATUS=$?
-#
-#if [ $EXIT_STATUS -ne 0 ]; then
-#  exit $EXIT_STATUS
-#fi
-#
-#
-#./gradlew micronautMcpWeatherHttpBuild || EXIT_STATUS=$?
-#
-#if [ $EXIT_STATUS -ne 0 ]; then
-#  exit $EXIT_STATUS
-#fi
-#
-#
-#./gradlew micronautMcpWeatherStdioBuild || EXIT_STATUS=$?
-#
-#if [ $EXIT_STATUS -ne 0 ]; then
-#  exit $EXIT_STATUS
-#fi
+#### MCP
+####./gradlew micronautMcpDiskspaceHttpBuild || EXIT_STATUS=$?
+####
+####if [ $EXIT_STATUS -ne 0 ]; then
+####  exit $EXIT_STATUS
+####fi
+####
+####
+####./gradlew micronautMcpDiskspaceStdioBuild || EXIT_STATUS=$?
+####
+####if [ $EXIT_STATUS -ne 0 ]; then
+####  exit $EXIT_STATUS
+####fi
+####
+####
+####./gradlew micronautMcpWeatherHttpBuild || EXIT_STATUS=$?
+####
+####if [ $EXIT_STATUS -ne 0 ]; then
+####  exit $EXIT_STATUS
+####fi
+####
+####
+####./gradlew micronautMcpWeatherStdioBuild || EXIT_STATUS=$?
+####
+####if [ $EXIT_STATUS -ne 0 ]; then
+####  exit $EXIT_STATUS
+####fi
 
 
 
-# Messaging
-#./gradlew micronautJmsAwsSqsBuild || EXIT_STATUS=$?
-#
-#if [ $EXIT_STATUS -ne 0 ]; then
-#  exit $EXIT_STATUS
-#fi
+#### Messaging
+####./gradlew micronautJmsAwsSqsBuild || EXIT_STATUS=$?
+####
+####if [ $EXIT_STATUS -ne 0 ]; then
+####  exit $EXIT_STATUS
+####fi
 
 
 ./gradlew micronautKafkaBuild || EXIT_STATUS=$?
@@ -635,7 +635,7 @@ fi
 
 
 
-# Metrics
+#### Metrics
 ./gradlew micronautMetricsBuild || EXIT_STATUS=$?
 
 if [ $EXIT_STATUS -ne 0 ]; then
@@ -658,7 +658,7 @@ fi
 
 
 
-# Micronaut Security
+#### Micronaut Security
 ./gradlew micronautCliJwkgenBuild || EXIT_STATUS=$?
 
 if [ $EXIT_STATUS -ne 0 ]; then
@@ -715,11 +715,11 @@ if [ $EXIT_STATUS -ne 0 ]; then
 fi
 
 
-#./gradlew micronautSecuritySessionDatabaseAuthenticationBuild || EXIT_STATUS=$?
-#
-#if [ $EXIT_STATUS -ne 0 ]; then
-#  exit $EXIT_STATUS
-#fi
+####./gradlew micronautSecuritySessionDatabaseAuthenticationBuild || EXIT_STATUS=$?
+####
+####if [ $EXIT_STATUS -ne 0 ]; then
+####  exit $EXIT_STATUS
+####fi
 
 
 ./gradlew micronautSecurityTestBuild || EXIT_STATUS=$?
@@ -744,37 +744,37 @@ fi
 
 
 
-# MongoDB
-#./gradlew micronautDataMongodbAsynchronousBuild || EXIT_STATUS=$?
-#
-#if [ $EXIT_STATUS -ne 0 ]; then
-#  exit $EXIT_STATUS
-#fi
-#
-#
-#./gradlew micronautDataMongodbSynchronousBuild || EXIT_STATUS=$?
-#
-#if [ $EXIT_STATUS -ne 0 ]; then
-#  exit $EXIT_STATUS
-#fi
-#
-#
-#./gradlew micronautMongodbAsynchronousBuild || EXIT_STATUS=$?
-#
-#if [ $EXIT_STATUS -ne 0 ]; then
-#  exit $EXIT_STATUS
-#fi
-#
-#
-#./gradlew micronautMongodbSynchronousBuild || EXIT_STATUS=$?
-#
-#if [ $EXIT_STATUS -ne 0 ]; then
-#  exit $EXIT_STATUS
-#fi
+#### MongoDB
+####./gradlew micronautDataMongodbAsynchronousBuild || EXIT_STATUS=$?
+####
+####if [ $EXIT_STATUS -ne 0 ]; then
+####  exit $EXIT_STATUS
+####fi
+####
+####
+####./gradlew micronautDataMongodbSynchronousBuild || EXIT_STATUS=$?
+####
+####if [ $EXIT_STATUS -ne 0 ]; then
+####  exit $EXIT_STATUS
+####fi
+####
+####
+####./gradlew micronautMongodbAsynchronousBuild || EXIT_STATUS=$?
+####
+####if [ $EXIT_STATUS -ne 0 ]; then
+####  exit $EXIT_STATUS
+####fi
+####
+####
+####./gradlew micronautMongodbSynchronousBuild || EXIT_STATUS=$?
+####
+####if [ $EXIT_STATUS -ne 0 ]; then
+####  exit $EXIT_STATUS
+####fi
 
 
 
-# Object Storage
+#### Object Storage
 ./gradlew micronautObjectStorageAwsBuild || EXIT_STATUS=$?
 
 if [ $EXIT_STATUS -ne 0 ]; then
@@ -797,7 +797,7 @@ fi
 
 
 
-# OpenAPI
+#### OpenAPI
 ./gradlew micronautOpenapiAdocBuild || EXIT_STATUS=$?
 
 if [ $EXIT_STATUS -ne 0 ]; then
@@ -805,18 +805,18 @@ if [ $EXIT_STATUS -ne 0 ]; then
 fi
 
 
-#./gradlew micronautOpenapiGeneratorClientBuild || EXIT_STATUS=$?
-#
-#if [ $EXIT_STATUS -ne 0 ]; then
-#  exit $EXIT_STATUS
-#fi
-#
-#
-#./gradlew micronautOpenapiGeneratorServerBuild || EXIT_STATUS=$?
-#
-#if [ $EXIT_STATUS -ne 0 ]; then
-#  exit $EXIT_STATUS
-#fi
+####./gradlew micronautOpenapiGeneratorClientBuild || EXIT_STATUS=$?
+####
+####if [ $EXIT_STATUS -ne 0 ]; then
+####  exit $EXIT_STATUS
+####fi
+####
+####
+####./gradlew micronautOpenapiGeneratorServerBuild || EXIT_STATUS=$?
+####
+####if [ $EXIT_STATUS -ne 0 ]; then
+####  exit $EXIT_STATUS
+####fi
 
 
 ./gradlew micronautOpenapiSwaggerUiBuild || EXIT_STATUS=$?
@@ -827,7 +827,7 @@ fi
 
 
 
-# Patterns
+#### Patterns
 ./gradlew micronautPatternsCompositeBuild || EXIT_STATUS=$?
 
 if [ $EXIT_STATUS -ne 0 ]; then
@@ -836,7 +836,7 @@ fi
 
 
 
-# Registry
+#### Registry
 ./gradlew micronautPushToGithubContainerRegistryBuild || EXIT_STATUS=$?
 
 if [ $EXIT_STATUS -ne 0 ]; then
@@ -859,7 +859,7 @@ fi
 
 
 
-# Scale to Zero Containers
+#### Scale to Zero Containers
 ./gradlew micronautGoogleCloudPlatformCloudRunBuild || EXIT_STATUS=$?
 
 if [ $EXIT_STATUS -ne 0 ]; then
@@ -875,7 +875,7 @@ fi
 
 
 
-# Scheduling
+#### Scheduling
 ./gradlew micronautAwsLambdaEventbridgeEventBuild || EXIT_STATUS=$?
 
 if [ $EXIT_STATUS -ne 0 ]; then
@@ -891,14 +891,14 @@ fi
 
 
 
-# Schema Migration
+#### Schema Migration
 ./gradlew micronautFlywayBuild || EXIT_STATUS=$?
 
 if [ $EXIT_STATUS -ne 0 ]; then
   exit $EXIT_STATUS
 fi
 
-# Secrets Manager
+#### Secrets Manager
 ./gradlew micronautAwsSecretsmanagerBuild || EXIT_STATUS=$?
 
 if [ $EXIT_STATUS -ne 0 ]; then
@@ -935,7 +935,7 @@ fi
 
 
 
-# Serverless
+#### Serverless
 ./gradlew micronautAzureHttpFunctionsBuild || EXIT_STATUS=$?
 
 if [ $EXIT_STATUS -ne 0 ]; then
@@ -943,11 +943,11 @@ if [ $EXIT_STATUS -ne 0 ]; then
 fi
 
 
-#./gradlew micronautGoogleCloudHttpFunctionBuild || EXIT_STATUS=$?
-#
-#if [ $EXIT_STATUS -ne 0 ]; then
-#  exit $EXIT_STATUS
-#fi
+####./gradlew micronautGoogleCloudHttpFunctionBuild || EXIT_STATUS=$?
+####
+####if [ $EXIT_STATUS -ne 0 ]; then
+####  exit $EXIT_STATUS
+####fi
 
 
 ./gradlew micronautOracleFunctionBuild || EXIT_STATUS=$?
@@ -957,15 +957,15 @@ if [ $EXIT_STATUS -ne 0 ]; then
 fi
 
 
-#./gradlew micronautOracleFunctionHttpBuild || EXIT_STATUS=$?
-#
-#if [ $EXIT_STATUS -ne 0 ]; then
-#  exit $EXIT_STATUS
-#fi
+####./gradlew micronautOracleFunctionHttpBuild || EXIT_STATUS=$?
+####
+####if [ $EXIT_STATUS -ne 0 ]; then
+####  exit $EXIT_STATUS
+####fi
 
 
 
-# Service Discovery
+#### Service Discovery
 ./gradlew micronautK8sBuild || EXIT_STATUS=$?
 
 if [ $EXIT_STATUS -ne 0 ]; then
@@ -1010,7 +1010,7 @@ fi
 
 
 
-# Static Resources
+#### Static Resources
 ./gradlew micronautStaticResourcesBuild || EXIT_STATUS=$?
 
 if [ $EXIT_STATUS -ne 0 ]; then
@@ -1019,7 +1019,7 @@ fi
 
 
 
-# Testing
+#### Testing
 ./gradlew micronautRestAssuredBuild || EXIT_STATUS=$?
 
 if [ $EXIT_STATUS -ne 0 ]; then
@@ -1056,25 +1056,25 @@ fi
 
 
 
-# Turbo
-#./gradlew hotwireTurboMicronautChatBuild || EXIT_STATUS=$?
-#
-#if [ $EXIT_STATUS -ne 0 ]; then
-#  exit $EXIT_STATUS
-#fi
-#
-#
-#./gradlew micronautTurboNativeBuild || EXIT_STATUS=$?
-#
-#if [ $EXIT_STATUS -ne 0 ]; then
-#  exit $EXIT_STATUS
-#fi
+#### Turbo
+####./gradlew hotwireTurboMicronautChatBuild || EXIT_STATUS=$?
+####
+####if [ $EXIT_STATUS -ne 0 ]; then
+####  exit $EXIT_STATUS
+####fi
+####
+####
+####./gradlew micronautTurboNativeBuild || EXIT_STATUS=$?
+####
+####if [ $EXIT_STATUS -ne 0 ]; then
+####  exit $EXIT_STATUS
+####fi
 
 
 
-# Uncategorized
+#### Uncategorized
 
-# Validation
+#### Validation
 ./gradlew micronautCustomValidationAnnotationBuild || EXIT_STATUS=$?
 
 if [ $EXIT_STATUS -ne 0 ]; then
@@ -1090,7 +1090,7 @@ fi
 
 
 
-# Views
+#### Views
 ./gradlew micronautViewsThymeleafBuild || EXIT_STATUS=$?
 
 if [ $EXIT_STATUS -ne 0 ]; then
@@ -1106,7 +1106,7 @@ fi
 
 
 
-# WebSockets
+#### WebSockets
 ./gradlew micronautWebsocketBuild || EXIT_STATUS=$?
 
 if [ $EXIT_STATUS -ne 0 ]; then
@@ -1115,7 +1115,7 @@ fi
 
 
 
-# i18n
+#### i18n
 ./gradlew localizedMessageSourceBuild || EXIT_STATUS=$?
 
 if [ $EXIT_STATUS -ne 0 ]; then
@@ -1124,7 +1124,7 @@ fi
 
 
 
-# AWS Lambda
+#### AWS Lambda
 ./gradlew micronautAwsLambdaEventbridgeEventBuild || EXIT_STATUS=$?
 
 if [ $EXIT_STATUS -ne 0 ]; then
@@ -1196,7 +1196,7 @@ fi
 
 
 
-# Authorization Code
+#### Authorization Code
 ./gradlew micronautCloudOidcOracleBuild || EXIT_STATUS=$?
 
 if [ $EXIT_STATUS -ne 0 ]; then
@@ -1275,7 +1275,7 @@ fi
 
 
 
-# Beyond JSON
+#### Beyond JSON
 ./gradlew micronautFileDownloadExcelBuild || EXIT_STATUS=$?
 
 if [ $EXIT_STATUS -ne 0 ]; then
@@ -1298,7 +1298,7 @@ fi
 
 
 
-# Boot to Micronaut Building a REST API
+#### Boot to Micronaut Building a REST API
 ./gradlew buildingARestApiSpringBootVsMicronautDataBuild || EXIT_STATUS=$?
 
 if [ $EXIT_STATUS -ne 0 ]; then
@@ -1342,7 +1342,7 @@ fi
 
 
 
-# Client Credentials
+#### Client Credentials
 ./gradlew micronautOauth2ClientCredentialsAuth0Build || EXIT_STATUS=$?
 
 if [ $EXIT_STATUS -ne 0 ]; then
@@ -1365,7 +1365,7 @@ fi
 
 
 
-# Coordinated Restore at Checkpoint
+#### Coordinated Restore at Checkpoint
 ./gradlew micronautCracGoogleCloudPlatformCloudRunBuild || EXIT_STATUS=$?
 
 if [ $EXIT_STATUS -ne 0 ]; then
@@ -1379,7 +1379,7 @@ if [ $EXIT_STATUS -ne 0 ]; then
   exit $EXIT_STATUS
 fi
 
-# Spring Boot
+#### Spring Boot
 ./gradlew micronautSpringBootBuild || EXIT_STATUS=$?
 
 if [ $EXIT_STATUS -ne 0 ]; then
