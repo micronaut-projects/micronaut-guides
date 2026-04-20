@@ -18,12 +18,14 @@ package example.micronaut;
 import io.micronaut.core.annotation.Creator;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.annotation.Nullable;
+import io.micronaut.core.annotation.ReflectiveAccess;
 import io.micronaut.serde.annotation.Serdeable;
 import org.bson.codecs.pojo.annotations.BsonCreator;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 
 import jakarta.validation.constraints.NotBlank;
 
+@ReflectiveAccess
 @Serdeable // <1>
 public class Fruit {
 
