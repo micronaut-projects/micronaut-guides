@@ -82,13 +82,21 @@ public final class GuideUtils {
         return app.features();
     }
 
-    public static boolean shouldSkip(Guide guide, BuildTool buildTool) {
+    public static boolean isSupported(BuildTool buildTool, Language language) {
+        return !(buildTool == BuildTool.MAVEN && language == Language.KOTLIN);
+    }
+
+    public static boolean shouldSkip(Guide guide, BuildTool buildTool, Language language) {
+        if (!isSupported(buildTool, language)) {
+            return true;
+        }
         if (BuildTool.valuesGradle().contains(buildTool)) {
             return guide.skipGradleTests();
         }
         if (buildTool == BuildTool.MAVEN) {
             return guide.skipMavenTests();
         }
+
         return false;
     }
 

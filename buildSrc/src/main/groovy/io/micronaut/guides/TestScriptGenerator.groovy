@@ -156,7 +156,7 @@ kill_kotlin_daemon () {
                 String folder = GuideProjectGenerator.folderName(metadata.slug(), guidesOption)
                 BuildTool buildTool = folder.containsIgnoreCase(MAVEN.toString()) ? MAVEN : GRADLE
                 if (metadata.apps().any { it.name() == DEFAULT_APP_NAME } ) {
-                    if (GuideUtils.shouldSkip(metadata,buildTool)) {
+                    if (GuideUtils.shouldSkip(metadata,buildTool, guidesOption.getLanguage())) {
                         continue
                     }
                     def defaultApp = metadata.apps().find { it.name() == DEFAULT_APP_NAME }
@@ -171,7 +171,7 @@ kill_kotlin_daemon () {
 cd $folder
 """
                     for (App app : metadata.apps()) {
-                        if (GuideUtils.shouldSkip(metadata,buildTool)) {
+                        if (GuideUtils.shouldSkip(metadata,buildTool, guidesOption.getLanguage())) {
                             continue
                         }
                         if (!nativeTest || supportsNativeTest(app, guidesOption)) {
