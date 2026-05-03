@@ -25,6 +25,8 @@ import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.Produces;
 import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
+import io.micronaut.security.annotation.Secured;
+import io.micronaut.security.rules.SecurityRule;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.annotation.security.PermitAll;
 import jakarta.inject.Inject;
@@ -41,7 +43,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @Property(name = "spec.name", value = "BookInfoTest") // <2>
 @MicronautTest
 public class BookInfoTest {
-//end::annotations[]
+    //end::annotations[]
     //tag::requiredProperties[]
     @Inject
     Validator validator; // <1>
@@ -115,7 +117,7 @@ public class BookInfoTest {
     @Requires(property = "spec.name", value = "BookInfoTest") // <3>
     @Controller("/bookinfo") // <1>
     static class BookInfoSerdeController {
-        @PermitAll
+        @Secured(SecurityRule.IS_ANONYMOUS)
         @Get
         BookInfo index() { // <4>
             return new BookInfo("Alice's Adventures in Wonderland", BookAvailability.AVAILABLE)

@@ -26,6 +26,8 @@ import io.micronaut.http.annotation.QueryValue;
 import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.http.uri.UriBuilder;
+import io.micronaut.security.annotation.Secured;
+import io.micronaut.security.rules.SecurityRule;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.annotation.security.PermitAll;
 import jakarta.inject.Inject;
@@ -73,7 +75,7 @@ public class BookAvailabilityTest {
     @Requires(property = "spec.name", value = "BookAvailabilityTest") // <5>
     @Controller("/bookavailability") // <3>
     static class BookAvailabilityController {
-        @PermitAll
+        @Secured(SecurityRule.IS_ANONYMOUS)
         @Produces(MediaType.TEXT_PLAIN)
         @Get // <4>
         String index(@QueryValue BookAvailability availability) {
