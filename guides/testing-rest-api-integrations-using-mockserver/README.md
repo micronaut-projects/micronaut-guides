@@ -1,0 +1,2 @@
+test are ignored because `dependencyInsight` showed the classpath problem: mockserver-client-java:5.15.0 expects com.networknt:json-schema-validator:1.0.76, but the Micronaut platform constraint was upgrading it to 3.0.2.
+MockServer 5.15.0 still calls the 1.x API, so the class is missing.
