@@ -41,12 +41,12 @@ class MicronautguideControllerTest {
         MockData.instanceLifecycleState = Running;
 
         val response = FnHttpTest.invoke( // <3>
-                HttpRequest.GET<Any>("/compute/status/$instanceOcid"),
-                SHARED_CLASSES)
+            HttpRequest.GET<Any>("/compute/status/$instanceOcid"),
+            SHARED_CLASSES)
         assertEquals(OK, response.status())
         assertEquals(
-                "{\"lifecycleState\":\"Running\",\"ocid\":\"$instanceOcid\"}", // <4>
-                response.body())
+            "{\"lifecycleState\":\"Running\",\"ocid\":\"$instanceOcid\"}", // <4>
+            response.body())
     }
 
     @Test
@@ -56,13 +56,13 @@ class MicronautguideControllerTest {
         MockData.instanceLifecycleState = Stopped;
 
         val response = FnHttpTest.invoke(
-                HttpRequest.POST<Any?>("/compute/start/$instanceOcid", null),
-                SHARED_CLASSES)
+            HttpRequest.POST("/compute/start/$instanceOcid", ""),
+            SHARED_CLASSES)
 
         assertEquals(OK, response.status())
         assertEquals(
-                "{\"lifecycleState\":\"Starting\",\"ocid\":\"$instanceOcid\"}",
-                response.body())
+            "{\"lifecycleState\":\"Starting\",\"ocid\":\"$instanceOcid\"}",
+            response.body())
     }
 
     @Test
@@ -72,13 +72,13 @@ class MicronautguideControllerTest {
         MockData.instanceLifecycleState = Running;
 
         val response = FnHttpTest.invoke(
-                HttpRequest.POST<Any?>("/compute/stop/$instanceOcid", null),
-                SHARED_CLASSES)
+            HttpRequest.POST("/compute/stop/$instanceOcid", ""),
+            SHARED_CLASSES)
 
         assertEquals(OK, response.status())
         assertEquals(
-                "{\"lifecycleState\":\"Stopping\",\"ocid\":\"$instanceOcid\"}",
-                response.body())
+            "{\"lifecycleState\":\"Stopping\",\"ocid\":\"$instanceOcid\"}",
+            response.body())
     }
 
     @AfterEach
@@ -88,7 +88,7 @@ class MicronautguideControllerTest {
 
     companion object {
         private val SHARED_CLASSES = listOf( // <1>
-                MockData::class.java,
-                LifecycleState::class.java)
+            MockData::class.java,
+            LifecycleState::class.java)
     }
 }
