@@ -1,0 +1,123 @@
+common:header.adoc[]
+
+Micronaut Control Panel provides a browser UI for viewing and managing the state of a Micronaut application during development.
+
+In this guide, you will add Control Panel to an application, run it with the `dev` environment, and use the browser UI to inspect routes, health information, and logging configuration.
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+common:create-app-features.adoc[]
+
+== Control Panel Dependencies
+
+The `control-panel` feature adds the Control Panel UI as a development-only dependency in Gradle projects and as a provided dependency in Maven projects.
+It also adds the Control Panel management module and the Micronaut Management dependency, which provide management-backed panels.
+
+:exclude-for-build:maven
+
+.build.gradle
+[source,groovy]
+----
+developmentOnly("io.micronaut.controlpanel:micronaut-control-panel-ui")
+developmentOnly("io.micronaut.controlpanel:micronaut-control-panel-management")
+----
+
+:exclude-for-build:
+:exclude-for-build:gradle
+
+.pom.xml
+[source,xml]
+----
+<dependency>
+  <groupId>io.micronaut.controlpanel</groupId>
+  <artifactId>micronaut-control-panel-ui</artifactId>
+  <scope>provided</scope>
+</dependency>
+<dependency>
+  <groupId>io.micronaut.controlpanel</groupId>
+  <artifactId>micronaut-control-panel-management</artifactId>
+  <scope>provided</scope>
+</dependency>
+----
+
+:exclude-for-build:
+
+dependency:micronaut-management[]
+
+== Development Configuration
+
+Control Panel is enabled by default in the `dev` and `test` environments.
+The `control-panel` feature creates development-only endpoint configuration so the management-backed panels can read the information they display.
+
+resource:application-dev.properties[tag=control-panel]
+
+<1> Enables management endpoints in the `dev` environment.
+<2> Makes management endpoints accessible to the local development Control Panel.
+<3> Shows health details in the health panel.
+<4> Allows the loggers panel to update logger levels.
+
+IMPORTANT: Keep this configuration in an environment-specific file such as `application-dev.properties`.
+Do not expose sensitive management endpoints publicly in production.
+
+== Application
+
+`Application.@languageextension@` is used when running the application via Gradle or Maven.
+You can also run the main class directly within your IDE.
+
+source:Application[]
+
+external:hello-base/hellocontroller.adoc[]
+
+external:hello-base/hellotest.adoc[]
+
+common:testApp.adoc[]
+
+== Run the Application
+
+:exclude-for-build:maven
+
+Run the application with the `dev` environment:
+
+[source,bash]
+----
+MICRONAUT_ENVIRONMENTS=dev ./gradlew run
+----
+
+:exclude-for-build:
+:exclude-for-build:gradle
+
+Run the application with the `dev` environment:
+
+[source,bash]
+----
+MICRONAUT_ENVIRONMENTS=dev ./mvnw mn:run
+----
+
+:exclude-for-build:
+
+Open http://localhost:8080/control-panel[] in your browser.
+
+The dashboard lists the available panels for the running application.
+Use the routes panel to verify that the `/hello` route is available.
+Use the health panel to verify that the application health is `UP`.
+Use the loggers panel to inspect and change logger levels while the application is running.
+
+You can also verify the `/hello` route from the command line:
+
+[source,bash]
+----
+curl localhost:8080/hello
+----
+
+[source]
+----
+Hello World
+----
+
+== Next Steps
+
+Read more about the https://micronaut-projects.github.io/micronaut-control-panel/latest/guide/[Micronaut Control Panel] and Micronaut https://docs.micronaut.io/latest/guide/#management[Management and Monitoring].
+
+common:helpWithMicronaut.adoc[]
