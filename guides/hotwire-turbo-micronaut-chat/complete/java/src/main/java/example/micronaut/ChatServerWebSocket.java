@@ -19,6 +19,7 @@ import io.micronaut.context.event.ApplicationEventListener;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.io.Writable;
 import example.micronaut.models.RoomMessage;
+import io.micronaut.http.HttpRequest;
 import io.micronaut.views.turbo.TurboStream;
 import io.micronaut.views.turbo.TurboStreamAction;
 import io.micronaut.views.turbo.TurboStreamRenderer;
@@ -50,12 +51,12 @@ import java.util.function.Predicate;
 public class ChatServerWebSocket implements ApplicationEventListener<RoomMessage> {
     private static final Logger LOG = LoggerFactory.getLogger(ChatServerWebSocket.class);
     private final WebSocketBroadcaster broadcaster;
-    private final TurboStreamRenderer turboStreamRenderer;
+    private final TurboStreamRenderer<HttpRequest<?>> turboStreamRenderer;
 
     private Map<String, Set<String>> roomSessions = new ConcurrentHashMap<>();
 
     ChatServerWebSocket(WebSocketBroadcaster broadcaster, // <2>
-                        TurboStreamRenderer turboStreamRenderer) {
+                        TurboStreamRenderer<HttpRequest<?>> turboStreamRenderer) {
         this.broadcaster = broadcaster;
         this.turboStreamRenderer = turboStreamRenderer;
     }

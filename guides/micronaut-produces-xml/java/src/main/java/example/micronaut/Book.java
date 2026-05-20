@@ -15,9 +15,9 @@
  */
 package example.micronaut;
 
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import io.micronaut.core.annotation.Introspected;
+import tools.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import tools.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
 @Introspected // <1>
 @JacksonXmlRootElement(localName = "book") // <2>

@@ -4,7 +4,7 @@ import io.micronaut.context.annotation.ConfigurationProperties;
 import io.micronaut.starter.options.JdkVersion;
 
 import java.util.List;
-import static io.micronaut.starter.options.JdkVersion.JDK_21;
+import static io.micronaut.starter.options.JdkVersion.JDK_25;
 
 @ConfigurationProperties(GuidesConfigurationProperties.PREFIX)
 public class GuidesConfigurationProperties implements GuidesConfiguration {
@@ -19,8 +19,8 @@ public class GuidesConfigurationProperties implements GuidesConfiguration {
     private static final String API_URL = "https://docs.micronaut.io/latest/api";
     private static final String DEFAULT_VERSION = "classpath:version.txt";
     private static final String DEFAULT_ENV_JDK_VERSION = "JDK_VERSION";
-    private static final JdkVersion DEFAULT_JAVA_VERSION = JDK_21;
-    private static final List<JdkVersion> DEFAULT_JDK_VERSIONS_SUPPORTED_BY_GRAALVM = List.of(JDK_21);
+    private static final JdkVersion DEFAULT_JAVA_VERSION = JDK_25;
+    private static final List<JdkVersion> DEFAULT_JDK_VERSIONS_SUPPORTED_BY_GRAALVM = List.of(JDK_25);
     private static final String GITHUB_WORKFLOW_JAVA_CI = "Java CI";
     private static final String ENV_GITHUB_WORKFLOW = "GITHUB_WORKFLOW";
     private static final String SYS_PROP_MICRONAUT_GUIDE = "micronaut.guide";

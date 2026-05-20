@@ -62,7 +62,7 @@ class GithubControllerTest {
         assertEquals(HttpStatus.OK, rsp.status)   // <6>
         val releases = rsp.body()
         assertNotNull(releases)
-        assertReleases(releases.toList()) // <7>
+        assertReleases(releases!!.toList()) // <7>
     }
 
     fun assertReleases(releases: List<GithubRelease>) {

@@ -19,14 +19,12 @@ import io.micronaut.context.annotation.Replaces
 import io.micronaut.context.event.ApplicationEvent
 import io.micronaut.context.event.ApplicationEventPublisher
 import io.micronaut.core.async.annotation.SingleResult
-import io.micronaut.http.HttpRequest
-import io.micronaut.http.HttpResponse
-import io.micronaut.http.HttpStatus
-import io.micronaut.http.MediaType
-import io.micronaut.http.MutableHttpResponse
+import io.micronaut.http.*
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Part
 import io.micronaut.http.annotation.Post
+import io.micronaut.http.server.util.HttpHostResolver
+import io.micronaut.http.server.util.locale.HttpLocaleResolver
 import io.micronaut.security.authentication.AuthenticationRequest
 import io.micronaut.security.authentication.AuthenticationResponse
 import io.micronaut.security.authentication.Authenticator
@@ -40,6 +38,8 @@ import reactor.core.publisher.Flux
 @Replaces(LoginController::class)
 @Controller("/login")
 class AuthLoginController(
+    val httpHostResolver: HttpHostResolver,
+    val httpLocaleResolver: HttpLocaleResolver,
     val authenticator: Authenticator<HttpRequest<*>>,
     val loginHandler: LoginHandler<HttpRequest<*>, MutableHttpResponse<*>>,
     val eventPublisher: ApplicationEventPublisher<ApplicationEvent>
@@ -47,19 +47,21 @@ class AuthLoginController(
 
     @SingleResult
     @Post(consumes = [MediaType.TEXT_HTML, MediaType.MULTIPART_FORM_DATA], produces = [MediaType.TEXT_HTML])
-    fun login(@Part name: String?, request: HttpRequest<*>?): Publisher<MutableHttpResponse<*>> {
+    fun login(@Part name: String?, request: HttpRequest<*>): Publisher<MutableHttpResponse<*>> {
         val auth = object: AuthenticationRequest<String, String> {
             override fun getIdentity() = name ?: ""
             override fun getSecret() = ""
         }
         return Flux.from(authenticator.authenticate(request, auth))
             .map { authenticationResponse: AuthenticationResponse ->
+                val locale = httpLocaleResolver.resolveOrDefault(request)
+                val host = httpHostResolver.resolve(request)
                 if (authenticationResponse.isAuthenticated && authenticationResponse.authentication.isPresent) {
                     val authentication = authenticationResponse.authentication.get()
-                    eventPublisher.publishEvent(LoginSuccessfulEvent(auth))
+                    eventPublisher.publishEvent(LoginSuccessfulEvent(auth, host, locale))
                     return@map loginHandler.loginSuccess(authentication, request)
                 } else {
-                    this.eventPublisher.publishEvent(LoginFailedEvent(auth))
+                    this.eventPublisher.publishEvent(LoginFailedEvent(authenticationResponse, auth, host, locale))
                     return@map loginHandler.loginFailed(authenticationResponse, request)
                 }
             }.defaultIfEmpty(HttpResponse.status(HttpStatus.UNAUTHORIZED))

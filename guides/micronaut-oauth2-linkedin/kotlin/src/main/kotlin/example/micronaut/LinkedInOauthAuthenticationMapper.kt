@@ -15,7 +15,6 @@
  */
 package example.micronaut
 
-import io.micronaut.core.annotation.Nullable
 import io.micronaut.http.HttpHeaderValues.AUTHORIZATION_PREFIX_BEARER
 import io.micronaut.security.authentication.AuthenticationResponse
 import io.micronaut.security.oauth2.endpoint.authorization.state.State
@@ -30,14 +29,17 @@ import reactor.core.publisher.Mono
 @Singleton // <2>
 class LinkedInOauthAuthenticationMapper(private val linkedInApiClient: LinkedInApiClient) : OauthAuthenticationMapper {  // <3>
 
-    override fun createAuthenticationResponse(tokenResponse: TokenResponse,
-                                              @Nullable state: State): Publisher<AuthenticationResponse> =
-
-        Mono.from(linkedInApiClient.me(AUTHORIZATION_PREFIX_BEARER + ' ' + tokenResponse.accessToken))
-                .map { (username, localizedFirstName, localizedLastName): LinkedInMe ->
-                    val attributes = mapOf(
-                            "firstName" to localizedFirstName,
-                            "lastName" to localizedLastName)
-                    AuthenticationResponse.success(username, emptyList(), attributes)
-                }
+    override fun createAuthenticationResponse(
+        tokenResponse: TokenResponse?,
+        state: State?
+    ): Publisher<AuthenticationResponse> {
+        return Mono.from(linkedInApiClient.me(AUTHORIZATION_PREFIX_BEARER + ' ' + tokenResponse!!.accessToken))
+            .map { (username, localizedFirstName, localizedLastName): LinkedInMe ->
+                val attributes = mapOf(
+                    "firstName" to localizedFirstName,
+                    "lastName" to localizedLastName
+                )
+                AuthenticationResponse.success(username, emptyList(), attributes)
+            }
+    }
 }

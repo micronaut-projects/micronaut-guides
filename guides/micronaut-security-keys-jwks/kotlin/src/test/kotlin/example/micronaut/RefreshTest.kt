@@ -36,7 +36,7 @@ class RefreshTest {
 
     @Test
     fun refreshEndpointIsExposed() {
-        assertDoesNotThrow<HttpResponse<Any?>> {
+        assertDoesNotThrow<HttpResponse<Any>> {
             httpClient.toBlocking().exchange(HttpRequest.POST("/refresh", emptyMap<Any, Any>()))
         }
     }

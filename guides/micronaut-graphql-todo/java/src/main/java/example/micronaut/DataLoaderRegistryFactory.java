@@ -17,7 +17,7 @@ package example.micronaut;
 
 import io.micronaut.context.annotation.Factory;
 import io.micronaut.runtime.http.scope.RequestScope;
-import org.dataloader.DataLoader;
+import org.dataloader.DataLoaderFactory;
 import org.dataloader.DataLoaderRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +33,7 @@ public class DataLoaderRegistryFactory {
         DataLoaderRegistry dataLoaderRegistry = new DataLoaderRegistry();
         dataLoaderRegistry.register(
                 "author",
-                DataLoader.newMappedDataLoader(authorDataLoader)
+                DataLoaderFactory.newMappedDataLoader(authorDataLoader)
         ); // <3>
 
         LOG.trace("Created new data loader registry");

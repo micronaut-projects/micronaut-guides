@@ -33,7 +33,7 @@ import java.util.List;
 import static io.micronaut.core.util.StringUtils.EMPTY_STRING;
 import static io.micronaut.http.HttpStatus.BAD_REQUEST;
 import static io.micronaut.starter.options.BuildTool.GRADLE;
-import static io.micronaut.starter.options.JdkVersion.JDK_8;
+import static io.micronaut.starter.options.JdkVersion.JDK_25;
 
 @Singleton
 public class DefaultGuideProjectGenerator implements GuideProjectGenerator {
@@ -142,7 +142,7 @@ public class DefaultGuideProjectGenerator implements GuideProjectGenerator {
                         lang,
                         testFramework != null ? testFramework.toTestFramework() : null,
                         buildTool == null ? GRADLE : buildTool,
-                        javaVersion != null ? javaVersion : JDK_8).withFramework(framework),
+                        javaVersion != null ? javaVersion : JDK_25).withFramework(framework),
                 null,
                 features != null ? features : Collections.emptyList(),
                 ConsoleOutput.NOOP

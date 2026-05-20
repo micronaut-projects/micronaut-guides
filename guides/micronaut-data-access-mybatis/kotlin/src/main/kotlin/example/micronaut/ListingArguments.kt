@@ -30,18 +30,10 @@ class ListingArguments(
     @field:Pattern(regexp = "asc|ASC|desc|DESC") var order: String? = null
 ) {
     fun of(uriBuilder: UriBuilder): URI {
-        if (max != null) {
-            uriBuilder.queryParam("max", max)
-        }
-        if (order != null) {
-            uriBuilder.queryParam("order", order)
-        }
-        if (offset != null) {
-            uriBuilder.queryParam("offset", offset)
-        }
-        if (sort != null) {
-            uriBuilder.queryParam("sort", sort)
-        }
+        max?.let { uriBuilder.queryParam("max", it) }
+        order?.let { uriBuilder.queryParam("order", it) }
+        offset?.let { uriBuilder.queryParam("offset", it) }
+        sort?.let { uriBuilder.queryParam("sort", it) }
         return uriBuilder.build()
     }
 

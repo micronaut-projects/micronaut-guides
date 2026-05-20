@@ -15,43 +15,65 @@
  */
 package example.micronaut;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.test.web.servlet.client.EntityExchangeResult;
+import org.springframework.test.web.servlet.client.RestTestClient;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT) // <1>
 class SecurityTest {
 
-    @Autowired // <2>
-    TestRestTemplate restTemplate; // <3>
+    @LocalServerPort // <2>
+    int port;
+
+    RestTestClient restTestClient; // <3>
+
+    @BeforeEach
+    void setUp() {
+        restTestClient = RestTestClient.bindToServer()
+                .baseUrl("http://localhost:" + port)
+                .build();
+    }
 
     @Test
     void shouldNotAllowAccessToSaasSubscriptionsTheyDoNotOwn() {
-        ResponseEntity<String> response = restTemplate
-                .withBasicAuth("sarah1", "abc123") // <4>
-                .getForEntity("/subscriptions/102", String.class); // john's data
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        EntityExchangeResult<String> response = withBasicAuth("sarah1", "abc123") // <4>
+                .get()
+                .uri("/subscriptions/102") // john's data
+                .exchange()
+                .returnResult(String.class);
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
     @Test
     void shouldRejectUsersWhoAreNotSubscriptionOwners() {
-        ResponseEntity<String> response = restTemplate
-                .withBasicAuth("john-owns-no-subscriptions", "qrs456")
-                .getForEntity("/subscriptions/99", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+        EntityExchangeResult<String> response = withBasicAuth("john-owns-no-subscriptions", "qrs456")
+                .get()
+                .uri("/subscriptions/99")
+                .exchange()
+                .returnResult(String.class);
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.FORBIDDEN);
     }
 
     @Test
     void shouldNotReturnASaasSubscriptionWithAnUnknownId() {
-        ResponseEntity<String> response = restTemplate
-                .withBasicAuth("sarah1", "BAD-PASSWORD")
-                .getForEntity("/subscriptions/1000", String.class);
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
-        assertThat(response.getBody()).isBlank();
+        EntityExchangeResult<String> response = withBasicAuth("sarah1", "BAD-PASSWORD")
+                .get()
+                .uri("/subscriptions/1000")
+                .exchange()
+                .returnResult(String.class);
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.UNAUTHORIZED);
+        assertThat(response.getResponseBody() == null ? "" : response.getResponseBody()).isBlank();
+    }
+
+    private RestTestClient withBasicAuth(String username, String password) {
+        return restTestClient.mutate()
+                .defaultHeaders(headers -> headers.setBasicAuth(username, password))
+                .build();
     }
 }

@@ -21,7 +21,7 @@ import io.micronaut.context.exceptions.NoSuchBeanException
 
 class GithubFilterCondition : Condition { // <1>
 
-    override fun matches(context: ConditionContext<*>?): Boolean {
+    override fun matches(context: ConditionContext<*>): Boolean {
         if (context != null && context.beanContext != null) {
             try {
                 val githubConfiguration: GithubConfiguration =

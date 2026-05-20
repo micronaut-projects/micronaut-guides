@@ -15,7 +15,6 @@
  */
 package example.micronaut;
 
-import io.micronaut.core.annotation.NonNull;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.security.endpoints.LogoutControllerConfiguration;
 import io.micronaut.security.utils.SecurityService;
@@ -27,13 +26,14 @@ import io.micronaut.views.fields.elements.InputSubmitFormElement;
 import io.micronaut.views.fields.messages.Message;
 import io.micronaut.views.model.ViewModelProcessor;
 import jakarta.inject.Singleton;
+import org.jspecify.annotations.NonNull;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 @Singleton // <1>
-class LogoutFormViewModelProcessor  implements ViewModelProcessor<Map<String, Object>> { // <2>
+class LogoutFormViewModelProcessor  implements ViewModelProcessor<Map<String, Object>, HttpRequest<?>> { // <2>
 
     private static final String MODEL_KEY = "logoutForm";
 

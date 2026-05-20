@@ -48,7 +48,7 @@ public class FilesTransferUtilityTest {
         assertTrue(new File(outputPath + "/creating-your-first-micronaut-app-gradle-kotlin").exists());
         assertTrue(new File(outputPath + "/creating-your-first-micronaut-app-maven-groovy").exists());
         assertTrue(new File(outputPath + "/creating-your-first-micronaut-app-maven-java").exists());
-        assertTrue(new File(outputPath + "/creating-your-first-micronaut-app-maven-kotlin").exists());
+        assertFalse(new File(outputPath + "/creating-your-first-micronaut-app-maven-kotlin").exists());
 
         assertFalse(new File(outputPath + "/hello-base-gradle-groovy").exists());
         assertFalse(new File(outputPath + "/hello-base-gradle-java").exists());
@@ -62,14 +62,13 @@ public class FilesTransferUtilityTest {
         assertTrue(new File(outputPath + "/creating-your-first-micronaut-app-gradle-kotlin/src/main/kotlin/example/micronaut/HelloController.kt").exists());
         assertTrue(new File(outputPath + "/creating-your-first-micronaut-app-maven-groovy/src/main/groovy/example/micronaut/HelloController.groovy").exists());
         assertTrue(new File(outputPath + "/creating-your-first-micronaut-app-maven-java/src/main/java/example/micronaut/HelloController.java").exists());
-        assertTrue(new File(outputPath + "/creating-your-first-micronaut-app-maven-kotlin/src/main/kotlin/example/micronaut/HelloController.kt").exists());
+        assertFalse(new File(outputPath + "/creating-your-first-micronaut-app-maven-kotlin/src/main/kotlin/example/micronaut/HelloController.kt").exists());
 
         assertFalse(new File(outputPath + "/creating-your-first-micronaut-app-gradle-groovy/src/main/groovy/example/micronaut/Application.groovy").exists());
         assertFalse(new File(outputPath + "/creating-your-first-micronaut-app-gradle-java/src/main/java/example/micronaut/Application.java").exists());
         assertFalse(new File(outputPath + "/creating-your-first-micronaut-app-gradle-kotlin/src/main/kotlin/example/micronaut/Application.kt").exists());
         assertFalse(new File(outputPath + "/creating-your-first-micronaut-app-maven-groovy/src/main/groovy/example/micronaut/Application.groovy").exists());
         assertFalse(new File(outputPath + "/creating-your-first-micronaut-app-maven-java/src/main/java/example/micronaut/Application.java").exists());
-        assertFalse(new File(outputPath + "/creating-your-first-micronaut-app-maven-kotlin/src/main/kotlin/example/micronaut/Application.kt").exists());
     }
 
 }

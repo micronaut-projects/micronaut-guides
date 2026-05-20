@@ -170,7 +170,7 @@ class EmailControllerSpec extends Specification {
 
         then:
         'test.csv' == attachment.filename
-        TEXT_CSV == attachment.contentType
+        attachment.contentType.contains(TEXT_CSV)
         'test,email' == new String(attachment.content)
 
         when:

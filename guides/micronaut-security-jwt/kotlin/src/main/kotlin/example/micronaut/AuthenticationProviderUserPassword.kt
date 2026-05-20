@@ -23,14 +23,13 @@ import io.micronaut.security.authentication.provider.HttpRequestAuthenticationPr
 import jakarta.inject.Singleton
 
 @Singleton // <1>
-class AuthenticationProviderUserPassword<B> : HttpRequestAuthenticationProvider<B> { // <2>
-
+class AuthenticationProviderUserPassword<B : Any> : HttpRequestAuthenticationProvider<B> { // <2>
     override fun authenticate(
-        httpRequest: HttpRequest<B>?,
-        authenticationRequest: AuthenticationRequest<String, String>
+        requestContext: HttpRequest<B>?,
+        authenticationRequest: AuthenticationRequest<String?, String?>
     ): AuthenticationResponse {
         return if (authenticationRequest.identity == "sherlock" && authenticationRequest.secret == "password")
-            AuthenticationResponse.success(authenticationRequest.identity) else
+            AuthenticationResponse.success(authenticationRequest.identity!!) else
             AuthenticationResponse.failure(AuthenticationFailureReason.CREDENTIALS_DO_NOT_MATCH)
     }
 }

@@ -16,31 +16,25 @@
 package example.micronaut.repository;
 
 import example.micronaut.domain.Thing;
-import io.micronaut.context.ApplicationContext;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import io.micronaut.context.DefaultApplicationContextBuilder;
+import io.micronaut.core.annotation.NonNull;
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+import io.micronaut.test.support.TestPropertyProvider;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+@MicronautTest
 class ThingRepositoryTest {
-
-    private ApplicationContext applicationContext;
-    private ThingRepository thingRepository;
-
-    @BeforeEach
-    void setup() {
-        applicationContext = ApplicationContext.run();
-        thingRepository = applicationContext.getBean(ThingRepository.class);
-    }
-
     @Test
-    void testFindAll() {
+    void testFindAll(ThingRepository thingRepository) {
 
         // clear out existing data; safe because each
         // test runs in a transaction that's rolled back
@@ -64,7 +58,7 @@ class ThingRepositoryTest {
     }
 
     @Test
-    void testFindByName() {
+    void testFindByName(ThingRepository thingRepository) {
 
         String name = UUID.randomUUID().toString();
 
@@ -75,12 +69,5 @@ class ThingRepositoryTest {
         thing = thingRepository.findByName(name).orElse(null);
         assertNotNull(thing);
         assertEquals(name, thing.getName());
-    }
-
-    @AfterEach
-    void cleanup() {
-        if (applicationContext != null) {
-            applicationContext.close();
-        }
     }
 }

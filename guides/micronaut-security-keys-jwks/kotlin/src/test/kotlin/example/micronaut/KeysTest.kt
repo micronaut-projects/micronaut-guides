@@ -37,7 +37,7 @@ class KeysTest {
 
     @Test
     fun whenYouDefineABeanOfTypeJwkProviderThenTheKeysEndpointIsExposed() {
-        assertDoesNotThrow<HttpResponse<Any?>> {
+        assertDoesNotThrow<HttpResponse<Any>> {
             httpClient.toBlocking().exchange(HttpRequest.GET<Any>("/keys"))
         }
     }

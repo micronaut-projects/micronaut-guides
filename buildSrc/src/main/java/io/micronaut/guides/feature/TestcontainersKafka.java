@@ -7,7 +7,7 @@ import jakarta.inject.Singleton;
 public class TestcontainersKafka extends AbstractFeature {
 
     public TestcontainersKafka() {
-        super("testcontainers-kafka", "kafka");
+        super("testcontainers-kafka", "testcontainers-kafka");
     }
 
     @Override

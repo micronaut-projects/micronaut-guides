@@ -33,8 +33,8 @@ public interface UserJdbcRepository extends CrudRepository<UserEntity, Long> { /
                 u.username,
                 LISTAGG(r.authority, ',') WITHIN GROUP (ORDER BY r.authority) AS authorities
             FROM users u
-            LEFT JOIN user_role ur ON ur.id_user_id = u.id
-            LEFT JOIN role r ON r.id = ur.id_role_id
+            LEFT JOIN user_role ur ON ur.user_id = u.id
+            LEFT JOIN role r ON r.id = ur.role_id
             WHERE u.username = :username
             GROUP BY u.id, u.username
             """)

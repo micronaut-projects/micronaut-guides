@@ -1,6 +1,8 @@
 package io.micronaut.guides.feature;
 
 import io.micronaut.starter.application.generator.GeneratorContext;
+import io.micronaut.starter.build.dependencies.Dependency;
+import io.micronaut.starter.options.MicronautVersion;
 import jakarta.inject.Singleton;
 
 import static io.micronaut.starter.build.dependencies.Scope.TEST;
@@ -21,7 +23,17 @@ public class Geb extends AbstractFeature {
         if (generatorContext.getTestFramework().equals(JUNIT)) {
             addDependency(generatorContext, "geb-junit", TEST);
         } else if (generatorContext.getTestFramework().equals(SPOCK)) {
-            addDependency(generatorContext, "geb-spock", TEST);
+
+
+            generatorContext.addDependency(Dependency.builder()
+                    .groupId("org.apache.groovy.geb")
+                    .artifactId("geb-spock")
+                            .version("8.0.1")
+                    .scope(TEST)
+                    .exclude(Dependency.builder()
+                            .groupId("org.apache.groovy.geb")
+                            .artifactId("geb-implicit-assertions")
+                            .build()));
         }
     }
 }

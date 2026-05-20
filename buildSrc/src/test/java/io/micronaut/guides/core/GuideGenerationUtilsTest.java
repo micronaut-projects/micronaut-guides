@@ -50,7 +50,20 @@ class GuideGenerationUtilsTest {
 
         List<GuidesOption> result = GuideGenerationUtils.guidesOptions(guideMetadata, LOG);
 
-        assertEquals(4, result.size());
+        assertEquals(3, result.size());
+        assertFalse(result.stream()
+                .anyMatch(option -> option.getBuildTool() == BuildTool.MAVEN && option.getLanguage() == Language.KOTLIN));
+    }
+
+    @Test
+    void testGroovyGuideProjectGeneratorGuidesOptions() {
+        Guide guideMetadata = new Guide(null,null, null, null, null, null, null, null,false,false,null, List.of(Language.JAVA, Language.KOTLIN),null, List.of(BuildTool.GRADLE, BuildTool.MAVEN), TestFramework.JUNIT,null,null,true,null,null,null);
+
+        List<GuidesOption> result = io.micronaut.guides.GuideProjectGenerator.guidesOptions(guideMetadata);
+
+        assertEquals(3, result.size());
+        assertFalse(result.stream()
+                .anyMatch(option -> option.getBuildTool() == BuildTool.MAVEN && option.getLanguage() == Language.KOTLIN));
     }
 
     @Test

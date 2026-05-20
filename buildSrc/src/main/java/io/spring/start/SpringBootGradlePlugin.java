@@ -23,7 +23,7 @@ import io.micronaut.starter.feature.Feature;
 import io.micronaut.starter.feature.FeatureContext;
 import io.micronaut.starter.feature.GradleSpecificFeature;
 import io.micronaut.starter.feature.build.gradle.Gradle;
-import io.micronaut.starter.feature.build.gradle.templates.useJunitPlatform;
+import io.micronaut.starter.rocker.feature.build.gradle.templates.useJunitPlatform;
 import io.micronaut.starter.feature.test.TestFeature;
 import io.micronaut.starter.options.Options;
 import io.micronaut.starter.options.TestFramework;

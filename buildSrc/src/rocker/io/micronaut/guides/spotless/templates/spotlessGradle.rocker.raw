@@ -1,0 +1,33 @@
+@option discardLogicWhitespace=true
+@import io.micronaut.starter.options.Language
+@import java.util.List
+@import io.micronaut.starter.build.gradle.GradleDsl
+@args(GradleDsl dsl, List<Language> languages, String framework)
+spotless {
+@if(languages.contains(Language.JAVA)) {
+    java {
+        licenseHeaderFile(file("LICENSEHEADER"))
+    }
+}
+@if(languages.contains(Language.KOTLIN)) {
+    kotlin {
+        licenseHeaderFile(file("LICENSEHEADER"))
+    }
+}
+@if(languages.contains(Language.GROOVY)) {
+    groovy {
+        licenseHeaderFile(file("LICENSEHEADER"))
+    }
+}
+}
+@if (framework == "Micronaut") {
+@if (dsl == GradleDsl.GROOVY) {
+tasks.withType(io.micronaut.gradle.testresources.StartTestResourcesService).configureEach {
+    useClassDataSharing = false
+}
+} else {
+tasks.withType<io.micronaut.gradle.testresources.StartTestResourcesService>().configureEach {
+      useClassDataSharing.set(false)
+}
+}
+}

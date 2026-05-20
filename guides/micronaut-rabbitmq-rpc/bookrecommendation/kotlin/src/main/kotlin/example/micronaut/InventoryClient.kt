@@ -25,5 +25,5 @@ import reactor.core.publisher.Mono
 interface InventoryClient {
 
     @Binding("books.inventory")// <3>
-    fun stock(isbn: String): Mono<Boolean?> // <4>
+    fun stock(isbn: String): Mono<Boolean> // <4>
 }

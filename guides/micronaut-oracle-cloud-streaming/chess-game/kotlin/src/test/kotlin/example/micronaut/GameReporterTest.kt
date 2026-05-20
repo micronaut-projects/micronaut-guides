@@ -22,6 +22,7 @@ import io.micronaut.configuration.kafka.annotation.OffsetReset.EARLIEST
 import io.micronaut.configuration.kafka.annotation.Topic
 import io.micronaut.core.type.Argument
 import io.micronaut.http.HttpRequest
+import io.micronaut.http.HttpMethod
 import io.micronaut.http.MediaType.APPLICATION_FORM_URLENCODED_TYPE
 import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
@@ -235,7 +236,7 @@ class GameReporterTest : TestPropertyProvider { // <3>
 
     private fun endGame(gameId: String, winner: String?) {
         val uri = if (winner == null) "/game/draw/$gameId" else "/game/checkmate/$gameId/$winner"
-        val request: HttpRequest<Any?> = HttpRequest.POST(uri, null)
-        client.toBlocking().exchange<Any?, Any>(request) // <14>
+        val request: HttpRequest<Any> = HttpRequest.create(HttpMethod.POST, uri)
+        client.toBlocking().exchange<Any, Any>(request) // <14>
     }
 }

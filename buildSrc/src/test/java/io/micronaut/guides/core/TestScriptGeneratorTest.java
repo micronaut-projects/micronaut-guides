@@ -12,9 +12,9 @@ import java.util.List;
 
 import static io.micronaut.starter.options.BuildTool.GRADLE;
 import static io.micronaut.starter.options.BuildTool.MAVEN;
-import static org.gradle.internal.impldep.org.junit.Assert.assertFalse;
-import static org.gradle.internal.impldep.org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @MicronautTest(startApplication = false)
 public class TestScriptGeneratorTest {

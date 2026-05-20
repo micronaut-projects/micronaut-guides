@@ -26,8 +26,6 @@ import io.micronaut.security.token.claims.ClaimsGenerator
 import io.micronaut.security.token.jwt.signature.SignatureGeneratorConfiguration
 import io.micronaut.security.token.jwt.signature.rsa.RSASignatureGenerator
 import io.micronaut.security.token.jwt.validator.JsonWebTokenValidator
-import io.micronaut.security.token.jwt.validator.JwtTokenValidator
-import io.micronaut.security.token.validator.TokenValidator
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import jakarta.inject.Inject
 import spock.lang.Specification

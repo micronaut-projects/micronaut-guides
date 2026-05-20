@@ -54,7 +54,7 @@ class JwtAuthenticationTest(@Client("/") val client: HttpClient) { // <2>
             client.toBlocking().exchange(request, BearerAccessRefreshToken::class.java) // <5>
         assertEquals(OK, rsp.status)
 
-        val bearerAccessRefreshToken: BearerAccessRefreshToken = rsp.body()
+        val bearerAccessRefreshToken: BearerAccessRefreshToken = rsp.body()!!
         assertEquals("sherlock", bearerAccessRefreshToken.username)
         assertNotNull(bearerAccessRefreshToken.accessToken)
         assertTrue(JWTParser.parse(bearerAccessRefreshToken.accessToken) is SignedJWT)

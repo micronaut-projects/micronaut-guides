@@ -17,34 +17,53 @@ package example.micronaut;
 
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.test.web.servlet.client.ExchangeResult;
+import org.springframework.test.web.servlet.client.RestTestClient;
 
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT) // <1>
 class SaasSubscriptionPostControllerTest {
 
-    @Autowired // <2>
-    TestRestTemplate restTemplate;  // <3>
+    @LocalServerPort
+    private int port; // <2>
+
+    private RestTestClient restTestClient;  // <3>
+
+    @BeforeEach
+    void setUp() {
+        this.restTestClient = RestTestClient.bindToServer()
+                .baseUrl("http://localhost:" + this.port)
+                .build();
+    }
 
     @Test
     void shouldCreateANewSaasSubscription() {
         SaasSubscription newSaasSubscription = new SaasSubscription(null, "Advanced", 2500);
-        ResponseEntity<Void> createResponse = restTemplate.postForEntity("/subscriptions", newSaasSubscription, Void.class);
-        assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        ExchangeResult createResponse = restTestClient.post()
+                .uri("/subscriptions")
+                .body(newSaasSubscription)
+                .exchange()
+                .returnResult();
+        assertThat(createResponse.getStatus()).isEqualTo(HttpStatus.CREATED);
 
-        URI locationOfNewSaasSubscription = createResponse.getHeaders().getLocation();
-        ResponseEntity<String> getResponse = restTemplate.getForEntity(locationOfNewSaasSubscription, String.class);
-        assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+        URI locationOfNewSaasSubscription = createResponse.getResponseHeaders().getLocation();
+        ExchangeResult getResponse = restTestClient.get()
+                .uri(locationOfNewSaasSubscription.toString())
+                .exchange()
+                .returnResult();
+        assertThat(getResponse.getStatus()).isEqualTo(HttpStatus.OK);
 
-        DocumentContext documentContext = JsonPath.parse(getResponse.getBody());
+        DocumentContext documentContext = JsonPath.parse(
+                new String(getResponse.getResponseBodyContent(), StandardCharsets.UTF_8));
         Number id = documentContext.read("$.id");
         assertThat(id).isNotNull();
 
