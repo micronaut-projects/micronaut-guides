@@ -41,7 +41,7 @@ open class ThumbnailatorThumbnailGenerator(
                 .toOutputStream(byteArrayOutputStream)
             byteArrayOutputStream.toByteArray()
         } catch (e: IOException) {
-            LOG.warn("IOException thrown while generating the thumbnail")
+            LOG.warn("IOException thrown while generating the thumbnail", e)
             null
         }
     }

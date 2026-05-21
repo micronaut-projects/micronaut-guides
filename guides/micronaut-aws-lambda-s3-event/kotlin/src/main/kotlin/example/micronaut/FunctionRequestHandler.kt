@@ -46,22 +46,24 @@ class FunctionRequestHandler : MicronautRequestHandler<S3EventNotification, Void
                 if (index != -1) {
                     val format = key.substring(index + 1).lowercase(Locale.ENGLISH)
                     if (format == PNG || format == JPG) {
-                        thumbnailGenerator.thumbnail(
-                            s3Client.getObject(
-                                GetObjectRequest.builder()
-                                    .bucket(bucket)
-                                    .key(key)
-                                    .build()
-                            ),
-                            format
-                        )?.let { bytes ->
-                            s3Client.putObject(
-                                PutObjectRequest.builder()
-                                    .key(thumbnailKey(key))
-                                    .bucket(bucket)
-                                    .build(),
-                                RequestBody.fromBytes(bytes)
-                            )
+                        s3Client.getObject(
+                            GetObjectRequest.builder()
+                                .bucket(bucket)
+                                .key(key)
+                                .build()
+                        ).use { inputStream ->
+                            thumbnailGenerator.thumbnail(
+                                inputStream,
+                                format
+                            )?.let { bytes ->
+                                s3Client.putObject(
+                                    PutObjectRequest.builder()
+                                        .key(thumbnailKey(key))
+                                        .bucket(bucket)
+                                        .build(),
+                                    RequestBody.fromBytes(bytes)
+                                )
+                            }
                         }
                     }
                 }

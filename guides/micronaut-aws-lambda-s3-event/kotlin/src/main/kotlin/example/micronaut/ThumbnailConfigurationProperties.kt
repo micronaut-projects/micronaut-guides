@@ -16,14 +16,14 @@
 package example.micronaut
 
 import io.micronaut.context.annotation.ConfigurationProperties
-import jakarta.validation.constraints.NotNull
+import jakarta.validation.constraints.Positive
 
 @ConfigurationProperties("thumbnail") // <1>
 class ThumbnailConfigurationProperties : ThumbnailConfiguration {
 
-    @field:NotNull // <2>
+    @field:Positive // <2>
     override var width: Int = 0
 
-    @field:NotNull // <2>
+    @field:Positive // <2>
     override var height: Int = 0
 }
