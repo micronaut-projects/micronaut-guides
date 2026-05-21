@@ -22,12 +22,14 @@ import jakarta.validation.constraints.NotBlank
 
 @MappedEntity // <1>
 class Fruit(
+    @field:Id // <2>
+    @field:GeneratedValue
+    var id: String? = null,
+
     @field:NotBlank // <3>
     val name: String,
     var description: String?
 ) {
 
-    @field:Id // <2>
-    @field:GeneratedValue
-    var id: String? = null
+    constructor(name: String, description: String?) : this(null, name, description)
 }
