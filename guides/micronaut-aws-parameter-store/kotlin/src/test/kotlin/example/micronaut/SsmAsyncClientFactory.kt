@@ -33,7 +33,7 @@ class SsmAsyncClientFactory(private val config: SsmConfig) {
 
     @Primary
     @Singleton
-    fun createSecretsManagerClient(builder: SsmAsyncClientBuilder): SsmAsyncClient {
+    fun createSsmAsyncClient(builder: SsmAsyncClientBuilder): SsmAsyncClient {
         try {
             return builder
                 .endpointOverride(URI(config.ssm.endpointOverride!!))
