@@ -25,6 +25,7 @@ import io.micronaut.http.uri.UriBuilder
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import io.micronaut.test.support.TestPropertyProvider
 import jakarta.inject.Inject
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertThrows
@@ -59,6 +60,11 @@ class BooksControllerTest : TestPropertyProvider {
             "dynamodb-local.host" to "localhost",
             "dynamodb-local.port" to dynamoDBLocal.firstMappedPort.toString()
         )
+    }
+
+    @AfterAll
+    fun clearAwsRegion() {
+        System.clearProperty("aws.region")
     }
 
     @Test

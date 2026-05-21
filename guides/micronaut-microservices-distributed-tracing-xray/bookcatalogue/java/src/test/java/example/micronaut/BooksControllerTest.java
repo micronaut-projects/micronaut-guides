@@ -25,6 +25,7 @@ import io.micronaut.http.client.annotation.Client;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import io.micronaut.test.support.TestPropertyProvider;
 import jakarta.inject.Inject;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.testcontainers.containers.GenericContainer;
@@ -68,6 +69,11 @@ class BooksControllerTest implements TestPropertyProvider {
         return CollectionUtils.mapOf(
                 "dynamodb-local.host", "localhost",
                         "dynamodb-local.port", dynamoDBLocal.getFirstMappedPort());
+    }
+
+    @AfterAll
+    void clearAwsRegion() {
+        System.clearProperty("aws.region");
     }
 
     @Test

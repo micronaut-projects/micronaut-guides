@@ -37,7 +37,7 @@ class DynamoDbClientBuilderListener(
     private val endpoint: URI = try {
         URI("http://$host:$port")
     } catch (e: URISyntaxException) {
-        throw ConfigurationException("dynamodb.endpoint not a valid URI")
+        throw ConfigurationException("dynamodb-local.host and dynamodb-local.port do not form a valid URI")
     }
     private val accessKeyId = "fakeMyKeyId"
     private val secretAccessKey = "fakeSecretAccessKey"
