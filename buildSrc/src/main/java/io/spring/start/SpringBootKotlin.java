@@ -20,6 +20,7 @@ import io.micronaut.starter.application.ApplicationType;
 import io.micronaut.starter.application.generator.GeneratorContext;
 import io.micronaut.starter.feature.Feature;
 import io.micronaut.starter.feature.FeatureContext;
+import io.micronaut.starter.feature.RequireKaptFeature;
 import io.micronaut.starter.feature.lang.LanguageFeature;
 import io.spring.start.templates.applicationkotlin;
 import io.spring.start.templates.applicationtestkotlinjunit;
@@ -39,14 +40,16 @@ public class SpringBootKotlin implements LanguageFeature {
     protected final KotlinStdlib kotlinStdlib;
     protected final KotlinMavenPlugin kotlinMavenPlugin;
     protected final KotlinGradlePlugin kotlinGradlePlugin;
+    protected final KotlinKaptGradlePlugin kotlinKaptGradlePlugin;
     protected final KotlinSpringGradlePlugin kotlinSpringGradlePlugin;
     protected final KotlinJackson kotlinJackson;
     protected final KotlinReflect kotlinReflect;
 
-    public SpringBootKotlin(KotlinStdlib kotlinStdlib, KotlinMavenPlugin kotlinMavenPlugin, KotlinGradlePlugin kotlinGradlePlugin, KotlinSpringGradlePlugin kotlinSpringGradlePlugin, KotlinJackson kotlinJackson, KotlinReflect kotlinReflect) {
+    public SpringBootKotlin(KotlinStdlib kotlinStdlib, KotlinMavenPlugin kotlinMavenPlugin, KotlinGradlePlugin kotlinGradlePlugin, KotlinKaptGradlePlugin kotlinKaptGradlePlugin, KotlinSpringGradlePlugin kotlinSpringGradlePlugin, KotlinJackson kotlinJackson, KotlinReflect kotlinReflect) {
         this.kotlinStdlib = kotlinStdlib;
         this.kotlinMavenPlugin = kotlinMavenPlugin;
         this.kotlinGradlePlugin = kotlinGradlePlugin;
+        this.kotlinKaptGradlePlugin = kotlinKaptGradlePlugin;
         this.kotlinSpringGradlePlugin = kotlinSpringGradlePlugin;
         this.kotlinJackson = kotlinJackson;
         this.kotlinReflect = kotlinReflect;
@@ -62,6 +65,9 @@ public class SpringBootKotlin implements LanguageFeature {
     public void processSelectedFeatures(FeatureContext featureContext) {
         if (featureContext.getBuildTool().isGradle()) {
             featureContext.addFeature(kotlinGradlePlugin);
+            if (featureContext.getSelectedFeatures().stream().anyMatch(RequireKaptFeature.class::isInstance)) {
+                featureContext.addFeature(kotlinKaptGradlePlugin);
+            }
             featureContext.addFeature(kotlinSpringGradlePlugin);
         } else {
             featureContext.addFeature(kotlinStdlib);
