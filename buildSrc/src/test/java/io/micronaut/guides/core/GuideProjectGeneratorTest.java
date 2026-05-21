@@ -10,6 +10,7 @@ import org.gradle.api.JavaVersion;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.List;
@@ -163,8 +164,7 @@ class GuideProjectGeneratorTest {
 
     @Test
     void springBootKotlinGuideWithMicronautDataAppliesKaptPlugin() {
-        File outputDirectory = new File("build/tmp/test-spring-boot-kotlin-kapt-" + System.nanoTime());
-        outputDirectory.mkdir();
+        File outputDirectory = createTempOutputDirectory("test-spring-boot-kotlin-kapt-");
         App app = new App(
                 "default",
                 "example.micronaut",
@@ -215,8 +215,7 @@ class GuideProjectGeneratorTest {
 
     @Test
     void springBootKotlinGuideWithoutKaptFeatureDoesNotApplyKaptPlugin() {
-        File outputDirectory = new File("build/tmp/test-spring-boot-kotlin-no-kapt-" + System.nanoTime());
-        outputDirectory.mkdir();
+        File outputDirectory = createTempOutputDirectory("test-spring-boot-kotlin-no-kapt-");
         App app = new App(
                 "default",
                 "example.micronaut",
@@ -266,5 +265,8 @@ class GuideProjectGeneratorTest {
         assertFalse(result.contains("id(\"org.jetbrains.kotlin.kapt\")"), result);
     }
 
+    private File createTempOutputDirectory(String prefix) {
+        return assertDoesNotThrow(() -> Files.createTempDirectory(Files.createDirectories(Paths.get("build/tmp")), prefix).toFile());
+    }
 
 }
