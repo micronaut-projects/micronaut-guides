@@ -63,7 +63,7 @@ internal class MicronautguideTest : TestPropertyProvider { // <3>
     }
 
     companion object {
-        private val localstackImage: DockerImageName = DockerImageName.parse("localstack/localstack:latest")
+        private val localstackImage: DockerImageName = DockerImageName.parse("localstack/localstack:4.14.0")
         private val localstack: LocalStackContainer = LocalStackContainer(localstackImage)
             .withServices(LocalStackContainer.Service.SQS)
     }
