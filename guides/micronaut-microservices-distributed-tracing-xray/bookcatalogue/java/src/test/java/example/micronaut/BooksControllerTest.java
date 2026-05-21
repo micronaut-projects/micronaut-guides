@@ -61,6 +61,7 @@ class BooksControllerTest implements TestPropertyProvider {
     @NonNull
     @Override
     public Map<String, String> getProperties() {
+        System.setProperty("aws.region", "us-east-1");
         if (!dynamoDBLocal.isRunning()) {
             dynamoDBLocal.start();
         }

@@ -12,7 +12,7 @@ ____
 
 You will be using:
 
-* A PostgreSQL instance provided by <<Test Resources>> and running in Docker.
+* A PostgreSQL instance provided by <<test-resources,Test Resources>> and running in Docker.
 * https://micronaut-projects.github.io/micronaut-data/latest/guide/[Micronaut Data] to persist our ToDos to this database.
 * https://micronaut-projects.github.io/micronaut-flyway/latest/guide/[Flyway] to handle our database migrations.
 * https://micronaut-projects.github.io/micronaut-graphql/latest/guide/[Micronaut GraphQL] to expose our data.
@@ -32,7 +32,7 @@ common:flyway.adoc[]
 
 resource:db/migration/V1__schema.sql[]
 
-<1> Authors will be stored in table separate to the ToDos.  They just have a username.
+<1> Authors will be stored in a table separate from the ToDos. They just have a username.
 <2> ToDos have a title, completion status, and a foreign-key reference to the author.
 
 === Entities
@@ -62,14 +62,14 @@ source:ToDoRepository[]
 callout:jdbcrepository[]
 callout:crudrepository[]
 
-Then create a Repository for the Authors.  This requires extra finders for this to simplify the GraphQL wiring in the next step:
+Then create a repository for the authors. This requires extra finders to simplify the GraphQL wiring in the next step:
 
 source:AuthorRepository[]
 
 callout:jdbcrepository[]
 callout:crudrepository[]
 <3> When creating todos a method is required to search for an existing username.
-<4> When GraphQL loads a ToDo, it use this to fetch the authors if they are required in the response.
+<4> When GraphQL loads a ToDo, it uses this to fetch the authors if they are required in the response.
 <5> Find an existing author, or else create a new one when creating a ToDo.
 
 == GraphQL
@@ -148,7 +148,7 @@ callout:factory[]
 <2> This registry has request scope, so a new one will be created for every request.
 <3> Register the AuthorDataLoader whenever the loader for `"author"` is requested.
 
-Add an `AuthorDataFetcher` which requests and uses this loader to populate a `ToDo` if the author when required.
+Add an `AuthorDataFetcher` which requests and uses this loader to populate a `ToDo` with the author when required.
 
 source:AuthorDataFetcher[]
 
@@ -164,7 +164,7 @@ source:GraphQLFactory[]
 callout:factory[]
 callout:singleton[]
 <3> Wire up the query behavior.
-<4> Wire up each mutators.
+<4> Wire up each mutator.
 <5> Wire up how to populate a ToDo with authors if they are requested.
 
 common:test-resources-postgres.adoc[]

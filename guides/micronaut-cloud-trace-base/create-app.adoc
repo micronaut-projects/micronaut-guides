@@ -4,9 +4,9 @@ common:create-app-features.adoc[]
 
 === OpenTelemetry
 
-The Micronaut framework uses https://opentelemetry.io/[OpenTelemetry] to generate and export tracing data.
+Micronaut Framework uses https://opentelemetry.io/[OpenTelemetry] to generate and export tracing data.
 
-OpenTelemetry provides two annotations: one to create a span and another to include additional information to the span.
+OpenTelemetry provides two annotations: one to create a span and another to include additional information in the span.
 
 @WithSpan:: Used on methods to create a new span; defaults to the method name, but a unique name may be assigned instead.
 
@@ -14,7 +14,7 @@ OpenTelemetry provides two annotations: one to create a span and another to incl
 
 `@WithSpan` and `@SpanAttribute` can be used only on non-private methods.
 
-If these annotations are not enough, or if you want to add tracing to a private method, the Micronaut framework’s tracing integration registers a `io.opentelemetry.api.trace.Tracer` bean, which exposes the OpenTelemetry API and can be dependency-injected as needed.
+If these annotations are not enough, or if you want to add tracing to a private method, Micronaut Framework's tracing integration registers a `io.opentelemetry.api.trace.Tracer` bean, which exposes the OpenTelemetry API and can be dependency-injected as needed.
 
 [NOTE]
 ====
@@ -28,9 +28,9 @@ The following `io.micronaut.tracing.annotation`s are available if you prefer to 
 === Inventory Service
 
 source:InventoryService[]
-<1> Inject Tracing bean into class
+<1> Inject the `Tracer` bean into the class
 <2> Creates a new span called "stock-counts"
-<3> Adds a label, or tag, called "inventory.item" that will contain the value contained in `item`
+<3> Adds a label, or tag, called "inventory.item" that will contain the value in `item`
 <4> Same as `@SpanAttribute("inventory.store-name")`
 <5> Same as `@WithSpan("warehouse-order")` with `@SpanAttributes` for item and count
 
@@ -40,13 +40,13 @@ This class demonstrates use of the `io.micronaut.tracing.annotation` instead of 
 
 [NOTE]
 ====
-If you have the following dependency declared, all HTTP Server methods (those annotated with `@Get`, `@Post`, etc.) will create spans automatically.
+If you have the following dependency declared, all HTTP server methods (those annotated with `@Get`, `@Post`, etc.) will create spans automatically.
 dependency:micronaut-tracing-opentelemetry-http[groupId=io.micronaut.tracing]
 ====
 
 source:StoreController[]
 <1> Equivalent to `@WithSpan("store.order")`
-<2> Same as `@SpanAttribute("order.item")`and `@SpanAttribute`
+<2> Same as `@SpanAttribute("order.item")` and `@SpanAttribute("count")`
 <3> Span created automatically if `micronaut-tracing-opentelemetry-http` is declared
 <4> Required for `@SpanTag`
 <5> Tag is only added to the span if `micronaut-tracing-opentelemetry-http` is declared; otherwise ignored
@@ -57,7 +57,7 @@ You can also mix OpenTelemetry and Micronaut Tracing annotations in the same cla
 
 [NOTE]
 ====
-If you have the following dependency declared, all HTTP Client methods (those annotated with `@Get`, `@Post`, etc.) will create spans automatically.
+If you have the following dependency declared, all HTTP client methods (those annotated with `@Get`, `@Post`, etc.) will create spans automatically.
 dependency:micronaut-tracing-opentelemetry-http[groupId=io.micronaut.tracing]
 ====
 
@@ -66,7 +66,7 @@ source:WarehouseClient[]
 
 === Warehouse Controller
 
-The `WarehouseController` class represents external service that will be called by `WarehouseClient`.
+The `WarehouseController` class represents an external service that will be called by `WarehouseClient`.
 
 source:WarehouseController[]
 callout:executes-on[]
