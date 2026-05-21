@@ -1,0 +1,294 @@
+// Start: src/docs/common/snippets/common-header.adoc
+// Start: src/docs/common/snippets/common-header-top.adoc
+= Access a MongoDB database with Micronaut Data MongoDB
+
+Learn how to access a MongoDB database with Micronaut Data and the MongoDB Sync driver.
+
+Authors: Tim Yates
+
+Micronaut Version: 5.0.0
+// End: src/docs/common/snippets/common-header-top.adoc
+
+// Start: src/docs/common/snippets/common-gettingStarted.adoc
+== Getting Started
+
+In this guide, we will create a Micronaut application written in Kotlin.
+// End: src/docs/common/snippets/common-gettingStarted.adoc
+// End: src/docs/common/snippets/common-header.adoc
+
+You will use https://www.mongodb.com[MongoDB] for persistence.
+
+// Start: src/docs/common/snippets/common-requirements.adoc
+== What you will need
+
+To complete this guide, you will need the following:
+
+* Some time on your hands
+* A decent text editor or IDE (e.g. https://guides.micronaut.io/latest/micronaut-intellij-idea-ide-setup.html[IntelliJ IDEA])
+* JDK 21 or greater installed with `JAVA_HOME` https://www.baeldung.com/java-home-on-windows-7-8-10-mac-os-x-linux[configured appropriately]
+// End: src/docs/common/snippets/common-requirements.adoc
+* https://www.docker.io/gettingstarted/#h_installation[Docker] installed to run MongoDB and to run tests using https://www.testcontainers.org[Testcontainers].
+
+// Start: src/docs/common/snippets/common-completesolution.adoc
+== Solution
+
+We recommend that you follow the instructions in the next sections and create the application step by step. However, you can go right to the **completed example**.
+
+* link:micronaut-data-mongodb-synchronous-gradle-kotlin.zip[Download] and unzip the source
+// End: src/docs/common/snippets/common-completesolution.adoc
+
+// Start: src/docs/common/snippets/common-create-app-features.adoc
+== Writing the Application
+
+// Start: src/docs/common/snippets/common-cli-or-launch.adoc
+Create an application using the https://docs.micronaut.io/latest/guide/#cli[Micronaut Command Line Interface] or with https://launch.micronaut.io[Micronaut Launch].
+// End: src/docs/common/snippets/common-cli-or-launch.adoc
+
+[source,bash]
+----
+mn create-app example.micronaut.micronautguide \
+    --features=data-mongodb \
+    --build=gradle \
+    --lang=kotlin \
+    --test=junit
+----
+
+// Start: src/docs/common/snippets/common-build-lang-arguments.adoc
+NOTE: If you don't specify the `--build` argument, Gradle with the https://docs.gradle.org/current/userguide/kotlin_dsl.html[Kotlin DSL] is used as the build tool. +++<br/>+++ If you don't specify the `--lang` argument, Java is used as the language.+++<br/>+++ If you don't specify the `--test` argument, JUnit is used for Java and Kotlin, and Spock is used for Groovy.
+// End: src/docs/common/snippets/common-build-lang-arguments.adoc
+
+// Start: src/docs/common/snippets/common-default-package.adoc
+The previous command creates a Micronaut application with the default package `example.micronaut` in a directory named `micronautguide`.
+// End: src/docs/common/snippets/common-default-package.adoc
+
+If you use Micronaut Launch, select Micronaut Application as application type and add `data-mongodb` features.
+
+// Start: src/docs/common/snippets/common-diff-general.adoc
+// Start: src/docs/common/snippets/common-diff.adoc
+NOTE: If you have an existing Micronaut application and want to add the functionality described here, you can view the dependency and configuration changes from the specified features, and apply those changes to your application.
+
+
+// End: src/docs/common/snippets/common-diff.adoc
+
+https://micronaut.io/launch?features=data-mongodb&lang=KOTLIN&build=GRADLE&test=JUNIT&name=micronautguide&type=DEFAULT&package=example.micronaut&activity=diff[Diff, window="_blank"]
+// End: src/docs/common/snippets/common-diff-general.adoc
+
+https://guides.micronaut.io/latest/micronaut-intellij-idea-ide-setup.html[Setup IntelliJ IDEA to develop Micronaut Applications].
+// End: src/docs/common/snippets/common-create-app-features.adoc
+
+=== Dependencies
+
+In this guide, we use the MongoDB Sync driver.
+
+The `data-mongodb` feature adds the following dependencies:
+
+
+
+
+
+
+
+
+
+[source, groovy]
+.build.gradle
+----
+kapt("io.micronaut.data:micronaut-data-document-processor")
+implementation("io.micronaut.data:micronaut-data-mongodb")
+runtimeOnly("org.mongodb:mongodb-driver-sync")
+implementation("org.mongodb:mongodb-driver-sync")
+----
+
+
+
+
+=== Entity
+
+Create a `Fruit` entity:
+
+
+[source,kotlin]
+.src/main/kotlin/example/micronaut/Fruit.kt
+----
+include::{sourceDir}/micronaut-data-mongodb-synchronous/micronaut-data-mongodb-synchronous-gradle-kotlin/src/main/kotlin/example/micronaut/Fruit.kt[lines=16..-1]
+----
+
+<.> Annotate the class with `@MappedEntity` to map the class to the table defined in the schema.
+<.> Specifies the ID of an entity
+<.> Use `jakarta.validation.constraints` Constraints to ensure the data matches your expectations.
+
+=== Repository
+
+Create a repository interface to encapsulate the CRUD actions for `Fruit`.
+
+[source,kotlin]
+.src/main/kotlin/example/micronaut/FruitRepository.kt
+----
+include::{sourceDir}/micronaut-data-mongodb-synchronous/micronaut-data-mongodb-synchronous-gradle-kotlin/src/main/kotlin/example/micronaut/FruitRepository.kt[lines=16..-1]
+----
+
+<1> Annotate with `@MongoRepository`.
+<2> Add a finder for finding fruit by a list of names.
+
+=== Service
+
+Create a service `FruitService` as an API to interact with the `Fruit` repository.
+This will allow you to keep business logic out of the controller, and to test the controller later without interacting with a real database.
+
+[source,kotlin]
+.src/main/kotlin/example/micronaut/FruitService.kt
+----
+include::{sourceDir}/micronaut-data-mongodb-synchronous/micronaut-data-mongodb-synchronous-gradle-kotlin/src/main/kotlin/example/micronaut/FruitService.kt[lines=16..-1]
+----
+
+And then create a default implementation of this service.
+
+[source,kotlin]
+.src/main/kotlin/example/micronaut/DefaultFruitService.kt
+----
+include::{sourceDir}/micronaut-data-mongodb-synchronous/micronaut-data-mongodb-synchronous-gradle-kotlin/src/main/kotlin/example/micronaut/DefaultFruitService.kt[lines=16..-1]
+----
+
+<.> Use `jakarta.inject.Singleton` to designate a class as a singleton.
+
+=== Controller
+
+Create `FruitController`:
+
+[source,kotlin]
+.src/main/kotlin/example/micronaut/FruitController.kt
+----
+include::{sourceDir}/micronaut-data-mongodb-synchronous/micronaut-data-mongodb-synchronous-gradle-kotlin/src/main/kotlin/example/micronaut/FruitController.kt[lines=16..-1]
+----
+
+<.> The class is defined as a controller with the https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Controller.html[@Controller] annotation mapped to the path `/fruits`.
+<.> It is critical that any blocking I/O operations (such as fetching the data from the database) are offloaded to a separate thread pool that does not block the Event loop.
+<.> Use constructor injection to inject a bean of type `FruitService`.
+<.> The https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Get.html[@Get] annotation maps the `list` method to an HTTP GET request on `/fruits`.
+<.> The https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Post.html[@Post] annotation maps the `save` method to an HTTP POST request on `/fruits`.
+<.> You can specify the HTTP status code via the `@Status` annotation.
+<.> Add `@Valid` to any method parameter which requires validation.
+<.> The https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Get.html[@Get] annotation maps the `find` method to an HTTP GET request on `/fruits/\{id\}`.
+<.> The https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Get.html[@Get] annotation maps the `findByNameInList` method to an HTTP GET request on `/fruits/q`.
+<.> Bind a list of Strings to the query parameter `names`
+
+=== Test Client
+
+Add a https://docs.micronaut.io/latest/guide/#httpClient[Micronaut declarative HTTP Client] to `src/test` to ease the testing of the application's API.
+
+[source,kotlin]
+.src/test/kotlin/example/micronaut/FruitClient.kt
+----
+include::{sourceDir}/micronaut-data-mongodb-synchronous/micronaut-data-mongodb-synchronous-gradle-kotlin/src/test/kotlin/example/micronaut/FruitClient.kt[lines=16..-1]
+----
+
+Then create a test that verifies the validation of the `Fruit` entity when we create a new entity via `POST`:
+
+[source,kotlin]
+.src/test/kotlin/example/micronaut/FruitValidationControllerTest.kt
+----
+include::{sourceDir}/micronaut-data-mongodb-synchronous/micronaut-data-mongodb-synchronous-gradle-kotlin/src/test/kotlin/example/micronaut/FruitValidationControllerTest.kt[lines=16..-1]
+----
+
+Create a test that checks the controller works against a real MongoDB database:
+
+[source,kotlin]
+.src/test/kotlin/example/micronaut/FruitControllerTest.kt
+----
+include::{sourceDir}/micronaut-data-mongodb-synchronous/micronaut-data-mongodb-synchronous-gradle-kotlin/src/test/kotlin/example/micronaut/FruitControllerTest.kt[lines=16..-1]
+----
+
+And finally, create a test which uses a replacement `FruitService` to test the controller without touching the database:
+
+[source,kotlin]
+.src/test/kotlin/example/micronaut/ControllerIsolationTest.kt
+----
+include::{sourceDir}/micronaut-data-mongodb-synchronous/micronaut-data-mongodb-synchronous-gradle-kotlin/src/test/kotlin/example/micronaut/ControllerIsolationTest.kt[lines=16..-1]
+----
+
+// Start: src/docs/common/snippets/common-test-resources-mongodb.adoc
+== Test Resources
+
+When the application is started locally -- either under test or by <<running-the-application,running the application>> -- resolution of the property `mongodb.uri` is detected and the Test Resources service will start a local MongoDB docker container, and inject the properties required to use this as the datasource.
+
+When running under production, you should replace this property with the location of your production MongoDB instance via an environment variable.
+
+[source,shell]
+----
+MONGODB_URI=mongodb://username:password@production-server:27017/databaseName
+----
+
+For more information, see the https://micronaut-projects.github.io/micronaut-test-resources/snapshot/guide/#modules-mongodb[MongoDB section of the Test Resources documentation].
+// End: src/docs/common/snippets/common-test-resources-mongodb.adoc
+
+// Start: src/docs/common/snippets/common-testApp.adoc
+== Testing the Application
+
+// Start: src/docs/common/snippets/common-testApp-noheader.adoc
+To run the tests:
+
+
+[source, bash]
+----
+./gradlew test
+----
+
+Then open `build/reports/tests/test/index.html` in a browser to see the results.
+
+
+// End: src/docs/common/snippets/common-testApp-noheader.adoc
+// End: src/docs/common/snippets/common-testApp.adoc
+
+// Start: src/docs/common/snippets/common-runapp.adoc
+== Running the Application
+
+// Start: src/docs/common/snippets/common-runapp-instructions.adoc
+
+To run the application, use the `./gradlew run` command, which starts the application on port 8080.
+
+
+// End: src/docs/common/snippets/common-runapp-instructions.adoc
+// End: src/docs/common/snippets/common-runapp.adoc
+
+[source, bash]
+----
+curl -d '{"name":"Pear"}' \
+     -H "Content-Type: application/json" \
+     -X POST http://localhost:8080/fruits
+----
+
+[source, bash]
+----
+curl -i localhost:8080/fruits
+----
+
+[source]
+----
+HTTP/1.1 200 OK
+date: Wed, 15 Sep 2021 12:40:15 GMT
+Content-Type: application/json
+content-length: 110
+connection: keep-alive
+
+[{"name":"Pear"}]
+----
+
+// Start: src/docs/common/snippets/common-next.adoc
+== Next Steps
+
+Explore more features with https://micronaut.io/guides/[Micronaut Guides].
+// End: src/docs/common/snippets/common-next.adoc
+
+Read more about the https://micronaut-projects.github.io/micronaut-data/latest/guide/#mongo[integration between Micronaut Data and MongoDB].
+
+// Start: src/docs/common/snippets/common-helpWithMicronaut.adoc
+== Help with the Micronaut Framework
+
+The https://micronaut.io/foundation/[Micronaut Foundation] sponsored the creation of this Guide. A variety of https://micronaut.io/commercial-support/[consulting and support services] are available.
+// End: src/docs/common/snippets/common-helpWithMicronaut.adoc
+
+// Start: src/docs/common/snippets/common-license.adoc
+== License
+
+NOTE: All guides are released with an https://www.apache.org/licenses/LICENSE-2.0[Apache license 2.0 license] for the code and a https://creativecommons.org/licenses/by/4.0/deed.en[Creative Commons Attribution 4.0] license for the writing and media (images...).
+// End: src/docs/common/snippets/common-license.adoc
