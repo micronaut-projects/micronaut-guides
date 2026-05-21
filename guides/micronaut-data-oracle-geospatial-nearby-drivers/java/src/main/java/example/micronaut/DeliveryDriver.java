@@ -21,11 +21,9 @@ import io.micronaut.data.annotation.Index;
 import io.micronaut.data.annotation.MappedEntity;
 import io.micronaut.data.annotation.Srid;
 import io.micronaut.data.model.geo.Point;
-import io.micronaut.serde.annotation.Serdeable;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-@Serdeable
 @MappedEntity("delivery_driver") // <1>
 public class DeliveryDriver {
 

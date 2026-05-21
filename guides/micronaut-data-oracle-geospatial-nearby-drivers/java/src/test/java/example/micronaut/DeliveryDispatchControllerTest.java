@@ -16,26 +16,30 @@
 package example.micronaut;
 
 import io.micronaut.data.model.geo.Point;
+import io.micronaut.http.HttpRequest;
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.HttpStatus;
+import io.micronaut.http.client.BlockingHttpClient;
+import io.micronaut.http.client.HttpClient;
+import io.micronaut.http.client.annotation.Client;
+import io.micronaut.http.client.exceptions.HttpClientResponseException;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Optional;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@MicronautTest(startApplication = false) // <1>
-class DispatchServiceTest {
-
-    private static final double EARTH_RADIUS_METERS = 6_371_008.8d;
+@MicronautTest(transactional = false) // <1>
+class DeliveryDispatchControllerTest {
 
     @Inject
     DeliveryDriverRepository deliveryDriverRepository;
 
     @Inject
-    DispatchService dispatchService;
+    @Client("/") // <2>
+    HttpClient httpClient;
 
     @BeforeEach
     void clean() {
@@ -44,8 +48,7 @@ class DispatchServiceTest {
 
     @Test
     void findsClosestAvailableDriverWithinFiveKilometers() {
-        Point orderLocation = new Point(-73.9857d, 40.7484d);
-        DeliveryDriver nearby = deliveryDriverRepository.save(new DeliveryDriver(
+        deliveryDriverRepository.save(new DeliveryDriver(
             "Nearby Driver",
             DeliveryDriver.AVAILABLE,
             new Point(-73.9757d, 40.7554d)
@@ -59,23 +62,25 @@ class DispatchServiceTest {
             "Busy Driver",
             DeliveryDriver.BUSY,
             new Point(-73.9850d, 40.7488d)
-        )); // <2>
+        )); // <3>
         deliveryDriverRepository.save(new DeliveryDriver(
             "Far Driver",
             DeliveryDriver.AVAILABLE,
             new Point(-73.9000d, 40.8000d)
-        )); // <3>
+        )); // <4>
 
-        Optional<DriverMatch> match = dispatchService.findClosestAvailableDriver(orderLocation);
+        BlockingHttpClient client = httpClient.toBlocking();
+        HttpResponse<DriverMatch> response = client.exchange(
+            HttpRequest.GET("/orders/nearest-driver?longitude=-73.9857&latitude=40.7484"),
+            DriverMatch.class
+        ); // <5>
 
-        assertTrue(match.isPresent());
-        assertEquals(closest.getId(), match.get().driverId()); // <4>
-        assertTrue(match.get().distanceMeters() < distanceMeters(orderLocation, nearby.getLocation()));
+        assertEquals(HttpStatus.OK, response.status());
+        assertEquals(closest.getId(), response.body().driverId()); // <6>
     }
 
     @Test
-    void returnsEmptyWhenNoAvailableDriverIsCloseEnough() {
-        Point orderLocation = new Point(-73.9857d, 40.7484d);
+    void returnsNotFoundWhenNoAvailableDriverIsCloseEnough() {
         deliveryDriverRepository.save(new DeliveryDriver(
             "Busy Driver",
             DeliveryDriver.BUSY,
@@ -87,19 +92,14 @@ class DispatchServiceTest {
             new Point(-73.9000d, 40.8000d)
         ));
 
-        assertTrue(dispatchService.findClosestAvailableDriver(orderLocation).isEmpty());
-    }
+        BlockingHttpClient client = httpClient.toBlocking();
+        HttpClientResponseException thrown = assertThrows(HttpClientResponseException.class, () ->
+            client.exchange(
+                HttpRequest.GET("/orders/nearest-driver?longitude=-73.9857&latitude=40.7484"),
+                DriverMatch.class
+            )
+        ); // <7>
 
-    private static double distanceMeters(Point left, Point right) {
-        double leftLatitude = Math.toRadians(left.y());
-        double rightLatitude = Math.toRadians(right.y());
-        double deltaLatitude = Math.toRadians(right.y() - left.y());
-        double deltaLongitude = Math.toRadians(right.x() - left.x());
-
-        double a = Math.sin(deltaLatitude / 2) * Math.sin(deltaLatitude / 2)
-            + Math.cos(leftLatitude) * Math.cos(rightLatitude)
-            * Math.sin(deltaLongitude / 2) * Math.sin(deltaLongitude / 2);
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return EARTH_RADIUS_METERS * c;
+        assertEquals(HttpStatus.NOT_FOUND, thrown.getStatus());
     }
 }

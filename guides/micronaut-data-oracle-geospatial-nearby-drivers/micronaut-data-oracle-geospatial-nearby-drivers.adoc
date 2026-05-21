@@ -73,14 +73,17 @@ source:DeliveryDispatchController[]
 
 == Test
 
-Add a test that verifies the real dispatch rule:
+Add a test that verifies the dispatch endpoint:
 
-test:DispatchServiceTest[]
+test:DeliveryDispatchControllerTest[]
 
-<1> Start the Micronaut context without starting an HTTP server.
-<2> A busy driver can be nearby, but should not be returned.
-<3> An available driver outside the 5 km radius should not be returned.
-<4> The closest available driver within 5 km is selected.
+<1> Start the Micronaut application with an embedded server and disable the test transaction. The test inserts data directly with the repository, and the HTTP request reads it through a separate connection.
+<2> Inject an HTTP client bound to the embedded server.
+<3> A busy driver can be nearby, but should not be returned.
+<4> An available driver outside the 5 km radius should not be returned.
+<5> Call the dispatch endpoint with the order longitude and latitude.
+<6> The response body contains the closest available driver within 5 km.
+<7> When no available driver is close enough, the endpoint responds with `404 Not Found`.
 
 common:testApp.adoc[]
 
