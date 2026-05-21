@@ -30,11 +30,10 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 import java.io.BufferedReader
-import java.io.BufferedWriter
-import java.io.FileWriter
 import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
+import java.nio.charset.StandardCharsets.UTF_8
 import java.nio.file.Files
 import java.nio.file.Path
 
@@ -78,7 +77,7 @@ abstract class AbstractProfilePicturesControllerTest {
         val download = client.retrieve(location, ByteArray::class.java)
 
         //then:
-        assertEquals("micronaut", String(download))
+        assertEquals("micronaut", String(download, UTF_8))
 
         //when:
         response = client.exchange(HttpRequest.DELETE<Any>(location))
@@ -88,7 +87,7 @@ abstract class AbstractProfilePicturesControllerTest {
     }
 
     protected fun textFromFile(inputStream: InputStream): String =
-        IOUtils.readText(BufferedReader(InputStreamReader(inputStream)))
+        IOUtils.readText(BufferedReader(InputStreamReader(inputStream, UTF_8)))
 
     @Throws(IOException::class)
     protected abstract fun assertThatFileIsStored(key: String, expected: String)
@@ -98,9 +97,7 @@ abstract class AbstractProfilePicturesControllerTest {
         @Throws(IOException::class)
         fun createTempFile(): Path {
             val path = Files.createTempFile("test-file", ".txt")
-            BufferedWriter(FileWriter(path.toFile())).use { writer ->
-                writer.write("micronaut")
-            }
+            Files.write(path, "micronaut".toByteArray(UTF_8))
             return path
         }
     }

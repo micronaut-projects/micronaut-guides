@@ -89,7 +89,9 @@ class ProfilePicturesControllerTest : AbstractProfilePicturesControllerTest() {
                 .build()
         )
 
-        assertEquals(expected, textFromFile(response.inputStream))
+        response.inputStream.use { inputStream ->
+            assertEquals(expected, textFromFile(inputStream))
+        }
     }
 
     @Singleton

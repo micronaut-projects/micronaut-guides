@@ -20,9 +20,12 @@ import org.testcontainers.containers.GenericContainer
 import org.testcontainers.utility.DockerImageName
 import java.io.IOException
 import java.io.InputStream
+import java.io.UncheckedIOException
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.function.Supplier
+
+private const val PRIVATE_KEY_PATH = "src/test/resources/key.pem"
 
 class OciEmulatorContainer(dockerImageName: DockerImageName) : GenericContainer<OciEmulatorContainer>(dockerImageName) {
 
@@ -49,9 +52,9 @@ class OciEmulatorContainer(dockerImageName: DockerImageName) : GenericContainer<
     val privateKeySupplier: Supplier<InputStream>
         get() = Supplier {
             try {
-                Files.newInputStream(Paths.get("src/test/resources/key.pem"))
+                Files.newInputStream(Paths.get(PRIVATE_KEY_PATH))
             } catch (e: IOException) {
-                throw RuntimeException(e)
+                throw UncheckedIOException("Unable to read test OCI private key from $PRIVATE_KEY_PATH", e)
             }
         }
 
