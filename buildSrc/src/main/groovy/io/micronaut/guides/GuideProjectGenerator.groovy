@@ -30,6 +30,7 @@ import static groovy.io.FileType.FILES
 import static io.micronaut.core.util.StringUtils.EMPTY_STRING
 import static io.micronaut.starter.api.TestFramework.JUNIT
 import static io.micronaut.starter.api.TestFramework.SPOCK
+import static io.micronaut.starter.options.BuildTool.MAVEN
 import static io.micronaut.starter.options.JdkVersion.JDK_25
 import static io.micronaut.starter.options.Language.GROOVY
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING
@@ -48,6 +49,8 @@ class GuideProjectGenerator implements AutoCloseable {
     private static final String BASE_PACKAGE = 'example.micronaut'
     private static final List<JdkVersion> JDK_VERSIONS_SUPPORTED_BY_GRAALVM = [JDK_25]
     public static final String LICENSEHEADER = "LICENSEHEADER"
+    private static final String ORACLE_CLOUD_ATP = 'oracle-cloud-atp'
+    private static final String ORACLE_FREE_TEST_RESOURCES = 'micronaut-test-resources-jdbc-oracle-free'
 
     private final ApplicationContext applicationContext
     private final GuidesGenerator guidesGenerator
@@ -183,9 +186,42 @@ class GuideProjectGenerator implements AutoCloseable {
                         copyFile(inputDir, destinationRoot, zipInclude)
                     }
                 }
+                configureOracleFreeTestResourcesForMaven(destination, buildTool, appFeatures)
                 addLicenses(new File(outputDir.absolutePath, folder))
             }
         }
+    }
+
+    private static void configureOracleFreeTestResourcesForMaven(File destination,
+                                                                 BuildTool buildTool,
+                                                                 List<String> appFeatures) {
+        if (buildTool != MAVEN || !appFeatures.contains(ORACLE_CLOUD_ATP)) {
+            return
+        }
+        File pom = new File(destination, 'pom.xml')
+        if (!pom.exists()) {
+            return
+        }
+
+        String pomText = pom.text
+        if (pomText.contains(ORACLE_FREE_TEST_RESOURCES)) {
+            return
+        }
+
+        String marker = '          <configFile>aot-${packaging}.properties</configFile>\n'
+        if (!pomText.contains(marker)) {
+            throw new GradleException("Cannot configure Oracle Test Resources dependency in ${pom.absolutePath}")
+        }
+
+        String dependency = """          <testResourcesDependencies>
+            <dependency>
+              <groupId>io.micronaut.testresources</groupId>
+              <artifactId>${ORACLE_FREE_TEST_RESOURCES}</artifactId>
+              <version>\${micronaut.test.resources.version}</version>
+            </dependency>
+          </testResourcesDependencies>
+"""
+        pom.text = pomText.replace(marker, marker + dependency)
     }
 
     void addLicenses(File folder) {
