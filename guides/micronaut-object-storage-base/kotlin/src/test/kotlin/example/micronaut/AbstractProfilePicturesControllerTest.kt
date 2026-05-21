@@ -71,9 +71,6 @@ abstract class AbstractProfilePicturesControllerTest {
         //when:
         val location = response.header(HttpHeaders.LOCATION) ?: error("Missing Location header")
 
-        //then:
-        assertNotNull(location)
-
         //when:
         val download = client.retrieve(location, ByteArray::class.java)
 

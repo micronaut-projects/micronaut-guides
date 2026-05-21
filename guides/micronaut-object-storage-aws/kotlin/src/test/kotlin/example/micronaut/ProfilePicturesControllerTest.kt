@@ -28,8 +28,10 @@ import software.amazon.awssdk.core.ResponseInputStream
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.CreateBucketRequest
 import software.amazon.awssdk.services.s3.model.DeleteBucketRequest
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest
 import software.amazon.awssdk.services.s3.model.GetObjectRequest
 import software.amazon.awssdk.services.s3.model.GetObjectResponse
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Request
 import java.io.IOException
 
 @Testcontainers(disabledWithoutDocker = true)
@@ -48,6 +50,9 @@ class ProfilePicturesControllerTest : AbstractProfilePicturesControllerTest(), T
 
     @AfterEach
     fun cleanup() {
+        s3.listObjectsV2(ListObjectsV2Request.builder().bucket(BUCKET_NAME).build()).contents().forEach { obj ->
+            s3.deleteObject(DeleteObjectRequest.builder().bucket(BUCKET_NAME).key(obj.key()).build())
+        }
         s3.deleteBucket(DeleteBucketRequest.builder().bucket(BUCKET_NAME).build())
     }
 
@@ -62,7 +67,9 @@ class ProfilePicturesControllerTest : AbstractProfilePicturesControllerTest(), T
                 .bucket(BUCKET_NAME)
                 .build()
         )
-        assertEquals(expected, textFromFile(inputStream))
+        inputStream.use {
+            assertEquals(expected, textFromFile(it))
+        }
     }
 
     companion object {
