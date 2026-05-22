@@ -92,7 +92,7 @@ class GithubControllerSpec extends Specification {
         @Produces("application/vnd.github.v3+json")
         @Get("/repos/micronaut-projects/micronaut-core/releases")
         Optional<String> coreReleases() {
-            resourceLoader.getResourceAsStream("releases.json") // <3>
+            resourceLoader.getResourceAsStream("single-release.json") // <3>
                     .map(inputStream -> inputStream.text)
         }
     }
