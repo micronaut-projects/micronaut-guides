@@ -17,10 +17,12 @@ package example.micronaut;
 
 import io.floci.testcontainers.FlociContainer;
 import io.micronaut.core.util.CollectionUtils;
+import org.testcontainers.utility.DockerImageName;
 
 import java.util.Map;
 
 public class Floci {
+    private static final DockerImageName FLOCI_IMAGE = DockerImageName.parse("floci/floci:1.5.18");
     private static FlociContainer floci;
 
     private static FlociContainer getFloci() {
@@ -56,7 +58,7 @@ public class Floci {
 
     public static void init() {
         if (floci == null) {
-            floci = new FlociContainer();
+            floci = new FlociContainer(FLOCI_IMAGE);
             floci.start();
         }
     }

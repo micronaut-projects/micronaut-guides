@@ -28,6 +28,7 @@ import org.hamcrest.Matchers
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.testcontainers.utility.DockerImageName
 
 @MicronautTest // <1>
 @TestInstance(TestInstance.Lifecycle.PER_CLASS) // <2>
@@ -61,6 +62,6 @@ internal class MicronautguideTest : TestPropertyProvider { // <3>
     }
 
     companion object {
-        private val floci: FlociContainer = FlociContainer()
+        private val floci: FlociContainer = FlociContainer(DockerImageName.parse("floci/floci:1.5.18"))
     }
 }

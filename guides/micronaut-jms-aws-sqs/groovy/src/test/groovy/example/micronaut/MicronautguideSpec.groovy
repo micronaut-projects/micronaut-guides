@@ -27,12 +27,13 @@ import spock.lang.AutoCleanup
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.util.concurrent.PollingConditions
+import org.testcontainers.utility.DockerImageName
 
 @MicronautTest // <1>
 class MicronautguideSpec extends Specification implements TestPropertyProvider { // <3>
     @AutoCleanup
     @Shared
-    private static FlociContainer floci = new FlociContainer()
+    private static FlociContainer floci = new FlociContainer(DockerImageName.parse("floci/floci:1.5.18"))
 
     @Override
     @NonNull

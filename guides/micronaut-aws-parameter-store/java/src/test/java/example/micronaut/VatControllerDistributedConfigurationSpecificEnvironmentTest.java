@@ -27,6 +27,7 @@ import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import io.micronaut.test.support.TestPropertyProvider;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.testcontainers.utility.DockerImageName;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.services.ssm.SsmClient;
@@ -44,7 +45,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @Property(name = "aws.distributed-configuration.search-active-environments", value = StringUtils.TRUE)
 class VatControllerDistributedConfigurationSpecificEnvironmentTest implements TestPropertyProvider {
 
-    private static FlociContainer floci = new FlociContainer();
+    private static final DockerImageName FLOCI_IMAGE = DockerImageName.parse("floci/floci:1.5.18");
+    private static FlociContainer floci = new FlociContainer(FLOCI_IMAGE);
 
     @Override
     public @NonNull Map<String, String> getProperties() {
