@@ -28,6 +28,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.testcontainers.utility.DockerImageName;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.secretsmanager.SecretsManagerClient;
 import software.amazon.awssdk.services.secretsmanager.model.CreateSecretRequest;
 
@@ -52,6 +53,7 @@ class ClientIdControllerTest implements TestPropertyProvider { // <3>
         }
         try (SecretsManagerClient secretsManager = SecretsManagerClient.builder()
                 .endpointOverride(URI.create(floci.getEndpoint()))
+                .region(Region.of(floci.getRegion()))
                 .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create(floci.getAccessKey(), floci.getSecretKey())))
                 .build()
         ) {

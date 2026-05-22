@@ -28,6 +28,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.testcontainers.utility.DockerImageName;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.ssm.SsmClient;
 import software.amazon.awssdk.services.ssm.model.ParameterType;
 import software.amazon.awssdk.services.ssm.model.PutParameterRequest;
@@ -51,6 +52,7 @@ class VatControllerDistributedConfigurationTest implements TestPropertyProvider 
         }
         try (SsmClient ssmClient = SsmClient.builder()
                 .endpointOverride(URI.create(floci.getEndpoint()))
+                .region(Region.of(floci.getRegion()))
                 .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create(floci.getAccessKey(), floci.getSecretKey())))
                 .build()
         ) {
