@@ -15,23 +15,43 @@
  */
 package example.micronaut;
 
+import org.testcontainers.DockerClientFactory;
 import org.testcontainers.containers.GenericContainer;
+
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.net.ServerSocket;
 
 class FakeGcsServerContainer extends GenericContainer<FakeGcsServerContainer> {
 
     private static final String DEFAULT_IMAGE_NAME = "fsouza/fake-gcs-server:1.40.1";
     private static final int DEFAULT_PORT = 4443;
+    private final int hostPort;
+    private final String externalUrl;
 
     public FakeGcsServerContainer() {
         super(DEFAULT_IMAGE_NAME);
-        this.withExposedPorts(DEFAULT_PORT)
-                .withCreateContainerCmdModifier(cmd -> cmd.withEntrypoint("/bin/fake-gcs-server", "-scheme", "http"));
+        hostPort = findAvailablePort();
+        externalUrl = String.format("http://%s:%s", DockerClientFactory.instance().dockerHostIpAddress(), hostPort);
+        addFixedExposedPort(hostPort, DEFAULT_PORT);
+        this.withCreateContainerCmdModifier(cmd -> cmd.withEntrypoint(
+                "/bin/fake-gcs-server",
+                "-scheme", "http",
+                "-external-url", externalUrl));
     }
 
     public String getUrl() {
         if (!isRunning()) {
             start();
         }
-        return String.format("http://%s:%s", getHost(), getMappedPort(DEFAULT_PORT));
+        return externalUrl;
+    }
+
+    private static int findAvailablePort() {
+        try (ServerSocket socket = new ServerSocket(0)) {
+            return socket.getLocalPort();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 }
