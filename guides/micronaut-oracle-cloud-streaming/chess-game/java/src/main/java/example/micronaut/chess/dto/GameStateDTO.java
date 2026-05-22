@@ -15,20 +15,17 @@
  */
 package example.micronaut.chess.dto;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import io.micronaut.core.annotation.Introspected;
 import io.micronaut.core.annotation.NonNull;
+import io.micronaut.serde.annotation.Serdeable;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME;
 
 /**
  * DTO for <code>GameState</code> entity.
  */
-@Introspected // <1>
-@JsonTypeInfo(use = NAME, property = "_className") // <2>
+@Serdeable // <1>
 public class GameStateDTO {
 
     @Size(max = 36)

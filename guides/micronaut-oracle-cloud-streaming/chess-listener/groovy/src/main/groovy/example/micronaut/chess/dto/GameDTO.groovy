@@ -15,7 +15,6 @@
  */
 package example.micronaut.chess.dto
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo
 import groovy.transform.CompileStatic
 import io.micronaut.core.annotation.Creator
 import io.micronaut.serde.annotation.Serdeable
@@ -24,10 +23,8 @@ import io.micronaut.core.annotation.Nullable
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
 
-import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME
 
 @Serdeable // <1>
-@JsonTypeInfo(use = NAME, property = '_className') // <2>
 @CompileStatic
 class GameDTO {
 
@@ -58,7 +55,7 @@ class GameDTO {
      * @param draw <code>true</code> if the game ended in a draw
      * @param winner <code>null</code> if a new game or the game ended in a draw, "b", or "w" to indicate the winner
      */
-    @Creator // <3>
+    @Creator // <2>
     GameDTO(@NonNull String id,
             @Nullable String blackName,
             @Nullable String whiteName,
