@@ -12,6 +12,7 @@ import io.micronaut.guides.core.Guide
 import io.micronaut.guides.core.GuideParser
 import io.micronaut.guides.core.GuideUtils
 import io.micronaut.guides.core.GuidesOption
+import io.micronaut.guides.core.OracleCloudAtpMavenTestResources
 import io.micronaut.starter.api.TestFramework
 import io.micronaut.starter.options.BuildTool
 import io.micronaut.starter.options.JdkVersion
@@ -143,6 +144,7 @@ class GuideProjectGenerator implements AutoCloseable {
 
                 guidesGenerator.generateAppIntoDirectory(destination, app.applicationType(), packageAndName, app.framework(),
                         appFeatures, buildTool, app.testFramework() ?: testFramework, lang, javaVersion)
+                OracleCloudAtpMavenTestResources.addDependency(destinationPath, appFeatures, buildTool)
 
                 if (metadata.base()) {
                     File baseDir = new File(inputDir.parentFile, metadata.base())
