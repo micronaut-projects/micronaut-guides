@@ -33,7 +33,7 @@ class DispatchService(private val deliveryDriverRepository: DeliveryDriverReposi
 
     fun findClosestAvailableDriver(orderLocation: Point): Optional<DriverMatch> {
         val candidates = deliveryDriverRepository.findByStatusAndLocationNear(
-            DeliveryDriver.AVAILABLE,
+            DeliveryDriver.Status.AVAILABLE,
             orderLocation,
             MAX_DISTANCE_METERS
         ) // <2>

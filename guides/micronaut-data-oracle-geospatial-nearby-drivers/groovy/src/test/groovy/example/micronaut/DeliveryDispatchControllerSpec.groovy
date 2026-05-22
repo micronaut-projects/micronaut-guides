@@ -45,22 +45,22 @@ class DeliveryDispatchControllerSpec extends Specification {
         given:
         deliveryDriverRepository.save(new DeliveryDriver(
             'Nearby Driver',
-            DeliveryDriver.AVAILABLE,
+            DeliveryDriver.Status.AVAILABLE,
             new Point(-73.9757d, 40.7554d)
         ))
         DeliveryDriver closest = deliveryDriverRepository.save(new DeliveryDriver(
             'Closest Driver',
-            DeliveryDriver.AVAILABLE,
+            DeliveryDriver.Status.AVAILABLE,
             new Point(-73.9827d, 40.7504d)
         ))
         deliveryDriverRepository.save(new DeliveryDriver(
             'Busy Driver',
-            DeliveryDriver.BUSY,
+            DeliveryDriver.Status.BUSY,
             new Point(-73.9850d, 40.7488d)
         )) // <3>
         deliveryDriverRepository.save(new DeliveryDriver(
             'Far Driver',
-            DeliveryDriver.AVAILABLE,
+            DeliveryDriver.Status.AVAILABLE,
             new Point(-73.9000d, 40.8000d)
         )) // <4>
 
@@ -80,12 +80,12 @@ class DeliveryDispatchControllerSpec extends Specification {
         given:
         deliveryDriverRepository.save(new DeliveryDriver(
             'Busy Driver',
-            DeliveryDriver.BUSY,
+            DeliveryDriver.Status.BUSY,
             new Point(-73.9850d, 40.7488d)
         ))
         deliveryDriverRepository.save(new DeliveryDriver(
             'Far Driver',
-            DeliveryDriver.AVAILABLE,
+            DeliveryDriver.Status.AVAILABLE,
             new Point(-73.9000d, 40.8000d)
         ))
 

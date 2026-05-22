@@ -23,5 +23,5 @@ import io.micronaut.data.repository.CrudRepository
 @JdbcRepository(dialect = Dialect.ORACLE) // <1>
 interface DeliveryDriverRepository : CrudRepository<DeliveryDriver, Long> {
 
-    fun findByStatusAndLocationNear(status: String, orderLocation: Point, maxDistanceMeters: Double): List<DeliveryDriver> // <2>
+    fun findByStatusAndLocationNear(status: DeliveryDriver.Status, orderLocation: Point, maxDistanceMeters: Double): List<DeliveryDriver> // <2>
 }

@@ -44,28 +44,28 @@ class DeliveryDispatchControllerTest(
         deliveryDriverRepository.save(
             DeliveryDriver(
                 "Nearby Driver",
-                DeliveryDriver.AVAILABLE,
+                DeliveryDriver.Status.AVAILABLE,
                 Point(-73.9757, 40.7554)
             )
         )
         val closest = deliveryDriverRepository.save(
             DeliveryDriver(
                 "Closest Driver",
-                DeliveryDriver.AVAILABLE,
+                DeliveryDriver.Status.AVAILABLE,
                 Point(-73.9827, 40.7504)
             )
         )
         deliveryDriverRepository.save(
             DeliveryDriver(
                 "Busy Driver",
-                DeliveryDriver.BUSY,
+                DeliveryDriver.Status.BUSY,
                 Point(-73.9850, 40.7488)
             )
         ) // <3>
         deliveryDriverRepository.save(
             DeliveryDriver(
                 "Far Driver",
-                DeliveryDriver.AVAILABLE,
+                DeliveryDriver.Status.AVAILABLE,
                 Point(-73.9000, 40.8000)
             )
         ) // <4>
@@ -85,14 +85,14 @@ class DeliveryDispatchControllerTest(
         deliveryDriverRepository.save(
             DeliveryDriver(
                 "Busy Driver",
-                DeliveryDriver.BUSY,
+                DeliveryDriver.Status.BUSY,
                 Point(-73.9850, 40.7488)
             )
         )
         deliveryDriverRepository.save(
             DeliveryDriver(
                 "Far Driver",
-                DeliveryDriver.AVAILABLE,
+                DeliveryDriver.Status.AVAILABLE,
                 Point(-73.9000, 40.8000)
             )
         )

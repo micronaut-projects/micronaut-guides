@@ -29,8 +29,8 @@ data class DeliveryDriver(
     @field:NotBlank
     var name: String,
 
-    @field:NotBlank
-    var status: String, // <2>
+    @field:NotNull
+    var status: Status, // <2>
 
     @field:NotNull
     @field:Srid(4326) // <3>
@@ -42,8 +42,8 @@ data class DeliveryDriver(
     var id: Long? = null
 ) {
 
-    companion object {
-        const val AVAILABLE = "AVAILABLE"
-        const val BUSY = "BUSY"
+    enum class Status {
+        AVAILABLE,
+        BUSY
     }
 }

@@ -34,7 +34,7 @@ class DispatchService {
 
     Optional<DriverMatch> findClosestAvailableDriver(Point orderLocation) {
         List<DeliveryDriver> candidates = deliveryDriverRepository.findByStatusAndLocationNear(
-            DeliveryDriver.AVAILABLE,
+            DeliveryDriver.Status.AVAILABLE,
             orderLocation,
             MAX_DISTANCE_METERS
         ) // <2>

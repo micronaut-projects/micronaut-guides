@@ -30,8 +30,10 @@ import jakarta.validation.constraints.NotNull
 @MappedEntity('delivery_driver') // <1>
 class DeliveryDriver {
 
-    static final String AVAILABLE = 'AVAILABLE'
-    static final String BUSY = 'BUSY'
+    enum Status {
+        AVAILABLE,
+        BUSY
+    }
 
     @Id
     @GeneratedValue
@@ -40,8 +42,8 @@ class DeliveryDriver {
     @NotBlank
     String name
 
-    @NotBlank
-    String status // <2>
+    @NotNull
+    Status status // <2>
 
     @NotNull
     @Srid(4326) // <3>
@@ -51,7 +53,7 @@ class DeliveryDriver {
     DeliveryDriver() {
     }
 
-    DeliveryDriver(String name, String status, Point location) {
+    DeliveryDriver(String name, Status status, Point location) {
         this.name = name
         this.status = status
         this.location = location
