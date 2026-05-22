@@ -44,7 +44,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @Property(name = "aws.distributed-configuration.search-active-environments", value = StringUtils.TRUE)
 class VatControllerDistributedConfigurationSpecificEnvironmentTest implements TestPropertyProvider {
 
-    private static DockerImageName localstackImage = DockerImageName.parse("localstack/localstack:latest");
+    private static DockerImageName localstackImage = DockerImageName.parse("localstack/localstack:4.14.0");
     private static LocalStackContainer localstack = new LocalStackContainer(localstackImage)
             .withServices(LocalStackContainer.Service.SSM);
 

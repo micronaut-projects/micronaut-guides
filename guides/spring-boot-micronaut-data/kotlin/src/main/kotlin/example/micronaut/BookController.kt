@@ -13,15 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package example.micronaut.chess.dto
+package example.micronaut
 
-import io.micronaut.serde.annotation.Serdeable
-import jakarta.validation.constraints.Size
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.RestController
 
-@Serdeable // <1>
-data class GameStateDTO(@field:Size(max = 36) val id: String,
-                        @field:Size(max = 36) val gameId: String,
-                        @field:Size(max = 1) val player: String,
-                        @field:Size(max = 100) val move: String,
-                        val fen: String,
-                        @field:Size(max = 10) val pgn: String)
+@RestController // <1>
+open class BookController {
+
+    @Autowired // <2>
+    private lateinit var bookRepository: BookRepository
+
+    @GetMapping("/books") // <3>
+    fun list(): Iterable<Book> = bookRepository.findAll()
+}

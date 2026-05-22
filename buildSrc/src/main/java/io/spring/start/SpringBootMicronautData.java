@@ -7,6 +7,7 @@ import io.micronaut.starter.build.dependencies.Dependency;
 import io.micronaut.starter.build.dependencies.MicronautDependencyUtils;
 import io.micronaut.starter.build.dependencies.Scope;
 import io.micronaut.starter.feature.Feature;
+import io.micronaut.starter.feature.RequireKaptFeature;
 import io.micronaut.starter.feature.database.H2;
 import io.micronaut.starter.util.VersionInfo;
 import jakarta.inject.Singleton;
@@ -17,7 +18,7 @@ import static io.micronaut.starter.application.ApplicationType.DEFAULT;
 import static io.micronaut.starter.feature.Category.DATABASE;
 
 @Singleton
-public class SpringBootMicronautData implements Feature {
+public class SpringBootMicronautData implements Feature, RequireKaptFeature {
 
     public static final String MICRONAUT_VERSION = "micronaut.version";
 

@@ -31,7 +31,7 @@ import spock.util.concurrent.PollingConditions
 
 @MicronautTest // <1>
 class MicronautguideSpec extends Specification implements TestPropertyProvider { // <3>
-    private static DockerImageName localstackImage = DockerImageName.parse("localstack/localstack:latest")
+    private static DockerImageName localstackImage = DockerImageName.parse("localstack/localstack:4.14.0")
     @AutoCleanup
     @Shared
     private static LocalStackContainer localstack = new LocalStackContainer(localstackImage)

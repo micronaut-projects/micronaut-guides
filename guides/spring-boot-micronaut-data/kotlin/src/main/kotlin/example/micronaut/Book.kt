@@ -13,15 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package example.micronaut.chess.dto
+package example.micronaut
 
-import io.micronaut.serde.annotation.Serdeable
-import jakarta.validation.constraints.Size
+import io.micronaut.core.annotation.Nullable
+import io.micronaut.data.annotation.GeneratedValue
+import io.micronaut.data.annotation.Id
+import io.micronaut.data.annotation.MappedEntity
 
-@Serdeable // <1>
-data class GameStateDTO(@field:Size(max = 36) val id: String,
-                        @field:Size(max = 36) val gameId: String,
-                        @field:Size(max = 1) val player: String,
-                        @field:Size(max = 100) val move: String,
-                        val fen: String,
-                        @field:Size(max = 10) val pgn: String)
+@MappedEntity // <1>
+data class Book(
+    @field:Id // <2>
+    @field:GeneratedValue // <3>
+    @field:Nullable // <4>
+    val id: Long? = null,
+    val title: String,
+    val pages: Int
+)

@@ -40,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS) // <2>
 class VatControllerDistributedConfigurationTest implements TestPropertyProvider { // <3>
 
-    private static DockerImageName localstackImage = DockerImageName.parse("localstack/localstack:latest");
+    private static DockerImageName localstackImage = DockerImageName.parse("localstack/localstack:4.14.0");
     private static LocalStackContainer localstack = new LocalStackContainer(localstackImage)
             .withServices(LocalStackContainer.Service.SSM);
 
