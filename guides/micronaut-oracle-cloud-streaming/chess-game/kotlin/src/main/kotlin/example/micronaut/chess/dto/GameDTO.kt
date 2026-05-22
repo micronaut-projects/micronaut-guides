@@ -15,17 +15,14 @@
  */
 package example.micronaut.chess.dto
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME
 import io.micronaut.core.annotation.Creator
-import io.micronaut.core.annotation.Introspected
+import io.micronaut.serde.annotation.Serdeable
 import jakarta.validation.constraints.Size
 
-@Introspected // <1>
-@JsonTypeInfo(use = NAME, property = "_className") // <2>
+@Serdeable // <1>
 class GameDTO
 
-    @Creator // <3>
+    @Creator // <2>
     constructor(@field:Size(max = 36) val id: String,
                 @field:Size(max = 255) val blackName: String?,
                 @field:Size(max = 255) val whiteName: String?,
