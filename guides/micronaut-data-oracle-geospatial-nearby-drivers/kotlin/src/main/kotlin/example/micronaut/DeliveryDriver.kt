@@ -25,7 +25,7 @@ import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 
 @MappedEntity("delivery_driver") // <1>
-class DeliveryDriver(
+data class DeliveryDriver(
     @field:NotBlank
     var name: String,
 
@@ -35,15 +35,15 @@ class DeliveryDriver(
     @field:NotNull
     @field:Srid(4326) // <3>
     @field:Index(columns = ["location"]) // <4>
-    var location: Point
+    var location: Point,
+
+    @field:Id
+    @field:GeneratedValue
+    var id: Long? = null
 ) {
 
     companion object {
         const val AVAILABLE = "AVAILABLE"
         const val BUSY = "BUSY"
     }
-
-    @field:Id
-    @field:GeneratedValue
-    var id: Long? = null
 }

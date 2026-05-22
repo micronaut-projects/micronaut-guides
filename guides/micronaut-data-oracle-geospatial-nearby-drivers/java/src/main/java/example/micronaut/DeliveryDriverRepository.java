@@ -25,5 +25,5 @@ import java.util.List;
 @JdbcRepository(dialect = Dialect.ORACLE) // <1>
 public interface DeliveryDriverRepository extends CrudRepository<DeliveryDriver, Long> {
 
-    List<DeliveryDriver> findByStatusAndLocationNear(String status, Point orderLocation, double maxDistanceMeters); // <2>
+    List<DeliveryDriver> findByStatusAndLocationNear(DeliveryDriver.Status status, Point orderLocation, double maxDistanceMeters); // <2>
 }

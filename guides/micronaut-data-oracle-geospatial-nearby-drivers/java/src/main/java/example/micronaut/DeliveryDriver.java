@@ -25,64 +25,29 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 @MappedEntity("delivery_driver") // <1>
-public class DeliveryDriver {
-
-    public static final String AVAILABLE = "AVAILABLE";
-    public static final String BUSY = "BUSY";
-
+public record DeliveryDriver(
     @Id
     @GeneratedValue
-    private Long id;
+    Long id,
 
     @NotBlank
-    private String name;
+    String name,
 
-    @NotBlank
-    private String status; // <2>
+    @NotNull
+    Status status, // <2>
 
     @NotNull
     @Srid(4326) // <3>
     @Index(columns = "location") // <4>
-    private Point location;
+    Point location
+) {
 
-    public DeliveryDriver() {
+    public enum Status {
+        AVAILABLE,
+        BUSY
     }
 
-    public DeliveryDriver(String name, String status, Point location) {
-        this.name = name;
-        this.status = status;
-        this.location = location;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public Point getLocation() {
-        return location;
-    }
-
-    public void setLocation(Point location) {
-        this.location = location;
+    public DeliveryDriver(String name, Status status, Point location) {
+        this(null, name, status, location);
     }
 }

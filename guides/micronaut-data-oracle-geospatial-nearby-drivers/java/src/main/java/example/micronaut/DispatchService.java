@@ -36,16 +36,16 @@ public class DispatchService {
 
     public Optional<DriverMatch> findClosestAvailableDriver(Point orderLocation) {
         List<DeliveryDriver> candidates = deliveryDriverRepository.findByStatusAndLocationNear(
-            DeliveryDriver.AVAILABLE,
+            DeliveryDriver.Status.AVAILABLE,
             orderLocation,
             MAX_DISTANCE_METERS
         ); // <2>
 
         return candidates.stream()
             .map(driver -> new DriverMatch(
-                driver.getId(),
-                driver.getName(),
-                distanceMeters(orderLocation, driver.getLocation())
+                driver.id(),
+                driver.name(),
+                distanceMeters(orderLocation, driver.location())
             ))
             .min(Comparator.comparingDouble(DriverMatch::distanceMeters)); // <3>
     }
