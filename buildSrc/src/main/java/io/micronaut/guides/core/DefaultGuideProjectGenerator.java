@@ -113,7 +113,6 @@ public class DefaultGuideProjectGenerator implements GuideProjectGenerator {
                     generatorContext.getProject(),
                     new FileSystemOutputHandler(destination, ConsoleOutput.NOOP),
                     generatorContext);
-            OracleCloudAtpMavenTestResources.addDependency(destinationPath, appFeatures, guidesOption.getBuildTool());
         } catch (Exception e) {
             LOG.error("Error generating application: " + e.getMessage(), e);
             throw new IOException(e.getMessage(), e);
