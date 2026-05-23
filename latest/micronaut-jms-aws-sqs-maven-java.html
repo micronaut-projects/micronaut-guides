@@ -127,7 +127,7 @@
 </li>
 <li><a href="#testing">6. Testing</a>
 <ul class="sectlevel2">
-<li><a href="#localstack-dependencies">6.1. LocalStack Dependencies</a></li>
+<li><a href="#floci-dependencies">6.1. Floci Dependencies</a></li>
 </ul>
 </li>
 <li><a href="#amazon-web-services-aws">7. Amazon Web Services (AWS)</a>
@@ -242,7 +242,7 @@
 <div class="listingblock">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide <span class="se">\</span>
-    <span class="nt">--features</span><span class="o">=</span>jms-sqs,localstack,awaitility <span class="se">\</span>
+    <span class="nt">--features</span><span class="o">=</span>jms-sqs,testcontainers,testcontainers-floci,awaitility <span class="se">\</span>
     <span class="nt">--build</span><span class="o">=</span>maven <span class="se">\</span>
     <span class="nt">--lang</span><span class="o">=</span>java <span class="se">\</span>
     <span class="nt">--test</span><span class="o">=</span>junit</code></pre>
@@ -264,7 +264,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle with the <a
 <p>The previous command creates a Micronaut application with the default package <code>example.micronaut</code> in a directory named <code>micronautguide</code>.</p>
 </div>
 <div class="paragraph">
-<p>If you use Micronaut Launch, select Micronaut Application as application type and add <code>jms-sqs</code>, <code>localstack</code>, and <code>awaitility</code> features.</p>
+<p>If you use Micronaut Launch, select Micronaut Application as application type and add <code>jms-sqs</code>, <code>testcontainers</code>, <code>testcontainers-floci</code>, and <code>awaitility</code> features.</p>
 </div>
 <div class="admonitionblock note">
 <table>
@@ -279,7 +279,7 @@ If you have an existing Micronaut application and want to add the functionality 
 </table>
 </div>
 <div class="paragraph">
-<p><a href="https://micronaut.io/launch?features=jms-sqs&amp;features=localstack&amp;features=awaitility&amp;lang=JAVA&amp;build=MAVEN&amp;test=JUNIT&amp;name=micronautguide&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">Diff</a></p>
+<p><a href="https://micronaut.io/launch?features=jms-sqs&amp;features=testcontainers&amp;features=testcontainers-floci&amp;features=awaitility&amp;lang=JAVA&amp;build=MAVEN&amp;test=JUNIT&amp;name=micronautguide&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">Diff</a></p>
 </div>
 <div class="paragraph">
 <p><a href="https://guides.micronaut.io/latest/micronaut-intellij-idea-ide-setup.html">Setup IntelliJ IDEA to develop Micronaut Applications</a>.</p>
@@ -467,19 +467,15 @@ If you have an existing Micronaut application and want to add the functionality 
 <h2 id="testing">6. Testing</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>To test, we will use <a href="https://www.localstack.cloud">LocalStack</a>.</p>
+<p>To test, we will use <a href="https://github.com/floci-io/floci">Floci</a>.</p>
 </div>
-<div class="quoteblock">
-<blockquote>
 <div class="paragraph">
-<p>Develop and test your AWS applications locally to reduce development time and increase product velocity. Reduce unnecessary AWS spend and remove the complexity and risk of maintaining AWS dev accounts.</p>
-</div>
-</blockquote>
+<p>Floci tests run through Docker and Testcontainers. The Floci container mounts the Docker daemon socket at <code>/var/run/docker.sock</code>, so run these tests only in trusted local or trusted CI Docker environments.</p>
 </div>
 <div class="sect2">
-<h3 id="localstack-dependencies">6.1. LocalStack Dependencies</h3>
+<h3 id="floci-dependencies">6.1. Floci Dependencies</h3>
 <div class="paragraph">
-<p>Add the following dependencies to your test classpath:</p>
+<p>To test with Floci, add the following dependencies:</p>
 </div>
 <div class="listingblock">
 <div class="title">pom.xml</div>
@@ -490,8 +486,8 @@ If you have an existing Micronaut application and want to add the functionality 
     <span class="nt">&lt;scope&gt;</span>test<span class="nt">&lt;/scope&gt;</span>
 <span class="nt">&lt;/dependency&gt;</span>
 <span class="nt">&lt;dependency&gt;</span>
-    <span class="nt">&lt;groupId&gt;</span>org.testcontainers<span class="nt">&lt;/groupId&gt;</span>
-    <span class="nt">&lt;artifactId&gt;</span>testcontainers-localstack<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>io.floci<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>testcontainers-floci<span class="nt">&lt;/artifactId&gt;</span>
     <span class="nt">&lt;scope&gt;</span>test<span class="nt">&lt;/scope&gt;</span>
 <span class="nt">&lt;/dependency&gt;</span>
 <span class="nt">&lt;dependency&gt;</span>
@@ -502,7 +498,7 @@ If you have an existing Micronaut application and want to add the functionality 
 </div>
 </div>
 <div class="paragraph">
-<p>First, we create a configuration properties object to encapsulate the configuration of the SQS client, which we will provide via LocalStack.</p>
+<p>First, we create a configuration properties object to encapsulate the configuration of the SQS client, which we will provide via Floci.</p>
 </div>
 <div class="listingblock">
 <div class="title">src/test/java/example/micronaut/SqsConfig.java</div>
@@ -573,7 +569,7 @@ If you have an existing Micronaut application and want to add the functionality 
 </table>
 </div>
 <div class="paragraph">
-<p>Create a <code>BeanCreatedEventListener</code> to override the SQS client endpoint with the LocalStack endpoint.</p>
+<p>Create a <code>BeanCreatedEventListener</code> to override the SQS client endpoint with the Floci endpoint.</p>
 </div>
 <div class="listingblock">
 <div class="title">src/test/java/example/micronaut/SqsClientBuilderListener.java</div>
@@ -681,13 +677,14 @@ If you have an existing Micronaut application and want to add the functionality 
 </table>
 </div>
 <div class="paragraph">
-<p>Create a test using the <a href="https://java.testcontainers.org/modules/localstack/">Testcontainers LocalStack</a> module to start a LocalStack container and verify that the message has been sent and received.</p>
+<p>Create a test using the Floci Testcontainers module to start a Floci container and verify that the message has been sent and received.</p>
 </div>
 <div class="listingblock">
 <div class="title">src/test/java/example/micronaut/MicronautguideTest.java</div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
 
+<span class="kn">import</span> <span class="nn">io.floci.testcontainers.FlociContainer</span><span class="o">;</span>
 <span class="kn">import</span> <span class="nn">io.micronaut.core.annotation.NonNull</span><span class="o">;</span>
 <span class="kn">import</span> <span class="nn">io.micronaut.http.HttpRequest</span><span class="o">;</span>
 <span class="kn">import</span> <span class="nn">io.micronaut.http.client.HttpClient</span><span class="o">;</span>
@@ -697,7 +694,6 @@ If you have an existing Micronaut application and want to add the functionality 
 <span class="kn">import</span> <span class="nn">jakarta.inject.Inject</span><span class="o">;</span>
 <span class="kn">import</span> <span class="nn">org.junit.jupiter.api.Test</span><span class="o">;</span>
 <span class="kn">import</span> <span class="nn">org.junit.jupiter.api.TestInstance</span><span class="o">;</span>
-<span class="kn">import</span> <span class="nn">org.testcontainers.containers.localstack.LocalStackContainer</span><span class="o">;</span>
 <span class="kn">import</span> <span class="nn">org.testcontainers.utility.DockerImageName</span><span class="o">;</span>
 
 <span class="kn">import</span> <span class="nn">java.util.Collections</span><span class="o">;</span>
@@ -711,19 +707,18 @@ If you have an existing Micronaut application and want to add the functionality 
 <span class="nd">@TestInstance</span><span class="o">(</span><span class="nc">TestInstance</span><span class="o">.</span><span class="na">Lifecycle</span><span class="o">.</span><span class="na">PER_CLASS</span><span class="o">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
 <span class="kd">class</span> <span class="nc">MicronautguideTest</span> <span class="kd">implements</span> <span class="nc">TestPropertyProvider</span> <span class="o">{</span> <i class="conum" data-value="3"></i><b>(3)</b>
 
-    <span class="kd">private</span> <span class="kd">static</span> <span class="nc">DockerImageName</span> <span class="n">localstackImage</span> <span class="o">=</span> <span class="nc">DockerImageName</span><span class="o">.</span><span class="na">parse</span><span class="o">(</span><span class="s">"localstack/localstack:latest"</span><span class="o">);</span>
-    <span class="kd">private</span> <span class="kd">static</span> <span class="nc">LocalStackContainer</span> <span class="n">localstack</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">LocalStackContainer</span><span class="o">(</span><span class="n">localstackImage</span><span class="o">)</span>
-            <span class="o">.</span><span class="na">withServices</span><span class="o">(</span><span class="nc">LocalStackContainer</span><span class="o">.</span><span class="na">Service</span><span class="o">.</span><span class="na">SQS</span><span class="o">);</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="nc">DockerImageName</span> <span class="no">FLOCI_IMAGE</span> <span class="o">=</span> <span class="nc">DockerImageName</span><span class="o">.</span><span class="na">parse</span><span class="o">(</span><span class="s">"floci/floci:1.5.18"</span><span class="o">);</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="nc">FlociContainer</span> <span class="n">floci</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">FlociContainer</span><span class="o">(</span><span class="no">FLOCI_IMAGE</span><span class="o">);</span>
 
     <span class="nd">@Override</span>
     <span class="kd">public</span> <span class="nd">@NonNull</span> <span class="nc">Map</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">,</span> <span class="nc">String</span><span class="o">&gt;</span> <span class="nf">getProperties</span><span class="o">()</span> <span class="o">{</span>
-        <span class="k">if</span> <span class="o">(!</span><span class="n">localstack</span><span class="o">.</span><span class="na">isRunning</span><span class="o">())</span> <span class="o">{</span>
-            <span class="n">localstack</span><span class="o">.</span><span class="na">start</span><span class="o">();</span>
+        <span class="k">if</span> <span class="o">(!</span><span class="n">floci</span><span class="o">.</span><span class="na">isRunning</span><span class="o">())</span> <span class="o">{</span>
+            <span class="n">floci</span><span class="o">.</span><span class="na">start</span><span class="o">();</span>
         <span class="o">}</span>
-        <span class="k">return</span> <span class="nc">Map</span><span class="o">.</span><span class="na">of</span><span class="o">(</span><span class="s">"aws.access-key-id"</span><span class="o">,</span> <span class="n">localstack</span><span class="o">.</span><span class="na">getAccessKey</span><span class="o">(),</span>
-                <span class="s">"aws.secret-key"</span><span class="o">,</span> <span class="n">localstack</span><span class="o">.</span><span class="na">getSecretKey</span><span class="o">(),</span>
-                <span class="s">"aws.region"</span><span class="o">,</span> <span class="n">localstack</span><span class="o">.</span><span class="na">getRegion</span><span class="o">(),</span>
-                <span class="s">"aws.services.sqs.endpoint-override"</span><span class="o">,</span> <span class="n">localstack</span><span class="o">.</span><span class="na">getEndpointOverride</span><span class="o">(</span><span class="nc">LocalStackContainer</span><span class="o">.</span><span class="na">Service</span><span class="o">.</span><span class="na">SQS</span><span class="o">).</span><span class="na">toString</span><span class="o">());</span>
+        <span class="k">return</span> <span class="nc">Map</span><span class="o">.</span><span class="na">of</span><span class="o">(</span><span class="s">"aws.access-key-id"</span><span class="o">,</span> <span class="n">floci</span><span class="o">.</span><span class="na">getAccessKey</span><span class="o">(),</span>
+                <span class="s">"aws.secret-key"</span><span class="o">,</span> <span class="n">floci</span><span class="o">.</span><span class="na">getSecretKey</span><span class="o">(),</span>
+                <span class="s">"aws.region"</span><span class="o">,</span> <span class="n">floci</span><span class="o">.</span><span class="na">getRegion</span><span class="o">(),</span>
+                <span class="s">"aws.services.sqs.endpoint-override"</span><span class="o">,</span> <span class="n">floci</span><span class="o">.</span><span class="na">getEndpoint</span><span class="o">());</span>
     <span class="o">}</span>
     <span class="nd">@Inject</span>
     <span class="nd">@Client</span><span class="o">(</span><span class="s">"/"</span><span class="o">)</span>
