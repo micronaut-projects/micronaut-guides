@@ -15,6 +15,7 @@
  */
 package example.micronaut;
 
+import io.floci.testcontainers.FlociContainer;
 import io.micronaut.context.annotation.Property;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.http.client.BlockingHttpClient;
@@ -24,13 +25,14 @@ import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import io.micronaut.test.support.TestPropertyProvider;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.testcontainers.containers.localstack.LocalStackContainer;
 import org.testcontainers.utility.DockerImageName;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.secretsmanager.SecretsManagerClient;
 import software.amazon.awssdk.services.secretsmanager.model.CreateSecretRequest;
 
+import java.net.URI;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -41,18 +43,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS) // <2>
 class ClientIdControllerTest implements TestPropertyProvider { // <3>
 
-    private static DockerImageName localstackImage = DockerImageName.parse("localstack/localstack:4.14.0");
-    private static LocalStackContainer localstack = new LocalStackContainer(localstackImage)
-            .withServices(LocalStackContainer.Service.SECRETSMANAGER);
+    private static final DockerImageName FLOCI_IMAGE = DockerImageName.parse("floci/floci:1.5.18");
+    private static FlociContainer floci = new FlociContainer(FLOCI_IMAGE);
 
     @Override
     public @NonNull Map<String, String> getProperties() {
-        if (!localstack.isRunning()) {
-            localstack.start();
+        if (!floci.isRunning()) {
+            floci.start();
         }
         try (SecretsManagerClient secretsManager = SecretsManagerClient.builder()
-                .endpointOverride(localstack.getEndpointOverride(LocalStackContainer.Service.SECRETSMANAGER))
-                .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create(localstack.getAccessKey(), localstack.getSecretKey())))
+                .endpointOverride(URI.create(floci.getEndpoint()))
+                .region(Region.of(floci.getRegion()))
+                .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create(floci.getAccessKey(), floci.getSecretKey())))
                 .build()
         ) {
             secretsManager.createSecret(CreateSecretRequest.builder()
@@ -60,10 +62,10 @@ class ClientIdControllerTest implements TestPropertyProvider { // <3>
                     .secretString("{\"micronaut.security.oauth2.clients.companyauthserver.client-id\":\"XXX\",\"micronaut.security.oauth2.clients.companyauthserver.client-secret\":\"YYY\"}")
                     .build());
         }
-        return Map.of("aws.access-key-id", localstack.getAccessKey(),
-                "aws.secret-key", localstack.getSecretKey(),
-                "aws.region", localstack.getRegion(),
-                "aws.services.secretsmanager.endpoint-override", localstack.getEndpointOverride(LocalStackContainer.Service.SECRETSMANAGER).toString());
+        return Map.of("aws.access-key-id", floci.getAccessKey(),
+                "aws.secret-key", floci.getSecretKey(),
+                "aws.region", floci.getRegion(),
+                "aws.services.secretsmanager.endpoint-override", floci.getEndpoint());
     }
 
     @Test

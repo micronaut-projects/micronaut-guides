@@ -15,6 +15,7 @@
  */
 package example.micronaut;
 
+import io.floci.testcontainers.FlociContainer;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.client.HttpClient;
@@ -24,7 +25,6 @@ import io.micronaut.test.support.TestPropertyProvider;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.testcontainers.containers.localstack.LocalStackContainer;
 import org.testcontainers.utility.DockerImageName;
 
 import java.util.Collections;
@@ -38,19 +38,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS) // <2>
 class MicronautguideTest implements TestPropertyProvider { // <3>
 
-    private static DockerImageName localstackImage = DockerImageName.parse("localstack/localstack:4.14.0");
-    private static LocalStackContainer localstack = new LocalStackContainer(localstackImage)
-            .withServices(LocalStackContainer.Service.SQS);
+    private static final DockerImageName FLOCI_IMAGE = DockerImageName.parse("floci/floci:1.5.18");
+    private static FlociContainer floci = new FlociContainer(FLOCI_IMAGE);
 
     @Override
     public @NonNull Map<String, String> getProperties() {
-        if (!localstack.isRunning()) {
-            localstack.start();
+        if (!floci.isRunning()) {
+            floci.start();
         }
-        return Map.of("aws.access-key-id", localstack.getAccessKey(),
-                "aws.secret-key", localstack.getSecretKey(),
-                "aws.region", localstack.getRegion(),
-                "aws.services.sqs.endpoint-override", localstack.getEndpointOverride(LocalStackContainer.Service.SQS).toString());
+        return Map.of("aws.access-key-id", floci.getAccessKey(),
+                "aws.secret-key", floci.getSecretKey(),
+                "aws.region", floci.getRegion(),
+                "aws.services.sqs.endpoint-override", floci.getEndpoint());
     }
     @Inject
     @Client("/")

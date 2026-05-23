@@ -15,6 +15,7 @@
  */
 package example.micronaut;
 
+import io.floci.testcontainers.FlociContainer;
 import io.micronaut.context.annotation.Property;
 import io.micronaut.context.env.Environment;
 import io.micronaut.core.annotation.NonNull;
@@ -26,14 +27,15 @@ import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import io.micronaut.test.support.TestPropertyProvider;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.testcontainers.containers.localstack.LocalStackContainer;
 import org.testcontainers.utility.DockerImageName;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.ssm.SsmClient;
 import software.amazon.awssdk.services.ssm.model.ParameterType;
 import software.amazon.awssdk.services.ssm.model.PutParameterRequest;
 
+import java.net.URI;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -44,29 +46,29 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @Property(name = "aws.distributed-configuration.search-active-environments", value = StringUtils.TRUE)
 class VatControllerDistributedConfigurationSpecificEnvironmentTest implements TestPropertyProvider {
 
-    private static DockerImageName localstackImage = DockerImageName.parse("localstack/localstack:4.14.0");
-    private static LocalStackContainer localstack = new LocalStackContainer(localstackImage)
-            .withServices(LocalStackContainer.Service.SSM);
+    private static final DockerImageName FLOCI_IMAGE = DockerImageName.parse("floci/floci:1.5.18");
+    private static FlociContainer floci = new FlociContainer(FLOCI_IMAGE);
 
     @Override
     public @NonNull Map<String, String> getProperties() {
-        if (!localstack.isRunning()) {
-            localstack.start();
+        if (!floci.isRunning()) {
+            floci.start();
         }
         try (SsmClient ssmClient = SsmClient.builder()
-                .endpointOverride(localstack.getEndpointOverride(LocalStackContainer.Service.SSM))
-                .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create(localstack.getAccessKey(), localstack.getSecretKey())))
+                .endpointOverride(URI.create(floci.getEndpoint()))
+                .region(Region.of(floci.getRegion()))
+                .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create(floci.getAccessKey(), floci.getSecretKey())))
                 .build()
         ) {
-            ssmClient.putParameter(putParameterRequest("/config/micronautguide/vat/country/", "Spain"));
-            ssmClient.putParameter(putParameterRequest("/config/micronautguide/vat/rate/", "21"));
-            ssmClient.putParameter(putParameterRequest("/config/micronautguide_ch/vat/country/", "Switzerland"));
-            ssmClient.putParameter(putParameterRequest("/config/micronautguide_ch/vat/rate/", "7.7"));
+            ssmClient.putParameter(putParameterRequest("/config/micronautguide/vat/country", "Spain"));
+            ssmClient.putParameter(putParameterRequest("/config/micronautguide/vat/rate", "21"));
+            ssmClient.putParameter(putParameterRequest("/config/micronautguide_ch/vat/country", "Switzerland"));
+            ssmClient.putParameter(putParameterRequest("/config/micronautguide_ch/vat/rate", "7.7"));
         }
-        return Map.of("aws.access-key-id", localstack.getAccessKey(),
-                "aws.secret-key", localstack.getSecretKey(),
-                "aws.region", localstack.getRegion(),
-                "aws.services.ssm.endpoint-override", localstack.getEndpointOverride(LocalStackContainer.Service.SSM).toString());
+        return Map.of("aws.access-key-id", floci.getAccessKey(),
+                "aws.secret-key", floci.getSecretKey(),
+                "aws.region", floci.getRegion(),
+                "aws.services.ssm.endpoint-override", floci.getEndpoint());
     }
 
     private PutParameterRequest putParameterRequest(String name, String value) {

@@ -24,7 +24,6 @@ import io.micronaut.serde.annotation.Serdeable
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
 
-
 @Serdeable // <1>
 @CompileStatic
 class GameDTO {

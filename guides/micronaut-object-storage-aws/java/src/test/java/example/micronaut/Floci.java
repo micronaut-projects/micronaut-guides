@@ -15,36 +15,35 @@
  */
 package example.micronaut;
 
+import io.floci.testcontainers.FlociContainer;
 import io.micronaut.core.util.CollectionUtils;
-import org.testcontainers.containers.localstack.LocalStackContainer;
 import org.testcontainers.utility.DockerImageName;
 
 import java.util.Map;
 
-public class LocalStack {
-    private static final String TAG = "4.14.0";
-    private static final String IMAGE = "localstack/localstack";
-    private static LocalStackContainer localstack;
+public class Floci {
+    private static final DockerImageName FLOCI_IMAGE = DockerImageName.parse("floci/floci:1.5.18");
+    private static FlociContainer floci;
 
-    private static LocalStackContainer getLocalStack() {
+    private static FlociContainer getFloci() {
         init();
-        return localstack;
+        return floci;
     }
 
     private static String getEndpoint() {
-        return getLocalStack().getEndpointOverride(LocalStackContainer.Service.S3).toString();
+        return getFloci().getEndpoint();
     }
 
     private static String secretAccessKey() {
-        return getLocalStack().getSecretKey();
+        return getFloci().getSecretKey();
     }
 
     private static String getRegion() {
-        return getLocalStack().getRegion();
+        return getFloci().getRegion();
     }
 
     private static String accessKeyId() {
-        return getLocalStack().getAccessKey();
+        return getFloci().getAccessKey();
     }
 
     public static Map<String, String> getProperties() {
@@ -52,20 +51,20 @@ public class LocalStack {
                 "aws.accessKeyId", accessKeyId(),
                 "aws.secretKey", secretAccessKey(),
                 "aws.region", getRegion(),
-                "aws.services.s3.endpoint-override", getEndpoint()
+                "aws.services.s3.endpoint-override", getEndpoint(),
+                "aws.services.s3.path-style-access-enabled", "true"
         );
     }
 
     public static void init() {
-        if (localstack == null) {
-            localstack = new LocalStackContainer(DockerImageName.parse(IMAGE + ":" + TAG))
-                    .withServices(LocalStackContainer.Service.S3);
-            localstack.start();
+        if (floci == null) {
+            floci = new FlociContainer(FLOCI_IMAGE);
+            floci.start();
         }
     }
     public static void close() {
-        if (localstack != null) {
-            localstack.close();
+        if (floci != null) {
+            floci.close();
         }
     }
 }

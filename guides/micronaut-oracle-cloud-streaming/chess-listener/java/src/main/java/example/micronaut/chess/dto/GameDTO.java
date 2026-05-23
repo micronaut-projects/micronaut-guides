@@ -23,7 +23,6 @@ import io.micronaut.core.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-
 @Serdeable // <1>
 public class GameDTO {
 

@@ -86,9 +86,8 @@ public class ProfilePicturesController implements ProfilePicturesApi {
 
     private static HttpResponse<StreamedFile> buildStreamedFile(GoogleCloudStorageEntry entry) {
         Blob nativeEntry = entry.getNativeEntry();
-        MediaType mediaType = Optional.ofNullable(nativeEntry.getContentType())
-                .map(MediaType::of)
-                .orElse(MediaType.APPLICATION_OCTET_STREAM_TYPE);
+        String contentType = nativeEntry.getContentType();
+        MediaType mediaType = contentType != null ? MediaType.of(contentType) : MediaType.APPLICATION_OCTET_STREAM_TYPE;
         StreamedFile file = new StreamedFile(entry.getInputStream(), mediaType).attach(entry.getKey());
         MutableHttpResponse<Object> httpResponse = HttpResponse.ok()
                 .header(HttpHeaders.ETAG, nativeEntry.getEtag()); // <3>
