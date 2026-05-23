@@ -15,6 +15,7 @@
  */
 package example.micronaut
 
+import io.floci.testcontainers.FlociContainer
 import io.micronaut.core.annotation.NonNull
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.client.HttpClient
@@ -27,7 +28,6 @@ import org.hamcrest.Matchers
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.testcontainers.containers.localstack.LocalStackContainer
 import org.testcontainers.utility.DockerImageName
 
 @MicronautTest // <1>
@@ -42,15 +42,14 @@ internal class MicronautguideTest : TestPropertyProvider { // <3>
     lateinit var demoConsumer: DemoConsumer
 
     override fun getProperties(): @NonNull MutableMap<String, String> {
-        if (!localstack.isRunning) {
-            localstack.start()
+        if (!floci.isRunning) {
+            floci.start()
         }
         return mapOf(
-            "aws.access-key-id" to localstack.accessKey,
-            "aws.secret-key" to localstack.secretKey,
-            "aws.region" to localstack.region,
-            "aws.services.sqs.endpoint-override" to localstack.getEndpointOverride(LocalStackContainer.Service.SQS)
-                .toString()
+            "aws.access-key-id" to floci.accessKey,
+            "aws.secret-key" to floci.secretKey,
+            "aws.region" to floci.region,
+            "aws.services.sqs.endpoint-override" to floci.endpoint
         ).toMutableMap()
     }
 
@@ -63,8 +62,6 @@ internal class MicronautguideTest : TestPropertyProvider { // <3>
     }
 
     companion object {
-        private val localstackImage: DockerImageName = DockerImageName.parse("localstack/localstack:latest")
-        private val localstack: LocalStackContainer = LocalStackContainer(localstackImage)
-            .withServices(LocalStackContainer.Service.SQS)
+        private val floci: FlociContainer = FlociContainer(DockerImageName.parse("floci/floci:1.5.18"))
     }
 }
