@@ -21,6 +21,7 @@ import org.bson.codecs.pojo.annotations.BsonCreator
 import org.bson.codecs.pojo.annotations.BsonProperty
 import jakarta.validation.constraints.NotBlank
 
+@ReflectiveAccess
 @Serdeable // <1>
 data class Fruit @Creator @BsonCreator constructor( // <4>
     @field:BsonProperty("name") @param:BsonProperty("name") @field:NotBlank val name: String, // <2> <3>
