@@ -15,48 +15,47 @@
  */
 package example.micronaut
 
-import org.testcontainers.containers.localstack.LocalStackContainer
+import io.floci.testcontainers.FlociContainer
 import org.testcontainers.utility.DockerImageName
 
-object LocalStack {
-    private const val TAG = "4.14.0"
-    private const val IMAGE = "localstack/localstack"
-    private var localstack: LocalStackContainer? = null
+object Floci {
+    private val flociImage: DockerImageName = DockerImageName.parse("floci/floci:1.5.18")
+    private var floci: FlociContainer? = null
 
-    private fun getLocalStack(): LocalStackContainer {
+    private fun getFloci(): FlociContainer {
         init()
-        return localstack!!
+        return floci!!
     }
 
     private fun getEndpoint(): String =
-        getLocalStack().getEndpointOverride(LocalStackContainer.Service.S3).toString()
+        getFloci().endpoint
 
     private fun secretAccessKey(): String =
-        getLocalStack().secretKey
+        getFloci().secretKey
 
     private fun getRegion(): String =
-        getLocalStack().region
+        getFloci().region
 
     private fun accessKeyId(): String =
-        getLocalStack().accessKey
+        getFloci().accessKey
 
     fun getProperties(): Map<String, String> = mapOf(
         "aws.accessKeyId" to accessKeyId(),
         "aws.secretKey" to secretAccessKey(),
         "aws.region" to getRegion(),
-        "aws.services.s3.endpoint-override" to getEndpoint()
+        "aws.services.s3.endpoint-override" to getEndpoint(),
+        "aws.services.s3.path-style-access-enabled" to "true"
     )
 
     fun init() {
-        if (localstack == null) {
-            localstack = LocalStackContainer(DockerImageName.parse("$IMAGE:$TAG"))
-                .withServices(LocalStackContainer.Service.S3)
-            localstack!!.start()
+        if (floci == null) {
+            floci = FlociContainer(flociImage)
+            floci!!.start()
         }
     }
 
     fun close() {
-        localstack?.close()
-        localstack = null
+        floci?.close()
+        floci = null
     }
 }

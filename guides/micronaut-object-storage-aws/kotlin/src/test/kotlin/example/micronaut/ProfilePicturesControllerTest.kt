@@ -35,7 +35,7 @@ import java.io.IOException
 @Testcontainers(disabledWithoutDocker = true)
 @MicronautTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@ExtendWith(LocalStackExtension::class)
+@ExtendWith(FlociExtension::class)
 class ProfilePicturesControllerTest : AbstractProfilePicturesControllerTest(), TestPropertyProvider {
 
     @Inject
@@ -52,7 +52,7 @@ class ProfilePicturesControllerTest : AbstractProfilePicturesControllerTest(), T
     }
 
     override fun getProperties(): MutableMap<String, String> =
-        LocalStack.getProperties().toMutableMap()
+        Floci.getProperties().toMutableMap()
 
     @Throws(IOException::class)
     override fun assertThatFileIsStored(key: String, expected: String) {

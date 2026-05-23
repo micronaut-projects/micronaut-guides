@@ -18,8 +18,8 @@ package example.micronaut
 import org.junit.jupiter.api.extension.AfterAllCallback
 import org.junit.jupiter.api.extension.ExtensionContext
 
-class LocalStackExtension : AfterAllCallback {
+class FlociExtension : AfterAllCallback {
     override fun afterAll(context: ExtensionContext) {
-        LocalStack.close()
+        Floci.close()
     }
 }
