@@ -44,6 +44,7 @@ class SecurityConfig {
         return http.authorizeHttpRequests(r -> r.requestMatchers("/subscriptions/**") // <4>
                         .hasRole(ROLE_SAAS_SUBSCRIPTION_OWNER))
                 .httpBasic(Customizer.withDefaults())
+                // Disable CSRF only for stateless APIs used by non-browser clients.
                 .csrf(AbstractHttpConfigurer::disable)
                 .build();
     }
