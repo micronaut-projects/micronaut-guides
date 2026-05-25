@@ -48,8 +48,7 @@ class AwsS3OperationsTest implements TestPropertyProvider {
     public Map<String, String> getProperties() {
         return CollectionUtils.mapOf(
                 "aws.accessKeyId", "test",
-                "aws.secretKey", "test",
-                "aws.region", "us-east-1"
+                "aws.secretKey", "test"
         );
     }
 }
