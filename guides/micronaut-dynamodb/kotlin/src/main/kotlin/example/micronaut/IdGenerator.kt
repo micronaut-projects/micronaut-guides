@@ -15,6 +15,6 @@
  */
 package example.micronaut
 
-interface ApplicationConfiguration {
-    val hostedDomain: String
+fun interface IdGenerator { // <1>
+    fun generate(): String
 }

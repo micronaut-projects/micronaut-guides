@@ -15,21 +15,13 @@
  */
 package example.micronaut
 
-import groovy.transform.CompileStatic
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
-import io.micronaut.security.annotation.Secured
-import io.micronaut.security.rules.SecurityRule
-import io.micronaut.views.View
+import java.math.BigDecimal
 
-@CompileStatic
 @Controller // <1>
-class HomeController {
+class VatController(private val vat: Vat) { // <2>
 
-    @Secured(SecurityRule.IS_ANONYMOUS) // <2>
-    @View('home') // <3>
-    @Get // <4>
-    Map<String, Object> index() {
-        [:]
-    }
+    @Get("/vat") // <3>
+    fun index(): Map<String, BigDecimal> = mapOf("rate" to vat.rate)
 }

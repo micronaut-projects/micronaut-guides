@@ -13,12 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package example.micronaut;
+package example.micronaut
 
-import io.micronaut.core.annotation.NonNull;
+import io.micronaut.context.annotation.ConfigurationProperties
+import io.micronaut.context.annotation.Requires
+import jakarta.validation.constraints.NotBlank
 
-public interface ApplicationConfiguration {
-
-    @NonNull
-    String getHostedDomain();
+@Requires(property = "dynamodb.table-name")
+@ConfigurationProperties("dynamodb")
+interface DynamoConfiguration {
+    @get:NotBlank
+    val tableName: String
 }

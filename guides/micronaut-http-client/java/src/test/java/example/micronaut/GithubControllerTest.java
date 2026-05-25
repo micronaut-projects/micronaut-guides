@@ -93,7 +93,7 @@ class GithubControllerTest {
         @Produces("application/vnd.github.v3+json")
         @Get("/repos/micronaut-projects/micronaut-core/releases")
         Optional<String> coreReleases() {
-            return resourceLoader.getResourceAsStream("releases.json") // <3>
+            return resourceLoader.getResourceAsStream("single-release.json") // <3>
                     .flatMap(inputStream -> {
                         try {
                             return Optional.of(new String(inputStream.readAllBytes(), UTF_8));

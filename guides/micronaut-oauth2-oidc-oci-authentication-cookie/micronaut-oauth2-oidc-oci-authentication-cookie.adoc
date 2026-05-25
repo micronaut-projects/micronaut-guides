@@ -8,9 +8,9 @@ common:completesolution.adoc[]
 
 == Oracle Cloud Identity Domain
 
-To provide authentication, sign in to you https://www.oracle.com/cloud/sign-in.html[Oracle Cloud] account and create an https://docs.oracle.com/en-us/iaas/Content/Identity/domains/overview.htm[Identity Domains].
+To provide authentication, sign in to your https://www.oracle.com/cloud/sign-in.html[Oracle Cloud] account and create an https://docs.oracle.com/en-us/iaas/Content/Identity/domains/overview.htm[Identity Domain].
 
-Copy the domain URL from the Identity Domain page. Obtain the client ID and Client secret from the Integrated applications / OAuth Configuration section.
+Copy the domain URL from the Identity Domain page. Obtain the client ID and client secret from the Integrated applications / OAuth Configuration section.
 
 Define the following environment variables:
 
@@ -43,7 +43,7 @@ dependency:micronaut-security-jwt[groupId=io.micronaut.security]
 
 ==== OAuth 2.0 Configuration
 
-Add the following OAuth2 Configuration:
+Add the following OAuth 2.0 configuration:
 
 resource:application.properties[tag=oauth2]
 
@@ -51,12 +51,12 @@ callout:oauth2-client-name[arg0=oci]
 <.> Client ID. You can obtain it in the Oracle Cloud Console: `Identity Domain` / `Integrated applications` / `OAuth Configuration` section.
 <.> Client Secret. You can obtain it in the Oracle Cloud Console: `Identity Domain` / `Integrated applications` / `OAuth Configuration` section.
 <.> `issuer` URL. It allows the Micronaut framework to discover the configuration of the OpenID Connect server.
-<.> Accept GET request to the `/logout` endpoint.
+<.> Accept GET requests to the `/logout` endpoint.
 
 ===== OpenID Auto Configuration
 
 Upon application startup, the Micronaut application visits the https://docs.oracle.com/en/cloud/paas/iam-domains-rest-api/op-well-known-openid-configuration-get.html[OpenID discovery endpoint]
-to configure your application. if you set `micronaut.security.oauth2.clients.oci.openid.issuer` to `https://idcs-xxx.identity.oraclecloud.com/`, Micronaut visits `https://idcs-xxx.identity.oraclecloud.com/.well-known/openid-configuration` on startup.
+to configure your application. If you set `micronaut.security.oauth2.clients.oci.openid.issuer` to `https://idcs-xxx.identity.oraclecloud.com/`, Micronaut visits `https://idcs-xxx.identity.oraclecloud.com/.well-known/openid-configuration` on startup.
 
 ==== Security Configuration
 
@@ -67,11 +67,9 @@ resource:application.properties[tag=security]
 <1> Set `micronaut.security.authentication` as `cookie`.
 <2> Change this to your own secret and keep it safe (do not store this in your VCS).
 
-When the OAuth 2.0 Authorization code flow ends, the application receives an ID Token.
-The ID Token is a signed JWT. Micronaut Security validates the JWT signature of the ID Token with the remote JSON Web Key Set (JWKS) exposed by Authorization Server.
+When the OAuth 2.0 Authorization Code flow ends, the application receives an ID token.
+The ID token is a signed JWT. Micronaut Security validates the JWT signature of the ID token with the remote JSON Web Key Set (JWKS) exposed by the authorization server.
 JWKS is exposed by the `jws-uri` entry of `.well-known/openid-configuration`.
-Instead of using the ID token, we will generate a new token with a subset of the ID token's claims and sign it in the Micronaut application.
-
 Instead of using the ID token, we will generate a new token with a subset of the ID token's claims and sign it in the Micronaut application.
 
 ===== Scopes Configuration
@@ -92,9 +90,9 @@ access token to get user groups from the userinfo endpoints. So, scope=get_group
 the ID token size.
 ____
 
-==== Open ID Authentication Mapper
+==== OpenID Authentication Mapper
 
-To avoid issues with an ID Token too large, we map a subset of the ID Token claims into a new token:
+To avoid issues with an ID token that is too large, we map a subset of the ID token claims into a new token:
 
 source:OciIdentityDomainOpenIdAuthenticationMapper[]
 
@@ -111,7 +109,7 @@ callout:secured-anonymous[]
 <.> Use https://micronaut-projects.github.io/micronaut-views/latest/api/io/micronaut/views/View.html[View] annotation to specify which template to use to render the response.
 <.> The @api@/io/micronaut/http/annotation/Get.html[@Get] annotation maps the `index` method to GET `/` requests.
 
-Create a thymeleaf template:
+Create a Thymeleaf template:
 
 resource:views/home.html[]
 
@@ -128,7 +126,7 @@ common:graal-with-plugins.adoc[]
 
 :exclude-for-languages:groovy
 
-After you execute the native executable, navigate to localhost:8080 and authenticate with Cognito.
+After you execute the native executable, navigate to `localhost:8080` and authenticate with OCI Identity Domains.
 
 :exclude-for-languages:
 
