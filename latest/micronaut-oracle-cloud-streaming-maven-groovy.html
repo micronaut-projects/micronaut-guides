@@ -48,7 +48,7 @@
                     <li id="menu-item-2865" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2865 nav-item"><a href="https://micronaut.io/download/" class="nav-link">Download</a></li>
                     <li id="menu-item-2868" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-2868 dropdown nav-item"><a href="https://micronaut.io/learn/" class="nav-link dropdown-toggle" data-toggle="dropdown">Learn</a><ul class="dropdown-menu">
                         <li id="menu-item-4943" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4943"><a href="https://micronaut.io/learn/" class="dropdown-item">Overview</a></li>
-                        <li id="menu-item-5111" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-5111"><a href="https://docs.micronaut.io/index.html" class="dropdown-item">User Documentaton</a></li>
+                        <li id="menu-item-5111" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-5111"><a href="https://docs.micronaut.io/index.html" class="dropdown-item">User Documentation</a></li>
                         <li id="menu-item-4510" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4510"><a href="https://micronaut.io/guides/" class="dropdown-item">Guides</a></li>
                         <li id="menu-item-2896" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2896"><a href="https://micronaut.io/category/microcast/" class="dropdown-item">Microcasts</a></li>
                         <li id="menu-item-2897" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2897"><a href="https://micronaut.io/category/webinar/" class="dropdown-item">Webinars</a></li>
@@ -194,7 +194,7 @@
 <p>A decent text editor or IDE</p>
 </li>
 <li>
-<p>JDK 11 or greater installed with <code>JAVA_HOME</code> configured appropriately</p>
+<p>JDK 17 or greater installed with <code>JAVA_HOME</code> configured appropriately</p>
 </li>
 <li>
 <p>An Oracle Cloud account (create a free trial account at <a href="https://signup.oraclecloud.com">signup.oraclecloud.com</a>)</p>
@@ -1660,7 +1660,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle with the <a
 </table>
 </div>
 <div class="paragraph">
-<p>Start Zookeeper and Kafka (use CTRL-C to stop both):</p>
+<p>Start ZooKeeper and Kafka (use CTRL-C to stop both):</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -2201,7 +2201,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle with the <a
     <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">Collection</span><span class="o">&lt;</span><span class="n">GameDTO</span><span class="o">&gt;</span> <span class="n">receivedGames</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ConcurrentLinkedDeque</span><span class="o">&lt;&gt;()</span>
     <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">Collection</span><span class="o">&lt;</span><span class="n">GameStateDTO</span><span class="o">&gt;</span> <span class="n">receivedMoves</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ConcurrentLinkedDeque</span><span class="o">&lt;&gt;()</span>
 
-    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">PollingConditions</span> <span class="n">pollingConditions</span> <span class="o">=</span> <span class="k">new</span> <span class="n">PollingConditions</span><span class="o">(</span><span class="nl">timeout:</span> <span class="mi">5</span><span class="o">)</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">PollingConditions</span> <span class="n">pollingConditions</span> <span class="o">=</span> <span class="k">new</span> <span class="n">PollingConditions</span><span class="o">(</span><span class="nl">timeout:</span> <span class="mi">30</span><span class="o">)</span>
 
     <span class="kd">static</span> <span class="n">KafkaContainer</span> <span class="n">kafka</span> <span class="o">=</span> <span class="k">new</span> <span class="n">KafkaContainer</span><span class="o">(</span>
             <span class="n">DockerImageName</span><span class="o">.</span><span class="na">parse</span><span class="o">(</span><span class="s1">'apache/kafka:latest'</span><span class="o">))</span> <i class="conum" data-value="4"></i><b>(4)</b>
@@ -2346,7 +2346,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle with the <a
         <span class="n">endGame</span><span class="o">(</span><span class="n">gameId</span><span class="o">,</span> <span class="kc">null</span><span class="o">)</span>
 
         <span class="nl">then:</span>
-        <span class="k">new</span> <span class="nf">PollingConditions</span><span class="o">().</span><span class="na">eventually</span> <span class="o">{</span>
+        <span class="n">pollingConditions</span><span class="o">.</span><span class="na">eventually</span> <span class="o">{</span>
             <span class="o">!</span><span class="n">receivedGames</span><span class="o">.</span><span class="na">empty</span>
         <span class="o">}</span>
 
@@ -2455,7 +2455,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle with the <a
 </tr>
 <tr>
 <td><i class="conum" data-value="8"></i><b>8</b></td>
-<td>Configure the Kafka broker port (it will be different unused port each time) so Micronaut Kafka clients and listeners connect to the test broker</td>
+<td>Configure the Kafka broker port (it will be a different unused port each time) so Micronaut Kafka clients and listeners connect to the test broker</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="9"></i><b>9</b></td>
@@ -2775,7 +2775,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle with the <a
 </tr>
 <tr>
 <td><i class="conum" data-value="7"></i><b>7</b></td>
-<td>Configure the Kafka broker port (it will be different unused port each time) so Micronaut Kafka clients and listeners connect to the test broker</td>
+<td>Configure the Kafka broker port (it will be a different unused port each time) so Micronaut Kafka clients and listeners connect to the test broker</td>
 </tr>
 </table>
 </div>
@@ -2915,7 +2915,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle with the <a
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-All guides are released with an <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache license 2.0 license</a> for the code and a <a href="https://creativecommons.org/licenses/by/4.0/deed.en">Creative Commons Attribution 4.0</a> license for the writing and media (images&#8230;&#8203;).
+All guides are released with an <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache License 2.0</a> for the code and a <a href="https://creativecommons.org/licenses/by/4.0/deed.en">Creative Commons Attribution 4.0</a> license for the writing and media (images).
 </td>
 </tr>
 </table>
@@ -2975,7 +2975,7 @@ All guides are released with an <a href="https://www.apache.org/licenses/LICENSE
                 <div id="text-5" class="widget widget_text">
                     <div class="textwidget">
                         <p>
-                            <small>Guides are licensed under <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> for the writing/media and <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache.2.0</a> for the code</small>
+                            <small>Guides are licensed under <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> for the writing/media and <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0</a> for the code</small>
                         </p>
                     </div>
                 </div>
