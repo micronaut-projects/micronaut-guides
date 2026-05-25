@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package example.micronaut;
+package example.micronaut
 
-import io.micronaut.mcp.annotations.Tool;
-import jakarta.inject.Singleton;
-import java.io.File;
+final class DiskUtils {
 
-@Singleton // <1>
-class MyTools {
-    @Tool(title = "Free Disk Space",
-          description = "Return the free disk space on the user's computer")  // <2>
-    String freeDiskSpace() {
-        return DiskUtils.freeDiskSpace();
+    private DiskUtils() {
+    }
+
+    static String freeDiskSpace() {
+        File root = new File('/')
+        long freeBytes = root.freeSpace
+        double freeGB = freeBytes / (1024.0 * 1024 * 1024)
+        String.format('Free disk space: %.2f GB', freeGB)
     }
 }
