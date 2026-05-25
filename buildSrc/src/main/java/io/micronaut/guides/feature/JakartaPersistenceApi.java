@@ -1,27 +1,24 @@
 package io.micronaut.guides.feature;
 
-import io.micronaut.core.annotation.NonNull;
-import io.micronaut.starter.application.ApplicationType;
 import io.micronaut.starter.application.generator.GeneratorContext;
 import io.micronaut.starter.build.dependencies.Dependency;
-import io.micronaut.starter.feature.Feature;
 import jakarta.inject.Singleton;
 
 @Singleton
-public class JakartaPersistenceApi implements Feature {
+public class JakartaPersistenceApi extends AbstractFeature {
+    private static final String VERSION_JAKARTA_PERSISTENCE_API = "3.2.0";
 
-    @Override
-    public @NonNull String getName() {
-        return "jakarta-persistence-api";
-    }
-
-    @Override
-    public boolean supports(ApplicationType applicationType) {
-        return true;
+    public JakartaPersistenceApi() {
+        super("jakarta-persistence-api");
     }
 
     @Override
     public void apply(GeneratorContext generatorContext) {
-        generatorContext.addDependency(Dependency.builder().groupId("jakarta.persistence").artifactId("jakarta.persistence-api").compileOnly().build());
+        generatorContext.addDependency(Dependency.builder()
+                .groupId("jakarta.persistence")
+                .artifactId("jakarta.persistence-api")
+                .version(VERSION_JAKARTA_PERSISTENCE_API)
+                .compile()
+                .build());
     }
 }
