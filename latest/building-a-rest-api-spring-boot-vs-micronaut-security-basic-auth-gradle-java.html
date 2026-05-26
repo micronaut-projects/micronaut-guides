@@ -385,6 +385,21 @@ Each subscription is associated with a user. Authenticated users can only access
 <div class="paragraph">
 <p>The following class configures Spring Security for the application:</p>
 </div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>This tutorial disables CSRF only for stateless APIs used by non-browser clients.
+If a Basic Auth endpoint can be called from a browser, keep CSRF protection enabled or use a credential strategy that browsers do not attach automatically because browsers can send cached Basic Auth credentials on cross-site requests.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
 <div class="listingblock">
 <div class="title">springboot/src/main/java/example/micronaut/SecurityConfig.java</div>
 <div class="content">
@@ -419,6 +434,8 @@ Each subscription is associated with a user. Authenticated users can only access
         <span class="k">return</span> <span class="n">http</span><span class="o">.</span><span class="na">authorizeHttpRequests</span><span class="o">(</span><span class="n">r</span> <span class="o">-&gt;</span> <span class="n">r</span><span class="o">.</span><span class="na">requestMatchers</span><span class="o">(</span><span class="s">"/subscriptions/**"</span><span class="o">)</span> <i class="conum" data-value="4"></i><b>(4)</b>
                         <span class="o">.</span><span class="na">hasRole</span><span class="o">(</span><span class="no">ROLE_SAAS_SUBSCRIPTION_OWNER</span><span class="o">))</span>
                 <span class="o">.</span><span class="na">httpBasic</span><span class="o">(</span><span class="nc">Customizer</span><span class="o">.</span><span class="na">withDefaults</span><span class="o">())</span>
+                <span class="c1">// This sample disables CSRF for the whole app, which is only appropriate</span>
+                <span class="c1">// for the tutorial's stateless, non-browser client scenario.</span>
                 <span class="o">.</span><span class="na">csrf</span><span class="o">(</span><span class="nl">AbstractHttpConfigurer:</span><span class="o">:</span><span class="n">disable</span><span class="o">)</span>
                 <span class="o">.</span><span class="na">build</span><span class="o">();</span>
     <span class="o">}</span>
@@ -457,7 +474,7 @@ Each subscription is associated with a user. Authenticated users can only access
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
-<td>All HTTP requests to <code>/subscriptions/**</code> endpoints are required to be authenticated using HTTP Basic Authentication security (username and password). They do not require CSRF security.</td>
+<td>All HTTP requests to <code>/subscriptions/**</code> endpoints require HTTP Basic Authentication. The sample disables CSRF only under the tutorial&#8217;s stateless, non-browser-client assumption.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="5"></i><b>5</b></td>
