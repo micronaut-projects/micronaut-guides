@@ -75,12 +75,18 @@ Two sample users will be able to authenticate: `sarah1` and `john-owns-no-subscr
 
 The following class configures Spring Security for the application:
 
+[NOTE]
+====
+This tutorial disables CSRF only for stateless APIs used by non-browser clients.
+If a Basic Auth endpoint can be called from a browser, keep CSRF protection enabled or use a credential strategy that browsers do not attach automatically because browsers can send cached Basic Auth credentials on cross-site requests.
+====
+
 source:SecurityConfig[app=springboot]
 
 callout:spring-boot-configuration[]
 <2> Create a bean of type `PasswordEncoder`
 <3> Create a bean of type `SecurityFilterChain` to configure Spring Security's filter chain.
-<4> All HTTP requests to `/subscriptions/**` endpoints are required to be authenticated using HTTP Basic Authentication security (username and password). They do not require CSRF security.
+<4> All HTTP requests to `/subscriptions/**` endpoints require HTTP Basic Authentication. The sample disables CSRF only under the tutorial's stateless, non-browser-client assumption.
 <5> Create a bean of type `UserDetails`.
 <6> `InMemoryUserDetailsManager` is a test-only service that Spring Security provides as a way to provide user authentication and authorization information.
 
