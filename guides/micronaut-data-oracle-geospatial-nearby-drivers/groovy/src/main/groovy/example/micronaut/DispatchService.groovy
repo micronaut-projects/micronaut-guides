@@ -32,7 +32,7 @@ class DispatchService {
         this.deliveryDriverRepository = deliveryDriverRepository
     }
 
-    Optional<DriverMatch> findClosestAvailableDriver(Point orderLocation) {
+    DriverMatch findClosestAvailableDriver(Point orderLocation) {
         List<DeliveryDriver> candidates = deliveryDriverRepository.findByStatusAndLocationNear(
             DeliveryDriver.Status.AVAILABLE,
             orderLocation,
@@ -50,7 +50,7 @@ class DispatchService {
                 closest = match
             }
         }
-        return Optional.ofNullable(closest) // <3>
+        return closest // <3>
     }
 
     private double distanceMeters(Point left, Point right) { // <4>

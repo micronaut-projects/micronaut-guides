@@ -19,13 +19,12 @@ import io.micronaut.data.model.geo.Point
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
 import io.micronaut.http.annotation.QueryValue
-import java.util.Optional
 
 @Controller("/orders") // <1>
 class DeliveryDispatchController(private val dispatchService: DispatchService) {
 
     @Get("/nearest-driver") // <2>
-    fun nearestDriver(@QueryValue longitude: Double, @QueryValue latitude: Double): Optional<DriverMatch> { // <3>
+    fun nearestDriver(@QueryValue longitude: Double, @QueryValue latitude: Double): DriverMatch? { // <3>
         return dispatchService.findClosestAvailableDriver(Point(longitude, latitude))
     }
 }

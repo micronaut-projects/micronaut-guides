@@ -32,7 +32,7 @@ class DeliveryDispatchController {
     }
 
     @Get('/nearest-driver') // <2>
-    Optional<DriverMatch> nearestDriver(@QueryValue double longitude, @QueryValue double latitude) { // <3>
+    DriverMatch nearestDriver(@QueryValue double longitude, @QueryValue double latitude) { // <3>
         dispatchService.findClosestAvailableDriver(new Point(longitude, latitude))
     }
 }

@@ -17,7 +17,6 @@ package example.micronaut
 
 import io.micronaut.data.model.geo.Point
 import jakarta.inject.Singleton
-import java.util.Optional
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
@@ -31,24 +30,22 @@ class DispatchService(private val deliveryDriverRepository: DeliveryDriverReposi
         private const val EARTH_RADIUS_METERS = 6_371_008.8
     }
 
-    fun findClosestAvailableDriver(orderLocation: Point): Optional<DriverMatch> {
+    fun findClosestAvailableDriver(orderLocation: Point): DriverMatch? {
         val candidates = deliveryDriverRepository.findByStatusAndLocationNear(
             DeliveryDriver.Status.AVAILABLE,
             orderLocation,
             MAX_DISTANCE_METERS
         ) // <2>
 
-        return Optional.ofNullable(
-            candidates
-                .map { driver ->
-                    DriverMatch(
-                        driver.id,
-                        driver.name,
-                        distanceMeters(orderLocation, driver.location)
-                    )
-                }
-                .minByOrNull { it.distanceMeters } // <3>
-        )
+        return candidates
+            .map { driver ->
+                DriverMatch(
+                    driver.id,
+                    driver.name,
+                    distanceMeters(orderLocation, driver.location)
+                )
+            }
+            .minByOrNull { it.distanceMeters } // <3>
     }
 
     private fun distanceMeters(left: Point, right: Point): Double { // <4>
