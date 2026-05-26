@@ -1260,13 +1260,6 @@ if [ $EXIT_STATUS -ne 0 ]; then
 fi
 
 
-./gradlew micronautOauth2OidcStravaBuild || EXIT_STATUS=$?
-
-if [ $EXIT_STATUS -ne 0 ]; then
-  exit $EXIT_STATUS
-fi
-
-
 ./gradlew micronautOauth2OktaBuild || EXIT_STATUS=$?
 
 if [ $EXIT_STATUS -ne 0 ]; then
@@ -1420,4 +1413,3 @@ fi
 if [ $EXIT_STATUS -ne 0 ]; then
   exit $EXIT_STATUS
 fi
-

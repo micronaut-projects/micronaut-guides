@@ -78,7 +78,7 @@ class GithubControllerTest {
         @Produces("application/vnd.github.v3+json")
         @Get("/repos/micronaut-projects/micronaut-core/releases")
         fun coreReleases() : String {
-            return resourceLoader.getResource("releases.json").orElseThrow().readText() // <3>
+            return resourceLoader.getResource("single-release.json").orElseThrow().readText() // <3>
         }
     }
 

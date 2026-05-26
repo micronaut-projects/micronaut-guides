@@ -3,42 +3,37 @@ on:
   push:
     branches:
       - master
-      - '[1-9]+.[0-9]+.x'
   pull_request:
     branches:
       - master
-      - '[1-9]+.[0-9]+.x'
 jobs:
   test_matrix:
     name: Generate Guide Test Matrix
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.test_matrix_step.outputs.matrix }}
+      has_tasks: ${{ steps.test_matrix_step.outputs.has_tasks }}
     steps:
-      - uses: actions/checkout@v4
-      - name: Set up JDK
-        uses: actions/setup-java@v4
+      - uses: actions/checkout@v6.0.2
         with:
-          distribution: 'adopt'
-          java-version: '25'
-      - uses: actions/cache@v3
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
+          fetch-depth: 0
       - name: Generate Guide Test Matrix
         id: test_matrix_step
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          DIFF_MODE: ${{ github.event_name == 'pull_request' && 'merge-base' || 'range' }}
         run: |
-          echo "Searching for groups..."
-          gradleTasks=$(./gradlew tasks | grep "Run group of guide tests" | sed 's/\(.*\) - Run group of guide tests/\"\1\"/' | tr '\n' ',' | sed 's/.$//')
-          tasksEntry="\"group_test_tasks\":[$(echo $gradleTasks)]"
-          matrixValue="{$(echo $tasksEntry)}"
-          echo "Created matrix: $matrixValue"
-          echo "matrix=$matrixValue" >> $GITHUB_OUTPUT
+          python3 .github/scripts/guide_ci_tasks.py \
+            --repo "$GITHUB_WORKSPACE" \
+            --base "$BASE_SHA" \
+            --head "$HEAD_SHA" \
+            --diff-mode "$DIFF_MODE" \
+            --github-output "$GITHUB_OUTPUT"
   alltests:
     name: Running ${{ matrix.group }} with Java ${{ matrix.java }}
     needs: test_matrix
+    if: needs.test_matrix.outputs.has_tasks == 'true'
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -47,21 +42,21 @@ jobs:
     env:
       JDK_VERSION: ${{ matrix.java }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6.0.2
         with:
           fetch-depth: 0
-      - uses: actions/cache@v3
+      - uses: actions/cache@v5.0.5
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: Set up JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5.2.0
         with:
           distribution: 'adopt'
           java-version: ${{ matrix.java }}
-      - name: Run All Guide Tests
+      - name: Run Selected Guide Test
         run: './gradlew ${{ matrix.group }}'
         env:
           GRADLE_ENTERPRISE_ACCESS_KEY: ${{ secrets.GRADLE_ENTERPRISE_ACCESS_KEY }}

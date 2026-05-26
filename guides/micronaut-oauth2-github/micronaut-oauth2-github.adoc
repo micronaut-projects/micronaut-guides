@@ -45,23 +45,23 @@ image::github-3.png[]
 
 === OAuth 2.0 Configuration
 
-Add the following OAuth2 Configuration:
+Add the following OAuth 2.0 configuration:
 
 
 resource:application.properties[tag=oauth2]
 
-<.> Once validated, we will save the ID Token in a Cookie. To read in subsequent requests, set `micronaut.security.authentication` to `cookie`.
+<.> Once validated, we will save the ID token in a cookie. To read it in subsequent requests, set `micronaut.security.authentication` to `cookie`.
 <.> You can create a https://micronaut-projects.github.io/micronaut-security/latest/api/io/micronaut/security/token/jwt/signature/secret/SecretSignatureConfiguration.html[SecretSignatureConfiguration] named `generator` via configuration as illustrated above. The `generator` signature is used to sign the issued JWT claims.
 <.> Change this to your own secret and keep it safe (do not store this in your VCS).
 callout:oauth2-client-name[arg0=github]
 <.> Client Secret. See previous screenshot.
 <.> Client ID. See previous screenshot.
 <.> Specify the scopes you want to request. https://developer.github.com/apps/building-oauth-apps/understanding-scopes-for-oauth-apps/[GitHub Scopes] let you specify exactly what type of access you need.
-<.> Map manually the GitHub https://tools.ietf.org/html/rfc6749#section-3.1[Authorization endpoint].
-<.> Map manually the Github https://tools.ietf.org/html/rfc6749#section-3.2[Token endpoint].
-<.> Accept GET request to the `/logout` endpoint.
+<.> Map the GitHub https://tools.ietf.org/html/rfc6749#section-3.1[Authorization endpoint] manually.
+<.> Map the GitHub https://tools.ietf.org/html/rfc6749#section-3.2[Token endpoint] manually.
+<.> Accept GET requests to the `/logout` endpoint.
 
-The previous configuration uses several placeholders. You will need to set up `OAUTH_CLIENT_ID`, `OAUTH_CLIENT_SECRET` environment variables.
+The previous configuration uses several placeholders. You will need to set up the `OAUTH_CLIENT_ID` and `OAUTH_CLIENT_SECRET` environment variables.
 
 [source, bash]
 ----
@@ -84,26 +84,26 @@ Then, create a Micronaut Declarative HTTP Client to consume https://developer.gi
 source:GithubApiClient[tags=package|clazz]
 
 <1> GitHub encourages explicitly requesting version 3 via the Accept header. With `@Header`, you add the `Accept: application/vnd.github.v3+json` HTTP header to every request.
-<2> Add the id `githubv3` to the `@Client` annotation. Later, you will provide URL for this client id.
-<3> Define a HTTP GET request to `/user` endpoint.
+<2> Add the ID `githubv3` to the `@Client` annotation. Later, you will provide the URL for this client ID.
+<3> Define an HTTP GET request to the `/user` endpoint.
 <4> You can return reactive types in a Micronaut declarative HTTP client.
-<5> You can specify that a parameter binds to a HTTP Header such as the *Authorization* header.
+<5> You can specify that a parameter binds to an HTTP header, such as the *Authorization* header.
 
 Specify the URL for the `githubv3` service.
 
 resource:application.properties[tag=micronaut-http-services]
 
-For GitHub we need to provide a Authentication Mapper. The easiest way is to create a bean which implements `OauthAuthenticationMapper`.
+For GitHub, we need to provide an authentication mapper. The easiest way is to create a bean that implements `OauthAuthenticationMapper`.
 
 source:GithubAuthenticationMapper[]
 
-<1> Use a name qualifier for the bean which matches the name you used in the OAuth 2.0 configuration in `application.properties`
+<1> Use a name qualifier for the bean that matches the name you used in the OAuth 2.0 configuration in `application.properties`.
 <2> Consume the `/user` endpoint with the Micronaut HTTP Client.
 <3> Save the original GitHub access token in a claim. We will use it to contact GitHub's API later.
 
 === Retrieve User GitHub repositories
 
-With the access token, we retrieved during the login we will contact the GitHub API to fetch the user's repositories.
+With the access token retrieved during login, we will contact the GitHub API to fetch the user's repositories.
 
 First, create a POJO to represent a GitHub repository:
 
@@ -114,7 +114,7 @@ Add a method to `GithubApiClient`
 source:GithubApiClient[tag=repos]
 
 <1> Specify two query values `sort` and `direction`.
-<2> Annotate `sort` and `direction` as `@Nullable` since they are optional. You can restrict the allowed values with use of constraints.
+<2> Annotate `sort` and `direction` as `@Nullable` since they are optional. You can restrict the allowed values with constraints.
 
 Create a controller to expose `/repos` endpoint:
 
@@ -139,7 +139,7 @@ common:graal-with-plugins.adoc[]
 
 :exclude-for-languages:groovy
 
-Visit localhost:8080 and authenticate with GitHub
+Visit `localhost:8080` and authenticate with GitHub.
 
 :exclude-for-languages:
 

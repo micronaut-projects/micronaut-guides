@@ -2,7 +2,7 @@ common:header-top.adoc[]
 
 == Getting Started
 
-In this guide, we will deploy three microservices on the https://docs.oracle.com/en-us/iaas/Content/ContEng/Concepts/contengoverview.htm[Oracle Cloud Container Engine for Kubernetes (OKE)]. We will use Kubernetes Service discovery and Distributed configuration to wire up our microservices.
+In this guide, we will deploy three microservices on the https://docs.oracle.com/en-us/iaas/Content/ContEng/Concepts/contengoverview.htm[Oracle Cloud Container Engine for Kubernetes (OKE)]. We will use Kubernetes service discovery and distributed configuration to wire up our microservices.
 
 You will discover how the Micronaut framework eases Kubernetes integration and deployment to OKE.
 
@@ -24,7 +24,7 @@ We will use Quick create cluster option on OKE to create Kubernetes Cluster. To 
 
 image::k8s-oci/create-cluster-wizard.png[]
 
-Choose name for kubernetes cluster, we chose to name it `micronaut-k8s`.
+Choose a name for the Kubernetes cluster. We chose `micronaut-k8s`.
 
 {empty} +
 
@@ -40,7 +40,7 @@ Copy `Cluster Id` (you will need it later).
 
 == Prepare and Deploy Microservices
 
-We will define some environment variables to make deploying process easier. In `OCI_USER_ID` store your user OCI, which you can find in your oci configuration file. We will get tenancy namespace from the oci commandline tool and store it in `OCI_TENANCY_NAMESPACE`.  In `OCIR_USERNAME` store your username in the format <tenancy_namespace>/<username>. We can reuse `OCI_TENANCY_NAMESPACE` and only edit the <username> part. Store your region code in `OCI_REGION` for an example "us-phoenix-1". In `OCI_CLUSTER_ID` store the Cluster Id that you copied earlier. Put your compartment id inside `OCI_COMPARTMENT_ID` variable.
+We will define some environment variables to make deployment easier. In `OCI_USER_ID`, store your OCI user ID, which you can find in your OCI configuration file. We will get the tenancy namespace from the OCI command-line tool and store it in `OCI_TENANCY_NAMESPACE`. In `OCIR_USERNAME`, store your username in the format <tenancy_namespace>/<username>. We can reuse `OCI_TENANCY_NAMESPACE` and only edit the <username> part. Store your region code in `OCI_REGION`, for example, "us-phoenix-1". In `OCI_CLUSTER_ID`, store the Cluster ID that you copied earlier. Put your compartment ID inside the `OCI_COMPARTMENT_ID` variable.
 
 [source,bash]
 ----
@@ -59,7 +59,7 @@ We have to create `AUTH_TOKEN` to be able to authenticate to Oracle Cloud Contai
 export AUTH_TOKEN=$(oci iam auth-token create --user-id $OCI_USER_ID --description k8s-micronaut | jq -r '.data.token')
 ----
 
-NOTE: Oracle Cloud allows you to have only 2 auth tokens in same time. If you already have 2 of them, please use existing one by exporting it in AUTH_TOKEN variable or delete one that you are not using.
+NOTE: Oracle Cloud allows you to have only 2 auth tokens at the same time. If you already have 2 of them, use an existing one by exporting it in the AUTH_TOKEN variable or delete one that you are not using.
 
 Run the next command to log in to `ocir.io` (Oracle Cloud Container Registry):
 
@@ -115,7 +115,7 @@ Deploy the _auth.yml_ file that we created in the guideLink:micronaut-k8s[Kubern
 kubectl apply -f auth.yml
 ----
 
-Create `ocirsecret` secret that will be used for authentication to Oracle Cloud Container Registry. This is needed because OKE needs credentials to be able to pull microservices images.
+Create an `ocirsecret` secret that will be used for authentication to Oracle Cloud Container Registry. This is needed because OKE needs credentials to be able to pull microservice images.
 
 [source,bash]
 ----
@@ -160,7 +160,7 @@ orders       NodePort       10.96.94.130   <none>           8080:31245/TCP      
 users        NodePort       10.96.34.174   <none>           8080:30790/TCP      2d1h
 ----
 
-NOTE: `If EXTERNAL-IP` is in <pending> state wait a couple of seconds and then run command again.
+NOTE: If `EXTERNAL-IP` is in the <pending> state, wait a couple of seconds and then run the command again.
 
 Run the next command to retrieve the URL of the `api` microservice:
 
@@ -173,14 +173,14 @@ external:micronaut-k8s/verify.adoc[]
 
 == Cleaning Up
 
-To delete all resources that were created in this guide run next command.
+To delete all resources that were created in this guide, run the next command.
 
 [source,bash]
 ----
 kubectl delete namespaces micronaut-k8s
 ----
 
-Run next command to delete OKE cluster.
+Run the next command to delete the OKE cluster.
 
 [source,bash]
 ----
@@ -196,4 +196,3 @@ common:next.adoc[]
 Read more about https://micronaut-projects.github.io/micronaut-kubernetes/snapshot/guide/[Micronaut Kubernetes] module.
 
 Read more about https://docs.oracle.com/en-us/iaas/Content/ContEng/home.htm[Oracle Container Engine for Kubernetes (OKE)]
-

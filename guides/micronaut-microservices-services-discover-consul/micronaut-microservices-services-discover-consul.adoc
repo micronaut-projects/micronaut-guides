@@ -5,7 +5,7 @@ common:header-top.adoc[]
 In this guide, we will create three microservices and register them with https://www.consul.io[Consul] Service discovery.
 
 ____
-Consul is a distributed service mesh to connect, secure, and configure services across any runtime platform and public or private cloud
+Consul is a distributed service mesh to connect, secure, and configure services across any runtime platform and public or private cloud.
 ____
 
 You will discover how the Micronaut framework eases Consul integration.
@@ -18,19 +18,19 @@ common:completesolution.adoc[]
 
 Let's describe the microservices you will build through the guide.
 
-* `bookcatalogue` - It returns a list of books. It uses a domain consisting of a book name and ISBN.
+* `bookcatalogue` - It returns a list of books. It uses a domain consisting of a book name and an ISBN.
 
-* `bookinventory` - It exposes an endpoint to check whether a book has sufficient stock to fulfil an order.  It uses a domain consisting of a stock level and ISBN.
+* `bookinventory` - It exposes an endpoint to check whether a book has sufficient stock to fulfill an order. It uses a domain consisting of a stock level and an ISBN.
 
-* `bookrecommendation` - It consumes previous services and exposes an endpoint which recommends book names which are in stock.
+* `bookrecommendation` - It consumes previous services and exposes an endpoint that recommends book names that are in stock.
 
-Initially we will hard-code the addresses where the different services are in the `bookcatalogue` service.
+Initially, we will hard-code the service addresses in the `bookcatalogue` service.
 
 image::hardcoded.svg[]
 
 As shown in the previous image, the `bookcatalogue` hardcodes references to its collaborators.
 
-In the second part of this guide we will use a discovery service.
+In the second part of this guide, we will use a discovery service.
 
 [NOTE]
 ====
@@ -45,7 +45,7 @@ Services register when they start up:
 
 image::discovery-service-registration.svg[]
 
-We will use **client‑side service discovery**, clients query the service registry,
+We will use **client‑side service discovery**. Clients query the service registry,
 select an available instance, and make a request.
 
 image::discovery-service-flow.svg[]
@@ -78,7 +78,7 @@ source:BooksController[app=bookcatalogue]
 callout:controller[arg0=/]
 callout:get[arg0=index,arg1=/books]
 
-The previous controller responds a `List<Book>`. Create the `Book` POJO:
+The previous controller responds with a `List<Book>`. Create the `Book` POJO:
 
 source:Book[app=bookcatalogue]
 
@@ -89,7 +89,7 @@ test:BooksControllerTest[app=bookcatalogue]
 callout:micronaut-test[]
 callout:http-client[]
 callout:http-request[]
-<.> Parse easily JSON into Java objects.
+<.> Easily parse JSON into Java objects.
 
 Edit `application.properties`
 
@@ -106,7 +106,7 @@ common:default-dev-environment-application-dev-yaml.adoc[]
 
 resource:application-dev.properties[app=bookcatalogue]
 
-<1> Configure the application to listen on port 8081
+<1> Configure the application to listen on port 8081.
 
 Create a file named `application-test.properties` which is used in the test environment:
 
@@ -183,7 +183,7 @@ common:default-dev-environment-application-dev-yaml.adoc[]
 
 resource:application-dev.properties[app=bookinventory]
 
-<1> Configure the application to listen on port 8082
+<1> Configure the application to listen on port 8082.
 
 Create a file named `application-test.properties` which is used in the test environment:
 
@@ -264,16 +264,16 @@ source:BookRecommendation[app=bookrecommendation]
 
 `BookCatalogueClient` and `BookInventoryClient` will fail to consume the `bookcatalogue` and `bookinventory` during the tests phase.
 
-Using the https://docs.micronaut.io/latest/guide/#clientFallback[@Fallback] annotation you can declare a fallback implementation of a client that will be picked up and used once all possible retries have been exhausted
+Using the https://docs.micronaut.io/latest/guide/#clientFallback[@Fallback] annotation, you can declare a fallback implementation of a client that will be picked up and used once all possible retries have been exhausted.
 
 Create `@Fallback` alternatives in the `test` classpath.
 
 test:BookInventoryClientStub[app=bookrecommendation]
 
-<1> Make this fallback class to be effective only when the Micronaut environment __TEST__ is active
-<2> Here we arbitrarily decided that if everything else fails, that book's `stock` would be true
-<3> Similarly, we decided that other book's `stock` method would be false
-<4> Finally, any other book will have their `stock` method return an empty value
+<1> Make this fallback class effective only when the Micronaut environment __TEST__ is active.
+<2> Here we arbitrarily decide that if everything else fails, that book's `stock` would be true.
+<3> Similarly, we decide that the other book's `stock` method would be false.
+<4> Finally, any other book will have its `stock` method return an empty value.
 
 test:BookCatalogueClientStub[app=bookrecommendation]
 
@@ -422,7 +422,7 @@ curl http://localhost:8080/books
 
 === Install Consul via Docker
 
-The quickest way to start using https://hub.docker.com/_/consul/[Consul is via Docker]:
+The quickest way to start using https://hub.docker.com/_/consul/[Consul] is via Docker:
 
 [source,bash]
 ----
@@ -441,7 +441,7 @@ image::kitematic-consul-2.png[]
 
 === Book Catalogue
 
-Append to `bookcatalogue` service `application.properties` the following snippet:
+Append the following snippet to the `bookcatalogue` service `application.properties`:
 
 resource:application.properties[app=bookcatalogue,tag=consul]
 
@@ -455,7 +455,7 @@ resource:application.properties[app=bookinventory,tag=consul]
 
 === Book Recommendation
 
-Append to `bookrecommendation`.`application.properties` the following snippet:
+Append the following snippet to the `bookrecommendation` service `application.properties`:
 
 resource:application.properties[app=bookrecommendation,tag=consul]
 
