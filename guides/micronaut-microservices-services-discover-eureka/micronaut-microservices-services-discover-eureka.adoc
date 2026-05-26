@@ -12,25 +12,25 @@ common:completesolution.adoc[]
 
 Let's describe the microservices:
 
-* `bookcatalogue` - It returns a list of books. It uses a domain consisting of a book name and ISBN.
+* `bookcatalogue` - It returns a list of books. It uses a domain consisting of a book name and an ISBN.
 
-* `bookinventory` - It exposes an endpoint to check whether a book has sufficient stock to fulfil an order.  It uses a domain consisting of a stock level and ISBN.
+* `bookinventory` - It exposes an endpoint to check whether a book has sufficient stock to fulfill an order. It uses a domain consisting of a stock level and an ISBN.
 
-* `bookrecommendation` - It consumes previous services and exposes an endpoint which recommends book names which are in stock.
+* `bookrecommendation` - It consumes previous services and exposes an endpoint that recommends book names that are in stock.
 
-Initially we will hard-code the addresses where the different services are in the `bookcatalogue` service.
+Initially, we will hard-code the service addresses in the `bookcatalogue` service.
 
 image::hardcoded.svg[]
 
 As shown in the previous image, the `bookcatalogue` hardcodes references to its collaborators.
 
-In the second part of this guide we will use a discovery service.
+In the second part of this guide, we will use a discovery service.
 
 The services register when they start up:
 
 image::discovery-service-registration.svg[]
 
-When a service wants to do a request to other service, it uses the discovery service to retrieve the address.
+When a service wants to make a request to another service, it uses the discovery service to retrieve the address.
 
 image::discovery-service-flow.svg[]
 
@@ -62,7 +62,7 @@ source:BooksController[app=bookcatalogue]
 callout:controller[arg0=/books]
 <2> The `@Get` annotation maps the index method to `/books` requests that use an HTTP GET.
 
-The previous controller responds a `List<Book>`. Create the `Book` POJO:
+The previous controller responds with a `List<Book>`. Create the `Book` POJO:
 
 source:Book[app=bookcatalogue]
 
@@ -73,7 +73,7 @@ test:BooksControllerTest[app=bookcatalogue]
 callout:micronaut-test[]
 callout:http-client[]
 callout:http-request[]
-<4> Parse easily JSON into Java objects.
+<4> Easily parse JSON into Java objects.
 
 Edit `application.properties`
 
@@ -90,7 +90,7 @@ common:default-dev-environment-application-dev-yaml.adoc[]
 
 resource:application-dev.properties[app=bookcatalogue]
 
-<1> Configure the application to listen on port 8081
+<1> Configure the application to listen on port 8081.
 
 Create a file named `application-test.properties` which is used in the test environment:
 
@@ -167,7 +167,7 @@ common:default-dev-environment-application-dev-yaml.adoc[]
 
 resource:application-dev.properties[app=bookinventory]
 
-<1> Configure the application to listen on port 8082
+<1> Configure the application to listen on port 8082.
 
 Create a file named `application-test.properties` which is used in the test environment:
 
@@ -248,16 +248,16 @@ source:BookRecommendation[app=bookrecommendation]
 
 `BookCatalogueClient` and `BookInventoryClient` will fail to consume the `bookcatalogue` and `bookinventory` during the tests phase.
 
-Using the https://docs.micronaut.io/latest/guide/#clientFallback[@Fallback] annotation you can declare a fallback implementation of a client that will be picked up and used once all possible retries have been exhausted
+Using the https://docs.micronaut.io/latest/guide/#clientFallback[@Fallback] annotation, you can declare a fallback implementation of a client that will be picked up and used once all possible retries have been exhausted.
 
 Create `@Fallback` alternatives in the `test` classpath.
 
 test:BookInventoryClientStub[app=bookrecommendation]
 
-<1> Make this fallback class to be effective only when the Micronaut environment __TEST__ is active
-<2> Here we arbitrarily decided that if everything else fails, that book's `stock` would be true
-<3> Similarly, we decided that other book's `stock` method would be false
-<4> Finally, any other book will have their `stock` method return an empty value
+<1> Make this fallback class effective only when the Micronaut environment __TEST__ is active.
+<2> Here we arbitrarily decide that if everything else fails, that book's `stock` would be true.
+<3> Similarly, we decide that the other book's `stock` method would be false.
+<4> Finally, any other book will have its `stock` method return an empty value.
 
 test:BookCatalogueClientStub[app=bookrecommendation]
 
@@ -424,21 +424,21 @@ Append to `bookcatalogue` service `application.properties` the following snippet
 
 resource:application.properties[app=bookcatalogue,tag=eureka]
 
-Previous configuration registers a Micronaut application with Eureka with minimal configuration. Discover a more complete list of configuration options at https://micronaut-projects.github.io/micronaut-discovery-client/latest/api/io/micronaut/discovery/eureka/EurekaConfiguration.html[EurekaConfiguration].
+The previous configuration registers a Micronaut application with Eureka with minimal configuration. Discover a more complete list of configuration options at https://micronaut-projects.github.io/micronaut-discovery-client/latest/api/io/micronaut/discovery/eureka/EurekaConfiguration.html[EurekaConfiguration].
 
 === Book Inventory
 
-Append to `bookinventory`.`application.properties` the following snippet:
+Append the following snippet to the `bookinventory` service `application.properties`:
 
 resource:application.properties[app=bookinventory,tag=eureka]
 
 === Book Recommendation
 
-Append to `bookrecommendation`.`application.properties` the following snippet:
+Append the following snippet to the `bookrecommendation` service `application.properties`:
 
 resource:application.properties[app=bookrecommendation,tag=eureka]
 
-Modify `BookInventoryClient` and `BookCatalogueClient` to use the service id instead of a hardcoded URL.
+Modify `BookInventoryClient` and `BookCatalogueClient` to use the service id instead of a hard-coded URL.
 
 source:BookCatalogueClient[app=bookrecommendation,tags=package|imports|eureka|clazz]
 

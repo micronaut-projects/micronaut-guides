@@ -2,7 +2,7 @@ common:header.adoc[]
 
 common:requirements.adoc[]
 * An https://aws.amazon.com/[AWS account] with:
-** An IAM user with enough permissions to create and manage a queue instances in SQS.
+** An IAM user with enough permissions to create and manage queue instances in SQS.
 ** The AWS CLI configured to use the IAM user above.
 
 common:completesolution.adoc[]
@@ -42,26 +42,26 @@ source:DemoConsumer[]
 
 === Creating a Controller
 
-Let’s create a Controller with an endpoint that we will call to verify that message has been sent by the JMS Producer (`DemoProducer`) and then finally received and consumed by the JMS Consumer (`DemoConsumer`).
+Let’s create a controller with an endpoint that we will call to verify that a message has been sent by the JMS Producer (`DemoProducer`) and then finally received and consumed by the JMS Consumer (`DemoConsumer`).
 
 source:DemoController[]
 callout:controller[arg0=/]
 callout:constructor-di[arg0=DemoProducer]
-<3> Maps a `GET` request to `/demo` path, which attempts to publish a message to a SQS queue instance.
+<3> Maps a `GET` request to the `/demo` path, which attempts to publish a message to an SQS queue instance.
 <4> Calls `send` method on `DemoProducer` instances providing the message payload.
 
 == Testing
 
-common:localstack.adoc[]
+common:floci.adoc[]
 
-common:localstack-dependencies.adoc[]
+common:floci-dependencies.adoc[]
 
-First, we create a configuration properties object to encapsulate the configuration of the SQS client, which we will provide via LocalStack.
+First, we create a configuration properties object to encapsulate the configuration of the SQS client, which we will provide via Floci.
 
 test:SqsConfig[]
 callout:configuration-properties[]
 
-Create a `BeanCreatedEventListener` to override the SQS client endpoint with the LocalStack endpoint.
+Create a `BeanCreatedEventListener` to override the SQS client endpoint with the Floci endpoint.
 
 test:SqsClientBuilderListener[]
 callout:singleton[]
@@ -74,7 +74,7 @@ test:SqsClientCreatedEventListener[]
 callout:singleton[]
 callout:bean-created-event-listener[]
 
-Create a test using the https://java.testcontainers.org/modules/localstack/[Testcontainers LocalStack] module to start a LocalStack container and verify that the message has been sent and received.
+Create a test using the Floci Testcontainers module to start a Floci container and verify that the message has been sent and received.
 
 test:MicronautguideTest[]
 
@@ -131,7 +131,7 @@ Run from a terminal window to publish and consume a message:
 curl "http://localhost:8080/demo"
 ----
 
-=== Stopping the Instance and cleaning up
+=== Stopping the Instance and Cleaning Up
 
 Once you are done with this guide, you can stop/delete the AWS resources created to avoid incurring unnecessary charges.
 

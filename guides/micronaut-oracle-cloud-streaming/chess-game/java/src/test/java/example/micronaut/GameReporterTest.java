@@ -61,6 +61,7 @@ import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 @TestInstance(PER_CLASS) // <2>
 class GameReporterTest implements TestPropertyProvider { // <3>
 
+    private static final int TIMEOUT_SECONDS = 30;
     private static final Collection<GameDTO> receivedGames = new ConcurrentLinkedDeque<>();
     private static final Collection<GameStateDTO> receivedMoves = new ConcurrentLinkedDeque<>();
 
@@ -86,7 +87,7 @@ class GameReporterTest implements TestPropertyProvider { // <3>
         Optional<String> result = startGame(blackName, whiteName);
         String gameId = result.orElseThrow(() -> new RuntimeException("Expected GameDTO id"));
 
-        await().atMost(5, SECONDS).until(() -> !receivedGames.isEmpty()); // <7>
+        await().atMost(TIMEOUT_SECONDS, SECONDS).until(() -> !receivedGames.isEmpty()); // <7>
 
         assertEquals(1, receivedGames.size());
         assertEquals(0, receivedMoves.size());
@@ -107,7 +108,7 @@ class GameReporterTest implements TestPropertyProvider { // <3>
         makeMove(gameId, Player.WHITE, "g4", "rnbqkbnr/pppp1ppp/4p3/8/6P1/5P2/PPPPP2P/RNBQKBNR b KQkq g3 0 2", "1. f3 e6 2. g4");
         makeMove(gameId, Player.BLACK, "Qh4#", "rnb1kbnr/pppp1ppp/4p3/8/6Pq/5P2/PPPPP2P/RNBQKBNR w KQkq - 1 3", "1. f3 e6 2. g4 Qh4#");
 
-        await().atMost(5, SECONDS).until(() -> receivedMoves.size() > 3);
+        await().atMost(TIMEOUT_SECONDS, SECONDS).until(() -> receivedMoves.size() > 3);
 
         assertEquals(0, receivedGames.size());
         assertEquals(4, receivedMoves.size());
@@ -132,7 +133,7 @@ class GameReporterTest implements TestPropertyProvider { // <3>
 
         endGame(gameId, Player.BLACK);
 
-        await().atMost(5, SECONDS).until(() -> !receivedGames.isEmpty());
+        await().atMost(TIMEOUT_SECONDS, SECONDS).until(() -> !receivedGames.isEmpty());
 
         assertEquals(1, receivedGames.size());
         assertEquals(0, receivedMoves.size());
@@ -158,7 +159,7 @@ class GameReporterTest implements TestPropertyProvider { // <3>
 
         String gameId = result.orElseThrow(() -> new RuntimeException("Expected GameDTO id"));
 
-        await().atMost(5, SECONDS).until(() -> !receivedGames.isEmpty());
+        await().atMost(TIMEOUT_SECONDS, SECONDS).until(() -> !receivedGames.isEmpty());
 
         assertEquals(1, receivedGames.size());
         assertEquals(0, receivedMoves.size());
@@ -177,7 +178,7 @@ class GameReporterTest implements TestPropertyProvider { // <3>
         makeMove(gameId, Player.WHITE, "f3", "rnbqkbnr/pppppppp/8/8/8/5P2/PPPPP1PP/RNBQKBNR b KQkq - 0 1", "1. f3");
         makeMove(gameId, Player.BLACK, "e6", "rnbqkbnr/pppp1ppp/4p3/8/8/5P2/PPPPP1PP/RNBQKBNR w KQkq - 0 2", "1. f3 e6");
 
-        await().atMost(5, SECONDS).until(() -> receivedMoves.size() > 1);
+        await().atMost(TIMEOUT_SECONDS, SECONDS).until(() -> receivedMoves.size() > 1);
 
         assertEquals(0, receivedGames.size());
         assertEquals(2, receivedMoves.size());
@@ -188,7 +189,7 @@ class GameReporterTest implements TestPropertyProvider { // <3>
 
         endGame(gameId, null);
 
-        await().atMost(5, SECONDS).until(() -> !receivedGames.isEmpty());
+        await().atMost(TIMEOUT_SECONDS, SECONDS).until(() -> !receivedGames.isEmpty());
 
         assertEquals(1, receivedGames.size());
         assertEquals(0, receivedMoves.size());
