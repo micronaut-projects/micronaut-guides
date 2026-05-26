@@ -47,19 +47,16 @@ to drive configuration, add the following dependency:
 
 dependency:micronaut-aws-parameter-store[groupId=io.micronaut.aws]
 
-common:enable-distributed-configuration.adoc[]
+=== Import Configuration from AWS Parameter Store
 
-common:distributed-configuration-search.adoc[]
+Add the following configuration to import distributed configuration from AWS Parameter Store:
 
-=== Enable Distributed Configuration with AWS Parameter Store
+resource:application.properties[tag=parameterstore]
 
-Add the following configuration to enable distributed configuration with AWS Parameter Store:
+<1> Set the application name used by the guide.
+<2> Import configuration from the `/config/micronautguide` hierarchy in AWS Parameter Store. The `optional:` prefix allows the application to start when the path is not available.
 
-resource:bootstrap.properties[tag=parameterstore]
-
-<1> Set `aws.client.system-manager.parameterstore.enabled` to enable distributed configuration with AWS Parameter Store.
-
-NOTE: The `micronaut.application.name` value will be part of the parameter name in AWS Parameter Store.
+NOTE: The import path uses the same `micronautguide` name you use in the AWS Parameter Store parameter names.
 
 === Logging
 
@@ -104,29 +101,6 @@ You will get an output such as:
 [source,bash]
 ----
 06:41:44.364 [main] INFO  i.m.context.env.DefaultEnvironment - Established active environments: [ec2]
-06:41:44.377 [main] INFO  i.m.context.env.DefaultEnvironment - Established active environments: [ec2]
-06:41:44.489 [main] INFO  i.m.context.DefaultBeanContext - Reading Startup environment from bootstrap-test.properties
-06:41:46.425 [main] DEBUG i.m.d.c.c.DistributedPropertySourceLocator - Resolving configuration sources from client: compositeConfigurationClient(AWS Parameter Store)
-06:41:47.811 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - parameterBasePath=/config/application no parameters found
-06:41:47.813 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - Retrieving parameters by path /config/application, pagination requested: false
-06:41:47.961 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - parameterBasePath=/config/application no parameters found
-06:41:47.961 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - parameterBasePath=/config/application no parameters found
-06:41:48.084 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - parameterBasePath=/config/micronautguide no parameters found
-06:41:48.085 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - Retrieving parameters by path /config/micronautguide, pagination requested: false
-06:41:48.222 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - parameterBasePath=/config/micronautguide no parameters found
-06:41:48.224 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - Converted {vat.rate=21, vat.country=Spain}
-06:41:48.224 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - param found: parameterBasePath=/config/micronautguide parameter=vat.rate
-06:41:48.224 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - param found: parameterBasePath=/config/micronautguide parameter=vat.country
-06:41:48.359 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - parameterBasePath=/config/application_ec2 no parameters found
-06:41:48.360 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - Retrieving parameters by path /config/application_ec2, pagination requested: false
-06:41:48.485 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - parameterBasePath=/config/application_ec2 no parameters found
-06:41:48.485 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - parameterBasePath=/config/application_ec2 no parameters found
-06:41:48.607 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - parameterBasePath=/config/micronautguide_ec2 no parameters found
-06:41:48.607 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - Retrieving parameters by path /config/micronautguide_ec2, pagination requested: false
-06:41:48.732 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - parameterBasePath=/config/micronautguide_ec2 no parameters found
-06:41:48.733 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - parameterBasePath=/config/micronautguide_ec2 no parameters found
-06:41:48.733 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - source=micronautguide got priority=-98
-06:41:48.734 [main] INFO  i.m.d.c.c.DistributedPropertySourceLocator - Resolved 1 configuration sources from client: compositeConfigurationClient(AWS Parameter Store)
 06:41:49.083 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 4874ms. Server Running: http://localhost:8080
 ----
 
@@ -167,29 +141,6 @@ You will get an output such as:
 [source,bash]
 ----
 06:41:44.364 [main] INFO  i.m.context.env.DefaultEnvironment - Established active environments: [ec2]
-06:41:44.377 [main] INFO  i.m.context.env.DefaultEnvironment - Established active environments: [ec2]
-06:41:44.489 [main] INFO  i.m.context.DefaultBeanContext - Reading Startup environment from bootstrap-test.properties
-06:41:46.425 [main] DEBUG i.m.d.c.c.DistributedPropertySourceLocator - Resolving configuration sources from client: compositeConfigurationClient(AWS Parameter Store)
-06:41:47.811 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - parameterBasePath=/config/application no parameters found
-06:41:47.813 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - Retrieving parameters by path /config/application, pagination requested: false
-06:41:47.961 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - parameterBasePath=/config/application no parameters found
-06:41:47.961 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - parameterBasePath=/config/application no parameters found
-06:41:48.084 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - parameterBasePath=/config/micronautguide no parameters found
-06:41:48.085 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - Retrieving parameters by path /config/micronautguide, pagination requested: false
-06:41:48.222 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - parameterBasePath=/config/micronautguide no parameters found
-06:41:48.224 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - Converted {vat.rate=21, vat.country=Spain}
-06:41:48.224 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - param found: parameterBasePath=/config/micronautguide parameter=vat.rate
-06:41:48.224 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - param found: parameterBasePath=/config/micronautguide parameter=vat.country
-06:41:48.359 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - parameterBasePath=/config/application_ec2 no parameters found
-06:41:48.360 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - Retrieving parameters by path /config/application_ec2, pagination requested: false
-06:41:48.485 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - parameterBasePath=/config/application_ec2 no parameters found
-06:41:48.485 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - parameterBasePath=/config/application_ec2 no parameters found
-06:41:48.607 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - parameterBasePath=/config/micronautguide_ec2 no parameters found
-06:41:48.607 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - Retrieving parameters by path /config/micronautguide_ec2, pagination requested: false
-06:41:48.732 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - parameterBasePath=/config/micronautguide_ec2 no parameters found
-06:41:48.733 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - parameterBasePath=/config/micronautguide_ec2 no parameters found
-06:41:48.733 [main] TRACE i.m.d.a.p.AWSParameterStoreConfigClient - source=micronautguide got priority=-98
-06:41:48.734 [main] INFO  i.m.d.c.c.DistributedPropertySourceLocator - Resolved 1 configuration sources from client: compositeConfigurationClient(AWS Parameter Store)
 06:41:49.083 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 4874ms. Server Running: http://localhost:8080
 ----
 
@@ -210,11 +161,11 @@ aws ssm put-parameter --name /config/micronautguide_ch/vat/country --value=Switz
 aws ssm put-parameter --name /config/micronautguide_ch/vat/rate --value=7.7 --type String
 ----
 
-Enable search for active environments:
+Update the import path for the environment-specific configuration:
 
 [source, properties]
 ----
-aws.distributed-configuration.search-active-environments=true
+micronaut.config.import=parameterstore:///config/micronautguide_ch
 ----
 
 Set the environment to use `ec2` and `ch`.

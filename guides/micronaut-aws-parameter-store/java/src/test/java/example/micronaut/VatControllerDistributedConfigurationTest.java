@@ -50,6 +50,7 @@ class VatControllerDistributedConfigurationTest implements TestPropertyProvider 
         if (!floci.isRunning()) {
             floci.start();
         }
+        configureSsmProperties();
         try (SsmClient ssmClient = SsmClient.builder()
                 .endpointOverride(URI.create(floci.getEndpoint()))
                 .region(Region.of(floci.getRegion()))
@@ -70,7 +71,15 @@ class VatControllerDistributedConfigurationTest implements TestPropertyProvider 
         return Map.of("aws.access-key-id", floci.getAccessKey(),
                 "aws.secret-key", floci.getSecretKey(),
                 "aws.region", floci.getRegion(),
-                "aws.services.ssm.endpoint-override", floci.getEndpoint());
+                "aws.services.ssm.endpoint-override", floci.getEndpoint(),
+                "micronaut.config.import", "parameterstore:///config/micronautguide");
+    }
+
+    private void configureSsmProperties() {
+        System.setProperty("aws.access-key-id", floci.getAccessKey());
+        System.setProperty("aws.secret-key", floci.getSecretKey());
+        System.setProperty("aws.region", floci.getRegion());
+        System.setProperty("aws.services.ssm.endpoint-override", floci.getEndpoint());
     }
 
     @Test

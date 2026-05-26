@@ -41,17 +41,25 @@ class SsmAsyncClientFactory {
     @Singleton
     SsmAsyncClient createSecretsManagerClient(SsmAsyncClientBuilder builder) {
         try {
+            String endpointOverride = valueOrSystemProperty(config.getSsm().getEndpointOverride(), "aws.services.ssm.endpoint-override");
+            String accessKeyId = valueOrSystemProperty(config.getAccessKeyId(), "aws.access-key-id");
+            String secretKey = valueOrSystemProperty(config.getSecretKey(), "aws.secret-key");
+            String region = valueOrSystemProperty(config.getRegion(), "aws.region");
             return builder
-                    .endpointOverride(new URI(config.getSsm().getEndpointOverride()))
+                    .endpointOverride(new URI(endpointOverride))
                     .credentialsProvider(
                             StaticCredentialsProvider.create(
-                                    AwsBasicCredentials.create(config.getAccessKeyId(), config.getSecretKey())
+                                    AwsBasicCredentials.create(accessKeyId, secretKey)
                             )
                     )
-                    .region(Region.of(config.getRegion()))
+                    .region(Region.of(region))
                     .build();
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private String valueOrSystemProperty(String value, String property) {
+        return value != null ? value : System.getProperty(property);
     }
 }

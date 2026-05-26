@@ -14,9 +14,14 @@ public class AwsParameterStoreReplacement extends AwsParameterStore {
     @Override
     public void apply(GeneratorContext generatorContext) {
         super.apply(generatorContext);
+        generatorContext.getBootstrapConfiguration().clear();
         generatorContext.addDependency(Dependency.builder()
                 .groupId("software.amazon.awssdk")
                 .artifactId("ssm")
                 .compile());
+    }
+
+    @Override
+    protected void addBootstrapProperties(GeneratorContext generatorContext) {
     }
 }

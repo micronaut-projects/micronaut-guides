@@ -16,9 +16,7 @@
 package example.micronaut
 
 import io.floci.testcontainers.FlociContainer
-import io.micronaut.context.annotation.Property
 import io.micronaut.context.env.Environment
-import io.micronaut.core.util.StringUtils
 import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
@@ -38,7 +36,6 @@ import java.net.URI
 
 @MicronautTest(environments = [Environment.AMAZON_EC2, "ch"])
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@Property(name = "aws.distributed-configuration.search-active-environments", value = StringUtils.TRUE)
 class VatControllerDistributedConfigurationSpecificEnvironmentTest : TestPropertyProvider {
 
     @Inject
@@ -49,6 +46,7 @@ class VatControllerDistributedConfigurationSpecificEnvironmentTest : TestPropert
         if (!floci.isRunning) {
             floci.start()
         }
+        configureSsmProperties()
         SsmClient.builder()
             .endpointOverride(URI.create(floci.endpoint))
             .credentialsProvider(
@@ -68,8 +66,16 @@ class VatControllerDistributedConfigurationSpecificEnvironmentTest : TestPropert
             "aws.access-key-id" to floci.accessKey,
             "aws.secret-key" to floci.secretKey,
             "aws.region" to floci.region,
-            "aws.services.ssm.endpoint-override" to floci.endpoint
+            "aws.services.ssm.endpoint-override" to floci.endpoint,
+            "micronaut.config.import" to "parameterstore:///config/micronautguide_ch"
         ).toMutableMap()
+    }
+
+    private fun configureSsmProperties() {
+        System.setProperty("aws.access-key-id", floci.accessKey)
+        System.setProperty("aws.secret-key", floci.secretKey)
+        System.setProperty("aws.region", floci.region)
+        System.setProperty("aws.services.ssm.endpoint-override", floci.endpoint)
     }
 
     private fun putParameterRequest(name: String, value: String): PutParameterRequest {

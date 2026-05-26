@@ -16,10 +16,8 @@
 package example.micronaut;
 
 import io.floci.testcontainers.FlociContainer;
-import io.micronaut.context.annotation.Property;
 import io.micronaut.context.env.Environment;
 import io.micronaut.core.annotation.NonNull;
-import io.micronaut.core.util.StringUtils;
 import io.micronaut.http.client.BlockingHttpClient;
 import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
@@ -43,7 +41,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @MicronautTest(environments = {Environment.AMAZON_EC2, "ch"})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@Property(name = "aws.distributed-configuration.search-active-environments", value = StringUtils.TRUE)
 class VatControllerDistributedConfigurationSpecificEnvironmentTest implements TestPropertyProvider {
 
     private static final DockerImageName FLOCI_IMAGE = DockerImageName.parse("floci/floci:1.5.18");
@@ -54,6 +51,7 @@ class VatControllerDistributedConfigurationSpecificEnvironmentTest implements Te
         if (!floci.isRunning()) {
             floci.start();
         }
+        configureSsmProperties();
         try (SsmClient ssmClient = SsmClient.builder()
                 .endpointOverride(URI.create(floci.getEndpoint()))
                 .region(Region.of(floci.getRegion()))
@@ -68,7 +66,15 @@ class VatControllerDistributedConfigurationSpecificEnvironmentTest implements Te
         return Map.of("aws.access-key-id", floci.getAccessKey(),
                 "aws.secret-key", floci.getSecretKey(),
                 "aws.region", floci.getRegion(),
-                "aws.services.ssm.endpoint-override", floci.getEndpoint());
+                "aws.services.ssm.endpoint-override", floci.getEndpoint(),
+                "micronaut.config.import", "parameterstore:///config/micronautguide_ch");
+    }
+
+    private void configureSsmProperties() {
+        System.setProperty("aws.access-key-id", floci.getAccessKey());
+        System.setProperty("aws.secret-key", floci.getSecretKey());
+        System.setProperty("aws.region", floci.getRegion());
+        System.setProperty("aws.services.ssm.endpoint-override", floci.getEndpoint());
     }
 
     private PutParameterRequest putParameterRequest(String name, String value) {

@@ -46,6 +46,7 @@ class VatControllerDistributedConfigurationTest : TestPropertyProvider { // <3>
         if (!floci.isRunning) {
             floci.start()
         }
+        configureSsmProperties()
         SsmClient.builder()
             .endpointOverride(URI.create(floci.endpoint))
             .credentialsProvider(
@@ -75,8 +76,16 @@ class VatControllerDistributedConfigurationTest : TestPropertyProvider { // <3>
             "aws.access-key-id" to floci.accessKey,
             "aws.secret-key" to floci.secretKey,
             "aws.region" to floci.region,
-            "aws.services.ssm.endpoint-override" to floci.endpoint
+            "aws.services.ssm.endpoint-override" to floci.endpoint,
+            "micronaut.config.import" to "parameterstore:///config/micronautguide"
         ).toMutableMap()
+    }
+
+    private fun configureSsmProperties() {
+        System.setProperty("aws.access-key-id", floci.accessKey)
+        System.setProperty("aws.secret-key", floci.secretKey)
+        System.setProperty("aws.region", floci.region)
+        System.setProperty("aws.services.ssm.endpoint-override", floci.endpoint)
     }
 
     @Test

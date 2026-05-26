@@ -35,14 +35,18 @@ class SsmAsyncClientFactory(private val config: SsmConfig) {
     @Singleton
     fun createSsmAsyncClient(builder: SsmAsyncClientBuilder): SsmAsyncClient {
         try {
+            val endpointOverride = config.ssm.endpointOverride ?: System.getProperty("aws.services.ssm.endpoint-override")
+            val accessKeyId = config.accessKeyId ?: System.getProperty("aws.access-key-id")
+            val secretKey = config.secretKey ?: System.getProperty("aws.secret-key")
+            val region = config.region ?: System.getProperty("aws.region")
             return builder
-                .endpointOverride(URI(config.ssm.endpointOverride!!))
+                .endpointOverride(URI(endpointOverride))
                 .credentialsProvider(
                     StaticCredentialsProvider.create(
-                        AwsBasicCredentials.create(config.accessKeyId!!, config.secretKey!!)
+                        AwsBasicCredentials.create(accessKeyId, secretKey)
                     )
                 )
-                .region(Region.of(config.region!!))
+                .region(Region.of(region))
                 .build()
         } catch (e: URISyntaxException) {
             throw RuntimeException(e)

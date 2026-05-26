@@ -15,15 +15,12 @@
  */
 package example.micronaut
 
-import io.micronaut.context.annotation.Property
-import io.micronaut.core.util.StringUtils
 import io.micronaut.runtime.EmbeddedApplication
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import jakarta.inject.Inject
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
-@Property(name = "micronaut.config-client.enabled", value = StringUtils.FALSE)
 @MicronautTest
 class DefaultTest {
 
