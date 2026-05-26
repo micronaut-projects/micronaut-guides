@@ -61,7 +61,9 @@ class FunctionRequestHandlerTest {
         @AfterAll
         @JvmStatic
         fun stopServer() {
-            handler.applicationContext.close() // <2>
+            if (::handler.isInitialized) {
+                handler.applicationContext.close() // <2>
+            }
         }
     }
 }
