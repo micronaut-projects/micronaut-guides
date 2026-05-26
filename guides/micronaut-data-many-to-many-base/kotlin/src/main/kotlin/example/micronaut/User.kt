@@ -17,10 +17,11 @@ package example.micronaut
 
 import io.micronaut.core.annotation.Introspected
 import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotNull
 
 @Introspected // <1>
 data class User(
-    @field:NotBlank
+    @field:NotNull
     val id: Long,
 
     @field:NotBlank
