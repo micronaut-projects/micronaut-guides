@@ -26,9 +26,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.testcontainers.containers.localstack.LocalStackContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
 import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
@@ -45,7 +43,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @Testcontainers(disabledWithoutDocker = true)
 @MicronautTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@ExtendWith(LocalStackExtension.class)
+@ExtendWith(FlociExtension.class)
 class ProfilePicturesControllerTest extends AbstractProfilePicturesControllerTest implements TestPropertyProvider {
     public static final String BUCKET_NAME = "micronaut-guide-object-storage";
 
@@ -65,7 +63,7 @@ class ProfilePicturesControllerTest extends AbstractProfilePicturesControllerTes
     @Override
     @NonNull
     public Map<String, String> getProperties() {
-        return LocalStack.getProperties();
+        return Floci.getProperties();
     }
 
     @Override

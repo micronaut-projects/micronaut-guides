@@ -69,6 +69,8 @@ Feature names must be valid Micronaut Starter features. If a guide needs a featu
 
 Use optional metadata only when needed: `languages`, `buildTools`, `testFramework`, `minimumJavaVersion`, `maximumJavaVersion`, `cloud`, `publish`, `base`, `zipIncludes`, `skipGradleTests`, `skipMavenTests`, `env`, app-specific `javaFeatures`, `kotlinFeatures`, `groovyFeatures`, `invisibleFeatures`, `excludeTest`, and `excludeSource`.
 
+Omit `languages` when a guide supports all default languages: Java, Groovy, and Kotlin. Add `languages` only when the guide intentionally narrows support to a subset.
+
 ## Asciidoc
 
 The guide file normally matches the directory name: `guides/<slug>/<slug>.adoc`.
@@ -116,9 +118,11 @@ Place numbered callout explanations immediately after the macro that emits the s
 
 Keep example package names as `example.micronaut` unless metadata explicitly uses another `packageName`.
 
-When changing guide code, update all supported languages unless metadata intentionally narrows `languages`. Java and Kotlin tests normally end in `Test`; Groovy tests normally end in `Spec`.
+When changing guide code, update all supported languages. If `languages` is absent, the supported languages are the default Java, Groovy, and Kotlin; if present, treat it as an intentional narrowed subset. Java and Kotlin tests normally end in `Test`; Groovy tests normally end in `Spec`.
 
 Shared resource overrides can live directly under `guides/<slug>/src/...`; language-specific overrides go under the language directory. For multi-app guides, apply the same rule inside each app directory.
+
+Prefer shared resources when supported languages need the same file. Put common files such as `src/main/resources/logback.xml`, `src/main/resources/application.yml`, and `src/test-resources/...` at the guide or app root instead of duplicating them under `java/`, `groovy/`, and `kotlin/`; keep language-specific resource copies only when their contents must differ.
 
 ## Final Checks
 

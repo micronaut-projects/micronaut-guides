@@ -15,6 +15,7 @@
  */
 package example.micronaut
 
+import io.floci.testcontainers.FlociContainer
 import io.micronaut.context.env.Environment
 import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
@@ -24,7 +25,6 @@ import jakarta.inject.Inject
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.testcontainers.containers.localstack.LocalStackContainer
 import org.testcontainers.utility.DockerImageName
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider
@@ -32,6 +32,7 @@ import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.ssm.SsmClient
 import software.amazon.awssdk.services.ssm.model.ParameterType
 import software.amazon.awssdk.services.ssm.model.PutParameterRequest
+import java.net.URI
 
 @MicronautTest(environments = [Environment.AMAZON_EC2]) // <1>
 @TestInstance(TestInstance.Lifecycle.PER_CLASS) // <2>
@@ -42,40 +43,39 @@ class VatControllerDistributedConfigurationTest : TestPropertyProvider { // <3>
     lateinit var httpClient: HttpClient
 
     override fun getProperties(): MutableMap<String, String> {
-        if (!localstack.isRunning) {
-            localstack.start()
+        if (!floci.isRunning) {
+            floci.start()
         }
         SsmClient.builder()
-            .endpointOverride(localstack.getEndpointOverride(LocalStackContainer.Service.SSM))
+            .endpointOverride(URI.create(floci.endpoint))
             .credentialsProvider(
                 StaticCredentialsProvider.create(
-                    AwsBasicCredentials.create(localstack.accessKey, localstack.secretKey)
+                    AwsBasicCredentials.create(floci.accessKey, floci.secretKey)
                 )
             )
-            .region(Region.of(localstack.region))
+            .region(Region.of(floci.region))
             .build()
             .use { ssmClient ->
                 ssmClient.putParameter(
                     PutParameterRequest.builder()
-                        .name("/config/micronautguide/vat/country/")
+                        .name("/config/micronautguide/vat/country")
                         .type(ParameterType.STRING)
                         .value("Spain")
                         .build()
                 )
                 ssmClient.putParameter(
                     PutParameterRequest.builder()
-                        .name("/config/micronautguide/vat/rate/")
+                        .name("/config/micronautguide/vat/rate")
                         .type(ParameterType.STRING)
                         .value("21")
                         .build()
                 )
             }
         return mapOf(
-            "aws.access-key-id" to localstack.accessKey,
-            "aws.secret-key" to localstack.secretKey,
-            "aws.region" to localstack.region,
-            "aws.services.ssm.endpoint-override" to localstack.getEndpointOverride(LocalStackContainer.Service.SSM)
-                .toString()
+            "aws.access-key-id" to floci.accessKey,
+            "aws.secret-key" to floci.secretKey,
+            "aws.region" to floci.region,
+            "aws.services.ssm.endpoint-override" to floci.endpoint
         ).toMutableMap()
     }
 
@@ -85,8 +85,6 @@ class VatControllerDistributedConfigurationTest : TestPropertyProvider { // <3>
     }
 
     companion object {
-        private val localstackImage: DockerImageName = DockerImageName.parse("localstack/localstack:4.14.0")
-        private val localstack: LocalStackContainer = LocalStackContainer(localstackImage)
-            .withServices(LocalStackContainer.Service.SSM)
+        private val floci: FlociContainer = FlociContainer(DockerImageName.parse("floci/floci:1.5.18"))
     }
 }

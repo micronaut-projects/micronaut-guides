@@ -14,7 +14,7 @@ common:micronaut-views-thymeleaf.adoc[]
 
 common:cognito.adoc[]
 
-Configure the appropriate callback, make sure you allow `Authorization code grant` OAuth Flow, and also the scopes `openid` and `email` are selected.
+Configure the appropriate callback, make sure you allow the `Authorization code grant` OAuth flow, and select the `openid` and `email` scopes.
 
 image::aws-cognito-5.png[]
 
@@ -26,7 +26,7 @@ Also add https://micronaut-projects.github.io/micronaut-security/latest/guide/#j
 
 dependency:micronaut-security-jwt[groupId=io.micronaut.security]
 
-Add the following OAuth2 Configuration:
+Add the following OAuth 2.0 configuration:
 
 
 resource:application.properties[tag=oauth2]
@@ -40,7 +40,7 @@ callout:oauth2-client-name[arg0=cognito]
 
 The previous configuration uses several placeholders. If you used the AWS CLI, then you are all set.
 
-Otherwise, you will need to set up `OAUTH_CLIENT_ID`, `OAUTH_CLIENT_SECRET`, `COGNITO_REGION` and `COGNITO_POOL_ID` environment variables.
+Otherwise, you will need to set up `OAUTH_CLIENT_ID`, `OAUTH_CLIENT_SECRET`, `COGNITO_REGION`, and `COGNITO_POOL_ID` environment variables.
 
 [source, bash]
 ----
@@ -57,13 +57,13 @@ Although undocumented in the https://docs.aws.amazon.com/cognito/latest/develope
 curl https://cognito-idp.${COGNITO_REGION}.amazonaws.com/${COGNITO_POOL_ID}/.well-known/openid-configuration
 ----
 
-We want to use an **Authorization Code** grant type flow which it is described in the following diagram:
+We want to use an **Authorization Code** grant type flow, which is described in the following diagram:
 
 image::diagramm.png[]
 
 === Home
 
-Create a controller to handle the requests to `/`. You will display the email of the authenticated person if any. Annotate the controller endpoint with `@View` since we will use a Thymeleaf template.
+Create a controller to handle requests to `/`. You will display the email of the authenticated person if any. Annotate the controller endpoint with `@View` since we will use a Thymeleaf template.
 
 source:HomeController[]
 
@@ -72,14 +72,14 @@ callout:secured-anonymous[]
 <3> Use https://micronaut-projects.github.io/micronaut-views/latest/api/io/micronaut/views/View.html[View] annotation to specify which template to use to render the response.
 <4> The @api@/io/micronaut/http/annotation/Get.html[@Get] annotation maps the `index` method to GET `/` requests.
 
-Create a thymeleaf template:
+Create a Thymeleaf template:
 
 resource:views/home.html[]
 
-Also, note that we return an empty model in the controller. However, we are accessing `security` in the thymeleaf template.
+Also, note that we return an empty model in the controller. However, we are accessing `security` in the Thymeleaf template.
 
 - The https://micronaut-projects.github.io/micronaut-views/latest/api/io/micronaut/views/model/security/SecurityViewModelProcessor.html[SecurityViewModelProcessor]
-injects into the model a `security` map with the authenticated user.  See https://micronaut-projects.github.io/micronaut-views/latest/guide/#security-model-enhancement[User in a view^] documentation.
+injects into the model a `security` map with the authenticated user. See https://micronaut-projects.github.io/micronaut-views/latest/guide/#security-model-enhancement[User in a view^] documentation.
 
 common:runapp.adoc[]
 
@@ -89,7 +89,7 @@ common:graal-with-plugins.adoc[]
 
 :exclude-for-languages:groovy
 
-After you execute the native executable, navigate to localhost:8080 and authenticate with Cognito.
+After you execute the native executable, navigate to `localhost:8080` and authenticate with Cognito.
 
 :exclude-for-languages:
 
