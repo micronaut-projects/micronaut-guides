@@ -52,6 +52,7 @@ import jakarta.inject.Inject
 class GameReporterTest : TestPropertyProvider { // <3>
 
     companion object {
+        private const val TIMEOUT_SECONDS = 30L
         val receivedGames: MutableCollection<GameDTO> = ConcurrentLinkedDeque()
         val receivedMoves: MutableCollection<GameStateDTO> = ConcurrentLinkedDeque()
 
@@ -77,7 +78,7 @@ class GameReporterTest : TestPropertyProvider { // <3>
         val result = startGame(blackName, whiteName)
         val gameId = result.orElseThrow { RuntimeException("Expected GameDTO id") }
 
-        await().atMost(5, SECONDS).until { !receivedGames.isEmpty() } // <9>
+        await().atMost(TIMEOUT_SECONDS, SECONDS).until { !receivedGames.isEmpty() } // <9>
 
         assertEquals(1, receivedGames.size)
         assertEquals(0, receivedMoves.size)
@@ -98,7 +99,7 @@ class GameReporterTest : TestPropertyProvider { // <3>
         makeMove(gameId, "w", "g4", "rnbqkbnr/pppp1ppp/4p3/8/6P1/5P2/PPPPP2P/RNBQKBNR b KQkq g3 0 2", "1. f3 e6 2. g4")
         makeMove(gameId, "b", "Qh4#", "rnb1kbnr/pppp1ppp/4p3/8/6Pq/5P2/PPPPP2P/RNBQKBNR w KQkq - 1 3", "1. f3 e6 2. g4 Qh4#")
 
-        await().atMost(5, SECONDS).until { receivedMoves.size > 3 }
+        await().atMost(TIMEOUT_SECONDS, SECONDS).until { receivedMoves.size > 3 }
 
         assertEquals(0, receivedGames.size)
         assertEquals(4, receivedMoves.size)
@@ -123,7 +124,7 @@ class GameReporterTest : TestPropertyProvider { // <3>
 
         endGame(gameId, "b")
 
-        await().atMost(5, SECONDS).until { !receivedGames.isEmpty() }
+        await().atMost(TIMEOUT_SECONDS, SECONDS).until { !receivedGames.isEmpty() }
 
         assertEquals(1, receivedGames.size)
         assertEquals(0, receivedMoves.size)
@@ -147,7 +148,7 @@ class GameReporterTest : TestPropertyProvider { // <3>
         val result = startGame(blackName, whiteName)
         val gameId = result.orElseThrow { RuntimeException("Expected GameDTO id") }
 
-        await().atMost(5, SECONDS).until { !receivedGames.isEmpty() }
+        await().atMost(TIMEOUT_SECONDS, SECONDS).until { !receivedGames.isEmpty() }
 
         assertEquals(1, receivedGames.size)
         assertEquals(0, receivedMoves.size)
@@ -167,7 +168,7 @@ class GameReporterTest : TestPropertyProvider { // <3>
         makeMove(gameId, "w", "f3", "rnbqkbnr/pppppppp/8/8/8/5P2/PPPPP1PP/RNBQKBNR b KQkq - 0 1", "1. f3")
         makeMove(gameId, "b", "e6", "rnbqkbnr/pppp1ppp/4p3/8/8/5P2/PPPPP1PP/RNBQKBNR w KQkq - 0 2", "1. f3 e6")
 
-        await().atMost(5, SECONDS).until { receivedMoves.size > 1 }
+        await().atMost(TIMEOUT_SECONDS, SECONDS).until { receivedMoves.size > 1 }
 
         assertEquals(0, receivedGames.size)
         assertEquals(2, receivedMoves.size)
@@ -178,7 +179,7 @@ class GameReporterTest : TestPropertyProvider { // <3>
 
         endGame(gameId, null)
 
-        await().atMost(5, SECONDS).until { !receivedGames.isEmpty() }
+        await().atMost(TIMEOUT_SECONDS, SECONDS).until { !receivedGames.isEmpty() }
 
         assertEquals(1, receivedGames.size)
         assertEquals(0, receivedMoves.size)

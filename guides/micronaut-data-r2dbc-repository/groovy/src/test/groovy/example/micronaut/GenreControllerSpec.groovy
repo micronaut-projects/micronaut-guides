@@ -131,6 +131,7 @@ class GenreControllerSpec extends Specification {
         request = HttpRequest.GET(UriBuilder.of("/genres")
                 .path("list")
                 .queryParam("size", 1)
+                .queryParam("sort", "name")
                 .build())
         genres = client.toBlocking().retrieve(request, Argument.listOf(Genre))
 
@@ -155,6 +156,7 @@ class GenreControllerSpec extends Specification {
                 .path("list")
                 .queryParam("size", 1)
                 .queryParam("page", 2)
+                .queryParam("sort", "name")
                 .build())
         genres = client.toBlocking().retrieve(request, Argument.listOf(Genre))
 
