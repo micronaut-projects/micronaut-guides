@@ -19,6 +19,8 @@ guides/<slug>/groovy
 
 Generated language directories should mirror the Java package and file structure unless an existing guide pattern for the same topic requires a different layout.
 
+Full Java, Groovy, and Kotlin support is the metadata default. Do not add `"languages": ["JAVA", "GROOVY", "KOTLIN"]` when all three language directories exist.
+
 ## Procedure
 
 1. Identify the target guide `slug`.
@@ -32,7 +34,7 @@ Generated language directories should mirror the Java package and file structure
    - Keep JUnit 5 for tests.
    - Use `Test.kt` naming for Kotlin tests.
 5. Write generated files into their language directories, preserving package names and source/resource layout.
-6. Update guide metadata only if the generated languages should be explicitly listed or if nearby guide patterns require it.
+6. Update guide metadata only when the guide intentionally supports a subset of languages. Omit `languages` when the guide has Java, Groovy, and Kotlin because that is the default.
 
 ## Checks
 
