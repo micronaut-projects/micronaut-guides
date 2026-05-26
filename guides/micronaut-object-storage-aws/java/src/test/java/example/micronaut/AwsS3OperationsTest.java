@@ -16,16 +16,23 @@
 package example.micronaut;
 
 import io.micronaut.context.BeanContext;
+import io.micronaut.core.annotation.NonNull;
+import io.micronaut.core.util.CollectionUtils;
 import io.micronaut.objectstorage.aws.AwsS3Operations;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+import io.micronaut.test.support.TestPropertyProvider;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @MicronautTest(startApplication = false)
-class AwsS3OperationsTest {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class AwsS3OperationsTest implements TestPropertyProvider {
 
     @Inject
     BeanContext beanContext;
@@ -34,5 +41,14 @@ class AwsS3OperationsTest {
     void onlyABeanOfTypeAwsS3OperationsExists() {
         assertDoesNotThrow(() -> beanContext.getBean(AwsS3Operations.class));
         assertEquals(1, beanContext.getBeansOfType(AwsS3Operations.class).size());
+    }
+
+    @Override
+    @NonNull
+    public Map<String, String> getProperties() {
+        return CollectionUtils.mapOf(
+                "aws.accessKeyId", "test",
+                "aws.secretKey", "test"
+        );
     }
 }

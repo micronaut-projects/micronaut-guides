@@ -101,7 +101,7 @@ class GenreControllerTest {
 
         assertEquals(2, genres.size());
 
-        request = HttpRequest.GET("/genres/list?size=1");
+        request = HttpRequest.GET("/genres/list?size=1&sort=name");
         genres = client.toBlocking().retrieve(request, Argument.of(List.class, Genre.class));
 
         assertEquals(1, genres.size());
@@ -113,7 +113,7 @@ class GenreControllerTest {
         assertEquals(1, genres.size());
         assertEquals("Micro-services", genres.get(0).getName());
 
-        request = HttpRequest.GET("/genres/list?size=1&page=2");
+        request = HttpRequest.GET("/genres/list?size=1&page=2&sort=name");
         genres = client.toBlocking().retrieve(request, Argument.of(List.class, Genre.class));
 
         assertEquals(0, genres.size());

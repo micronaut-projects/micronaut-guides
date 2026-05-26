@@ -21,7 +21,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 @Command(name = "keysgen",
-         description = "Generates a Json Web Key (JWT) with RS256 algorithm.",
+         description = "Generates a JSON Web Key (JWK) with the RS256 algorithm.",
          mixinStandardHelpOptions = true)  // <1>
 public class MicronautguideCommand implements Runnable {
 
