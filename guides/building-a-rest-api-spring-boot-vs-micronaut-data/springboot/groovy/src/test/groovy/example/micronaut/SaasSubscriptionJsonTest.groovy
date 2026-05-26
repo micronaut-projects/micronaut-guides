@@ -16,15 +16,16 @@ class SaasSubscriptionJsonTest {
     @Test
     void saasSubscriptionSerializationTest() {
         SaasSubscription subscription = new SaasSubscription(id: 99L, name: 'Professional', cents: 4900)
-        assertThat(json.write(subscription)).isStrictlyEqualToJson('expected.json')
-        assertThat(json.write(subscription)).hasJsonPathNumberValue('@.id')
-        assertThat(json.write(subscription)).extractingJsonPathNumberValue('@.id')
+        def result = json.write(subscription)
+        assertThat(result).isStrictlyEqualToJson('expected.json')
+        assertThat(result).hasJsonPathNumberValue('@.id')
+        assertThat(result).extractingJsonPathNumberValue('@.id')
                 .isEqualTo(99)
-        assertThat(json.write(subscription)).hasJsonPathStringValue('@.name')
-        assertThat(json.write(subscription)).extractingJsonPathStringValue('@.name')
+        assertThat(result).hasJsonPathStringValue('@.name')
+        assertThat(result).extractingJsonPathStringValue('@.name')
                 .isEqualTo('Professional')
-        assertThat(json.write(subscription)).hasJsonPathNumberValue('@.cents')
-        assertThat(json.write(subscription)).extractingJsonPathNumberValue('@.cents')
+        assertThat(result).hasJsonPathNumberValue('@.cents')
+        assertThat(result).extractingJsonPathNumberValue('@.cents')
                 .isEqualTo(4900)
     }
 
