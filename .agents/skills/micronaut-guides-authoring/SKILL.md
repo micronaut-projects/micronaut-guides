@@ -122,6 +122,8 @@ When changing guide code, update all supported languages. If `languages` is abse
 
 Shared resource overrides can live directly under `guides/<slug>/src/...`; language-specific overrides go under the language directory. For multi-app guides, apply the same rule inside each app directory.
 
+Prefer shared resources when supported languages need the same file. Put common files such as `src/main/resources/logback.xml`, `src/main/resources/application.yml`, and `src/test-resources/...` at the guide or app root instead of duplicating them under `java/`, `groovy/`, and `kotlin/`; keep language-specific resource copies only when their contents must differ.
+
 ## Final Checks
 
 For a guide slug, validate with the `micronaut-guides-validation` skill. At minimum, run the generated guide build task and inspect generated output in `build/dist` and `build/code` when the change affects rendered content or sample code.
