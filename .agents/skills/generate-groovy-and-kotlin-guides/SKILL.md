@@ -22,7 +22,7 @@ Generated language directories should mirror the Java package and file structure
 ## Procedure
 
 1. Identify the target guide `slug`.
-2. Read all files under `guides/<slug>/java/`.
+2. Read all files under `guides/<slug>/java/` and any shared guide resources under `guides/<slug>/src/`.
 3. If `guides/<slug>/groovy/` does not exist, generate Groovy code from the Java source:
    - Use idiomatic Groovy.
    - Replace JUnit 5 tests with equivalent Spock Framework specifications.
@@ -31,8 +31,9 @@ Generated language directories should mirror the Java package and file structure
    - Use idiomatic Kotlin.
    - Keep JUnit 5 for tests.
    - Use `Test.kt` naming for Kotlin tests.
-5. Write generated files into their language directories, preserving package names and source/resource layout.
-6. Update guide metadata only if the generated languages should be explicitly listed or if nearby guide patterns require it.
+5. Write generated language-specific source and test files into their language directories, preserving package names and source layout.
+6. Share identical resources between languages. If Java resources can also be used by Groovy and Kotlin, place them under `guides/<slug>/src/main/resources` or `guides/<slug>/src/test-resources` instead of copying them into each language directory; keep language-specific resource copies only when contents differ.
+7. Update guide metadata only if the generated languages should be explicitly listed or if nearby guide patterns require it.
 
 ## Checks
 
