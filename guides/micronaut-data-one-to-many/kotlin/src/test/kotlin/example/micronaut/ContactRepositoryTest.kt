@@ -33,7 +33,7 @@ class ContactRepositoryTest {
     @Test
     fun testAssociationsQuerying() {
         val firstName = "Sergio"
-        val lastName = "Sergio"
+        val lastName = "del Amo"
         val contactCount = contactRepository.count()
         val e = contactRepository.save(ContactEntity(null, firstName, lastName, null))
         val contactId = e.id!!
