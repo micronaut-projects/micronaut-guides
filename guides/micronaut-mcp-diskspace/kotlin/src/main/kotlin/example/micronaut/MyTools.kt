@@ -23,7 +23,7 @@ class MyTools {
 
     @Tool(
         title = "Free Disk Space",
-        description = "Return the free disk space in the users computer"
+        description = "Returns the free disk space in the user's computer"
     ) // <2>
     fun freeDiskSpace(): String {
         return DiskUtils.freeDiskSpace()
