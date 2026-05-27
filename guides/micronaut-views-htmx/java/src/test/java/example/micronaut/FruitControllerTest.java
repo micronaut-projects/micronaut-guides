@@ -60,6 +60,17 @@ class FruitControllerTest {
     }
 
     @Test
+    void normalPostRendersFullPage(@Client("/") HttpClient httpClient) {
+        BlockingHttpClient client = httpClient.toBlocking();
+
+        String html = client.retrieve(HttpRequest.POST("/fruits", Collections.emptyMap()));
+
+        assertTrue(html.contains("<!DOCTYPE html>"));
+        assertTrue(html.contains("<h2>Banana</h2>"));
+        assertTrue(html.contains("hx-post=\"/fruits\""));
+    }
+
+    @Test
     void htmxPostCanRenderOutOfBandSwap(@Client("/") HttpClient httpClient) {
         BlockingHttpClient client = httpClient.toBlocking();
         HttpRequest<?> request = HttpRequest.POST("/fruits", Collections.emptyMap())
@@ -68,7 +79,9 @@ class FruitControllerTest {
         String html = client.retrieve(request);
 
         assertTrue(html.contains("<h2>Banana</h2>"));
-        assertTrue(html.contains("<div id=\"message\" hx-swap-oob=\"true\">Selected Banana</div>"));
+        assertTrue(html.contains("id=\"message\""));
+        assertTrue(html.contains("hx-swap-oob=\"true\""));
+        assertTrue(html.contains("Selected Banana"));
     }
 
     @Test

@@ -26,9 +26,9 @@ import io.micronaut.views.ModelAndView;
 import io.micronaut.views.htmx.http.HtmxRequestHeaders;
 import io.micronaut.views.htmx.http.HtmxResponse;
 import io.micronaut.views.htmx.http.HtmxResponseHeaders;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
+import java.net.URI;
 import java.util.Map;
 
 @Controller("/fruits") // <1>
@@ -45,7 +45,10 @@ class FruitController {
 
     @Produces(MediaType.TEXT_HTML)
     @Post // <5>
-    HtmxResponse<?> select(@NonNull HtmxRequestHeaders htmxRequestHeaders) { // <6>
+    Object select(@Nullable HtmxRequestHeaders htmxRequestHeaders) { // <6>
+        if (htmxRequestHeaders == null) {
+            return new ModelAndView<>("fruits.html", fruit("Banana", "Yellow"));
+        }
         return HtmxResponse.builder()
                 .modelAndView(new ModelAndView<>("fruit.html", fruit("Banana", "Yellow")))
                 .modelAndView(new ModelAndView<>("message.html", Map.of("message", "Selected Banana")))
@@ -54,7 +57,10 @@ class FruitController {
 
     @Produces(MediaType.TEXT_HTML)
     @Get("/refresh")
-    HttpResponse<?> refresh(@NonNull HtmxRequestHeaders htmxRequestHeaders) { // <7>
+    HttpResponse<?> refresh(@Nullable HtmxRequestHeaders htmxRequestHeaders) { // <7>
+        if (htmxRequestHeaders == null) {
+            return HttpResponse.seeOther(URI.create("/fruits"));
+        }
         return HttpResponse.ok().header(HtmxResponseHeaders.HX_REFRESH, StringUtils.TRUE);
     }
 
