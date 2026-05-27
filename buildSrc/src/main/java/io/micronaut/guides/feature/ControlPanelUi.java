@@ -12,9 +12,7 @@ public class ControlPanelUi extends AbstractFeature {
     }
 
     @Override
-    protected void addDependency(GeneratorContext generatorContext,
-                                 String artifactId,
-                                 Scope scope) {
+    public void apply(GeneratorContext generatorContext) {
         addDependencyWithoutLookup(generatorContext, "io.micronaut.controlpanel");
     }
 }
