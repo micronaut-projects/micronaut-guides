@@ -20,22 +20,17 @@ import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent
 import io.micronaut.function.FunctionBean
 import io.micronaut.json.JsonMapper
 import jakarta.inject.Inject
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 
 import java.util.function.Function
 
 @FunctionBean('requestfunction') // <1>
 class RequestFunction implements Function<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> { // <2>
 
-    private static final Logger LOG = LoggerFactory.getLogger(RequestFunction)
-
     @Inject // <3>
     JsonMapper jsonMapper
 
     @Override
     APIGatewayProxyResponseEvent apply(APIGatewayProxyRequestEvent requestEvent) {
-        LOG.info('request {}', requestEvent)
         APIGatewayProxyResponseEvent response = new APIGatewayProxyResponseEvent()
         try {
             String json = new String(jsonMapper.writeValueAsBytes([message: 'Hello World']))
@@ -44,7 +39,6 @@ class RequestFunction implements Function<APIGatewayProxyRequestEvent, APIGatewa
         } catch (IOException e) {
             response.statusCode = 500
         }
-        LOG.info('response {}', response)
         response
     }
 }
