@@ -56,6 +56,6 @@ class MyToolsSpec extends Specification {
         then:
         tool.name() == 'freeDiskSpace'
         tool.title() == 'Free Disk Space'
-        tool.description() == 'Return the free disk space in the users computer'
+        tool.description() == 'Return the free disk space in the user\'s computer'
     }
 }

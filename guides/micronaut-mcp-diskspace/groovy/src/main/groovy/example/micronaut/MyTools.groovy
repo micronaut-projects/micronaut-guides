@@ -22,7 +22,7 @@ import jakarta.inject.Singleton
 class MyTools {
 
     @Tool(title = 'Free Disk Space',
-            description = 'Return the free disk space in the users computer') // <2>
+            description = 'Return the free disk space in the user\'s computer') // <2>
     String freeDiskSpace() {
         DiskUtils.freeDiskSpace()
     }
