@@ -1,0 +1,77 @@
+common:header.adoc[]
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+common:create-app-features.adoc[]
+
+common:micronaut-views-thymeleaf.adoc[]
+
+== HTMX
+
+https://htmx.org[HTMX] lets you add dynamic behavior to server-rendered HTML with HTML attributes.
+Micronaut Views provides helpers for HTMX request headers, response headers, and multi-template responses.
+
+The `htmx` feature adds the Micronaut Views HTMX integration to the application.
+
+dependency:micronaut-views-htmx[groupId=io.micronaut.views]
+
+== Controller
+
+Create a controller that renders a full page for normal browser requests and a partial template for HTMX requests.
+
+source:FruitController[]
+
+<1> The controller is available under `/fruits`.
+<2> The routes render HTML.
+<3> A normal `GET /fruits` request renders the full page.
+<4> `HtmxRequestHeaders` is bound only when the request contains HTMX headers. The route uses it to choose the full-page view or the partial view.
+<5> A form submission can return several templates in one HTMX response.
+<6> `HtmxResponse` renders each `ModelAndView` in order. The second template uses an out-of-band swap.
+<7> HTMX response header constants avoid hard-coding response header names.
+
+== Full Page
+
+Create a Thymeleaf template in `src/main/resources/views/fruits.html`.
+It renders a regular page and adds HTMX attributes to the form.
+
+resource:views/fruits.html[]
+
+== Partial View
+
+Create a Thymeleaf partial in `src/main/resources/views/fruit.html`.
+The controller returns this template when the request is an HTMX request.
+
+resource:views/fruit.html[]
+
+== Out-of-band Swap
+
+Create another partial in `src/main/resources/views/message.html`.
+The `hx-swap-oob` attribute updates an element outside the normal target.
+
+resource:views/message.html[]
+
+== Test
+
+Write a test that verifies normal HTML rendering, HTMX partial rendering, out-of-band swaps, and HTMX response headers.
+
+test:FruitControllerTest[]
+
+callout:micronaut-test[]
+callout:http-client[]
+
+common:testApp.adoc[]
+
+common:runapp.adoc[]
+
+Visit http://localhost:8080/fruits and click the button. HTMX replaces the fruit section without reloading the whole page.
+
+common:next.adoc[]
+
+Read more about:
+
+- https://micronaut-projects.github.io/micronaut-views/latest/guide/#htmx[Micronaut Views HTMX].
+- https://htmx.org/docs/[HTMX].
+
+common:helpWithMicronaut.adoc[]
