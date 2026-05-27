@@ -45,7 +45,7 @@ class ProductSchemaTest {
   "type": "object",
   "properties": {
     "productId": {
-      "description": "The unique identifier for a product // <1>",
+      "description": "The unique identifier for a product",
       "type": "integer"
     },
     "productName": {

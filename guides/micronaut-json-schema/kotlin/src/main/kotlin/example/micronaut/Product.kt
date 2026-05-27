@@ -25,7 +25,7 @@ import jakarta.validation.constraints.Size
 @JsonSchema(description = "A product from Acme's catalog") // <2>
 data class Product(
     @field:NotNull // <3>
-    @field:JsonPropertyDescription("The unique identifier for a product // <1>") // <1>
+    @field:JsonPropertyDescription("The unique identifier for a product") // <1>
     val productId: Long,
 
     @field:NotBlank
