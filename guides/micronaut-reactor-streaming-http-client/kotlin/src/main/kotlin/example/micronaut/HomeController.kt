@@ -37,7 +37,7 @@ class HomeController : AutoCloseable {
         val url = try {
             URI.create(urlStr).toURL()
         } catch (e: MalformedURLException) {
-            throw ConfigurationException("malformed URL$urlStr")
+            throw ConfigurationException("malformed URL: $urlStr")
         }
         reactorStreamingHttpClient = ReactorStreamingHttpClient.create(url) // <2>
     }

@@ -55,7 +55,7 @@ class HomeControllerTest {
         val resp = assertDoesNotThrow<HttpResponse<ByteArray>> {
             client.exchange(HttpRequest.GET<Any>("/"), ByteArray::class.java)
         }
-        val responseBytes = resp.body()
+        val responseBytes = resp.body() ?: throw AssertionError("Expected response body")
 
         val responseEncodedHash = digest.digest(responseBytes)
         val response = hexFormat.formatHex(responseEncodedHash)
