@@ -16,6 +16,7 @@
 package example.micronaut
 
 import groovy.transform.CompileStatic
+import io.micronaut.core.annotation.Nullable
 import io.micronaut.data.model.geo.Point
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Get
@@ -32,6 +33,7 @@ class DeliveryDispatchController {
     }
 
     @Get('/nearest-driver') // <2>
+    @Nullable
     DriverMatch nearestDriver(@QueryValue double longitude, @QueryValue double latitude) { // <3>
         dispatchService.findClosestAvailableDriver(new Point(longitude, latitude))
     }
