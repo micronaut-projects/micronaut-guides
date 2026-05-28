@@ -18,6 +18,7 @@ package example.micronaut
 import io.micronaut.context.BeanContext
 import io.micronaut.context.annotation.Property
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
+import jakarta.inject.Inject
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -25,7 +26,10 @@ import java.math.BigDecimal
 
 @Property(name = "vat.percentage", value = "21.0") // <1>
 @MicronautTest(startApplication = false) // <2>
-class ValueAddedTaxConfigurationTest(private val beanContext: BeanContext) {
+class ValueAddedTaxConfigurationTest {
+
+    @Inject
+    lateinit var beanContext: BeanContext
 
     @Test
     fun immutableConfigurationViaKotlinDataClasses() {

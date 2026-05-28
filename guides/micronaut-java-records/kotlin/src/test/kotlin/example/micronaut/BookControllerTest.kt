@@ -60,7 +60,7 @@ class BookControllerTest(
             about
         )
         val book = bookRepository.save(b)
-        assertEquals(booksInsertedInDbByMigration + 1, bookRepository.count())
+        assertEquals((booksInsertedInDbByMigration + 1).toLong(), bookRepository.count())
         val client = httpClient.toBlocking()
         val books = client.retrieve(
             HttpRequest.GET<Any>("/books"),
