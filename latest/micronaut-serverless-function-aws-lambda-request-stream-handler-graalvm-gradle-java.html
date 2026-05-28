@@ -254,7 +254,7 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle with the <a
 <p>The application contains a class extending <a href="https://micronaut-projects.github.io/micronaut-aws/latest/api/io/micronaut/function/aws/MicronautRequestStreamHandler.html">MicronautRequestStreamHandler</a></p>
 </div>
 <div class="paragraph">
-<p>Replace the generated <code>FunctionRequestHandler.java</code> with the following:</p>
+<p>Replace the generated <code>FunctionRequestHandler</code> with the following:</p>
 </div>
 <div class="listingblock">
 <div class="title">src/main/java/example/micronaut/FunctionRequestHandler.java</div>
@@ -300,8 +300,6 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle with the <a
 <span class="kn">import</span> <span class="nn">io.micronaut.function.FunctionBean</span><span class="o">;</span>
 <span class="kn">import</span> <span class="nn">io.micronaut.json.JsonMapper</span><span class="o">;</span>
 <span class="kn">import</span> <span class="nn">jakarta.inject.Inject</span><span class="o">;</span>
-<span class="kn">import</span> <span class="nn">org.slf4j.Logger</span><span class="o">;</span>
-<span class="kn">import</span> <span class="nn">org.slf4j.LoggerFactory</span><span class="o">;</span>
 
 <span class="kn">import</span> <span class="nn">java.io.IOException</span><span class="o">;</span>
 <span class="kn">import</span> <span class="nn">java.util.Collections</span><span class="o">;</span>
@@ -310,14 +308,11 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle with the <a
 <span class="nd">@FunctionBean</span><span class="o">(</span><span class="s">"requestfunction"</span><span class="o">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="kd">public</span> <span class="kd">class</span> <span class="nc">RequestFunction</span> <span class="kd">implements</span> <span class="nc">Function</span><span class="o">&lt;</span><span class="nc">APIGatewayProxyRequestEvent</span><span class="o">,</span> <span class="nc">APIGatewayProxyResponseEvent</span><span class="o">&gt;</span> <span class="o">{</span> <i class="conum" data-value="2"></i><b>(2)</b>
 
-    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="nc">Logger</span> <span class="no">LOG</span> <span class="o">=</span> <span class="nc">LoggerFactory</span><span class="o">.</span><span class="na">getLogger</span><span class="o">(</span><span class="nc">RequestFunction</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
-
     <span class="nd">@Inject</span> <i class="conum" data-value="3"></i><b>(3)</b>
     <span class="nc">JsonMapper</span> <span class="n">jsonMapper</span><span class="o">;</span>
 
     <span class="nd">@Override</span>
     <span class="kd">public</span> <span class="nc">APIGatewayProxyResponseEvent</span> <span class="nf">apply</span><span class="o">(</span><span class="nc">APIGatewayProxyRequestEvent</span> <span class="n">requestEvent</span><span class="o">)</span> <span class="o">{</span>
-        <span class="no">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"request {}"</span><span class="o">,</span> <span class="n">requestEvent</span><span class="o">);</span>
         <span class="nc">APIGatewayProxyResponseEvent</span> <span class="n">response</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">APIGatewayProxyResponseEvent</span><span class="o">();</span>
         <span class="k">try</span> <span class="o">{</span>
             <span class="nc">String</span> <span class="n">json</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">String</span><span class="o">(</span><span class="n">jsonMapper</span><span class="o">.</span><span class="na">writeValueAsBytes</span><span class="o">(</span><span class="nc">Collections</span><span class="o">.</span><span class="na">singletonMap</span><span class="o">(</span><span class="s">"message"</span><span class="o">,</span> <span class="s">"Hello World"</span><span class="o">)));</span>
@@ -326,7 +321,6 @@ If you don&#8217;t specify the <code>--build</code> argument, Gradle with the <a
         <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">IOException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
             <span class="n">response</span><span class="o">.</span><span class="na">setStatusCode</span><span class="o">(</span><span class="mi">500</span><span class="o">);</span>
         <span class="o">}</span>
-        <span class="no">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"response {}"</span><span class="o">,</span> <span class="n">response</span><span class="o">);</span>
         <span class="k">return</span> <span class="n">response</span><span class="o">;</span>
     <span class="o">}</span>
 <span class="o">}</span></code></pre>

@@ -316,8 +316,12 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="title">src/main/resources/application.properties</div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="properties"><span class="py">test-resources.containers.oracle.image-name</span><span class="p">=</span><span class="s">gvenzl/oracle-free</span>
-<span class="py">test-resources.containers.oracle.image-tag</span><span class="p">=</span><span class="s">latest</span></code></pre>
+<span class="py">test-resources.containers.oracle.image-tag</span><span class="p">=</span><span class="s">latest</span>
+<span class="py">test-resources.containers.oracle.startup-timeout</span><span class="p">=</span><span class="s">600s</span></code></pre>
 </div>
+</div>
+<div class="paragraph">
+<p>The Oracle Database image can take a while to download and initialize the first time. The startup timeout gives Micronaut Test Resources enough time to pull the image and start the container.</p>
 </div>
 </div>
 <div class="sect2">
@@ -542,7 +546,6 @@ If you have an existing Micronaut application and want to add the functionality 
 
 <span class="k">import</span> <span class="nn">io.micronaut.data.model.geo.Point</span>
 <span class="k">import</span> <span class="nn">jakarta.inject.Singleton</span>
-<span class="k">import</span> <span class="nn">java.util.Optional</span>
 <span class="k">import</span> <span class="nn">kotlin.math.atan2</span>
 <span class="k">import</span> <span class="nn">kotlin.math.cos</span>
 <span class="k">import</span> <span class="nn">kotlin.math.sin</span>
@@ -556,24 +559,22 @@ If you have an existing Micronaut application and want to add the functionality 
         <span class="k">private</span> <span class="k">const</span> <span class="kd">val</span> <span class="py">EARTH_RADIUS_METERS</span> <span class="p">=</span> <span class="mf">6_371_008.8</span>
     <span class="p">}</span>
 
-    <span class="k">fun</span> <span class="nf">findClosestAvailableDriver</span><span class="p">(</span><span class="n">orderLocation</span><span class="p">:</span> <span class="nc">Point</span><span class="p">):</span> <span class="nc">Optional</span><span class="p">&lt;</span><span class="nc">DriverMatch</span><span class="p">&gt;</span> <span class="p">{</span>
+    <span class="k">fun</span> <span class="nf">findClosestAvailableDriver</span><span class="p">(</span><span class="n">orderLocation</span><span class="p">:</span> <span class="nc">Point</span><span class="p">):</span> <span class="nc">DriverMatch</span><span class="p">?</span> <span class="p">{</span>
         <span class="kd">val</span> <span class="py">candidates</span> <span class="p">=</span> <span class="n">deliveryDriverRepository</span><span class="p">.</span><span class="nf">findByStatusAndLocationNear</span><span class="p">(</span>
             <span class="nc">DeliveryDriver</span><span class="p">.</span><span class="nc">Status</span><span class="p">.</span><span class="nc">AVAILABLE</span><span class="p">,</span>
             <span class="n">orderLocation</span><span class="p">,</span>
             <span class="nc">MAX_DISTANCE_METERS</span>
         <span class="p">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
 
-        <span class="k">return</span> <span class="nc">Optional</span><span class="p">.</span><span class="nf">ofNullable</span><span class="p">(</span>
-            <span class="n">candidates</span>
-                <span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="n">driver</span> <span class="p">-&gt;</span>
-                    <span class="nc">DriverMatch</span><span class="p">(</span>
-                        <span class="n">driver</span><span class="p">.</span><span class="n">id</span><span class="p">,</span>
-                        <span class="n">driver</span><span class="p">.</span><span class="n">name</span><span class="p">,</span>
-                        <span class="nf">distanceMeters</span><span class="p">(</span><span class="n">orderLocation</span><span class="p">,</span> <span class="n">driver</span><span class="p">.</span><span class="n">location</span><span class="p">)</span>
-                    <span class="p">)</span>
-                <span class="p">}</span>
-                <span class="p">.</span><span class="nf">minByOrNull</span> <span class="p">{</span> <span class="n">it</span><span class="p">.</span><span class="n">distanceMeters</span> <span class="p">}</span> <i class="conum" data-value="3"></i><b>(3)</b>
-        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">candidates</span>
+            <span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="n">driver</span> <span class="p">-&gt;</span>
+                <span class="nc">DriverMatch</span><span class="p">(</span>
+                    <span class="n">driver</span><span class="p">.</span><span class="n">id</span><span class="p">,</span>
+                    <span class="n">driver</span><span class="p">.</span><span class="n">name</span><span class="p">,</span>
+                    <span class="nf">distanceMeters</span><span class="p">(</span><span class="n">orderLocation</span><span class="p">,</span> <span class="n">driver</span><span class="p">.</span><span class="n">location</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">}</span>
+            <span class="p">.</span><span class="nf">minByOrNull</span> <span class="p">{</span> <span class="n">it</span><span class="p">.</span><span class="n">distanceMeters</span> <span class="p">}</span> <i class="conum" data-value="3"></i><b>(3)</b>
     <span class="p">}</span>
 
     <span class="k">private</span> <span class="k">fun</span> <span class="nf">distanceMeters</span><span class="p">(</span><span class="n">left</span><span class="p">:</span> <span class="nc">Point</span><span class="p">,</span> <span class="n">right</span><span class="p">:</span> <span class="nc">Point</span><span class="p">):</span> <span class="nc">Double</span> <span class="p">{</span> <i class="conum" data-value="4"></i><b>(4)</b>
@@ -646,13 +647,12 @@ If you have an existing Micronaut application and want to add the functionality 
 <span class="k">import</span> <span class="nn">io.micronaut.http.annotation.Controller</span>
 <span class="k">import</span> <span class="nn">io.micronaut.http.annotation.Get</span>
 <span class="k">import</span> <span class="nn">io.micronaut.http.annotation.QueryValue</span>
-<span class="k">import</span> <span class="nn">java.util.Optional</span>
 
 <span class="nd">@Controller</span><span class="p">(</span><span class="s">"/orders"</span><span class="p">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="kd">class</span> <span class="nc">DeliveryDispatchController</span><span class="p">(</span><span class="k">private</span> <span class="kd">val</span> <span class="py">dispatchService</span><span class="p">:</span> <span class="nc">DispatchService</span><span class="p">)</span> <span class="p">{</span>
 
     <span class="nd">@Get</span><span class="p">(</span><span class="s">"/nearest-driver"</span><span class="p">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
-    <span class="k">fun</span> <span class="nf">nearestDriver</span><span class="p">(</span><span class="nd">@QueryValue</span> <span class="n">longitude</span><span class="p">:</span> <span class="nc">Double</span><span class="p">,</span> <span class="nd">@QueryValue</span> <span class="n">latitude</span><span class="p">:</span> <span class="nc">Double</span><span class="p">):</span> <span class="nc">Optional</span><span class="p">&lt;</span><span class="nc">DriverMatch</span><span class="p">&gt;</span> <span class="p">{</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="k">fun</span> <span class="nf">nearestDriver</span><span class="p">(</span><span class="nd">@QueryValue</span> <span class="n">longitude</span><span class="p">:</span> <span class="nc">Double</span><span class="p">,</span> <span class="nd">@QueryValue</span> <span class="n">latitude</span><span class="p">:</span> <span class="nc">Double</span><span class="p">):</span> <span class="nc">DriverMatch</span><span class="p">?</span> <span class="p">{</span> <i class="conum" data-value="3"></i><b>(3)</b>
         <span class="k">return</span> <span class="n">dispatchService</span><span class="p">.</span><span class="nf">findClosestAvailableDriver</span><span class="p">(</span><span class="nc">Point</span><span class="p">(</span><span class="n">longitude</span><span class="p">,</span> <span class="n">latitude</span><span class="p">))</span>
     <span class="p">}</span>
 <span class="p">}</span></code></pre>
@@ -670,7 +670,7 @@ If you have an existing Micronaut application and want to add the functionality 
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>Returning an empty <code>Optional</code> makes the framework respond with <code>404 Not Found</code> when no driver is available within 5 km.</td>
+<td>Returning <code>null</code> from the controller method makes the framework respond with <code>404 Not Found</code> when no driver is available within 5 km.</td>
 </tr>
 </table>
 </div>

@@ -324,8 +324,12 @@ If you have an existing Micronaut application and want to add the functionality 
 <div class="title">src/main/resources/application.properties</div>
 <div class="content">
 <pre class="rouge highlight"><code data-lang="properties"><span class="py">test-resources.containers.oracle.image-name</span><span class="p">=</span><span class="s">gvenzl/oracle-free</span>
-<span class="py">test-resources.containers.oracle.image-tag</span><span class="p">=</span><span class="s">latest</span></code></pre>
+<span class="py">test-resources.containers.oracle.image-tag</span><span class="p">=</span><span class="s">latest</span>
+<span class="py">test-resources.containers.oracle.startup-timeout</span><span class="p">=</span><span class="s">600s</span></code></pre>
 </div>
+</div>
+<div class="paragraph">
+<p>The Oracle Database image can take a while to download and initialize the first time. The startup timeout gives Micronaut Test Resources enough time to pull the image and start the container.</p>
 </div>
 </div>
 <div class="sect2">
@@ -581,7 +585,7 @@ If you have an existing Micronaut application and want to add the functionality 
         <span class="k">this</span><span class="o">.</span><span class="na">deliveryDriverRepository</span> <span class="o">=</span> <span class="n">deliveryDriverRepository</span>
     <span class="o">}</span>
 
-    <span class="n">Optional</span><span class="o">&lt;</span><span class="n">DriverMatch</span><span class="o">&gt;</span> <span class="n">findClosestAvailableDriver</span><span class="o">(</span><span class="n">Point</span> <span class="n">orderLocation</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">DriverMatch</span> <span class="nf">findClosestAvailableDriver</span><span class="o">(</span><span class="n">Point</span> <span class="n">orderLocation</span><span class="o">)</span> <span class="o">{</span>
         <span class="n">List</span><span class="o">&lt;</span><span class="n">DeliveryDriver</span><span class="o">&gt;</span> <span class="n">candidates</span> <span class="o">=</span> <span class="n">deliveryDriverRepository</span><span class="o">.</span><span class="na">findByStatusAndLocationNear</span><span class="o">(</span>
             <span class="n">DeliveryDriver</span><span class="o">.</span><span class="na">Status</span><span class="o">.</span><span class="na">AVAILABLE</span><span class="o">,</span>
             <span class="n">orderLocation</span><span class="o">,</span>
@@ -599,7 +603,7 @@ If you have an existing Micronaut application and want to add the functionality 
                 <span class="n">closest</span> <span class="o">=</span> <span class="n">match</span>
             <span class="o">}</span>
         <span class="o">}</span>
-        <span class="k">return</span> <span class="n">Optional</span><span class="o">.</span><span class="na">ofNullable</span><span class="o">(</span><span class="n">closest</span><span class="o">)</span> <i class="conum" data-value="3"></i><b>(3)</b>
+        <span class="k">return</span> <span class="n">closest</span> <i class="conum" data-value="3"></i><b>(3)</b>
     <span class="o">}</span>
 
     <span class="kd">private</span> <span class="kt">double</span> <span class="nf">distanceMeters</span><span class="o">(</span><span class="n">Point</span> <span class="n">left</span><span class="o">,</span> <span class="n">Point</span> <span class="n">right</span><span class="o">)</span> <span class="o">{</span> <i class="conum" data-value="4"></i><b>(4)</b>
@@ -680,6 +684,7 @@ If you have an existing Micronaut application and want to add the functionality 
 <pre class="rouge highlight"><code data-lang="groovy"><span class="kn">package</span> <span class="nn">example.micronaut</span>
 
 <span class="kn">import</span> <span class="nn">groovy.transform.CompileStatic</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.core.annotation.Nullable</span>
 <span class="kn">import</span> <span class="nn">io.micronaut.data.model.geo.Point</span>
 <span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Controller</span>
 <span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Get</span>
@@ -696,7 +701,8 @@ If you have an existing Micronaut application and want to add the functionality 
     <span class="o">}</span>
 
     <span class="nd">@Get</span><span class="o">(</span><span class="s1">'/nearest-driver'</span><span class="o">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
-    <span class="n">Optional</span><span class="o">&lt;</span><span class="n">DriverMatch</span><span class="o">&gt;</span> <span class="n">nearestDriver</span><span class="o">(</span><span class="nd">@QueryValue</span> <span class="kt">double</span> <span class="n">longitude</span><span class="o">,</span> <span class="nd">@QueryValue</span> <span class="kt">double</span> <span class="n">latitude</span><span class="o">)</span> <span class="o">{</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="nd">@Nullable</span>
+    <span class="n">DriverMatch</span> <span class="nf">nearestDriver</span><span class="o">(</span><span class="nd">@QueryValue</span> <span class="kt">double</span> <span class="n">longitude</span><span class="o">,</span> <span class="nd">@QueryValue</span> <span class="kt">double</span> <span class="n">latitude</span><span class="o">)</span> <span class="o">{</span> <i class="conum" data-value="3"></i><b>(3)</b>
         <span class="n">dispatchService</span><span class="o">.</span><span class="na">findClosestAvailableDriver</span><span class="o">(</span><span class="k">new</span> <span class="n">Point</span><span class="o">(</span><span class="n">longitude</span><span class="o">,</span> <span class="n">latitude</span><span class="o">))</span>
     <span class="o">}</span>
 <span class="o">}</span></code></pre>
@@ -714,7 +720,7 @@ If you have an existing Micronaut application and want to add the functionality 
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>Returning an empty <code>Optional</code> makes the framework respond with <code>404 Not Found</code> when no driver is available within 5 km.</td>
+<td>Returning <code>null</code> from the controller method makes the framework respond with <code>404 Not Found</code> when no driver is available within 5 km.</td>
 </tr>
 </table>
 </div>
