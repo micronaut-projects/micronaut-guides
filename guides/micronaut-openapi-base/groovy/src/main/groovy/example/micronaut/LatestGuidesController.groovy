@@ -27,7 +27,7 @@ class LatestGuidesController {
             new Guide(
                     'Creating your first Micronaut application',
                     'Learn how to create a Hello World Micronaut application with a controller and a functional test.',
-                    ['Iván López', 'Sergio dle Amo'],
+                    ['Iván López', 'Sergio del Amo'],
                     ['junit', 'getting_started', 'graalvm'],
                     ['Getting Started'],
                     LocalDate.of(2018, 5, 23),
