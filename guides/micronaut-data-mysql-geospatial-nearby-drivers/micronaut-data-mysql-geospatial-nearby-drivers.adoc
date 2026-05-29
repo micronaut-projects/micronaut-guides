@@ -1,6 +1,6 @@
 common:header.adoc[]
 
-In this guide, you will build the dispatch part of a food delivery application. When a customer places an order, the application stores driver positions in MySQL `GEOMETRY` columns and asks Micronaut Data JDBC for available drivers near the order location. The dispatch service then chooses the closest candidate within 5 km.
+In this guide, you will build the dispatch part of a food delivery application. When a customer places an order, the application stores driver positions in an SRID-restricted MySQL `POINT` column and asks Micronaut Data JDBC for available drivers near the order location. The dispatch service then chooses the closest candidate within 5 km.
 
 The sample uses WGS 84 coordinates (`SRID 4326`), the coordinate system commonly used by GPS. With MySQL 8, `ST_Distance` returns meters for geographic coordinates in `SRID 4326`, so the repository enforces the 5 km dispatch rule.
 
@@ -28,7 +28,7 @@ common:liquibase.adoc[]
 
 resource:db/changelog/01-schema.xml[]
 
-The migration creates the `delivery_driver` table with a MySQL `GEOMETRY` column and a spatial index. In production, keep the spatial column and index statements in your migration tool instead of relying on test-only schema generation.
+The migration creates the `delivery_driver` table with a MySQL `POINT NOT NULL SRID 4326` column and a spatial index. The SRID attribute restricts the column to WGS 84 coordinates and lets MySQL's query optimizer use the spatial index. In production, keep the spatial column and index statements in your migration tool instead of relying on test-only schema generation.
 
 == Domain Model
 
@@ -36,7 +36,7 @@ Create a `DeliveryDriver` entity:
 
 source:DeliveryDriver[]
 
-Micronaut Data geospatial model types use GeoJSON conversion by default. MySQL stores the value in the `GEOMETRY` column declared in the Liquibase migration.
+Micronaut Data geospatial model types use GeoJSON conversion by default. MySQL stores the value in the `POINT NOT NULL SRID 4326` column declared in the Liquibase migration.
 
 <1> Map the entity to the `delivery_driver` table created by Liquibase.
 <2> Represent whether a driver is available or busy so dispatch queries can filter drivers before applying the spatial predicate.
