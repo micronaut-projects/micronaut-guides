@@ -26,7 +26,6 @@ import java.util.Optional;
 public class DispatchService {
 
     private static final double MAX_DISTANCE_METERS = 5_000d; // <1>
-
     private static final double WGS84_A = 6378137.0;              // semi-major axis, meters
     private static final double WGS84_F = 1.0 / 298.257223563;   // flattening
     private static final double EPS = 1e-15;
