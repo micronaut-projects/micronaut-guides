@@ -1,0 +1,110 @@
+common:header.adoc[]
+
+In this guide, you will build the dispatch part of a food delivery application. When a customer places an order, the application stores driver positions in SQL Server `geography` columns and asks Micronaut Data JDBC for available drivers near the order location. The dispatch service then chooses the closest candidate within 5 km.
+
+The sample uses WGS 84 coordinates (`SRID 4326`), the coordinate system commonly used by GPS. SQL Server `geography` uses meters for SRID 4326 distance calculations, and the service calculates a WGS 84 geodetic distance for each returned candidate before returning the closest driver.
+
+common:requirements.adoc[]
+
+* https://www.docker.io/gettingstarted/#h_installation[Docker] installed to run SQL Server with https://micronaut-projects.github.io/micronaut-test-resources/latest/guide/[Micronaut Test Resources].
+
+common:completesolution.adoc[]
+
+common:create-app-features.adoc[]
+
+common:sqlserver-driver.adoc[]
+
+Micronaut Data builds repository queries at compilation time. Add the Jakarta Persistence API as a compile-only dependency so the compile-time query model has the Criteria API types available:
+
+dependency:jakarta.persistence-api[groupId=jakarta.persistence,scope=compileOnly]
+
+== Datasource Configuration
+
+resource:application.properties[tag=datasource]
+
+resource:application.properties[tag=testresources]
+
+The SQL Server image can take a while to download and initialize the first time. The container startup timeout and generated build's Test Resources client timeout give Micronaut Test Resources enough time to pull the image and start the container.
+
+common:liquibase.adoc[]
+
+resource:db/changelog/01-schema.xml[]
+
+The migration creates the `delivery_driver` table with a SQL Server `geography` column and a spatial index. In production, keep the spatial column and index statements in your migration tool instead of relying on test-only schema generation.
+
+== Domain Model
+
+Create a `DeliveryDriver` entity:
+
+source:DeliveryDriver[]
+
+SQL Server does not provide a built-in GeoJSON conversion function, so the entity uses Micronaut Data's WKT converter and maps the column as `geography`. SQL Server stores the value in the `geography` column declared in the Liquibase migration.
+
+<1> Map the entity to the `delivery_driver` table created by Liquibase.
+<2> Represent whether a driver is available or busy so dispatch queries can filter drivers before applying the spatial predicate.
+<3> Use `SRID 4326` for GPS-style longitude and latitude coordinates.
+<4> Use Micronaut Data's WKT converter and map the property to a SQL Server `geography` column.
+<5> Mark the location column as spatially indexed in the Micronaut Data model.
+
+== Repository
+
+Create a repository that declares the SQL Server dialect:
+
+source:DeliveryDriverRepository[]
+
+<1> `@JdbcRepository` tells Micronaut Data to generate a SQL Server JDBC repository.
+<2> The `Near` predicate is translated to SQL Server `STDistance(...) <= ?`.
+
+== Dispatch Service
+
+The repository returns available drivers within 5 km of the order location. The service then selects the nearest candidate:
+
+source:DispatchService[]
+
+<1> Query radius is 5,000 meters for the dispatch rule.
+<2> Ask Micronaut Data for available drivers near the order location.
+<3> Select the closest candidate in application code using a geodetic distance calculation.
+<4> Calculate an approximate geodetic distance between the order and driver locations using WGS 84 coordinates. `Point.x()` is longitude and `Point.y()` is latitude, so the method validates coordinate ranges, converts degrees to radians, computes the central angle between the points, and applies a WGS 84 ellipsoid flattening correction before returning meters.
+
+Create a small response object for the match:
+
+source:DriverMatch[]
+
+== Controller
+
+Expose the dispatch operation through an HTTP endpoint:
+
+source:DeliveryDispatchController[]
+
+<1> Expose order dispatch operations under `/orders`.
+<2> Accept the order location as `longitude` and `latitude` query parameters.
+:exclude-for-languages:groovy,kotlin
+<3> Returning an empty `Optional` makes the framework respond with `404 Not Found` when no driver is available within 5 km.
+:exclude-for-languages:
+:exclude-for-languages:java
+<3> Returning `null` from the controller method makes the framework respond with `404 Not Found` when no driver is available within 5 km.
+:exclude-for-languages:
+
+== Test
+
+Add a test that verifies the dispatch endpoint:
+
+test:DeliveryDispatchControllerTest[]
+
+<1> Start the Micronaut application with an embedded server and disable the test transaction. The test inserts data directly with the repository, and the HTTP request reads it through a separate connection.
+<2> Inject an HTTP client bound to the embedded server.
+<3> A busy driver can be nearby, but should not be returned.
+<4> An available driver outside the 5 km radius should not be returned.
+<5> Call the dispatch endpoint with the order longitude and latitude.
+<6> The response body contains the closest available driver within 5 km.
+<7> When no available driver is close enough, the endpoint responds with `404 Not Found`.
+
+common:testApp.adoc[]
+
+When you run the test, Micronaut Test Resources starts a SQL Server container, accepts the container license, and configures the JDBC datasource automatically.
+
+== Next Steps
+
+Read more about https://micronaut-projects.github.io/micronaut-data/latest/guide/#sqlGeospatial[Micronaut Data geospatial support].
+
+common:helpWithMicronaut.adoc[]
