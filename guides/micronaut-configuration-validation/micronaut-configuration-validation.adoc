@@ -1,0 +1,107 @@
+common:header-top.adoc[]
+
+== Getting Started
+
+Micronaut configuration can come from several files and environments. The Micronaut Gradle configuration validation plugin adds verification tasks that check those files against Micronaut configuration schemas during the Gradle lifecycle.
+
+In this guide, you will create a Micronaut application, add configuration validation, run validation successfully, then see how the build fails when configuration contains an invalid value.
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+common:create-app-features.adoc[]
+
+== Apply Configuration Validation
+
+Add the `io.micronaut.configuration.validation` plugin to the Gradle build:
+
+[source, groovy]
+.build.gradle
+----
+plugins {
+    id("io.micronaut.application") version "..."
+    id("io.micronaut.configuration.validation") version "..."
+}
+----
+
+The guide project already applies the plugin. The plugin registers scenario-specific validation tasks:
+
+* `runConfigurationValidation` checks development configuration before `run`.
+* `testConfigurationValidation` checks test configuration before `test`.
+* `configurationValidation` checks production configuration before `assemble`, `check`, and `build`.
+
+== Application Configuration
+
+The generated application has a valid server port value:
+
+resource:application.yml[]
+
+Run production configuration validation:
+
+[source, bash]
+----
+./gradlew configurationValidation
+----
+
+The task succeeds and writes validation output under `build/reports/micronaut/config-validation/production`.
+
+== Invalid Configuration
+
+Change `micronaut.server.port` to a non-integer value:
+
+[source, yaml]
+.src/main/resources/application.yml
+----
+micronaut:
+  application:
+    name: micronautguide
+  server:
+    port: notAnInt
+----
+
+Run validation again:
+
+[source, bash]
+----
+./gradlew configurationValidation
+----
+
+Gradle fails the build because the configured port does not match the schema for `micronaut.server.port`.
+
+The report directory contains machine-readable and HTML output by default, so you can inspect validation failures locally or collect them from CI.
+
+== Configure Validation Scenarios
+
+You can configure validation globally or for each scenario:
+
+[source, groovy]
+.build.gradle
+----
+micronaut {
+    configurationValidation {
+        failOnNotPresent.set(true)
+        format.set("both")
+
+        run {
+            environments.set(["dev"])
+        }
+
+        test {
+            environments.set(["test"])
+        }
+
+        assemble {
+            environments.set([])
+        }
+    }
+}
+----
+
+Use scenario-specific environments when a value is valid only for development, test, or production.
+
+== Next Steps
+
+Read the https://micronaut-projects.github.io/micronaut-gradle-plugin/latest/#configuration-validation[Micronaut Gradle plugin configuration validation documentation] for all available options, including dependency injection validation, suppressions, report formats, and custom output directories.
+
+common:helpWithMicronaut.adoc[]
