@@ -2,7 +2,7 @@ common:header.adoc[]
 
 In this guide, you will build the dispatch part of a food delivery application. When a customer places an order, the application stores driver positions in H2 `GEOMETRY` columns and asks Micronaut Data JDBC for available drivers near the order location. The dispatch service then chooses the closest candidate within 5 km.
 
-The sample uses WGS 84 coordinates (`SRID 4326`), the coordinate system commonly used by GPS. H2GIS evaluates the spatial predicate with the geometry coordinate system.
+The sample uses WGS 84 coordinates (`SRID 4326`), the coordinate system commonly used by GPS. `Srid.CrsType.GEOGRAPHIC` tells Micronaut Data to use the H2GIS spherical distance function for the spatial predicate.
 
 common:requirements.adoc[]
 
@@ -36,7 +36,7 @@ H2 stores the value in the `GEOMETRY` column declared in the Liquibase migration
 
 <1> Map the entity to the `delivery_driver` table created by Liquibase.
 <2> Represent whether a driver is available or busy so dispatch queries can filter drivers before applying the spatial predicate.
-<3> Use `SRID 4326` for GPS-style longitude and latitude coordinates.
+<3> Use `SRID 4326` with `Srid.CrsType.GEOGRAPHIC` for GPS-style longitude and latitude coordinates.
 <4> Mark the location column as spatially indexed in the Micronaut Data model.
 
 == Repository
@@ -46,7 +46,7 @@ Create a repository that declares the H2 dialect:
 source:DeliveryDriverRepository[]
 
 <1> `@JdbcRepository` tells Micronaut Data to generate a H2 JDBC repository.
-<2> The `Near` predicate is translated to H2GIS `ST_DWithin`.
+<2> The `Near` predicate is translated to H2GIS `ST_DistanceSphere`.
 
 == Dispatch Service
 

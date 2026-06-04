@@ -33,7 +33,7 @@ data class DeliveryDriver(
     var status: Status, // <2>
 
     @field:NotNull
-    @field:Srid(4326) // <3>
+    @field:Srid(value = 4326, type = Srid.CrsType.GEOGRAPHIC) // <3>
     @field:Index(columns = ["location"]) // <4>
     var location: Point,
 
