@@ -2,7 +2,7 @@ common:header.adoc[]
 
 In this guide, you will build the dispatch part of a food delivery application. When a customer places an order, the application stores driver positions in MariaDB `GEOMETRY` columns and asks Micronaut Data JDBC for available drivers near the order location. The dispatch service then chooses the closest candidate within 5 km.
 
-The sample uses WGS 84 coordinates (`SRID 4326`), the coordinate system commonly used by GPS. `Srid.CrsType.GEOGRAPHIC` tells Micronaut Data to use the MariaDB spherical distance function for the 5 km spatial predicate, and the service calculates a WGS 84 geodetic distance in meters for each returned candidate.
+The sample uses WGS 84 coordinates (`SRID 4326`), the coordinate system commonly used by GPS. `Srid.CrsType.GEOGRAPHIC` tells Micronaut Data to use the MariaDB spherical distance function for the 5 km spatial predicate.
 
 common:requirements.adoc[]
 
@@ -47,11 +47,11 @@ Micronaut Data geospatial model types use GeoJSON conversion by default. MariaDB
 
 == Repository
 
-Create a repository that declares the MariaDB dialect:
+Create a repository that uses the MySQL dialect for MariaDB:
 
 source:DeliveryDriverRepository[]
 
-<1> `@JdbcRepository` tells Micronaut Data to generate a MariaDB JDBC repository.
+<1> Micronaut Data does not define a separate MariaDB dialect. Use `Dialect.MYSQL` for MariaDB JDBC repositories.
 <2> The `Near` predicate is translated to MariaDB `ST_Distance_Sphere(...) <= ?`.
 
 == Dispatch Service

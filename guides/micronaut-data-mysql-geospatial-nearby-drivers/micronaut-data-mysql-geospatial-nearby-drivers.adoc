@@ -2,7 +2,7 @@ common:header.adoc[]
 
 In this guide, you will build the dispatch part of a food delivery application. When a customer places an order, the application stores driver positions in an SRID-restricted MySQL `POINT` column and asks Micronaut Data JDBC for available drivers near the order location. The dispatch service then chooses the closest candidate within 5 km.
 
-The sample uses WGS 84 coordinates (`SRID 4326`), the coordinate system commonly used by GPS. With MySQL 8, `ST_Distance` returns meters for geographic coordinates in `SRID 4326`, so the repository enforces the 5 km dispatch rule.
+The sample uses WGS 84 coordinates (`SRID 4326`), the coordinate system commonly used by GPS. `Srid.CrsType.GEOGRAPHIC` tells Micronaut Data to use the MySQL spherical distance function for the 5 km spatial predicate.
 
 common:requirements.adoc[]
 
@@ -40,7 +40,7 @@ Micronaut Data geospatial model types use GeoJSON conversion by default. MySQL s
 
 <1> Map the entity to the `delivery_driver` table created by Liquibase.
 <2> Represent whether a driver is available or busy so dispatch queries can filter drivers before applying the spatial predicate.
-<3> Use `SRID 4326` for GPS-style longitude and latitude coordinates.
+<3> Use `SRID 4326` with `Srid.CrsType.GEOGRAPHIC` for GPS-style longitude and latitude coordinates.
 <4> Mark the location column as spatially indexed in the Micronaut Data model.
 
 == Repository
@@ -50,11 +50,11 @@ Create a repository that declares the MySQL dialect:
 source:DeliveryDriverRepository[]
 
 <1> `@JdbcRepository` tells Micronaut Data to generate a MySQL JDBC repository.
-<2> The `Near` predicate is translated to MySQL `ST_Distance(...) <= ?`.
+<2> The `Near` predicate is translated to MySQL `ST_Distance_Sphere(...) <= ?`.
 
 == Dispatch Service
 
-The repository returns available drivers within 5 km of the order location. The service then selects the nearest driver from those candidates:
+The repository returns available drivers within 5 km of the order location. The service then selects the nearest candidate:
 
 source:DispatchService[]
 

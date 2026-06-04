@@ -46,7 +46,7 @@ class DeliveryDriver {
     Status status // <2>
 
     @NotNull
-    @Srid(4326) // <3>
+    @Srid(value = 4326, type = Srid.CrsType.GEOGRAPHIC) // <3>
     @Index(columns = 'location') // <4>
     Point location
 
