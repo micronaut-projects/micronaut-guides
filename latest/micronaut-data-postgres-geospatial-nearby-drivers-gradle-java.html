@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'/>
+    <title>Find Nearby Delivery Drivers with Micronaut Data JDBC and PostGIS</title>
+    <link rel='stylesheet' id='wp-block-library-css' href='https://micronaut.io/wp-includes/css/dist/block-library/style.min.css' type='text/css' media='all'/>
+    <link rel='stylesheet' id='fonts-fira-sans-css' href='https://fonts.googleapis.com/css2?family=Fira+Sans%3Awght%40300%3B500&#038;display=swap&#038;ver=5.7' type='text/css' media='all'/>
+    <link rel='stylesheet' id='micronaut-style-css' href='https://micronaut.io/wp-content/themes/micronaut/style.min.css' type='text/css' media='all'/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link rel="shortcut icon" href="https://micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link rel="alternate" type="application/rss+xml" title="Micronaut Guides RSS Feed" href="https://guides.micronaut.io/latest/rss.xml" />
+    <link rel="alternate" type="application/json" title="Micronaut Guides JSON Feed" href="https://guides.micronaut.io/latest/feed.json" />
+    <link href="coderay.css" rel="stylesheet" />
+    <link href="rouge-github.css" rel="stylesheet" />
+    <link href="guide.css" rel="stylesheet" />
+    <script src="lunr.js"></script>
+    <script src="guide.js"></script>
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:image" content="https://guides.micronaut.io/latest/images/cards/micronauttwittercard.png"/>
+    <meta name="twitter:creator" content="@micronautfw"/>
+    <meta name="twitter:site" content="@micronautfw"/>
+    <meta name="twitter:title" content="Find Nearby Delivery Drivers with Micronaut Data JDBC and PostGIS"/>
+    <meta name="twitter:description" content="Learn how to use Micronaut Data JDBC and PostgreSQL spatial queries to find the closest available delivery driver within 5 km of a food delivery order."/>
+</head>
+<body class="page-template page-template-page-sidebar page-template-page-sidebar-php page page-parent guide">
+
+<header id="header">
+
+    <div class="container">
+
+        <nav class="navbar navbar-expand-lg navbar-dark">
+
+            <button class="collapsed" type="button" data-toggle="collapse" data-target="#nav" aria-expanded="false">
+                <span></span>
+            </button>
+
+            <a class="navbar-brand" href="https://micronaut.io">
+                <img src="https://micronaut.io/wp-content/uploads/2020/11/MIcronautLogo_Horizontal.svg" alt="Micronaut framework"/>
+            </a>
+
+            <div class="collapse navbar-collapse" id="nav">
+
+                <ul class="navbar-nav ml-auto">
+
+                    <li id="menu-item-2865" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2865 nav-item"><a href="https://micronaut.io/download/" class="nav-link">Download</a></li>
+                    <li id="menu-item-2868" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-2868 dropdown nav-item"><a href="https://micronaut.io/learn/" class="nav-link dropdown-toggle" data-toggle="dropdown">Learn</a><ul class="dropdown-menu">
+                        <li id="menu-item-4943" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4943"><a href="https://micronaut.io/learn/" class="dropdown-item">Overview</a></li>
+                        <li id="menu-item-5111" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-5111"><a href="https://docs.micronaut.io/index.html" class="dropdown-item">User Documentation</a></li>
+                        <li id="menu-item-4510" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4510"><a href="https://micronaut.io/guides/" class="dropdown-item">Guides</a></li>
+                        <li id="menu-item-2896" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2896"><a href="https://micronaut.io/category/microcast/" class="dropdown-item">Microcasts</a></li>
+                        <li id="menu-item-2897" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2897"><a href="https://micronaut.io/category/webinar/" class="dropdown-item">Webinars</a></li>
+                        <li id="menu-item-2871" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2871"><a href="https://micronaut.io/professional-training/" class="dropdown-item">Professional Training</a></li>
+                        <li id="menu-item-6526" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-6526"><a href="https://micronaut-projects.github.io/micronaut-guides-mn3/latest/" class="dropdown-item">Guides for Micronaut Framework 3</a></li>
+                    </ul>
+                    </li>
+                    <li id="menu-item-2878" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item"><a href="https://micronaut.io/resources/" class="nav-link dropdown-toggle" data-toggle="dropdown">Resources</a><ul class="dropdown-menu">
+                        <li id="menu-item-4999" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4999"><a href="https://micronaut.io/upcoming-events/" class="dropdown-item">Upcoming Events</a></li>
+                        <li id="menu-item-2879" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2879"><a href="https://micronaut.io/blog/" class="dropdown-item">Blog</a></li>
+                        <li id="menu-item-6478" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-6478"><a href="https://micronaut.io/category/release-announcements/" class="dropdown-item">Releases</a></li>
+                        <li id="menu-item-6715" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-6715"><a href="https://micronaut.io/category/security-announcements/" class="dropdown-item">Security Announcements</a></li>
+                        <li id="menu-item-4499" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-4499"><a href="https://micronautpodcast.com/" class="dropdown-item">Podcast</a></li>
+                        <li id="menu-item-5798" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5798"><a href="https://micronaut.io/support/" class="dropdown-item">Commercial Support</a></li>
+                        <li id="menu-item-4186" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4186"><a href="https://micronaut.io/resources/community-support/" class="dropdown-item">Community Support</a></li>
+                        <li id="menu-item-2882" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2882"><a href="https://micronaut.io/faq/" class="dropdown-item">FAQ</a></li>
+                        <li id="menu-item-2883" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2883"><a href="https://micronaut.io/contact/" class="dropdown-item">Contact</a></li>
+                        <li id="menu-item-6479" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-6479"><a href="https://micronaut.io/micronaut-success-stories/" class="dropdown-item">Micronaut Success Stories</a></li>
+                    </ul>
+                    </li>
+                    <li id="menu-item-2872" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2872 dropdown nav-item"><a href="https://micronaut.io/foundation/" class="nav-link dropdown-toggle" data-toggle="dropdown">Foundation</a><ul class="dropdown-menu">
+                        <li id="menu-item-2877" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2877"><a href="https://micronaut.io/foundation/" class="dropdown-item">Overview</a></li>
+                        <li id="menu-item-2874" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2874"><a href="https://micronaut.io/foundation/corporate-sponsorship/" class="dropdown-item">Corporate Sponsorship</a></li>
+                        <li id="menu-item-2873" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2873"><a href="https://micronaut.io/foundation/community-sponsorship/" class="dropdown-item">Community Sponsorship</a></li>
+                        <li id="menu-item-2876" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2876"><a href="https://micronaut.io/foundation/sponsors/" class="dropdown-item">Sponsors</a></li>
+                        <li id="menu-item-3838" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-3838"><a href="https://micronaut.io/meeting-minutes/" class="dropdown-item">Meeting Minutes</a></li>
+                    </ul>
+                    </li>
+                    <li id="menu-item-2884" class="action menu-item menu-item-type-custom menu-item-object-custom menu-item-2884 nav-item"><a target="_blank" rel="noopener" href="https://micronaut.io/launch/" class="nav-link">Launch</a></li>
+
+                </ul>
+
+            </div>
+
+        </nav>
+
+    </div>
+</header>
+
+<div style="background: #fff;padding-top: 20px;padding-bottom: 20px;">
+    <div class="container" style="clear: both;">
+        <fieldset style="float: right;">
+            <input type="search" id="search-form-query"/>
+            <input type="submit" onclick="search()" value="Search">
+            <input type="submit" onclick="resetSearch()" value="Reset">
+        </fieldset>
+    </div>
+    <div class="container" style="clear: both;margin-top: -20px;">
+        <div class="guide-list" id="searchResults">
+        </div>
+    </div>
+</div>
+<div id="breadcrumbs"><div class="container"><a href="https://micronaut.io/">Home</a> » <a href="./index.html">Guides</a> » <a href="micronaut-data-postgres-geospatial-nearby-drivers.html">Find Nearby Delivery Drivers with Micronaut Data JDBC and PostGIS</a> » <span class="breadcrumb_last" aria-current="page">gradle | java</span></div></div><!-- .breadcrumbs -->
+<main id="main">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+
+                <div class="toc">
+                    <div class="inner">
+                        <h1 class="title title_large first-word-bold first-word-break">Table of Contents</h1>
+                        <div class="underline"></div>
+                        
+<ul class="sectlevel1">
+<li><a href="#getting-started">1. Getting Started</a></li>
+<li><a href="#what-you-will-need">2. What you will need</a></li>
+<li><a href="#solution">3. Solution</a></li>
+<li><a href="#writing-the-application">4. Writing the Application</a>
+<ul class="sectlevel2">
+<li><a href="#postgresql-driver">4.1. PostgreSQL Driver</a></li>
+</ul>
+</li>
+<li><a href="#datasource-configuration">5. Datasource Configuration</a>
+<ul class="sectlevel2">
+<li><a href="#database-migration-with-liquibase">5.1. Database Migration with Liquibase</a></li>
+</ul>
+</li>
+<li><a href="#domain-model">6. Domain Model</a></li>
+<li><a href="#repository">7. Repository</a></li>
+<li><a href="#dispatch-service">8. Dispatch Service</a></li>
+<li><a href="#controller">9. Controller</a></li>
+<li><a href="#test">10. Test</a></li>
+<li><a href="#testing-the-application">11. Testing the Application</a></li>
+<li><a href="#next-steps">12. Next Steps</a></li>
+<li><a href="#help-with-the-micronaut-framework">13. Help with the Micronaut Framework</a></li>
+<li><a href="#license">14. License</a></li>
+</ul>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <h1>Find Nearby Delivery Drivers with Micronaut Data JDBC and PostGIS</h1>
+                <div class="underline"></div>
+<div class="sect1">
+<div class="sectionbody">
+
+<div class="paragraph">
+<p>Learn how to use Micronaut Data JDBC and PostgreSQL spatial queries to find the closest available delivery driver within 5 km of a food delivery order.</p>
+</div>
+<div class="paragraph">
+<p>Authors: Milenko Supic</p>
+</div>
+<div class="paragraph">
+<p>Micronaut Version: 5.0.2</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="getting-started">1. Getting Started</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this guide, we will create a Micronaut application written in Java.</p>
+</div>
+<div class="paragraph">
+<p>In this guide, you will build the dispatch part of a food delivery application. When a customer places an order, the application stores driver positions in PostgreSQL <code>GEOGRAPHY(POINT,4326)</code> columns and asks Micronaut Data JDBC for available drivers within 5 km of the order location. The dispatch service then chooses the closest returned candidate.</p>
+</div>
+<div class="paragraph">
+<p>The sample uses WGS 84 coordinates (<code>SRID 4326</code>), the coordinate system commonly used by GPS. The sample maps the column as PostGIS <code>geography</code>, so <code>ST_DWithin</code> applies the 5 km spatial predicate and interprets the 5,000 value as meters for SRID 4326 data.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="what-you-will-need">2. What you will need</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To complete this guide, you will need the following:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Some time on your hands</p>
+</li>
+<li>
+<p>A decent text editor or IDE (e.g. <a href="https://guides.micronaut.io/latest/micronaut-intellij-idea-ide-setup.html">IntelliJ IDEA</a>)</p>
+</li>
+<li>
+<p>JDK 21 or greater installed with <code>JAVA_HOME</code> <a href="https://www.baeldung.com/java-home-on-windows-7-8-10-mac-os-x-linux">configured appropriately</a></p>
+</li>
+<li>
+<p><a href="https://www.docker.io/gettingstarted/#h_installation">Docker</a> installed to run PostgreSQL with <a href="https://micronaut-projects.github.io/micronaut-test-resources/latest/guide/">Micronaut Test Resources</a>.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div></div><div class="row"><div class="col-md-12"><div class="sect1">
+<h2 id="solution">3. Solution</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We recommend that you follow the instructions in the next sections and create the application step by step. However, you can go right to the <strong>completed example</strong>.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="micronaut-data-postgres-geospatial-nearby-drivers-gradle-java.zip">Download</a> and unzip the source</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="writing-the-application">4. Writing the Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Create an application using the <a href="https://docs.micronaut.io/latest/guide/#cli">Micronaut Command Line Interface</a> or with <a href="https://launch.micronaut.io">Micronaut Launch</a>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide <span class="se">\</span>
+    <span class="nt">--features</span><span class="o">=</span>data-jdbc,liquibase,postgres,serialization-jackson,validation <span class="se">\</span>
+    <span class="nt">--build</span><span class="o">=</span>gradle <span class="se">\</span>
+    <span class="nt">--lang</span><span class="o">=</span>java <span class="se">\</span>
+    <span class="nt">--test</span><span class="o">=</span>junit</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you don&#8217;t specify the <code>--build</code> argument, Gradle with the <a href="https://docs.gradle.org/current/userguide/kotlin_dsl.html">Kotlin DSL</a> is used as the build tool. <br/> If you don&#8217;t specify the <code>--lang</code> argument, Java is used as the language.<br/> If you don&#8217;t specify the <code>--test</code> argument, JUnit is used for Java and Kotlin, and Spock is used for Groovy.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The previous command creates a Micronaut application with the default package <code>example.micronaut</code> in a directory named <code>micronautguide</code>.</p>
+</div>
+<div class="paragraph">
+<p>If you use Micronaut Launch, select Micronaut Application as application type and add <code>data-jdbc</code>, <code>liquibase</code>, <code>postgres</code>, <code>serialization-jackson</code>, and <code>validation</code> features.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you have an existing Micronaut application and want to add the functionality described here, you can view the dependency and configuration changes from the specified features, and apply those changes to your application.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><a href="https://micronaut.io/launch?features=data-jdbc&amp;features=liquibase&amp;features=postgres&amp;features=serialization-jackson&amp;features=validation&amp;lang=JAVA&amp;build=GRADLE&amp;test=JUNIT&amp;name=micronautguide&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">Diff</a></p>
+</div>
+<div class="paragraph">
+<p><a href="https://guides.micronaut.io/latest/micronaut-intellij-idea-ide-setup.html">Setup IntelliJ IDEA to develop Micronaut Applications</a>.</p>
+</div>
+<div class="sect2">
+<h3 id="postgresql-driver">4.1. PostgreSQL Driver</h3>
+<div class="paragraph">
+<p>Add also the PostgreSQL Driver</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="groovy"><span class="n">runtimeOnly</span><span class="o">(</span><span class="s2">"org.postgresql:postgresql"</span><span class="o">)</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Micronaut Data builds repository queries at compilation time. Add the Jakarta Persistence API as a compile-only dependency so the compile-time query model has the Criteria API types available:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="groovy"><span class="n">compileOnly</span><span class="o">(</span><span class="s2">"jakarta.persistence:jakarta.persistence-api"</span><span class="o">)</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="datasource-configuration">5. Datasource Configuration</h2>
+<div class="sectionbody">
+<div class="listingblock">
+<div class="title">src/main/resources/application.properties</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="properties"><span class="py">datasources.default.schema-generate</span><span class="p">=</span><span class="s">NONE</span>
+<i class="conum" data-value="1"></i><b>(1)</b>
+<span class="py">datasources.default.driver-class-name</span><span class="p">=</span><span class="s">org.postgresql.Driver</span>
+<i class="conum" data-value="2"></i><b>(2)</b>
+<span class="py">datasources.default.db-type</span><span class="p">=</span><span class="s">postgres</span>
+<i class="conum" data-value="3"></i><b>(3)</b>
+<span class="py">datasources.default.dialect</span><span class="p">=</span><span class="s">POSTGRES</span></code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/application.properties</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="properties"><span class="py">test-resources.containers.postgres.image-name</span><span class="p">=</span><span class="s">postgis/postgis</span>
+<span class="py">test-resources.containers.postgres.image-tag</span><span class="p">=</span><span class="s">17-3.5</span>
+<span class="py">test-resources.containers.postgres.startup-timeout</span><span class="p">=</span><span class="s">600s</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The PostgreSQL container image can take a while to download and initialize the first time. The container startup timeout and generated build&#8217;s Test Resources client timeout give Micronaut Test Resources enough time to pull the image and start the container.</p>
+</div>
+<div class="sect2">
+<h3 id="database-migration-with-liquibase">5.1. Database Migration with Liquibase</h3>
+<div class="paragraph">
+<p>We need a way to create the database schema. For that, we use
+<a href="https://micronaut-projects.github.io/micronaut-liquibase/latest/guide/">Micronaut integration with Liquibase</a>.</p>
+</div>
+<div class="paragraph">
+<p>Add the following snippet to include the necessary dependencies:</p>
+</div>
+<div class="listingblock">
+<div class="title">build.gradle</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="groovy"><span class="n">implementation</span><span class="o">(</span><span class="s2">"io.micronaut.liquibase:micronaut-liquibase"</span><span class="o">)</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Configure the database migrations directory for <a href="http://www.liquibase.org">Liquibase</a> in <code>application.properties</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/application.properties</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="properties"><span class="py">liquibase.datasources.default.change-log</span><span class="p">=</span><span class="s">classpath</span><span class="se">\:</span><span class="s">db/liquibase-changelog.xml</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Create the following files with the database schema creation:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/db/liquibase-changelog.xml</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="xml"><span class="cp">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
+<span class="nt">&lt;databaseChangeLog</span>
+  <span class="na">xmlns=</span><span class="s">"http://www.liquibase.org/xml/ns/dbchangelog"</span>
+  <span class="na">xmlns:xsi=</span><span class="s">"http://www.w3.org/2001/XMLSchema-instance"</span>
+  <span class="na">xsi:schemaLocation=</span><span class="s">"http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;include</span> <span class="na">file=</span><span class="s">"changelog/01-schema.xml"</span> <span class="na">relativeToChangelogFile=</span><span class="s">"true"</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/databaseChangeLog&gt;</span></code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/db/changelog/01-schema.xml</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="xml"><span class="cp">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
+
+<span class="nt">&lt;databaseChangeLog</span>
+  <span class="na">xmlns=</span><span class="s">"http://www.liquibase.org/xml/ns/dbchangelog"</span>
+  <span class="na">xmlns:xsi=</span><span class="s">"http://www.w3.org/2001/XMLSchema-instance"</span>
+  <span class="na">xsi:schemaLocation=</span><span class="s">"http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;changeSet</span> <span class="na">id=</span><span class="s">"01"</span> <span class="na">author=</span><span class="s">"micronaut-guides"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;sql&gt;</span>
+      CREATE EXTENSION IF NOT EXISTS postgis
+    <span class="nt">&lt;/sql&gt;</span>
+
+    <span class="nt">&lt;createTable</span> <span class="na">tableName=</span><span class="s">"delivery_driver"</span><span class="nt">&gt;</span>
+      <span class="nt">&lt;column</span> <span class="na">name=</span><span class="s">"id"</span> <span class="na">type=</span><span class="s">"BIGINT"</span> <span class="na">autoIncrement=</span><span class="s">"true"</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;constraints</span> <span class="na">primaryKey=</span><span class="s">"true"</span> <span class="na">primaryKeyName=</span><span class="s">"pk_delivery_driver"</span> <span class="na">nullable=</span><span class="s">"false"</span><span class="nt">/&gt;</span>
+      <span class="nt">&lt;/column&gt;</span>
+      <span class="nt">&lt;column</span> <span class="na">name=</span><span class="s">"name"</span> <span class="na">type=</span><span class="s">"VARCHAR(255)"</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;constraints</span> <span class="na">nullable=</span><span class="s">"false"</span><span class="nt">/&gt;</span>
+      <span class="nt">&lt;/column&gt;</span>
+      <span class="nt">&lt;column</span> <span class="na">name=</span><span class="s">"status"</span> <span class="na">type=</span><span class="s">"VARCHAR(32)"</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;constraints</span> <span class="na">nullable=</span><span class="s">"false"</span><span class="nt">/&gt;</span>
+      <span class="nt">&lt;/column&gt;</span>
+      <span class="nt">&lt;column</span> <span class="na">name=</span><span class="s">"location"</span> <span class="na">type=</span><span class="s">"GEOGRAPHY(POINT,4326)"</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;constraints</span> <span class="na">nullable=</span><span class="s">"false"</span><span class="nt">/&gt;</span>
+      <span class="nt">&lt;/column&gt;</span>
+    <span class="nt">&lt;/createTable&gt;</span>
+
+    <span class="nt">&lt;sql&gt;</span>
+      CREATE INDEX idx_delivery_driver_location ON delivery_driver USING GIST (location)
+    <span class="nt">&lt;/sql&gt;</span>
+  <span class="nt">&lt;/changeSet&gt;</span>
+<span class="nt">&lt;/databaseChangeLog&gt;</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The migration enables PostGIS, creates the <code>delivery_driver</code> table with a <code>GEOGRAPHY(POINT,4326)</code> column, and creates a GiST spatial index. In production, keep the spatial column and index statements in your migration tool instead of relying on test-only schema generation.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="domain-model">6. Domain Model</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Create a <code>DeliveryDriver</code> entity:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/DeliveryDriver.java</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">io.micronaut.data.annotation.GeneratedValue</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.data.annotation.Id</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.data.annotation.Index</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.data.annotation.MappedEntity</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.data.annotation.MappedProperty</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.data.annotation.Srid</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.data.model.geo.Point</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.validation.constraints.NotBlank</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.validation.constraints.NotNull</span><span class="o">;</span>
+
+<span class="nd">@MappedEntity</span><span class="o">(</span><span class="s">"delivery_driver"</span><span class="o">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">public</span> <span class="n">record</span> <span class="nf">DeliveryDriver</span><span class="o">(</span>
+    <span class="nd">@Id</span>
+    <span class="nd">@GeneratedValue</span>
+    <span class="nc">Long</span> <span class="n">id</span><span class="o">,</span>
+
+    <span class="nd">@NotBlank</span>
+    <span class="nc">String</span> <span class="n">name</span><span class="o">,</span>
+
+    <span class="nd">@NotNull</span>
+    <span class="nc">Status</span> <span class="n">status</span><span class="o">,</span> <i class="conum" data-value="2"></i><b>(2)</b>
+
+    <span class="nd">@NotNull</span>
+    <span class="nd">@Srid</span><span class="o">(</span><span class="mi">4326</span><span class="o">)</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="nd">@MappedProperty</span><span class="o">(</span><span class="n">definition</span> <span class="o">=</span> <span class="s">"geography not null"</span><span class="o">)</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="nd">@Index</span><span class="o">(</span><span class="n">columns</span> <span class="o">=</span> <span class="s">"location"</span><span class="o">)</span> <i class="conum" data-value="5"></i><b>(5)</b>
+    <span class="nc">Point</span> <span class="n">location</span>
+<span class="o">)</span> <span class="o">{</span>
+
+    <span class="kd">public</span> <span class="kd">enum</span> <span class="nc">Status</span> <span class="o">{</span>
+        <span class="no">AVAILABLE</span><span class="o">,</span>
+        <span class="no">BUSY</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nf">DeliveryDriver</span><span class="o">(</span><span class="nc">String</span> <span class="n">name</span><span class="o">,</span> <span class="nc">Status</span> <span class="n">status</span><span class="o">,</span> <span class="nc">Point</span> <span class="n">location</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">(</span><span class="kc">null</span><span class="o">,</span> <span class="n">name</span><span class="o">,</span> <span class="n">status</span><span class="o">,</span> <span class="n">location</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Micronaut Data geospatial model types use GeoJSON conversion by default. The entity maps the column as PostGIS <code>geography</code>, and PostgreSQL stores the value in the <code>GEOGRAPHY(POINT,4326)</code> column declared in the Liquibase migration.</p>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Map the entity to the <code>delivery_driver</code> table created by Liquibase.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Represent whether a driver is available or busy so dispatch queries can filter drivers before applying the spatial predicate.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Use <code>SRID 4326</code> for GPS-style longitude and latitude coordinates.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Map the property to a <code>geography</code> column so PostGIS distance predicates use meters with WGS 84 data.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Mark the location column as spatially indexed in the Micronaut Data model.</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="repository">7. Repository</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Create a repository that declares the PostgreSQL dialect:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/DeliveryDriverRepository.java</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">io.micronaut.data.jdbc.annotation.JdbcRepository</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.data.model.geo.Point</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.data.model.query.builder.sql.Dialect</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.data.repository.CrudRepository</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">java.util.List</span><span class="o">;</span>
+
+<span class="nd">@JdbcRepository</span><span class="o">(</span><span class="n">dialect</span> <span class="o">=</span> <span class="nc">Dialect</span><span class="o">.</span><span class="na">POSTGRES</span><span class="o">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">DeliveryDriverRepository</span> <span class="kd">extends</span> <span class="nc">CrudRepository</span><span class="o">&lt;</span><span class="nc">DeliveryDriver</span><span class="o">,</span> <span class="nc">Long</span><span class="o">&gt;</span> <span class="o">{</span>
+
+    <span class="nc">List</span><span class="o">&lt;</span><span class="nc">DeliveryDriver</span><span class="o">&gt;</span> <span class="nf">findByStatusAndLocationNear</span><span class="o">(</span><span class="nc">DeliveryDriver</span><span class="o">.</span><span class="na">Status</span> <span class="n">status</span><span class="o">,</span> <span class="nc">Point</span> <span class="n">orderLocation</span><span class="o">,</span> <span class="kt">double</span> <span class="n">maxDistanceMeters</span><span class="o">);</span> <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>@JdbcRepository</code> tells Micronaut Data to generate a PostgreSQL JDBC repository.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The <code>Near</code> predicate is translated to PostGIS <code>ST_DWithin</code>.</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="dispatch-service">8. Dispatch Service</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The repository returns available drivers within 5 km of the order location. The service then selects the nearest candidate:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/DispatchService.java</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">io.micronaut.data.model.geo.Point</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.inject.Singleton</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">java.util.Comparator</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.List</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.Optional</span><span class="o">;</span>
+
+<span class="nd">@Singleton</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">DispatchService</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">double</span> <span class="no">MAX_DISTANCE_METERS</span> <span class="o">=</span> <span class="mi">5_000</span><span class="n">d</span><span class="o">;</span> <i class="conum" data-value="1"></i><b>(1)</b>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">double</span> <span class="no">WGS84_A</span> <span class="o">=</span> <span class="mf">6378137.0</span><span class="o">;</span>              <span class="c1">// semi-major axis, meters</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">double</span> <span class="no">WGS84_F</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">298.257223563</span><span class="o">;</span>   <span class="c1">// flattening</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">double</span> <span class="no">EPS</span> <span class="o">=</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">15</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">DeliveryDriverRepository</span> <span class="n">deliveryDriverRepository</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nf">DispatchService</span><span class="o">(</span><span class="nc">DeliveryDriverRepository</span> <span class="n">deliveryDriverRepository</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">deliveryDriverRepository</span> <span class="o">=</span> <span class="n">deliveryDriverRepository</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="nc">Optional</span><span class="o">&lt;</span><span class="nc">DriverMatch</span><span class="o">&gt;</span> <span class="nf">findClosestAvailableDriver</span><span class="o">(</span><span class="nc">Point</span> <span class="n">orderLocation</span><span class="o">)</span> <span class="o">{</span>
+        <span class="nc">List</span><span class="o">&lt;</span><span class="nc">DeliveryDriver</span><span class="o">&gt;</span> <span class="n">candidates</span> <span class="o">=</span> <span class="n">deliveryDriverRepository</span><span class="o">.</span><span class="na">findByStatusAndLocationNear</span><span class="o">(</span>
+            <span class="nc">DeliveryDriver</span><span class="o">.</span><span class="na">Status</span><span class="o">.</span><span class="na">AVAILABLE</span><span class="o">,</span>
+            <span class="n">orderLocation</span><span class="o">,</span>
+            <span class="no">MAX_DISTANCE_METERS</span>
+        <span class="o">);</span> <i class="conum" data-value="2"></i><b>(2)</b>
+
+        <span class="k">return</span> <span class="n">candidates</span><span class="o">.</span><span class="na">stream</span><span class="o">()</span>
+            <span class="o">.</span><span class="na">map</span><span class="o">(</span><span class="n">driver</span> <span class="o">-&gt;</span> <span class="k">new</span> <span class="nc">DriverMatch</span><span class="o">(</span>
+                <span class="n">driver</span><span class="o">.</span><span class="na">id</span><span class="o">(),</span>
+                <span class="n">driver</span><span class="o">.</span><span class="na">name</span><span class="o">(),</span>
+                <span class="n">distanceMeters</span><span class="o">(</span><span class="n">orderLocation</span><span class="o">,</span> <span class="n">driver</span><span class="o">.</span><span class="na">location</span><span class="o">())</span>
+            <span class="o">))</span>
+            <span class="o">.</span><span class="na">min</span><span class="o">(</span><span class="nc">Comparator</span><span class="o">.</span><span class="na">comparingDouble</span><span class="o">(</span><span class="nl">DriverMatch:</span><span class="o">:</span><span class="n">distanceMeters</span><span class="o">));</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="o">}</span>
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kt">double</span> <span class="nf">distanceMeters</span><span class="o">(</span><span class="nc">Point</span> <span class="n">left</span><span class="o">,</span> <span class="nc">Point</span> <span class="n">right</span><span class="o">)</span> <span class="o">{</span> <i class="conum" data-value="4"></i><b>(4)</b>
+        <span class="kt">double</span> <span class="n">lon1Deg</span> <span class="o">=</span> <span class="n">left</span><span class="o">.</span><span class="na">x</span><span class="o">();</span>
+        <span class="kt">double</span> <span class="n">lat1Deg</span> <span class="o">=</span> <span class="n">left</span><span class="o">.</span><span class="na">y</span><span class="o">();</span>
+
+        <span class="kt">double</span> <span class="n">lon2Deg</span> <span class="o">=</span> <span class="n">right</span><span class="o">.</span><span class="na">x</span><span class="o">();</span>
+        <span class="kt">double</span> <span class="n">lat2Deg</span> <span class="o">=</span> <span class="n">right</span><span class="o">.</span><span class="na">y</span><span class="o">();</span>
+
+        <span class="n">validate</span><span class="o">(</span><span class="n">lon1Deg</span><span class="o">,</span> <span class="n">lat1Deg</span><span class="o">);</span>
+        <span class="n">validate</span><span class="o">(</span><span class="n">lon2Deg</span><span class="o">,</span> <span class="n">lat2Deg</span><span class="o">);</span>
+
+        <span class="kt">double</span> <span class="n">lon1</span> <span class="o">=</span> <span class="nc">Math</span><span class="o">.</span><span class="na">toRadians</span><span class="o">(</span><span class="n">lon1Deg</span><span class="o">);</span>
+        <span class="kt">double</span> <span class="n">lat1</span> <span class="o">=</span> <span class="nc">Math</span><span class="o">.</span><span class="na">toRadians</span><span class="o">(</span><span class="n">lat1Deg</span><span class="o">);</span>
+        <span class="kt">double</span> <span class="n">lon2</span> <span class="o">=</span> <span class="nc">Math</span><span class="o">.</span><span class="na">toRadians</span><span class="o">(</span><span class="n">lon2Deg</span><span class="o">);</span>
+        <span class="kt">double</span> <span class="n">lat2</span> <span class="o">=</span> <span class="nc">Math</span><span class="o">.</span><span class="na">toRadians</span><span class="o">(</span><span class="n">lat2Deg</span><span class="o">);</span>
+
+        <span class="k">if</span> <span class="o">(</span><span class="n">near</span><span class="o">(</span><span class="n">lon1</span><span class="o">,</span> <span class="n">lon2</span><span class="o">)</span> <span class="o">&amp;&amp;</span> <span class="n">near</span><span class="o">(</span><span class="n">lat1</span><span class="o">,</span> <span class="n">lat2</span><span class="o">))</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="mf">0.0</span><span class="o">;</span>
+        <span class="o">}</span>
+
+        <span class="kt">double</span> <span class="n">dLon</span> <span class="o">=</span> <span class="n">lon2</span> <span class="o">-</span> <span class="n">lon1</span><span class="o">;</span>
+
+        <span class="kt">double</span> <span class="n">sinLat1</span> <span class="o">=</span> <span class="nc">Math</span><span class="o">.</span><span class="na">sin</span><span class="o">(</span><span class="n">lat1</span><span class="o">);</span>
+        <span class="kt">double</span> <span class="n">cosLat1</span> <span class="o">=</span> <span class="nc">Math</span><span class="o">.</span><span class="na">cos</span><span class="o">(</span><span class="n">lat1</span><span class="o">);</span>
+        <span class="kt">double</span> <span class="n">sinLat2</span> <span class="o">=</span> <span class="nc">Math</span><span class="o">.</span><span class="na">sin</span><span class="o">(</span><span class="n">lat2</span><span class="o">);</span>
+        <span class="kt">double</span> <span class="n">cosLat2</span> <span class="o">=</span> <span class="nc">Math</span><span class="o">.</span><span class="na">cos</span><span class="o">(</span><span class="n">lat2</span><span class="o">);</span>
+
+        <span class="kt">double</span> <span class="n">cosD</span> <span class="o">=</span> <span class="n">sinLat1</span> <span class="o">*</span> <span class="n">sinLat2</span> <span class="o">+</span> <span class="n">cosLat1</span> <span class="o">*</span> <span class="n">cosLat2</span> <span class="o">*</span> <span class="nc">Math</span><span class="o">.</span><span class="na">cos</span><span class="o">(</span><span class="n">dLon</span><span class="o">);</span>
+        <span class="n">cosD</span> <span class="o">=</span> <span class="nc">Math</span><span class="o">.</span><span class="na">max</span><span class="o">(-</span><span class="mf">1.0</span><span class="o">,</span> <span class="nc">Math</span><span class="o">.</span><span class="na">min</span><span class="o">(</span><span class="mf">1.0</span><span class="o">,</span> <span class="n">cosD</span><span class="o">));</span>
+
+        <span class="kt">double</span> <span class="n">d</span> <span class="o">=</span> <span class="nc">Math</span><span class="o">.</span><span class="na">acos</span><span class="o">(</span><span class="n">cosD</span><span class="o">);</span>
+        <span class="kt">double</span> <span class="n">sinD</span> <span class="o">=</span> <span class="nc">Math</span><span class="o">.</span><span class="na">sin</span><span class="o">(</span><span class="n">d</span><span class="o">);</span>
+
+        <span class="kt">double</span> <span class="n">k</span> <span class="o">=</span> <span class="n">square</span><span class="o">(</span><span class="n">sinLat1</span> <span class="o">-</span> <span class="n">sinLat2</span><span class="o">);</span>
+        <span class="kt">double</span> <span class="n">l</span> <span class="o">=</span> <span class="n">square</span><span class="o">(</span><span class="n">sinLat1</span> <span class="o">+</span> <span class="n">sinLat2</span><span class="o">);</span>
+
+        <span class="kt">double</span> <span class="n">h</span> <span class="o">=</span> <span class="n">near</span><span class="o">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">cosD</span><span class="o">,</span> <span class="mf">0.0</span><span class="o">)</span> <span class="o">?</span> <span class="mf">0.0</span> <span class="o">:</span> <span class="o">(</span><span class="n">d</span> <span class="o">+</span> <span class="mf">3.0</span> <span class="o">*</span> <span class="n">sinD</span><span class="o">)</span> <span class="o">/</span> <span class="o">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">cosD</span><span class="o">);</span>
+        <span class="kt">double</span> <span class="n">g</span> <span class="o">=</span> <span class="n">near</span><span class="o">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">cosD</span><span class="o">,</span> <span class="mf">0.0</span><span class="o">)</span> <span class="o">?</span> <span class="mf">0.0</span> <span class="o">:</span> <span class="o">(</span><span class="n">d</span> <span class="o">-</span> <span class="mf">3.0</span> <span class="o">*</span> <span class="n">sinD</span><span class="o">)</span> <span class="o">/</span> <span class="o">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">cosD</span><span class="o">);</span>
+
+        <span class="kt">double</span> <span class="n">correction</span> <span class="o">=</span> <span class="o">-(</span><span class="no">WGS84_F</span> <span class="o">/</span> <span class="mf">4.0</span><span class="o">)</span> <span class="o">*</span> <span class="o">(</span><span class="n">h</span> <span class="o">*</span> <span class="n">k</span> <span class="o">+</span> <span class="n">g</span> <span class="o">*</span> <span class="n">l</span><span class="o">);</span>
+
+        <span class="k">return</span> <span class="no">WGS84_A</span> <span class="o">*</span> <span class="o">(</span><span class="n">d</span> <span class="o">+</span> <span class="n">correction</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">validate</span><span class="o">(</span><span class="kt">double</span> <span class="n">lon</span><span class="o">,</span> <span class="kt">double</span> <span class="n">lat</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(!</span><span class="nc">Double</span><span class="o">.</span><span class="na">isFinite</span><span class="o">(</span><span class="n">lon</span><span class="o">)</span> <span class="o">||</span> <span class="o">!</span><span class="nc">Double</span><span class="o">.</span><span class="na">isFinite</span><span class="o">(</span><span class="n">lat</span><span class="o">))</span> <span class="o">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nf">IllegalArgumentException</span><span class="o">(</span><span class="s">"Coordinates must be finite numbers"</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">lon</span> <span class="o">&lt;=</span> <span class="o">-</span><span class="mf">180.0</span> <span class="o">||</span> <span class="n">lon</span> <span class="o">&gt;</span> <span class="mf">180.0</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nf">IllegalArgumentException</span><span class="o">(</span><span class="s">"Longitude must be in (-180, 180]"</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">lat</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mf">90.0</span> <span class="o">||</span> <span class="n">lat</span> <span class="o">&gt;</span> <span class="mf">90.0</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nf">IllegalArgumentException</span><span class="o">(</span><span class="s">"Latitude must be in [-90, 90]"</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kt">boolean</span> <span class="nf">near</span><span class="o">(</span><span class="kt">double</span> <span class="n">a</span><span class="o">,</span> <span class="kt">double</span> <span class="n">b</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="nc">Math</span><span class="o">.</span><span class="na">abs</span><span class="o">(</span><span class="n">a</span> <span class="o">-</span> <span class="n">b</span><span class="o">)</span> <span class="o">&lt;=</span> <span class="no">EPS</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kt">double</span> <span class="nf">square</span><span class="o">(</span><span class="kt">double</span> <span class="n">x</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">x</span> <span class="o">*</span> <span class="n">x</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Query radius is 5,000 meters for the dispatch rule.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Ask Micronaut Data for available drivers within 5 km of the order location.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Select the closest candidate in application code using a geodetic distance calculation.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Calculate an approximate geodetic distance between the order and driver locations using WGS 84 coordinates. <code>Point.x()</code> is longitude and <code>Point.y()</code> is latitude, so the method validates coordinate ranges, converts degrees to radians, computes the central angle between the points, and applies a WGS 84 ellipsoid flattening correction before returning meters.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Create a small response object for the match:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/DriverMatch.java</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">io.micronaut.serde.annotation.Serdeable</span><span class="o">;</span>
+
+<span class="nd">@Serdeable</span>
+<span class="kd">public</span> <span class="n">record</span> <span class="nf">DriverMatch</span><span class="o">(</span><span class="nc">Long</span> <span class="n">driverId</span><span class="o">,</span> <span class="nc">String</span> <span class="n">name</span><span class="o">,</span> <span class="kt">double</span> <span class="n">distanceMeters</span><span class="o">)</span> <span class="o">{</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="controller">9. Controller</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Expose the dispatch operation through an HTTP endpoint:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/DeliveryDispatchController.java</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">io.micronaut.data.model.geo.Point</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Controller</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Get</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.QueryValue</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">java.util.Optional</span><span class="o">;</span>
+
+<span class="nd">@Controller</span><span class="o">(</span><span class="s">"/orders"</span><span class="o">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">DeliveryDispatchController</span> <span class="o">{</span>
+
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">DispatchService</span> <span class="n">dispatchService</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nf">DeliveryDispatchController</span><span class="o">(</span><span class="nc">DispatchService</span> <span class="n">dispatchService</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">dispatchService</span> <span class="o">=</span> <span class="n">dispatchService</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Get</span><span class="o">(</span><span class="s">"/nearest-driver"</span><span class="o">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="kd">public</span> <span class="nc">Optional</span><span class="o">&lt;</span><span class="nc">DriverMatch</span><span class="o">&gt;</span> <span class="nf">nearestDriver</span><span class="o">(</span><span class="nd">@QueryValue</span> <span class="kt">double</span> <span class="n">longitude</span><span class="o">,</span> <span class="nd">@QueryValue</span> <span class="kt">double</span> <span class="n">latitude</span><span class="o">)</span> <span class="o">{</span> <i class="conum" data-value="3"></i><b>(3)</b>
+        <span class="k">return</span> <span class="n">dispatchService</span><span class="o">.</span><span class="na">findClosestAvailableDriver</span><span class="o">(</span><span class="k">new</span> <span class="nc">Point</span><span class="o">(</span><span class="n">longitude</span><span class="o">,</span> <span class="n">latitude</span><span class="o">));</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Expose order dispatch operations under <code>/orders</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Accept the order location as <code>longitude</code> and <code>latitude</code> query parameters.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Returning an empty <code>Optional</code> makes the framework respond with <code>404 Not Found</code> when no driver is available within 5 km.</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="test">10. Test</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Add a test that verifies the dispatch endpoint:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/java/example/micronaut/DeliveryDispatchControllerTest.java</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">io.micronaut.data.model.geo.Point</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.HttpRequest</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.HttpResponse</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.HttpStatus</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.client.BlockingHttpClient</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.client.HttpClient</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.client.annotation.Client</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.client.exceptions.HttpClientResponseException</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">jakarta.inject.Inject</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.junit.jupiter.api.BeforeEach</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.junit.jupiter.api.Test</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">junit</span><span class="o">.</span><span class="na">jupiter</span><span class="o">.</span><span class="na">api</span><span class="o">.</span><span class="na">Assertions</span><span class="o">.</span><span class="na">assertEquals</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">junit</span><span class="o">.</span><span class="na">jupiter</span><span class="o">.</span><span class="na">api</span><span class="o">.</span><span class="na">Assertions</span><span class="o">.</span><span class="na">assertThrows</span><span class="o">;</span>
+
+<span class="nd">@MicronautTest</span><span class="o">(</span><span class="n">transactional</span> <span class="o">=</span> <span class="kc">false</span><span class="o">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">class</span> <span class="nc">DeliveryDispatchControllerTest</span> <span class="o">{</span>
+
+    <span class="nd">@Inject</span>
+    <span class="nc">DeliveryDriverRepository</span> <span class="n">deliveryDriverRepository</span><span class="o">;</span>
+
+    <span class="nd">@Inject</span>
+    <span class="nd">@Client</span><span class="o">(</span><span class="s">"/"</span><span class="o">)</span> <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="nc">HttpClient</span> <span class="n">httpClient</span><span class="o">;</span>
+
+    <span class="nd">@BeforeEach</span>
+    <span class="kt">void</span> <span class="nf">clean</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">deliveryDriverRepository</span><span class="o">.</span><span class="na">deleteAll</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">findsClosestAvailableDriverWithinFiveKilometers</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">deliveryDriverRepository</span><span class="o">.</span><span class="na">save</span><span class="o">(</span><span class="k">new</span> <span class="nc">DeliveryDriver</span><span class="o">(</span>
+            <span class="s">"Nearby Driver"</span><span class="o">,</span>
+            <span class="nc">DeliveryDriver</span><span class="o">.</span><span class="na">Status</span><span class="o">.</span><span class="na">AVAILABLE</span><span class="o">,</span>
+            <span class="k">new</span> <span class="nf">Point</span><span class="o">(-</span><span class="mf">73.9757d</span><span class="o">,</span> <span class="mf">40.7554d</span><span class="o">)</span>
+        <span class="o">));</span>
+        <span class="nc">DeliveryDriver</span> <span class="n">closest</span> <span class="o">=</span> <span class="n">deliveryDriverRepository</span><span class="o">.</span><span class="na">save</span><span class="o">(</span><span class="k">new</span> <span class="nc">DeliveryDriver</span><span class="o">(</span>
+            <span class="s">"Closest Driver"</span><span class="o">,</span>
+            <span class="nc">DeliveryDriver</span><span class="o">.</span><span class="na">Status</span><span class="o">.</span><span class="na">AVAILABLE</span><span class="o">,</span>
+            <span class="k">new</span> <span class="nf">Point</span><span class="o">(-</span><span class="mf">73.9827d</span><span class="o">,</span> <span class="mf">40.7504d</span><span class="o">)</span>
+        <span class="o">));</span>
+        <span class="n">deliveryDriverRepository</span><span class="o">.</span><span class="na">save</span><span class="o">(</span><span class="k">new</span> <span class="nc">DeliveryDriver</span><span class="o">(</span>
+            <span class="s">"Busy Driver"</span><span class="o">,</span>
+            <span class="nc">DeliveryDriver</span><span class="o">.</span><span class="na">Status</span><span class="o">.</span><span class="na">BUSY</span><span class="o">,</span>
+            <span class="k">new</span> <span class="nf">Point</span><span class="o">(-</span><span class="mf">73.9850d</span><span class="o">,</span> <span class="mf">40.7488d</span><span class="o">)</span>
+        <span class="o">));</span> <i class="conum" data-value="3"></i><b>(3)</b>
+        <span class="n">deliveryDriverRepository</span><span class="o">.</span><span class="na">save</span><span class="o">(</span><span class="k">new</span> <span class="nc">DeliveryDriver</span><span class="o">(</span>
+            <span class="s">"Far Driver"</span><span class="o">,</span>
+            <span class="nc">DeliveryDriver</span><span class="o">.</span><span class="na">Status</span><span class="o">.</span><span class="na">AVAILABLE</span><span class="o">,</span>
+            <span class="k">new</span> <span class="nf">Point</span><span class="o">(-</span><span class="mf">73.9000d</span><span class="o">,</span> <span class="mf">40.8000d</span><span class="o">)</span>
+        <span class="o">));</span> <i class="conum" data-value="4"></i><b>(4)</b>
+
+        <span class="nc">BlockingHttpClient</span> <span class="n">client</span> <span class="o">=</span> <span class="n">httpClient</span><span class="o">.</span><span class="na">toBlocking</span><span class="o">();</span>
+        <span class="nc">HttpResponse</span><span class="o">&lt;</span><span class="nc">DriverMatch</span><span class="o">&gt;</span> <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="na">exchange</span><span class="o">(</span>
+            <span class="nc">HttpRequest</span><span class="o">.</span><span class="na">GET</span><span class="o">(</span><span class="s">"/orders/nearest-driver?longitude=-73.9857&amp;latitude=40.7484"</span><span class="o">),</span>
+            <span class="nc">DriverMatch</span><span class="o">.</span><span class="na">class</span>
+        <span class="o">);</span> <i class="conum" data-value="5"></i><b>(5)</b>
+
+        <span class="n">assertEquals</span><span class="o">(</span><span class="nc">HttpStatus</span><span class="o">.</span><span class="na">OK</span><span class="o">,</span> <span class="n">response</span><span class="o">.</span><span class="na">status</span><span class="o">());</span>
+        <span class="n">assertEquals</span><span class="o">(</span><span class="n">closest</span><span class="o">.</span><span class="na">id</span><span class="o">(),</span> <span class="n">response</span><span class="o">.</span><span class="na">body</span><span class="o">().</span><span class="na">driverId</span><span class="o">());</span> <i class="conum" data-value="6"></i><b>(6)</b>
+    <span class="o">}</span>
+
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">returnsNotFoundWhenNoAvailableDriverIsCloseEnough</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">deliveryDriverRepository</span><span class="o">.</span><span class="na">save</span><span class="o">(</span><span class="k">new</span> <span class="nc">DeliveryDriver</span><span class="o">(</span>
+            <span class="s">"Busy Driver"</span><span class="o">,</span>
+            <span class="nc">DeliveryDriver</span><span class="o">.</span><span class="na">Status</span><span class="o">.</span><span class="na">BUSY</span><span class="o">,</span>
+            <span class="k">new</span> <span class="nf">Point</span><span class="o">(-</span><span class="mf">73.9850d</span><span class="o">,</span> <span class="mf">40.7488d</span><span class="o">)</span>
+        <span class="o">));</span>
+        <span class="n">deliveryDriverRepository</span><span class="o">.</span><span class="na">save</span><span class="o">(</span><span class="k">new</span> <span class="nc">DeliveryDriver</span><span class="o">(</span>
+            <span class="s">"Far Driver"</span><span class="o">,</span>
+            <span class="nc">DeliveryDriver</span><span class="o">.</span><span class="na">Status</span><span class="o">.</span><span class="na">AVAILABLE</span><span class="o">,</span>
+            <span class="k">new</span> <span class="nf">Point</span><span class="o">(-</span><span class="mf">73.9000d</span><span class="o">,</span> <span class="mf">40.8000d</span><span class="o">)</span>
+        <span class="o">));</span>
+
+        <span class="nc">BlockingHttpClient</span> <span class="n">client</span> <span class="o">=</span> <span class="n">httpClient</span><span class="o">.</span><span class="na">toBlocking</span><span class="o">();</span>
+        <span class="nc">HttpClientResponseException</span> <span class="n">thrown</span> <span class="o">=</span> <span class="n">assertThrows</span><span class="o">(</span><span class="nc">HttpClientResponseException</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="o">()</span> <span class="o">-&gt;</span>
+            <span class="n">client</span><span class="o">.</span><span class="na">exchange</span><span class="o">(</span>
+                <span class="nc">HttpRequest</span><span class="o">.</span><span class="na">GET</span><span class="o">(</span><span class="s">"/orders/nearest-driver?longitude=-73.9857&amp;latitude=40.7484"</span><span class="o">),</span>
+                <span class="nc">DriverMatch</span><span class="o">.</span><span class="na">class</span>
+            <span class="o">)</span>
+        <span class="o">);</span> <i class="conum" data-value="7"></i><b>(7)</b>
+
+        <span class="n">assertEquals</span><span class="o">(</span><span class="nc">HttpStatus</span><span class="o">.</span><span class="na">NOT_FOUND</span><span class="o">,</span> <span class="n">thrown</span><span class="o">.</span><span class="na">getStatus</span><span class="o">());</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Start the Micronaut application with an embedded server and disable the test transaction. The test inserts data directly with the repository, and the HTTP request reads it through a separate connection.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Inject an HTTP client bound to the embedded server.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>A busy driver can be nearby, but should not be returned.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>An available driver outside the 5 km radius should not be returned.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Call the dispatch endpoint with the order longitude and latitude.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>The response body contains the closest available driver within 5 km.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>When no available driver is close enough, the endpoint responds with <code>404 Not Found</code>.</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="testing-the-application">11. Testing the Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To run the tests:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">./gradlew <span class="nb">test</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then open <code>build/reports/tests/test/index.html</code> in a browser to see the results.</p>
+</div>
+<div class="paragraph">
+<p>When you run the test, Micronaut Test Resources starts a PostGIS-enabled PostgreSQL container and configures the JDBC datasource automatically.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="next-steps">12. Next Steps</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Read more about <a href="https://micronaut-projects.github.io/micronaut-data/latest/guide/#sqlGeospatial">Micronaut Data geospatial support</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="help-with-the-micronaut-framework">13. Help with the Micronaut Framework</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The <a href="https://micronaut.io/foundation/">Micronaut Foundation</a> sponsored the creation of this Guide. A variety of <a href="https://micronaut.io/commercial-support/">consulting and support services</a> are available.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="license">14. License</h2>
+<div class="sectionbody">
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+All guides are released with an <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache License 2.0</a> for the code and a <a href="https://creativecommons.org/licenses/by/4.0/deed.en">Creative Commons Attribution 4.0</a> license for the writing and media (images).
+</td>
+</tr>
+</table>
+</div>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer id="footer">
+    <div class="container">
+
+        <div class="row">
+            <div class="col-sm-5 footer-left">
+
+                <div id="text-14" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <a href="https://micronaut.io/foundation/"><img class="alignnone size-medium wp-image-3736" src="./images/micronaut_foundation_horizontal_white.svg" alt="Micronaut Foundation"/></a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-7 footer-right">
+
+                <ul class="meta">
+
+                    <li id="menu-item-2895" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2895">
+                        <a href="https://micronaut.io/brand-guidelines/">Brand Guidelines</a>
+                    </li>
+                    <li id="menu-item-2894" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2894">
+                        <a href="https://micronaut.io/community-guidelines/">Community Guidelines</a>
+                    </li>
+                    <li id="menu-item-3377" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-privacy-policy menu-item-3377">
+                        <a href="https://micronaut.io/privacy-policy/">Privacy Policy</a>
+                    </li>
+
+                </ul>
+
+                <div id="nav_menu-2" class="widget widget_nav_menu">
+                    <div class="menu-links-container">
+                        <ul id="menu-links" class="menu">
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="https://micronautpodcast.com"><i class="fa fa-podcast"><span class="sr-only">Podcast</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="https://micronaut.io/feed/rss/"><i class="fa fa-feed"><span class="sr-only">Feed</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="mailto:info@micronaut.io"><i class="fas fa-envelope"><span class="sr-only">Mail</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://twitter.com/micronautfw"><i class="fab fa-twitter"><span class="sr-only">Twitter</span></i></a></li>
+                            <li id="menu-item-6740" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-6740"><a href="https://fosstodon.org/@micronaut"><i class="fab fa-mastodon"><span class="sr-only">Mastodon</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://discord.gg/9xRFsHv98T"><i class="fab fa-discord"><span class="sr-only">Discord</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://github.com/micronaut-projects/"><i class="fab fa-github"><span class="sr-only">GitHub</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.youtube.com/@MicronautFramework"><i class="fab fa-youtube"><span class="sr-only">YouTube</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.linkedin.com/showcase/micronaut"><i class="fab fa-linkedin"><span class="sr-only">LinkedIn</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.twitch.tv/micronautfw"><i class="fab fa-twitch"><span class="sr-only">Twitch</span></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="text-5" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <small>Guides are licensed under <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> for the writing/media and <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0</a> for the code</small>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>

@@ -161,10 +161,10 @@
 <p>In this guide, we will create a Micronaut application written in Java.</p>
 </div>
 <div class="paragraph">
-<p>In this guide, you will build the dispatch part of a food delivery application. When a customer places an order, the application stores driver positions in Oracle <code>SDO_GEOMETRY</code> columns and asks Micronaut Data JDBC for available drivers near the order location. The dispatch service then chooses the closest candidate within 5 km.</p>
+<p>In this guide, you will build the dispatch part of a food delivery application. When a customer places an order, the application stores driver positions in Oracle <code>SDO_GEOMETRY</code> columns and asks Micronaut Data JDBC for available drivers within 5 km of the order location. The dispatch service then chooses the closest returned candidate.</p>
 </div>
 <div class="paragraph">
-<p>The sample uses WGS 84 coordinates (<code>SRID 4326</code>), the coordinate system commonly used by GPS. With Oracle geodetic data, <code>SDO_WITHIN_DISTANCE</code> interprets the distance value in meters when no explicit <code>unit</code> parameter is supplied.</p>
+<p>The sample uses WGS 84 coordinates (<code>SRID 4326</code>), the coordinate system commonly used by GPS. With Oracle geodetic data, <code>SDO_WITHIN_DISTANCE</code> applies the 5 km spatial predicate and interprets the distance value in meters when no explicit <code>unit</code> parameter is supplied.</p>
 </div>
 </div>
 </div>
@@ -329,7 +329,7 @@ If you have an existing Micronaut application and want to add the functionality 
 </div>
 </div>
 <div class="paragraph">
-<p>The Oracle Database image can take a while to download and initialize the first time. The startup timeout gives Micronaut Test Resources enough time to pull the image and start the container.</p>
+<p>The Oracle Database container image can take a while to download and initialize the first time. The container startup timeout and generated build&#8217;s Test Resources client timeout give Micronaut Test Resources enough time to pull the image and start the container.</p>
 </div>
 </div>
 <div class="sect2">
@@ -555,7 +555,7 @@ If you have an existing Micronaut application and want to add the functionality 
 <h2 id="dispatch-service">7. Dispatch Service</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The repository returns available drivers within 5 km of the order location. The service then selects the nearest driver from those candidates:</p>
+<p>The repository returns available drivers within 5 km of the order location. The service then selects the nearest candidate:</p>
 </div>
 <div class="listingblock">
 <div class="title">src/main/java/example/micronaut/DispatchService.java</div>
@@ -573,7 +573,9 @@ If you have an existing Micronaut application and want to add the functionality 
 <span class="kd">public</span> <span class="kd">class</span> <span class="nc">DispatchService</span> <span class="o">{</span>
 
     <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">double</span> <span class="no">MAX_DISTANCE_METERS</span> <span class="o">=</span> <span class="mi">5_000</span><span class="n">d</span><span class="o">;</span> <i class="conum" data-value="1"></i><b>(1)</b>
-    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">double</span> <span class="no">EARTH_RADIUS_METERS</span> <span class="o">=</span> <span class="mf">6_371_008.8d</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">double</span> <span class="no">WGS84_A</span> <span class="o">=</span> <span class="mf">6378137.0</span><span class="o">;</span>              <span class="c1">// semi-major axis, meters</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">double</span> <span class="no">WGS84_F</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">298.257223563</span><span class="o">;</span>   <span class="c1">// flattening</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">double</span> <span class="no">EPS</span> <span class="o">=</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">15</span><span class="o">;</span>
 
     <span class="kd">private</span> <span class="kd">final</span> <span class="nc">DeliveryDriverRepository</span> <span class="n">deliveryDriverRepository</span><span class="o">;</span>
 
@@ -597,17 +599,67 @@ If you have an existing Micronaut application and want to add the functionality 
             <span class="o">.</span><span class="na">min</span><span class="o">(</span><span class="nc">Comparator</span><span class="o">.</span><span class="na">comparingDouble</span><span class="o">(</span><span class="nl">DriverMatch:</span><span class="o">:</span><span class="n">distanceMeters</span><span class="o">));</span> <i class="conum" data-value="3"></i><b>(3)</b>
     <span class="o">}</span>
 
-    <span class="kd">private</span> <span class="kt">double</span> <span class="nf">distanceMeters</span><span class="o">(</span><span class="nc">Point</span> <span class="n">left</span><span class="o">,</span> <span class="nc">Point</span> <span class="n">right</span><span class="o">)</span> <span class="o">{</span> <i class="conum" data-value="4"></i><b>(4)</b>
-        <span class="kt">double</span> <span class="n">leftLatitude</span> <span class="o">=</span> <span class="nc">Math</span><span class="o">.</span><span class="na">toRadians</span><span class="o">(</span><span class="n">left</span><span class="o">.</span><span class="na">y</span><span class="o">());</span>
-        <span class="kt">double</span> <span class="n">rightLatitude</span> <span class="o">=</span> <span class="nc">Math</span><span class="o">.</span><span class="na">toRadians</span><span class="o">(</span><span class="n">right</span><span class="o">.</span><span class="na">y</span><span class="o">());</span>
-        <span class="kt">double</span> <span class="n">deltaLatitude</span> <span class="o">=</span> <span class="nc">Math</span><span class="o">.</span><span class="na">toRadians</span><span class="o">(</span><span class="n">right</span><span class="o">.</span><span class="na">y</span><span class="o">()</span> <span class="o">-</span> <span class="n">left</span><span class="o">.</span><span class="na">y</span><span class="o">());</span>
-        <span class="kt">double</span> <span class="n">deltaLongitude</span> <span class="o">=</span> <span class="nc">Math</span><span class="o">.</span><span class="na">toRadians</span><span class="o">(</span><span class="n">right</span><span class="o">.</span><span class="na">x</span><span class="o">()</span> <span class="o">-</span> <span class="n">left</span><span class="o">.</span><span class="na">x</span><span class="o">());</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kt">double</span> <span class="nf">distanceMeters</span><span class="o">(</span><span class="nc">Point</span> <span class="n">left</span><span class="o">,</span> <span class="nc">Point</span> <span class="n">right</span><span class="o">)</span> <span class="o">{</span> <i class="conum" data-value="4"></i><b>(4)</b>
+        <span class="kt">double</span> <span class="n">lon1Deg</span> <span class="o">=</span> <span class="n">left</span><span class="o">.</span><span class="na">x</span><span class="o">();</span>
+        <span class="kt">double</span> <span class="n">lat1Deg</span> <span class="o">=</span> <span class="n">left</span><span class="o">.</span><span class="na">y</span><span class="o">();</span>
 
-        <span class="kt">double</span> <span class="n">a</span> <span class="o">=</span> <span class="nc">Math</span><span class="o">.</span><span class="na">sin</span><span class="o">(</span><span class="n">deltaLatitude</span> <span class="o">/</span> <span class="mi">2</span><span class="o">)</span> <span class="o">*</span> <span class="nc">Math</span><span class="o">.</span><span class="na">sin</span><span class="o">(</span><span class="n">deltaLatitude</span> <span class="o">/</span> <span class="mi">2</span><span class="o">)</span>
-            <span class="o">+</span> <span class="nc">Math</span><span class="o">.</span><span class="na">cos</span><span class="o">(</span><span class="n">leftLatitude</span><span class="o">)</span> <span class="o">*</span> <span class="nc">Math</span><span class="o">.</span><span class="na">cos</span><span class="o">(</span><span class="n">rightLatitude</span><span class="o">)</span>
-            <span class="o">*</span> <span class="nc">Math</span><span class="o">.</span><span class="na">sin</span><span class="o">(</span><span class="n">deltaLongitude</span> <span class="o">/</span> <span class="mi">2</span><span class="o">)</span> <span class="o">*</span> <span class="nc">Math</span><span class="o">.</span><span class="na">sin</span><span class="o">(</span><span class="n">deltaLongitude</span> <span class="o">/</span> <span class="mi">2</span><span class="o">);</span>
-        <span class="kt">double</span> <span class="n">c</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="nc">Math</span><span class="o">.</span><span class="na">atan2</span><span class="o">(</span><span class="nc">Math</span><span class="o">.</span><span class="na">sqrt</span><span class="o">(</span><span class="n">a</span><span class="o">),</span> <span class="nc">Math</span><span class="o">.</span><span class="na">sqrt</span><span class="o">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">a</span><span class="o">));</span>
-        <span class="k">return</span> <span class="no">EARTH_RADIUS_METERS</span> <span class="o">*</span> <span class="n">c</span><span class="o">;</span>
+        <span class="kt">double</span> <span class="n">lon2Deg</span> <span class="o">=</span> <span class="n">right</span><span class="o">.</span><span class="na">x</span><span class="o">();</span>
+        <span class="kt">double</span> <span class="n">lat2Deg</span> <span class="o">=</span> <span class="n">right</span><span class="o">.</span><span class="na">y</span><span class="o">();</span>
+
+        <span class="n">validate</span><span class="o">(</span><span class="n">lon1Deg</span><span class="o">,</span> <span class="n">lat1Deg</span><span class="o">);</span>
+        <span class="n">validate</span><span class="o">(</span><span class="n">lon2Deg</span><span class="o">,</span> <span class="n">lat2Deg</span><span class="o">);</span>
+
+        <span class="kt">double</span> <span class="n">lon1</span> <span class="o">=</span> <span class="nc">Math</span><span class="o">.</span><span class="na">toRadians</span><span class="o">(</span><span class="n">lon1Deg</span><span class="o">);</span>
+        <span class="kt">double</span> <span class="n">lat1</span> <span class="o">=</span> <span class="nc">Math</span><span class="o">.</span><span class="na">toRadians</span><span class="o">(</span><span class="n">lat1Deg</span><span class="o">);</span>
+        <span class="kt">double</span> <span class="n">lon2</span> <span class="o">=</span> <span class="nc">Math</span><span class="o">.</span><span class="na">toRadians</span><span class="o">(</span><span class="n">lon2Deg</span><span class="o">);</span>
+        <span class="kt">double</span> <span class="n">lat2</span> <span class="o">=</span> <span class="nc">Math</span><span class="o">.</span><span class="na">toRadians</span><span class="o">(</span><span class="n">lat2Deg</span><span class="o">);</span>
+
+        <span class="k">if</span> <span class="o">(</span><span class="n">near</span><span class="o">(</span><span class="n">lon1</span><span class="o">,</span> <span class="n">lon2</span><span class="o">)</span> <span class="o">&amp;&amp;</span> <span class="n">near</span><span class="o">(</span><span class="n">lat1</span><span class="o">,</span> <span class="n">lat2</span><span class="o">))</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="mf">0.0</span><span class="o">;</span>
+        <span class="o">}</span>
+
+        <span class="kt">double</span> <span class="n">dLon</span> <span class="o">=</span> <span class="n">lon2</span> <span class="o">-</span> <span class="n">lon1</span><span class="o">;</span>
+
+        <span class="kt">double</span> <span class="n">sinLat1</span> <span class="o">=</span> <span class="nc">Math</span><span class="o">.</span><span class="na">sin</span><span class="o">(</span><span class="n">lat1</span><span class="o">);</span>
+        <span class="kt">double</span> <span class="n">cosLat1</span> <span class="o">=</span> <span class="nc">Math</span><span class="o">.</span><span class="na">cos</span><span class="o">(</span><span class="n">lat1</span><span class="o">);</span>
+        <span class="kt">double</span> <span class="n">sinLat2</span> <span class="o">=</span> <span class="nc">Math</span><span class="o">.</span><span class="na">sin</span><span class="o">(</span><span class="n">lat2</span><span class="o">);</span>
+        <span class="kt">double</span> <span class="n">cosLat2</span> <span class="o">=</span> <span class="nc">Math</span><span class="o">.</span><span class="na">cos</span><span class="o">(</span><span class="n">lat2</span><span class="o">);</span>
+
+        <span class="kt">double</span> <span class="n">cosD</span> <span class="o">=</span> <span class="n">sinLat1</span> <span class="o">*</span> <span class="n">sinLat2</span> <span class="o">+</span> <span class="n">cosLat1</span> <span class="o">*</span> <span class="n">cosLat2</span> <span class="o">*</span> <span class="nc">Math</span><span class="o">.</span><span class="na">cos</span><span class="o">(</span><span class="n">dLon</span><span class="o">);</span>
+        <span class="n">cosD</span> <span class="o">=</span> <span class="nc">Math</span><span class="o">.</span><span class="na">max</span><span class="o">(-</span><span class="mf">1.0</span><span class="o">,</span> <span class="nc">Math</span><span class="o">.</span><span class="na">min</span><span class="o">(</span><span class="mf">1.0</span><span class="o">,</span> <span class="n">cosD</span><span class="o">));</span>
+
+        <span class="kt">double</span> <span class="n">d</span> <span class="o">=</span> <span class="nc">Math</span><span class="o">.</span><span class="na">acos</span><span class="o">(</span><span class="n">cosD</span><span class="o">);</span>
+        <span class="kt">double</span> <span class="n">sinD</span> <span class="o">=</span> <span class="nc">Math</span><span class="o">.</span><span class="na">sin</span><span class="o">(</span><span class="n">d</span><span class="o">);</span>
+
+        <span class="kt">double</span> <span class="n">k</span> <span class="o">=</span> <span class="n">square</span><span class="o">(</span><span class="n">sinLat1</span> <span class="o">-</span> <span class="n">sinLat2</span><span class="o">);</span>
+        <span class="kt">double</span> <span class="n">l</span> <span class="o">=</span> <span class="n">square</span><span class="o">(</span><span class="n">sinLat1</span> <span class="o">+</span> <span class="n">sinLat2</span><span class="o">);</span>
+
+        <span class="kt">double</span> <span class="n">h</span> <span class="o">=</span> <span class="n">near</span><span class="o">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">cosD</span><span class="o">,</span> <span class="mf">0.0</span><span class="o">)</span> <span class="o">?</span> <span class="mf">0.0</span> <span class="o">:</span> <span class="o">(</span><span class="n">d</span> <span class="o">+</span> <span class="mf">3.0</span> <span class="o">*</span> <span class="n">sinD</span><span class="o">)</span> <span class="o">/</span> <span class="o">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">cosD</span><span class="o">);</span>
+        <span class="kt">double</span> <span class="n">g</span> <span class="o">=</span> <span class="n">near</span><span class="o">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">cosD</span><span class="o">,</span> <span class="mf">0.0</span><span class="o">)</span> <span class="o">?</span> <span class="mf">0.0</span> <span class="o">:</span> <span class="o">(</span><span class="n">d</span> <span class="o">-</span> <span class="mf">3.0</span> <span class="o">*</span> <span class="n">sinD</span><span class="o">)</span> <span class="o">/</span> <span class="o">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">cosD</span><span class="o">);</span>
+
+        <span class="kt">double</span> <span class="n">correction</span> <span class="o">=</span> <span class="o">-(</span><span class="no">WGS84_F</span> <span class="o">/</span> <span class="mf">4.0</span><span class="o">)</span> <span class="o">*</span> <span class="o">(</span><span class="n">h</span> <span class="o">*</span> <span class="n">k</span> <span class="o">+</span> <span class="n">g</span> <span class="o">*</span> <span class="n">l</span><span class="o">);</span>
+
+        <span class="k">return</span> <span class="no">WGS84_A</span> <span class="o">*</span> <span class="o">(</span><span class="n">d</span> <span class="o">+</span> <span class="n">correction</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">validate</span><span class="o">(</span><span class="kt">double</span> <span class="n">lon</span><span class="o">,</span> <span class="kt">double</span> <span class="n">lat</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(!</span><span class="nc">Double</span><span class="o">.</span><span class="na">isFinite</span><span class="o">(</span><span class="n">lon</span><span class="o">)</span> <span class="o">||</span> <span class="o">!</span><span class="nc">Double</span><span class="o">.</span><span class="na">isFinite</span><span class="o">(</span><span class="n">lat</span><span class="o">))</span> <span class="o">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nf">IllegalArgumentException</span><span class="o">(</span><span class="s">"Coordinates must be finite numbers"</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">lon</span> <span class="o">&lt;=</span> <span class="o">-</span><span class="mf">180.0</span> <span class="o">||</span> <span class="n">lon</span> <span class="o">&gt;</span> <span class="mf">180.0</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nf">IllegalArgumentException</span><span class="o">(</span><span class="s">"Longitude must be in (-180, 180]"</span><span class="o">);</span>
+        <span class="o">}</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">lat</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mf">90.0</span> <span class="o">||</span> <span class="n">lat</span> <span class="o">&gt;</span> <span class="mf">90.0</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nf">IllegalArgumentException</span><span class="o">(</span><span class="s">"Latitude must be in [-90, 90]"</span><span class="o">);</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kt">boolean</span> <span class="nf">near</span><span class="o">(</span><span class="kt">double</span> <span class="n">a</span><span class="o">,</span> <span class="kt">double</span> <span class="n">b</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="nc">Math</span><span class="o">.</span><span class="na">abs</span><span class="o">(</span><span class="n">a</span> <span class="o">-</span> <span class="n">b</span><span class="o">)</span> <span class="o">&lt;=</span> <span class="no">EPS</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kt">double</span> <span class="nf">square</span><span class="o">(</span><span class="kt">double</span> <span class="n">x</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">x</span> <span class="o">*</span> <span class="n">x</span><span class="o">;</span>
     <span class="o">}</span>
 <span class="o">}</span></code></pre>
 </div>
@@ -620,7 +672,7 @@ If you have an existing Micronaut application and want to add the functionality 
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Ask Micronaut Data for available drivers near the order location.</td>
+<td>Ask Micronaut Data for available drivers within 5 km of the order location.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
@@ -628,7 +680,7 @@ If you have an existing Micronaut application and want to add the functionality 
 </tr>
 <tr>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
-<td>Calculate the approximate great-circle distance between the order and driver locations with the Haversine formula. <code>Point.x()</code> is longitude and <code>Point.y()</code> is latitude, so the method converts latitude and coordinate deltas from degrees to radians before applying trigonometric functions. The <code>a</code> value is the haversine of the central angle between the points, <code>c</code> is that angle in radians, and multiplying by the average Earth radius converts the angular distance to meters.</td>
+<td>Calculate an approximate geodetic distance between the order and driver locations using WGS 84 coordinates. <code>Point.x()</code> is longitude and <code>Point.y()</code> is latitude, so the method validates coordinate ranges, converts degrees to radians, computes the central angle between the points, and applies a WGS 84 ellipsoid flattening correction before returning meters.</td>
 </tr>
 </table>
 </div>
