@@ -1,8 +1,8 @@
 common:header.adoc[]
 
-In this guide, you will build the dispatch part of a food delivery application. When a customer places an order, the application stores driver positions in Oracle `SDO_GEOMETRY` columns and asks Micronaut Data JDBC for available drivers near the order location. The dispatch service then chooses the closest candidate within 5 km.
+In this guide, you will build the dispatch part of a food delivery application. When a customer places an order, the application stores driver positions in Oracle `SDO_GEOMETRY` columns and asks Micronaut Data JDBC for available drivers within 5 km of the order location. The dispatch service then chooses the closest returned candidate.
 
-The sample uses WGS 84 coordinates (`SRID 4326`), the coordinate system commonly used by GPS. With Oracle geodetic data, `SDO_WITHIN_DISTANCE` interprets the distance value in meters when no explicit `unit` parameter is supplied.
+The sample uses WGS 84 coordinates (`SRID 4326`), the coordinate system commonly used by GPS. With Oracle geodetic data, `SDO_WITHIN_DISTANCE` applies the 5 km spatial predicate and interprets the distance value in meters when no explicit `unit` parameter is supplied.
 
 common:requirements.adoc[]
 
@@ -22,7 +22,7 @@ common:datasource-configuration-oracle.adoc[]
 
 resource:application.properties[tag=testresources]
 
-The Oracle Database image can take a while to download and initialize the first time. The startup timeout gives Micronaut Test Resources enough time to pull the image and start the container.
+The Oracle Database container image can take a while to download and initialize the first time. The container startup timeout and generated build's Test Resources client timeout give Micronaut Test Resources enough time to pull the image and start the container.
 
 common:liquibase.adoc[]
 
@@ -54,14 +54,14 @@ source:DeliveryDriverRepository[]
 
 == Dispatch Service
 
-The repository returns available drivers within 5 km of the order location. The service then selects the nearest driver from those candidates:
+The repository returns available drivers within 5 km of the order location. The service then selects the nearest candidate:
 
 source:DispatchService[]
 
 <1> Query radius is 5,000 meters. Oracle uses meters as the default distance unit for geodetic data.
-<2> Ask Micronaut Data for available drivers near the order location.
+<2> Ask Micronaut Data for available drivers within 5 km of the order location.
 <3> Select the closest candidate in application code using a geodetic distance calculation.
-<4> Calculate the approximate great-circle distance between the order and driver locations with the Haversine formula. `Point.x()` is longitude and `Point.y()` is latitude, so the method converts latitude and coordinate deltas from degrees to radians before applying trigonometric functions. The `a` value is the haversine of the central angle between the points, `c` is that angle in radians, and multiplying by the average Earth radius converts the angular distance to meters.
+<4> Calculate an approximate geodetic distance between the order and driver locations using WGS 84 coordinates. `Point.x()` is longitude and `Point.y()` is latitude, so the method validates coordinate ranges, converts degrees to radians, computes the central angle between the points, and applies a WGS 84 ellipsoid flattening correction before returning meters.
 
 Create a small response object for the match:
 
