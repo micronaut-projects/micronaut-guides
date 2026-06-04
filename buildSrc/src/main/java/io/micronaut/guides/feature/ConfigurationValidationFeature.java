@@ -1,19 +1,19 @@
 package io.micronaut.guides.feature;
 
+import io.micronaut.context.annotation.Replaces;
 import io.micronaut.starter.application.ApplicationType;
 import io.micronaut.starter.application.generator.GeneratorContext;
-import io.micronaut.starter.build.dependencies.PomDependencyVersionResolver;
-import io.micronaut.starter.build.gradle.GradlePlugin;
 import io.micronaut.starter.feature.Feature;
+import io.micronaut.starter.feature.validation.ConfigurationValidationBlock;
+import io.micronaut.starter.feature.validation.ConfigurationValidationProvider;
+import io.micronaut.starter.feature.validation.DefaultConfigurationValidationProvider;
 import jakarta.inject.Singleton;
 
-@Singleton
-public class ConfigurationValidationFeature implements Feature {
-    private final PomDependencyVersionResolver resolver;
+import java.util.List;
 
-    public ConfigurationValidationFeature(PomDependencyVersionResolver resolver) {
-        this.resolver = resolver;
-    }
+@Singleton
+@Replaces(DefaultConfigurationValidationProvider.class)
+public class ConfigurationValidationFeature implements Feature, ConfigurationValidationProvider {
 
     @Override
     public String getName() {
@@ -22,14 +22,28 @@ public class ConfigurationValidationFeature implements Feature {
 
     @Override
     public void apply(GeneratorContext generatorContext) {
-        if (generatorContext.getBuildTool().isGradle()) {
-            generatorContext.addBuildPlugin(GradlePlugin.builder()
-                    .id("io.micronaut.configuration.validation")
-                    .lookupArtifactId("micronaut-gradle-plugin")
-                    .version(resolver.resolve("micronaut-gradle-plugin").get().getVersion())
-                    .order(100)
-                    .build());
+    }
+
+    @Override
+    public ConfigurationValidationBlock configurationValidation(GeneratorContext generatorContext) {
+        if (generatorContext.getFeatures().contains(getName())) {
+            return ConfigurationValidationBlock.builder()
+                    .enabled(true)
+                    .failOnNotPresent(true)
+                    .validateDependencyInjection(false)
+                    .cacheEnabled(true)
+                    .build();
         }
+        if (generatorContext.getBuildTool().isGradle()) {
+            return null;
+        }
+        return ConfigurationValidationBlock.builder()
+                .enabled(false)
+                .suppressions(List.of("datasources.default.db-type"))
+                .failOnNotPresent(true)
+                .validateDependencyInjection(false)
+                .cacheEnabled(true)
+                .build();
     }
 
     @Override
