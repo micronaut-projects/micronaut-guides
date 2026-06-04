@@ -1,8 +1,8 @@
 common:header.adoc[]
 
-In this guide, you will build the dispatch part of a food delivery application. When a customer places an order, the application stores driver positions in SQL Server `geography` columns and asks Micronaut Data JDBC for available drivers near the order location. The dispatch service then chooses the closest candidate within 5 km.
+In this guide, you will build the dispatch part of a food delivery application. When a customer places an order, the application stores driver positions in SQL Server `geography` columns and asks Micronaut Data JDBC for available drivers within 5 km of the order location. The dispatch service then chooses the closest returned candidate.
 
-The sample uses WGS 84 coordinates (`SRID 4326`), the coordinate system commonly used by GPS. SQL Server `geography` uses meters for SRID 4326 distance calculations, and the service calculates a WGS 84 geodetic distance for each returned candidate before returning the closest driver.
+The sample uses WGS 84 coordinates (`SRID 4326`), the coordinate system commonly used by GPS. SQL Server `geography` applies the 5 km spatial predicate in meters for SRID 4326 distance calculations.
 
 common:requirements.adoc[]
 
@@ -24,7 +24,7 @@ resource:application.properties[tag=datasource]
 
 resource:application.properties[tag=testresources]
 
-The SQL Server image can take a while to download and initialize the first time. The container startup timeout and generated build's Test Resources client timeout give Micronaut Test Resources enough time to pull the image and start the container.
+The SQL Server container image can take a while to download and initialize the first time. The container startup timeout and generated build's Test Resources client timeout give Micronaut Test Resources enough time to pull the image and start the container.
 
 common:liquibase.adoc[]
 
@@ -62,7 +62,7 @@ The repository returns available drivers within 5 km of the order location. The 
 source:DispatchService[]
 
 <1> Query radius is 5,000 meters for the dispatch rule.
-<2> Ask Micronaut Data for available drivers near the order location.
+<2> Ask Micronaut Data for available drivers within 5 km of the order location.
 <3> Select the closest candidate in application code using a geodetic distance calculation.
 <4> Calculate an approximate geodetic distance between the order and driver locations using WGS 84 coordinates. `Point.x()` is longitude and `Point.y()` is latitude, so the method validates coordinate ranges, converts degrees to radians, computes the central angle between the points, and applies a WGS 84 ellipsoid flattening correction before returning meters.
 
