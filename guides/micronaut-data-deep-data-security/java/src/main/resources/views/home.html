@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Home</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+</head>
+<body class="bg-body-tertiary">
+<nav class="navbar navbar-expand-lg bg-dark navbar-dark">
+    <div class="container">
+        <a class="navbar-brand" href="/">Micronaut Entra ID</a>
+        <div class="ms-auto d-flex align-items-center gap-3">
+            <span class="navbar-text" th:if="${security}">
+                Signed in as <span class="fw-semibold" th:text="${security.attributes.get('preferred_username')}"></span>
+            </span>
+            <span class="navbar-text" th:unless="${security}">Anonymous</span>
+            <a class="btn btn-outline-light btn-sm" th:unless="${security}" href="/oauth/login/entraid">Enter</a>
+            <a class="btn btn-outline-light btn-sm" th:if="${security}" href="/logout">Logout</a>
+        </div>
+    </div>
+</nav>
+
+<main class="container py-4">
+    <div class="mb-4">
+        <h1 class="h3 mb-1">Employees</h1>
+        <p class="text-body-secondary mb-0">Oracle HR employee data for authenticated users.</p>
+    </div>
+
+    <div class="alert alert-secondary" th:unless="${security}" role="alert">
+        Sign in with Microsoft Entra ID to view employee salary summary and employee records.
+    </div>
+
+    <section th:if="${security}">
+        <div class="row g-3 mb-4" th:if="${salarySummary}">
+            <div class="col-12 col-sm-6 col-lg-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="text-body-secondary small text-uppercase">Minimum Salary</div>
+                        <div class="fs-4 fw-semibold" th:text="${salarySummary.minSalary()}"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-lg-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="text-body-secondary small text-uppercase">Maximum Salary</div>
+                        <div class="fs-4 fw-semibold" th:text="${salarySummary.maxSalary()}"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-lg-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="text-body-secondary small text-uppercase">Average Salary</div>
+                        <div class="fs-4 fw-semibold" th:text="${salarySummary.averageSalary()}"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-lg-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="text-body-secondary small text-uppercase">Employee Count</div>
+                        <div class="fs-4 fw-semibold" th:text="${salarySummary.employeeCount()}"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-responsive bg-white border rounded shadow-sm">
+            <table class="table table-striped table-hover align-middle mb-0">
+                <thead class="table-light">
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">First Name</th>
+                    <th scope="col">Last Name</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Manager</th>
+                    <th scope="col">SSN</th>
+                    <th scope="col">Salary</th>
+                    <th scope="col">Phone</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="employee : ${employees}">
+                    <td class="text-nowrap" th:text="${employee.employeeId()}"></td>
+                    <td th:text="${employee.firstName()}"></td>
+                    <td th:text="${employee.lastName()}"></td>
+                    <td th:text="${employee.email()}"></td>
+                    <td th:text="${employee.manager()}"></td>
+                    <td class="text-nowrap" th:text="${employee.ssn()}"></td>
+                    <td class="text-nowrap" th:text="${employee.salary()}"></td>
+                    <td class="text-nowrap" th:text="${employee.phone()}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+</body>
+</html>
