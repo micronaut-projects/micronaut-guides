@@ -1,0 +1,73 @@
+external:micronaut-email/header.adoc[]
+
+=== Controller
+
+Create a `MailController` class. This class uses a collaborator, `emailSender`, to send an email.
+
+You can send emails asynchronously using the https://micronaut-projects.github.io/micronaut-email/latest/api/index.html[AsyncEmailSender] API or synchronously using the https://micronaut-projects.github.io/micronaut-email/latest/api/index.html[EmailSender] API.
+
+source:MailController[]
+
+callout:controller[arg0=/mail/send]
+callout:constructor-di[arg0=AsyncEmailSender]
+callout:post[arg0=send,arg1=/mail/send]
+callout:body-qualifier[]
+<5> Pass a `Consumer<Message>` to customize the Postmark message before sending it.
+<6> Return 202 ACCEPTED as the result if the email delivery succeeds.
+
+external:micronaut-email/configuration.adoc[]
+
+=== Postmark
+
+https://postmark.com/[Postmark] is a transactional email service.
+
+Postmark supports transactional email delivery with features such as message streams, metadata, headers, and tags.
+
+==== Postmark API Key
+
+To use the Micronaut Postmark integration, you need a Postmark server API token.
+
+You need to https://micronaut-projects.github.io/micronaut-email/latest/guide/#io.micronaut.email.postmark.PostmarkConfigurationProperties[configure] the `postmark.api-key` property. However, don't put it in `application.properties`. It's a password. Expose it via the `POSTMARK_API_TOKEN` environment variable, use a secret manager, or create an environment-specific configuration file that will not be included in source version control.
+
+==== Dependency
+
+Because we added the `email-postmark` feature, the application contains the following dependency:
+
+dependency:micronaut-email-postmark[groupId=io.micronaut.email]
+
+=== Customize the Postmark message
+
+The controller passes a `Consumer<Message>` to the email sender. Use that callback to customize the underlying Postmark message, for example to set a tag or add custom headers before Micronaut Email sends the message.
+
+external:micronaut-email/test.adoc[]
+
+== Running the Application
+
+=== API Key
+
+Set the Postmark API key as an environment variable before you run the application:
+
+[source, bash]
+----
+export POSTMARK_API_TOKEN=xxx
+----
+
+=== From email address
+
+Change the property `micronaut.email.from.email` to a sender address or sender signature verified in Postmark.
+
+=== Run
+common:runapp-instructions.adoc[]
+
+=== Invoke
+
+[source, bash]
+----
+curl -d '{"to":"john@micronaut.example"}' \
+     -H "Content-Type: application/json" \
+     -X POST http://localhost:8080/mail/send
+----
+
+external:micronaut-email/next.adoc[]
+
+common:helpWithMicronaut.adoc[]
