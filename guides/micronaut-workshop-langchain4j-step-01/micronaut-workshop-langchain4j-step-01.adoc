@@ -1,0 +1,153 @@
+# Step 01 - Introduction to Micronaut LangChain4j
+
+To get started, make sure you use the `step-01` directory.
+
+This step is the starting point for the workshop.
+It's a simple Micronaut application that uses the https://micronaut-projects.github.io/micronaut-langchain4j/latest/guide/[Micronaut LangChain4j] extension to interact with OpenAI's gpt-4o model.
+It's a simple chatbot that we will extend in the subsequent steps.
+
+## OpenAI API key
+
+export your OpenAI key as an environment variable:
+
+[source,bash]
+----
+export OPENAI_API_KEY=your_openai_api_key
+----
+
+common:runapp.adoc[]
+
+NOTE: "Could not resolve placeholder ${OPENAI_API_KEY}". If you run into an error indicating `Error starting Micronaut server: Bean definition [io.micronaut.langchain4j.openai.DefaultOpenAiModerationModelConfiguration] could not be loaded: Error instantiating bean of type  [io.micronaut.langchain4j.openai.DefaultOpenAiModerationModelConfiguration] Message: Could not resolve placeholder ${OPENAI_API_KEY}`, make sure you have set the environment variable `OPENAI_API_KEY` with your OpenAI API key.
+
+This will bring up the page at http://localhost:8080[http://localhost:8080].
+Open it and click the red robot icon in the bottom right corner to start chatting with the chatbot.
+
+image::langchain4jworkshop/ui-no-chatbot.png[]
+
+## Chatting with the chatbot
+
+The chatbot is calling gpt-4o (from OpenAI) via the backend.
+You can test it out and observe that it has memory.
+Example:
+
+```
+User: My name is Clement.
+AI: Hi Clement, nice to meet you.
+User: What is my name?
+AI: Your name is Clement.
+```
+
+image::langchain4jworkshop/ui.png[]
+
+This is how memory is built up for LLMs.
+
+**In the terminal, you can observe the calls that are made to OpenAI behind the scenes. Notice the roles 'user' (`UserMessage`) and 'assistant' (`AiMessage`).**
+
+```bash
+# The request -> Sending a message to the LLM
+INFO  d.l.h.client.log.LoggingHttpClient - HTTP request:
+- method: POST
+- url: https://api.openai.com/v1/chat/completions
+- headers: [Authorization: Beare...UA], [User-Agent: langchain4j-openai], [Content-Type: application/json]
+- body: {
+  "model" : "gpt-4o",
+  "messages" : [ {
+    "role" : "user",
+    "content" : "Hello My name is Clement"
+  } ],
+  "stream" : false
+}
+
+# The response from the LLM
+INFO  d.l.h.client.log.LoggingHttpClient - HTTP response:
+- status code: 200
+- headers: [:status: 200], [access-control-expose-headers: X-Request-ID], [alt-svc: h3=":443"; ma=86400], [cf-cache-status: DYNAMIC], [cf-ray: 9c513b8c3e7d0269-MAD], [content-type: application/json], [date: Wed, 28 Jan 2026 14:38:18 GMT], [openai-organization: user-h9ynsd1daau72qpfema3plhh], [openai-processing-ms: 257], [openai-project: proj_Z4uFZA7Y7Sv7KncQUOS9SZFh], [openai-version: 2020-10-01], [server: cloudflare], [set-cookie: [__cf_bm=zP9MJF54hsBs8UbrtRh.wslNr8FdFjF5Er4CgC1nj5A-1769611098-1.0.1.1-0mZqyK7HI9G8vs_Px.ZKL9HFCxhlBhEi7IaE4a1SZv2awaasDNVijfdD6u6jP9C3Jlgd.13PxtamDnqoZuFUyqpWC2Vlr_ohXiXU5KBcKQc; path=/; expires=Wed, 28-Jan-26 15:08:18 GMT; domain=.api.openai.com; HttpOnly; Secure; SameSite=None, _cfuvid=tKa1NNuTKevhq7cjqZRXxGqFrYt1LE1iGmzNoGG8Ll0-1769611098260-0.0.1.1-604800000; path=/; domain=.api.openai.com; HttpOnly; Secure; SameSite=None]], [strict-transport-security: max-age=31536000; includeSubDomains; preload], [x-content-type-options: nosniff], [x-openai-proxy-wasm: v0.1], [x-ratelimit-limit-requests: 500], [x-ratelimit-limit-tokens: 30000], [x-ratelimit-remaining-requests: 499], [x-ratelimit-remaining-tokens: 29992], [x-ratelimit-reset-requests: 120ms], [x-ratelimit-reset-tokens: 16ms], [x-request-id: req_c9c49aba54c64b79a89599801e4398f3]
+- body: {
+  "id": "chatcmpl-D30yPEawhVpiBTn5h9sYEDVoL1UyO",
+  "object": "chat.completion",
+  "created": 1769611097,
+  "model": "gpt-4o-2024-08-06",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Hello Clement! How can I assist you today?",
+        "refusal": null,
+        "annotations": []
+      },
+      "logprobs": null,
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 12,
+    "completion_tokens": 10,
+    "total_tokens": 22,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "audio_tokens": 0
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "audio_tokens": 0,
+      "accepted_prediction_tokens": 0,
+      "rejected_prediction_tokens": 0
+    }
+  },
+  "service_tier": "default",
+  "system_fingerprint": "fp_a0e9480a2f"
+}
+```
+A very important aspect of the interaction with LLMs is their statelessness.
+To build a conversation, you need to _resend_ the full list of messages exchanged so far.
+That list includes both the user and the assistant messages.
+This is how the memory is built up and how the LLM can provide contextually relevant responses.
+We will see how to manage this in the subsequent steps.
+
+## Anatomy of the application
+
+Before going further, let's take a look at the code.
+
+If you open the build file, you will see that the project is a Micronaut application with the https://micronaut-projects.github.io/micronaut-langchain4j/latest/guide/#openai[`micronau-langchain4j-openai`] extension.
+
+dependency:micronaut-langchain4j-openai[groupId=io.micronaut.langchain4j]
+
+https://micronaut-projects.github.io/micronaut-langchain4j/latest/guide/#openai[Microanut LangChain4j OpenAI] is a dependency that provides a simple way to interact with language models (LLMs), like https://platform.openai.com/docs/models/gpt-4o[gpt-4o from OpenAI].
+It actually can interact with any model serving the OpenAI API (like https://docs.vllm.ai/en/latest/[vLLM] or https://podman-desktop.io/docs/ai-lab[Podman AI Lab].
+Micronaut LangChain4j abstracts the complexity of calling the model and provides a simple API to interact with it.
+
+In our case, the application is a simple chatbot.
+It uses a _WebSocket_, this is why you can also see the following dependency in the build file:
+you need something
+
+dependency:micronaut-websocket[groupId=io.micronaut]
+
+
+If you now open the `src/main/java/example/micronaut/CustomerSupportAgentWebSocket.java`  file, you can see how the web socket is implemented:
+
+source:CustomerSupportAgentWebSocket[]
+
+Basically, it:
+
+1. Welcomes the user when the connection is opened
+2. Calls the `chat` method of the `CustomerSupportAgent` class when a message is received and sends the result back to the user (via the web socket).
+
+Let's now look at the cornerstone of the application, the `CustomerSupportAgent` interface.
+
+source:CustomerSupportAgent[]
+
+This interface is annotated with `@AiService` to indicate that it is an AI service.
+An https://docs.langchain4j.dev/tutorials/ai-services/[_AI service_] is an object managed by the Micronaut LangChain4j extension.
+It models the interaction with the AI model.
+As you can see it's an interface, not a concrete class, so you don't need to implement anything (thanks Micronaut!).
+Micronaut LangChain4j will provide an implementation for you at build time.
+Thus, your application only interacts with the methods defined in the interface.
+
+There is a single method in this interface, `chat`, but you could name the method whatever you wanted.
+It takes a user message as input (as it's the only parameter, we consider it to be the user message) and returns the response from the AI model.
+How this is done is abstracted away by Micronaut LangChain4j.
+
+So far, so good! Let's move on to the /latest/micronaut-workshop-langchain4j-step-02.html[next step].
+
+This tutorial is a fork of the https://quarkus.io/quarkus-workshop-langchain4j/[Quarkus Langchain4j workshop] licensed with https://github.com/quarkusio/quarkus-workshop-langchain4j/blob/main/LICENSE[Apache License 2.0].
