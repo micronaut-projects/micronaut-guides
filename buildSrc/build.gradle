@@ -71,6 +71,12 @@ rocker {
     version = rockerVersion
     configurations{
         main {
+            // Without this, Rocker emits `getModifiedAt() { return <template mtime>; }` into every
+            // generated class. On CI each checkout gives the templates fresh modification times, so
+            // all 32 generated sources differ on every build and :buildSrc:compileJava can never hit
+            // the build cache. `optimize` drops that method (it only exists to support runtime
+            // template reloading, which this build does not use), making generation reproducible.
+            optimize = true
             discardLogicWhitespace = true
             templateDir = file('src/rocker')
             outputDir = file('src/generated/rocker')
