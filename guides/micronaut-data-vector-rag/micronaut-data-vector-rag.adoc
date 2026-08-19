@@ -1,0 +1,107 @@
+common:header.adoc[]
+
+In this guide, you will build the retrieval part of a Retrieval-Augmented Generation (RAG) service. The application creates a local embedding for each document, stores the embedding in an Oracle `VECTOR` column, and retrieves the most relevant documents for a natural-language query.
+
+The guide uses the `all-MiniLM-L6-v2` model through LangChain4j. It runs in the application, produces 384-dimensional vectors, and does not require an API key. The returned documents are the context a later generation step can send to an LLM.
+
+common:requirements.adoc[]
+
+* https://www.docker.io/gettingstarted/#h_installation[Docker] installed to run Oracle Database with https://micronaut-projects.github.io/micronaut-test-resources/latest/guide/[Micronaut Test Resources].
+
+common:completesolution.adoc[]
+
+common:create-app-features.adoc[]
+
+common:oracle-driver.adoc[]
+
+The `langchain4j-all-minilm` Java feature adds the local embedding model:
+
+dependency:langchain4j-embeddings-all-minilm-l6-v2[groupId=dev.langchain4j]
+
+== Configure the datasource
+
+resource:application.properties[]
+
+The application uses Micronaut Test Resources to start Oracle Database Free. `schema-generate=CREATE_DROP` lets Micronaut Data create and remove the table for this sample.
+
+== Create embeddings
+
+An embedding is a numeric representation of text. Similar text produces vectors that are close together in vector space. Create an `Embeddings` singleton that wraps the local MiniLM model:
+
+source:Embeddings[]
+
+The model produces 384-dimensional vectors, so the database column must use the same dimension.
+
+== Store documents and their vectors
+
+Create a `Document` entity with a `VECTOR` column:
+
+source:Document[]
+
+`@VectorStorage` tells Micronaut Data to map `FloatVector` to the database's native vector type. The embedding is generated before the entity is saved.
+
+== Query by semantic similarity
+
+Create a repository with a derived nearest-neighbor query:
+
+source:DocumentRepository[]
+
+Micronaut Data generates the JDBC implementation at compile time. The `Near` predicate becomes a database vector search, so Oracle compares and orders the vectors without loading every document into the application.
+
+== Expose ingestion and retrieval
+
+Create a controller that embeds incoming text, stores documents, and returns the most relevant context:
+
+source:DocumentController[]
+
+<1> Generate an embedding for the document before persisting it.
+<2> Search with the embedding for the query text.
+<3> Use cosine similarity to compare semantic meaning rather than exact words.
+
+== Test the retrieval flow
+
+Verify that the model creates vectors with the expected dimension:
+
+test:EmbeddingsTest[]
+
+Then verify storage and nearest-neighbor ordering against Oracle:
+
+test:VectordemoTest[]
+
+common:testApp.adoc[]
+
+When you run the test, Micronaut Test Resources starts an Oracle Database container and configures the JDBC datasource automatically.
+
+== Run the application
+
+common:runapp.adoc[]
+
+Add a few documents:
+
+[source,bash]
+----
+curl -X POST localhost:8080/documents -H 'Content-Type: application/json' \\
+  -d '{"content":"Micronaut is a JVM framework for fast microservices"}'
+
+curl -X POST localhost:8080/documents -H 'Content-Type: application/json' \\
+  -d '{"content":"Micronaut Data generates database queries at compile time"}'
+
+curl -X POST localhost:8080/documents -H 'Content-Type: application/json' \\
+  -d '{"content":"Tomatoes grow well in sunny gardens"}'
+----
+
+Search with different words:
+
+[source,bash]
+----
+curl --get localhost:8080/documents/search \\
+  --data-urlencode 'q=lightweight Java toolkit for backend services'
+----
+
+The Micronaut document should be returned first even though the query uses different words. Its content can be passed to a generation model as RAG context.
+
+== Next steps
+
+Read more about https://micronaut-projects.github.io/micronaut-data/latest/guide/#vector[Micronaut Data vector support] and https://docs.oracle.com/en/database/oracle/oracle-database/23/vecse/[Oracle AI Vector Search].
+
+common:helpWithMicronaut.adoc[]
