@@ -31,7 +31,7 @@ final class DocumentController {
 
     @Post
     HttpResponse<DocumentCreated> create(@Body DocumentRequest request) {
-        var content = required(request.content());
+        var content = required(request.content()); // <1>
         var saved = documents.save(new Document(null, content, embeddings.embed(content)));
         return HttpResponse.created(new DocumentCreated(saved.id(), saved.content()));
     }
@@ -39,9 +39,9 @@ final class DocumentController {
     @Get("/search")
     List<Match> search(@QueryValue String q) {
         return documents.searchTop3ByEmbeddingNear(
-                        embeddings.embed(required(q)),
+                        embeddings.embed(required(q)), // <2>
                         new Score(2),
-                        ScoringFunction.COSINE
+                        ScoringFunction.COSINE // <3>
                 ).results().stream()
                 .map(result -> new Match(
                         result.entity().id(),
