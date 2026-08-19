@@ -1,6 +1,6 @@
 common:header.adoc[]
 
-In this guide you will learn how to effectively use the annotations `@ConfigurationProperties`, `@ConfigurationBuilder`, and `@EachProperty` to use configured properties in a Micronaut application. These annotations allow declared values to be injected into a bean for easy usage in the application.
+In this guide, you will learn how to use the annotations `@ConfigurationProperties`, `@ConfigurationBuilder`, and `@EachProperty` to consume configured properties in a Micronaut application. These annotations allow declared values to be injected into a bean for use in the application.
 
 common:requirements.adoc[]
 
@@ -15,7 +15,7 @@ Imagine a feature where you can configure a sports team in a declarative manner.
 
 resource:application.properties[tag=teamConfig]
 
-With the Micronaut framework, we can use the `@ConfigurationProperties` annotation to slurp the configuration into a bean. Each property that matches the configuration in the `application.properties` will call the setter in the bean. The bean will be subsequently available for injection in the application!
+With Micronaut Framework, you can use the `@ConfigurationProperties` annotation to bind the configuration into a bean. Each property that matches the configuration in `application.properties` will call the setter in the bean. The bean will then be available for injection in the application.
 
 source:TeamConfiguration[tags=teamConfigClassNoBuilder|gettersandsetters]
 
@@ -30,78 +30,78 @@ test:TeamConfigurationTest[tag=teamConfigSpecNoBuilder]
 == Team Admin Builder with @ConfigurationBuilder
 
 The Builder pattern is a great way to build configuration objects incrementally. Read about the Builder pattern in this
-https://dzone.com/articles/design-patterns-the-builder-pattern[DZone] article to learn more. The Framework supports the Builder pattern with `@ConfigurationBuilder`.
+https://dzone.com/articles/design-patterns-the-builder-pattern[DZone] article to learn more. Micronaut Framework supports the Builder pattern with `@ConfigurationBuilder`.
 
-Let's suppose we want to add team administrators to a team. The team administration is composed by using a builder pattern object. We can add a coach, manager and president to the team.
+Suppose you want to add team administrators to a team. The team administration is composed by using a builder pattern object. You can add a coach, manager, and president to the team.
 
 resource:application.properties[tag=allTeamConfig]
 
-<1> `manager` property is an example of an element that will be built
+<1> The `manager` property is an example of an element that will be built.
 
 The `TeamAdmin` object abides by the Builder pattern.
 
 source:TeamAdmin[]
 
-<1> `TeamAdmin` is the configuration object which consumes the declared properties.
+<1> `TeamAdmin` is the configuration object that consumes the declared properties.
 <2> The builder object is used to incrementally construct the object.
-<3> An example of a builder method, where a attribute is set and then the builder itself is returned.
+<3> An example of a builder method, where an attribute is set and then the builder itself is returned.
 <4> The final `build()` method creates the `TeamAdmin` object.
 
-At the bottom of `TeamConfiguration`, we add the inner class `TeamAdmin.Builder` and annotate it with `@ConfigurationBuilder`.
-This tells the Micronaut framework that configuration can be read in and an object can be constructed using the Builder pattern.
+At the bottom of `TeamConfiguration`, add the inner class `TeamAdmin.Builder` and annotate it with `@ConfigurationBuilder`.
+This tells Micronaut Framework that configuration can be read and an object can be constructed using the Builder pattern.
 
 [NOTE]
-We are using the builder only here, so we will have to call `builder.build()` to actually get the `TeamAdmin` object, at a later time. In our case, we will call `builder.build()` in the JUnit test.
+The builder is used only here, so call `builder.build()` later to get the `TeamAdmin` object. In this guide, the JUnit test calls `builder.build()`.
 
 source:TeamConfiguration[]
 
 callout:serdeable[]
 <2> Mark the builder as being ignored during serialization.
-<3> `prefixes` tells the Micronaut framework to find methods that are prefixed by `with`; `configurationPrefix` allows the developer to customize the `application.properties` element
+<3> `prefixes` tells Micronaut Framework to find methods that are prefixed by `with`; `configurationPrefix` allows the developer to customize the `application.properties` element.
 <4> Instantiate the builder object so it can be populated with configuration values.
 
 === Test @ConfigurationBuilder
 
-We can validate `@ConfigurationBuilder` is applied properly with the following JUnit test. The test format is similar to previous tests.
+Validate that `@ConfigurationBuilder` is applied properly with the following JUnit test. The test format is similar to previous tests.
 
 test:TeamConfigurationTest[tag=teamConfigSpecBuilder]
 
-<1> Properties which will invoke the builder methods on `TeamAdmin.Builder`
-<2> The builder object is now configured, so we must run `build()` on it to create the `TeamAdmin` object
-<3> Verify the object is created with the `application.properties` properties
+<1> Properties that will invoke the builder methods on `TeamAdmin.Builder`.
+<2> The builder object is now configured, so run `build()` on it to create the `TeamAdmin` object.
+<3> Verify the object is created with the `application.properties` properties.
 
 == Stadiums with @EachProperty
 
-The Micronaut framework is also able to read a "list" of configurations that are related. Imagine we would like to declare stadiums and their attributes.
+Micronaut Framework is also able to read a list of related configurations. Imagine you would like to declare stadiums and their attributes.
 
 resource:application.properties[tag=stadiumConfig]
 
 <1> This element will be the name of the bean. It must be lower kebab-case.
 
-We can use `@EachProperty` which will cycle through the configuration and read each nested clause as a bean. The higher level
+You can use `@EachProperty` to cycle through the configuration and read each nested clause as a bean. The higher-level
 property will be parameterized as the name.
 
 source:StadiumConfiguration[]
 
 callout:serdeable[]
-<2> Establish the top layer of configuration
-<3> `name` is read in from the property key and send as a parameter to the bean.
+<2> Establish the top layer of configuration.
+<3> `name` is read from the property key and sent as a parameter to the bean.
 
 === Test @EachProperty
 
-Validate the configuration with a test. Notice multiple beans are created from the configuration.  In a controller we can
-inject a particular `StadiumConfiguration` instance bean by using the `@Named` parameter with qualifier name.
+Validate the configuration with a test. Notice multiple beans are created from the configuration. In a controller, you can
+inject a particular `StadiumConfiguration` instance bean by using the `@Named` parameter with a qualifier name.
 
 test:StadiumConfigurationTest[]
 
 <1> Multiple configurations can be declared for the same class.
-<2> Since there are multiple beans to retrieve a bean a `Qualifier` must be sent.
+<2> Since there are multiple beans, a `Qualifier` must be sent to retrieve a bean.
 
 common:runapp.adoc[]
 
 == Controller
 
-Configuration beans can be injected into the application with just like any other beans. As a demonstration, create a controller where the beans are constructor injected. The `StadiumConfiguration` class has two instances, so for injection we need to use the `@Named` annotation with a qualifier name to specify the bean.
+Configuration beans can be injected into the application just like any other beans. As a demonstration, create a controller where the beans are constructor injected. The `StadiumConfiguration` class has two instances, so for injection you need to use the `@Named` annotation with a qualifier name to specify the bean.
 
 source:MyController[]
 

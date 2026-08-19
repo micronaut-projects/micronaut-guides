@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2024 original authors
+ * Copyright 2017-2026 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import io.micronaut.runtime.http.scope.RequestScope
 class Robot : RequestAware { // <2>
     private var serialNumber: String? = null
 
-    override fun setRequest(request: HttpRequest<*>?) {
+    override fun setRequest(request: HttpRequest<*>) {
         this.serialNumber = request!!.headers.get("UUID")
     }
 

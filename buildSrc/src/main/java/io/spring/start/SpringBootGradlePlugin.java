@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2024 original authors
+ * Copyright 2017-2026 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import io.micronaut.starter.feature.Feature;
 import io.micronaut.starter.feature.FeatureContext;
 import io.micronaut.starter.feature.GradleSpecificFeature;
 import io.micronaut.starter.feature.build.gradle.Gradle;
-import io.micronaut.starter.feature.build.gradle.templates.useJunitPlatform;
+import io.micronaut.starter.rocker.feature.build.gradle.templates.useJunitPlatform;
 import io.micronaut.starter.feature.test.TestFeature;
 import io.micronaut.starter.options.Options;
 import io.micronaut.starter.options.TestFramework;

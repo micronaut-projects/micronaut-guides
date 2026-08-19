@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2024 original authors
+ * Copyright 2017-2026 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,8 +30,8 @@ public interface UserRoleJdbcRepository extends CrudRepository<UserRole, UserRol
 
     @Query("""
     SELECT authority FROM role 
-    INNER JOIN user_role ON user_role.id_role_id = role.id 
-    INNER JOIN "user" user_ ON user_role.id_user_id = user_.id 
+    INNER JOIN user_role ON user_role.role_id = role.id 
+    INNER JOIN "user" user_ ON user_role.user_id = user_.id 
     WHERE user_.username = :username""") // <3>
     List<String> findAllAuthoritiesByUsername(@NotBlank String username);
 }

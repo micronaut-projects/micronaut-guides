@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2024 original authors
+ * Copyright 2017-2026 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ class ContextTest {
     fun lifeCycleOfClassesAnnotatedWithAtContextIsBoundToThatOfTheBeanContext() {
 
         val thrown =
-            assertThrows<BeanInstantiationException> { ApplicationContext.run(mapOf("micronaut.language" to "scala")) }
+            assertThrows<BeanInstantiationException> { ApplicationContext.run(mapOf("framework.language" to "scala")) }
         assertTrue(thrown.message!!.contains("must match \"groovy|java|kotlin\""))
     }
 }

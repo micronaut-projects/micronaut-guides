@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2024 original authors
+ * Copyright 2017-2026 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,6 +44,8 @@ class SecurityConfig {
         return http.authorizeHttpRequests(r -> r.requestMatchers("/subscriptions/**") // <4>
                         .hasRole(ROLE_SAAS_SUBSCRIPTION_OWNER))
                 .httpBasic(Customizer.withDefaults())
+                // This sample disables CSRF for the whole app, which is only appropriate
+                // for the tutorial's stateless, non-browser client scenario.
                 .csrf(AbstractHttpConfigurer::disable)
                 .build();
     }

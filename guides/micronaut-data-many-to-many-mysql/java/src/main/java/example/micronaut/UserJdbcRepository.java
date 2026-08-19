@@ -33,8 +33,8 @@ public interface UserJdbcRepository extends CrudRepository<UserEntity, Long> { /
                 u.username, 
                 GROUP_CONCAT(DISTINCT r.authority ORDER BY r.authority SEPARATOR ',') AS authorities 
             FROM users AS u 
-            LEFT JOIN user_role AS ur ON ur.id_user_id = u.id 
-            LEFT JOIN role AS r ON r.id = ur.id_role_id 
+            LEFT JOIN user_role AS ur ON ur.user_id = u.id 
+            LEFT JOIN role AS r ON r.id = ur.role_id 
             WHERE u.username = :username 
             GROUP BY u.id, u.username;
             """)

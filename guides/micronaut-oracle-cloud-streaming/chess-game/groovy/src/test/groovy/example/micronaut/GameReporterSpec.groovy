@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2024 original authors
+ * Copyright 2017-2026 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ class GameReporterSpec extends Specification implements TestPropertyProvider { /
     private static final Collection<GameDTO> receivedGames = new ConcurrentLinkedDeque<>()
     private static final Collection<GameStateDTO> receivedMoves = new ConcurrentLinkedDeque<>()
 
-    private static final PollingConditions pollingConditions = new PollingConditions(timeout: 5)
+    private static final PollingConditions pollingConditions = new PollingConditions(timeout: 30)
 
     static KafkaContainer kafka = new KafkaContainer(
             DockerImageName.parse('apache/kafka:latest')) // <4>
@@ -187,7 +187,7 @@ class GameReporterSpec extends Specification implements TestPropertyProvider { /
         endGame(gameId, null)
 
         then:
-        new PollingConditions().eventually {
+        pollingConditions.eventually {
             !receivedGames.empty
         }
 

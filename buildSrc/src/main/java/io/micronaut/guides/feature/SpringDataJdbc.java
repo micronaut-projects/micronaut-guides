@@ -26,8 +26,8 @@ public class SpringDataJdbc implements Feature {
 
     private void addDependencies(GeneratorContext generatorContext) {
         generatorContext.addDependency(Dependency.builder()
-                .groupId("org.springframework.data")
-                .artifactId("spring-data-jdbc")
+                .groupId("org.springframework.boot")
+                .artifactId("spring-boot-starter-data-jdbc")
                 .compile());
     }
 }

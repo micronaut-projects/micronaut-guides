@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2024 original authors
+ * Copyright 2017-2026 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,4 +20,4 @@ import io.micronaut.serde.annotation.Serdeable
 import jakarta.validation.constraints.NotBlank
 
 @Serdeable
-class GenreUpdateCommand(var id: Long, @field:NotBlank var name: String?)
+class GenreUpdateCommand(var id: Long, @field:NotBlank var name: String)

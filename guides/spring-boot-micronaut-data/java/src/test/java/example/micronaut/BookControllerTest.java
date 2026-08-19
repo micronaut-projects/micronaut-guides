@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2024 original authors
+ * Copyright 2017-2026 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,12 @@
  */
 package example.micronaut;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.client.RestClient;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT) // <1>
@@ -28,11 +28,17 @@ class BookControllerTest {
     @LocalServerPort // <2>
     private int port;
 
-    @Autowired // <3>
-    private TestRestTemplate restTemplate;
+    private RestClient restClient;
 
-    @Autowired // <4>
+    @Autowired // <3>
     BookRepository bookRepository;
+
+    @BeforeEach
+    void setup() {
+        restClient = RestClient.builder()
+                .baseUrl("http://localhost:" + port)
+                .build();
+    }
 
     @Test
     void booksGet() {
@@ -48,14 +54,10 @@ class BookControllerTest {
     }
 
     private Book[] booksJsonArray() {
-        return restTemplate.getForObject(booksRequestUriString(), Book[].class);
-    }
-
-    private String booksRequestUriString() {
-        return UriComponentsBuilder.fromUriString("http://localhost:" + port)
-                .path("books")
-                .build()
-                .toUriString();
+        return restClient.get()
+                .uri("/books")
+                .retrieve()
+                .body(Book[].class);
     }
 
 }

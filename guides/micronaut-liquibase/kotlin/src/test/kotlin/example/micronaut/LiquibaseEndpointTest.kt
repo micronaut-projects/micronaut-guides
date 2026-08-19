@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2024 original authors
+ * Copyright 2017-2026 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ class LiquibaseEndpointTest(@Client("/") val httpClient: HttpClient) { // <2>
         val response = client.exchange(HttpRequest.GET<Any>("/liquibase"), Argument.listOf(LiquibaseReport::class.java))
         assertEquals(OK, response.status())
 
-        val liquibaseReport = response.body().get(0)
+        val liquibaseReport = response.body()!!.get(0)
         assertNotNull(liquibaseReport)
         assertNotNull(liquibaseReport!!.changeSets)
         assertEquals(2, liquibaseReport.changeSets!!.size)

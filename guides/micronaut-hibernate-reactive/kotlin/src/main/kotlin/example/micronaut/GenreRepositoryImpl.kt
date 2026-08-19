@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2024 original authors
+ * Copyright 2017-2026 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ open class GenreRepositoryImpl(
         })
     }
 
-    override fun update(id: Long, name: String?): Publisher<Int?> {
+    override fun update(id: Long, name: String): Publisher<Int> {
         return Mono.fromCompletionStage(sessionFactory.withTransaction { session ->
             session.createQuery<Long>("UPDATE Genre g SET name = :name where id = :id")
                 .setParameter("name", name)
@@ -60,7 +60,7 @@ open class GenreRepositoryImpl(
         })
     }
 
-    override fun findAll(args: SortingAndOrderArguments): Publisher<Genre?> {
+    override fun findAll(args: SortingAndOrderArguments): Publisher<Genre> {
         val qlString: String = createQuery(args)
         return Mono.fromCompletionStage(sessionFactory.withSession { session ->
             val query = session.createQuery(
@@ -92,7 +92,7 @@ open class GenreRepositoryImpl(
         }
     }
 
-    override fun saveWithException(name: String): Publisher<Genre?> {
+    override fun saveWithException(name: String): Publisher<Genre> {
         return Mono.fromCompletionStage(sessionFactory.withTransaction { session ->
             val entity = Genre(id = null, name = name)
             session.persist(entity)

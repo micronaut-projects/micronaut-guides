@@ -135,8 +135,10 @@ class GuideUtilsTest {
         assertTrue(inputStreamOptional.isPresent());
         InputStream inputStream = inputStreamOptional.get();
         Guide guide = assertDoesNotThrow(() -> jsonMapper.readValue(inputStream, Guide.class));
-        assertFalse(GuideUtils.shouldSkip(guide, BuildTool.GRADLE));
-        assertFalse(GuideUtils.shouldSkip(guide, BuildTool.MAVEN));
+        assertFalse(GuideUtils.shouldSkip(guide, BuildTool.GRADLE, Language.JAVA));
+        assertFalse(GuideUtils.shouldSkip(guide, BuildTool.MAVEN, Language.JAVA));
+        assertTrue(GuideUtils.shouldSkip(guide, BuildTool.MAVEN, Language.KOTLIN));
+        assertFalse(GuideUtils.isSupported(BuildTool.MAVEN, Language.KOTLIN));
     }
 
     @Test
@@ -145,8 +147,8 @@ class GuideUtilsTest {
         assertTrue(inputStreamOptional.isPresent());
         InputStream inputStream = inputStreamOptional.get();
         Guide guide = assertDoesNotThrow(() -> jsonMapper.readValue(inputStream, Guide.class));
-        assertTrue(GuideUtils.shouldSkip(guide, BuildTool.GRADLE_KOTLIN));
-        assertFalse(GuideUtils.shouldSkip(guide, BuildTool.MAVEN));
+        assertTrue(GuideUtils.shouldSkip(guide, BuildTool.GRADLE_KOTLIN, Language.JAVA));
+        assertFalse(GuideUtils.shouldSkip(guide, BuildTool.MAVEN, Language.JAVA));
     }
 
     @Test

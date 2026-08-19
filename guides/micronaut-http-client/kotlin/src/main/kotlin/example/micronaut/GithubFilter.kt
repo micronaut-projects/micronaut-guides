@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2024 original authors
+ * Copyright 2017-2026 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,8 @@ class GithubFilter(val configuration: GithubConfiguration) { // <3>
 
     @RequestFilter // <4>
     fun doFilter(request: MutableHttpRequest<*>) {
-        request.basicAuth(configuration.username, configuration.token) // <5>
+        val username = configuration.username ?: return
+        val password = configuration.token ?: return
+        request.basicAuth(username, password) // <5>
     }
 }

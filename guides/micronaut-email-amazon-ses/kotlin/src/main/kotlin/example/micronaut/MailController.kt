@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2024 original authors
+ * Copyright 2017-2026 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ class MailController(private val emailSender: AsyncEmailSender<SesRequest, SesRe
                         LOG.info("message id: {}", rsp.messageId())
                     }
                 }.onErrorMap(EmailException::class.java) { t: EmailException? -> HttpStatusException(UNPROCESSABLE_ENTITY, "Email could not be sent") }
-                .map { rsp: SesResponse? -> HttpResponse.accepted<Any?>() } // <5>
+                .map { rsp: SesResponse? -> HttpResponse.accepted<Any>() } // <5>
     }
 
     companion object {

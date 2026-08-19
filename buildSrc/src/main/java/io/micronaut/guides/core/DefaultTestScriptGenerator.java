@@ -217,7 +217,7 @@ public class DefaultTestScriptGenerator implements TestScriptGenerator {
                 String folder = MacroUtils.getSourceDir(metadata.slug(), guidesOption);
                 BuildTool buildTool = folder.contains(MAVEN.toString()) ? MAVEN : GRADLE;
                 if (metadata.apps().stream().anyMatch(app -> app.name().equals(guidesConfiguration.getDefaultAppName()))) {
-                    if (GuideUtils.shouldSkip(metadata, buildTool)) {
+                    if (GuideUtils.shouldSkip(metadata, buildTool, guidesOption.getLanguage())) {
                         continue;
                     }
                     Optional<App> appOptional = metadata.apps().stream().filter(app -> app.name().equals(guidesConfiguration.getDefaultAppName())).findFirst();
@@ -233,7 +233,7 @@ public class DefaultTestScriptGenerator implements TestScriptGenerator {
                 } else {
                     bashScript.append("cd " + folder + "\n");
                     for (App app : metadata.apps()) {
-                        if (GuideUtils.shouldSkip(metadata, buildTool)) {
+                        if (GuideUtils.shouldSkip(metadata, buildTool, guidesOption.getLanguage())) {
                             continue;
                         }
                         if (!nativeTest || supportsNativeTest(app, guidesOption)) {

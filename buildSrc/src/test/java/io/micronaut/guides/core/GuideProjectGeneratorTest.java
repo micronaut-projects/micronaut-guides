@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @MicronautTest(startApplication = false)
-public class GuideProjectGeneratorTest {
+class GuideProjectGeneratorTest {
 
     @Inject
     GuideParser guideParser;
@@ -101,7 +101,8 @@ public class GuideProjectGeneratorTest {
                     implementation("io.micronaut.serde:micronaut-serde-jackson")
                     runtimeOnly("ch.qos.logback:logback-classic")
                     runtimeOnly("org.yaml:snakeyaml")
-                }"""));
+                    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+                }"""), result);
         assertTrue(result.contains("""
                 micronaut {
                     testRuntime("junit5")
@@ -120,10 +121,11 @@ public class GuideProjectGeneratorTest {
                 application {
                     mainClass = "example.micronaut.CliCommand"
                 }
+                
                 java {
-                    sourceCompatibility = JavaVersion.toVersion("21")
-                    targetCompatibility = JavaVersion.toVersion("21")
-                }""".replace("21", javaVersion)));
+                    sourceCompatibility = JavaVersion.toVersion("25")
+                    targetCompatibility = JavaVersion.toVersion("25")
+                }""".replace("25", javaVersion)));
 
     }
 
@@ -156,6 +158,58 @@ public class GuideProjectGeneratorTest {
                 assertTrue(result.contains(feature));
             }
         }
+    }
+
+    @Test
+    void testGenerateOracleAtpMavenProjectWithOracleFreeTestResources() {
+        File outputDirectory = new File("build/tmp/test-oracle-atp-" + System.nanoTime());
+        outputDirectory.mkdir();
+        App app = new App(
+                "default",
+                "example.micronaut",
+                ApplicationType.DEFAULT,
+                "Micronaut",
+                List.of("data-jdbc", "flyway", "http-client", "oracle-cloud-atp"),
+                List.of("test-resources-jdbc-oracle-free"),
+                List.of(),
+                List.of(),
+                List.of(),
+                null,
+                null,
+                null,
+                true
+        );
+        Guide guide = new Guide(
+                "Access an Oracle Autonomous Database",
+                "Learn how to access an Oracle Autonomous Database using the Micronaut framework.",
+                List.of("Burt Beckwith"),
+                List.of("Data Access"),
+                LocalDate.of(2021, 5, 17),
+                null,
+                null,
+                null,
+                false,
+                false,
+                "micronaut-oracle-autonomous-db.adoc",
+                List.of(Language.JAVA),
+                List.of("autonomous"),
+                List.of(BuildTool.MAVEN),
+                TestFramework.JUNIT,
+                List.of(),
+                "micronaut-oracle-autonomous-db",
+                true,
+                null,
+                Map.of(),
+                List.of(app)
+        );
+
+        assertDoesNotThrow(() -> guideProjectGenerator.generate(outputDirectory, guide));
+
+        File dest = Paths.get(outputDirectory.getAbsolutePath(), MacroUtils.getSourceDir(guide.slug(), new GuidesOption(BuildTool.MAVEN, Language.JAVA, TestFramework.JUNIT))).toFile();
+        String result = readFile(new File(dest, "pom.xml"));
+        assertTrue(result.contains("<testResourcesDependencies>"), result);
+        assertTrue(result.contains("<groupId>io.micronaut.testresources</groupId>"), result);
+        assertTrue(result.contains("<artifactId>micronaut-test-resources-jdbc-oracle-free</artifactId>"), result);
     }
 
 

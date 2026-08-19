@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2024 original authors
+ * Copyright 2017-2026 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,10 @@
  */
 package example.micronaut.chess.dto
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME
 import io.micronaut.serde.annotation.Serdeable
 import jakarta.validation.constraints.Size
 
 @Serdeable // <1>
-@JsonTypeInfo(use = NAME, property = "_className") // <2>
 data class GameStateDTO(@field:Size(max = 36) val id: String,
                         @field:Size(max = 36) val gameId: String,
                         @field:Size(max = 1) val player: String,

@@ -28,12 +28,12 @@ class Tools {
         this.weatherClient = weatherClient;
     }
 
-    @Tool(description = "Get weather forecast for a specific latitude/longitude coordinates") // 3>
+    @Tool(description = "Get weather forecast for specific latitude/longitude coordinates") // <3>
     String getWeatherForecastByLocation(Point point) {
         return weatherClient.formattedForecast(point.latitude(), point.longitude());
     }
 
-    @Tool(description = "Get weather alerts for a US state") // 3>
+    @Tool(description = "Get weather alerts for a US state") // <3>
     String getAlerts(GetAlertInput input) {
         return weatherClient.formattedAlerts(input.state());
     }
