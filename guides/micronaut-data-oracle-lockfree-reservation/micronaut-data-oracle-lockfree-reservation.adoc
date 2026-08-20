@@ -1,0 +1,151 @@
+common:header.adoc[]
+
+In this guide, you will use Micronaut Data JDBC with Oracle Database lock-free reservation support. You will map numeric columns that are changed by adding or subtracting an amount, generate Oracle `RESERVABLE` columns and `CHECK` constraints, and define a repository method that updates multiple reservable fields atomically.
+
+Lock-free reservation requires Oracle Database 23.26.1 or later. Oracle documentation may refer to this capability using the `26` or `26ai` code name. Micronaut Data does not detect the Oracle version automatically; you are responsible for using `@Reservable` only with a compatible Oracle database.
+
+common:requirements.adoc[]
+
+* Oracle Database 23.26.1 or later accessible to the application and tests.
+* Docker is optional; the Oracle image used by your environment must provide the required database version.
+
+common:completesolution.adoc[]
+
+common:create-app-features.adoc[]
+
+common:oracle-driver.adoc[]
+
+common:datasource-configuration-oracle.adoc[]
+
+resource:application.properties[]
+
+The example uses schema generation so the generated Oracle DDL can be inspected. The datasource URL, username, and password can be supplied through the normal Oracle datasource configuration for your environment.
+
+=== Domain Model
+
+Create an `Account` entity:
+
+source:domain/Account[]
+
+callout:mapped-entity[]
+callout:mapped-entity-id[]
+callout:generated-value[]
+callout:serdeable[]
+callout:constraints[]
+
+The `balance` and `credit` properties are numeric values that are changed by adding or subtracting an amount. `@Reservable` tells Micronaut Data to generate Oracle `RESERVABLE` columns.
+
+`@PositiveOrZero` is translated into a column-level Oracle `CHECK` constraint. For example, the generated DDL contains a constraint equivalent to `CHECK (BALANCE >= 0)`.
+Other supported numeric constraints include `@Min`, `@Max`, `@DecimalMin`, `@DecimalMax`, `@Positive`, and `@Negative`.
+
+=== Repository
+
+Create an Oracle JDBC repository:
+
+source:AccountRepository[]
+
+callout:jdbcrepository[]
+callout:crudrepository[]
+
+The derived `reserveIncrementBalanceAndDecrementCredit` method generates an update similar to:
+
+[source,sql]
+----
+UPDATE "ACCOUNT"
+SET "BALANCE" = ("BALANCE" + ?),
+    "CREDIT" = ("CREDIT" - ?)
+WHERE ("ID" = ?)
+----
+
+Both reservable fields are updated in one atomic reservation statement. Unlike a normal entity update, the generated SQL uses deltas instead of replacing the current values.
+
+=== Controller
+
+Expose account creation and reservation:
+
+source:AccountController[]
+
+callout:controller[arg0=/accounts]
+callout:constructor-di[arg0=AccountRepository]
+
+=== Writing Tests
+
+Create a test that verifies both the successful multi-field reservation and a database constraint failure:
+
+test:AccountTest[]
+
+callout:micronaut-test[]
+
+The successful reservation increments `balance` and decrements `credit` in one repository operation. A reservation that would make `credit` negative violates the generated `CHECK` constraint and is translated to `DataIntegrityViolationException`, which extends `DataAccessException`.
+
+=== Inspecting Generated DDL
+
+After starting the application or running the test, inspect the generated columns:
+
+[source,sql]
+----
+SELECT table_name, column_name, data_type
+FROM user_tab_columns
+WHERE table_name = 'ACCOUNT'
+ORDER BY column_id;
+----
+
+Inspect the generated check constraints:
+
+[source,sql]
+----
+SELECT c.constraint_name,
+       cc.column_name,
+       c.search_condition,
+       c.status
+FROM user_constraints c
+LEFT JOIN user_cons_columns cc
+       ON cc.constraint_name = c.constraint_name
+      AND cc.table_name = c.table_name
+WHERE c.table_name = 'ACCOUNT'
+  AND c.constraint_type = 'C'
+ORDER BY c.constraint_name, cc.position;
+----
+
+You should see constraints similar to `CK_ACCOUNT_BALANCE_GE_0` and `CK_ACCOUNT_CREDIT_GE_0`.
+
+=== Update Restrictions
+
+Normal generated entity updates do not assign values directly to reservable properties. If an entity also has ordinary updatable properties, those properties can still be updated while reservable properties are omitted from the direct assignment update.
+
+If an entity has only reservable updatable properties, do not use inherited `save(...)` or `update(...)` methods. Extend `GenericRepository` and explicitly declare `insert(...)`, finder/delete methods, and derived reservation methods. A reservation method must express whether each change increments or decrements the current value.
+
+JDBC and R2DBC integrity failures use `DataIntegrityViolationException`. Duplicate-key failures continue to use `EntityExistsException`. Micronaut Data does not translate database integrity failures into Bean Validation `ConstraintViolationException` automatically.
+
+common:testApp.adoc[]
+
+common:runapp.adoc[]
+
+== Testing the Running API
+
+Create an account:
+
+[source,bash]
+----
+curl -X POST 'http://localhost:8080/accounts' \
+     -H 'Content-Type: application/json' \
+     -d '{"name":"Checking","balance":100,"credit":50}'
+----
+
+Reserve both fields atomically:
+
+[source,bash]
+----
+curl -X POST 'http://localhost:8080/accounts/1/reserve?balance=25&credit=10'
+----
+
+Attempt a reservation that violates `CREDIT >= 0`:
+
+[source,bash]
+----
+curl -i -X POST 'http://localhost:8080/accounts/1/reserve?balance=0&credit=1000'
+----
+
+The repository operation throws `DataIntegrityViolationException` when Oracle rejects the reservation. The HTTP response is an application-level database error unless you add an application-specific exception handler.
+
+common:next.adoc[]
