@@ -1,0 +1,69 @@
+common:header.adoc[]
+
+In this guide, you will use Oracle's `SYS_ROW_ETAG` function with Micronaut Data JDBC to implement optimistic locking without a physical version column. The ETag is computed from selected values in the row and compared during updates and deletes.
+
+common:requirements.adoc[]
+
+* Docker installed to run Oracle Database with https://micronaut-projects.github.io/micronaut-test-resources/latest/guide/[Micronaut Test Resources].
+
+common:completesolution.adoc[]
+
+common:create-app-features.adoc[]
+
+common:oracle-driver.adoc[]
+
+common:datasource-configuration-oracle.adoc[]
+
+resource:application.properties[tag=testresources]
+
+The datasource uses the Oracle dialect and schema generation creates the sample tables. Test Resources supplies the JDBC URL, username, and password by starting an Oracle Free container.
+
+== Entity with an implicit ETag
+
+Annotate a `String` property with `@GeneratedETag`. When the entity is annotated with `@ETaggable`, all eligible persistent scalar properties participate in the ETag calculation:
+
+source:ETagBook[tag=generated-etag]
+
+<1> `@ETaggable` includes eligible scalar properties such as `id`, `title`, and the embedded `pages` property.
+<2> `@GeneratedETag` marks `etag` as a generated, read-only version property. It is not a physical column.
+<3> `@ETagValue(exclude = true)` excludes `chapters` even though it is persisted.
+
+The `@ETagValue` annotation can also explicitly select ETag inputs when `@ETaggable` is not used:
+
+source:ExplicitETagBook[tag=explicit-etag]
+
+In this example, only `id` and `title` participate. The `notes` property can change without changing the ETag. The explicit `function` value is the function name only; Micronaut Data supplies the input columns. If `function` is omitted, Oracle's dialect default, `SYS_ROW_ETAG`, is used.
+
+== Repository
+
+Declare an Oracle JDBC repository:
+
+source:ETagBookRepository[]
+
+<1> The repository dialect must match the database because Micronaut Data computes SQL at compilation time.
+
+== Optimistic locking
+
+The ETag is projected when an entity is read. Micronaut Data then uses the same computed expression in the optimistic-lock predicate for `UPDATE` and `DELETE` operations.
+
+Add a test that verifies a fresh ETag succeeds and a stale ETag fails:
+
+test:ETagRepositoryTest[]
+
+<1> Reload the entity after saving it to obtain the computed ETag.
+<2> A successful update changes an ETag input, so reload the entity before another optimistic-locking write.
+<3> Reusing the old ETag causes api:data.exceptions.OptimisticLockException[] because the row no longer matches.
+
+Changes to fields excluded with `@ETagValue(exclude = true)`, or fields not selected with explicit `@ETagValue`, do not change the ETag. Always reload an entity after changing an ETag input before issuing another update.
+
+common:testApp.adoc[]
+
+If you run the test, Micronaut Test Resources starts an Oracle Database container through https://testcontainers.org[Testcontainers].
+
+common:test-resources-benefits.adoc[]
+
+== Next Steps
+
+Read more about https://micronaut-projects.github.io/micronaut-data/latest/guide/#optimisticLocking[optimistic locking in Micronaut Data].
+
+common:helpWithMicronaut.adoc[]

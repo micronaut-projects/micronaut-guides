@@ -1,0 +1,55 @@
+/*
+ * Copyright 2017-2026 original authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * https://www.apache.org/licenses/LICENSE-2.0
+ */
+package example.micronaut;
+
+import io.micronaut.data.exceptions.OptimisticLockException;
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+import jakarta.inject.Inject;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+@MicronautTest(transactional = false)
+class ETagRepositoryTest {
+
+    @Inject
+    ETagBookRepository bookRepository;
+
+    @Inject
+    ExplicitETagBookRepository explicitBookRepository;
+
+    @Test
+    void staleEtagPreventsAnUpdate() {
+        ETagBook saved = bookRepository.save(new ETagBook(null, "Initial", new ETagBook.BookDetails(200, 10), null));
+        ETagBook fresh = bookRepository.findById(saved.id()).orElseThrow(); // <1>
+        assertNotNull(fresh.etag());
+
+        bookRepository.update(new ETagBook(fresh.id(), "Updated", fresh.details(), fresh.etag())); // <2>
+
+        ETagBook stale = new ETagBook(fresh.id(), "Stale", fresh.details(), fresh.etag()); // <3>
+        assertThrows(OptimisticLockException.class, () -> bookRepository.update(stale));
+    }
+
+    @Test
+    void changingAnExcludedFieldDoesNotChangeTheEtag() {
+        ExplicitETagBook saved = explicitBookRepository.save(
+            new ExplicitETagBook(null, "Oracle", "Initial notes", null));
+        ExplicitETagBook fresh = explicitBookRepository.findById(saved.id()).orElseThrow();
+
+        explicitBookRepository.update(new ExplicitETagBook(
+            fresh.id(), fresh.title(), "Updated notes", fresh.etag()));
+
+        ExplicitETagBook reloaded = explicitBookRepository.findById(fresh.id()).orElseThrow();
+        assertEquals("Updated notes", reloaded.notes());
+        assertEquals(fresh.etag(), reloaded.etag());
+    }
+}
