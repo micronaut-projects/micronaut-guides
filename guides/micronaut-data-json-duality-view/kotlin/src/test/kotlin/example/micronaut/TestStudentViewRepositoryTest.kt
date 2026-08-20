@@ -8,7 +8,7 @@ import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import jakarta.inject.Inject
 import org.junit.jupiter.api.Test
 import java.util.*
-import kotlin.test.assertNotNull
+import org.junit.jupiter.api.Assertions.assertNotNull
 
 @MicronautTest
 class TestStudentViewRepositoryTest {
@@ -24,7 +24,7 @@ class TestStudentViewRepositoryTest {
         val mathClass = classRepository.save(Class(null, "Math"))
         val studentView = StudentView(null, "John", mutableListOf())
         val studentScheduleClassSubView = StudentScheduleClassSubView(null, mathClass.name)
-        val studentScheduleSubView = StudentScheduleSubView(null, studentScheduleClassSubView)
+        val studentScheduleSubView = StudentScheduleSubView(0L, studentScheduleClassSubView)
         studentViewRepository.save(studentView)
         val student: Optional<StudentView> = studentViewRepository.findByName(studentView.name)
         assertNotNull(student)

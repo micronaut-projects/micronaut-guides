@@ -19,10 +19,10 @@ class TestStudentViewRepositorySpec extends Specification {
 
     def "test create student view"() {
         when:
-        def mathClass = classRepository.save(new Class(null, "Math"))
-        def studentView = new StudentView(null, "John", [])
-        def studentScheduleClassSubView = new StudentScheduleClassSubView(null, mathClass.name)
-        def studentScheduleSubView = new StudentScheduleSubView(null, studentScheduleClassSubView)
+        def mathClass = classRepository.save(new Class(name: "Math"))
+        def studentView = new StudentView(name: "John", classes: [])
+        def studentScheduleClassSubView = new StudentScheduleClassSubView(classID: null, name: mathClass.name)
+        def studentScheduleSubView = new StudentScheduleSubView(id: 0L, clazz: studentScheduleClassSubView)
         studentViewRepository.save(studentView)
         def student = studentViewRepository.findByName(studentView.name)
 

@@ -1,14 +1,23 @@
-CREATE OR REPLACE JSON RELATIONAL DUALITY VIEW STUDENT_VIEW AS
+CREATE OR REPLACE JSON RELATIONAL DUALITY VIEW student_view AS
 SELECT JSON {
-    '_id': TBL_STUDENT.id,
-    'name': TBL_STUDENT.name WITH UPDATE,
+    '_id': s.id,
+    'name': s.name,
     'classes': [
         SELECT JSON {
-            'id': TBL_STUDENT_CLASSES.id
+            'id': sc.id,
+            'class': (
+                SELECT JSON {
+                    'classID': c.id,
+                    'name': c.name
+                }
+                FROM TBL_CLASS c
+                WITH INSERT UPDATE
+                WHERE sc."CLASS_ID"=c."ID"
+            )
         }
-        FROM TBL_STUDENT_CLASSES
-        WITH INSERT UPDATE DELETE
-        WHERE TBL_STUDENT.id = TBL_STUDENT_CLASSES.student_id
+        FROM TBL_STUDENT_CLASSES sc
+        WITH UPDATE INSERT DELETE
+        WHERE s."ID"=sc."STUDENT_ID"
     ]
 }
-FROM TBL_STUDENT WITH UPDATE INSERT DELETE;
+FROM TBL_STUDENT s WITH UPDATE INSERT DELETE;

@@ -10,7 +10,7 @@ import io.micronaut.data.annotation.MappedProperty;
 import java.time.LocalTime;
 
 @Embeddable
-@JsonSubView(entity = Class.class)
+@JsonSubView(entity = Class.class, operations = {JsonView.Operation.INSERT, JsonView.Operation.UPDATE})
 public record StudentScheduleClassSubView (
         @Id
         @MappedProperty(value = "id")
