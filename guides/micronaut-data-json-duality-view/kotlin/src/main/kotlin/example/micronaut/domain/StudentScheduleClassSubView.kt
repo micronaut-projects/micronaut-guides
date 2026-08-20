@@ -7,7 +7,7 @@ import io.micronaut.data.annotation.JsonSubView
 import io.micronaut.data.annotation.JsonView
 
 @Embeddable
-@JsonSubView(entity = Class::class, operations = [JsonView.Operation.INSERT, JsonView.Operation.UPDATE])
+@JsonSubView(entity = Class::class, operations = [JsonView.Operation.INSERT, JsonView.Operation.UPDATE]) // <1>
 data class StudentScheduleClassSubView(
     @Id
     @MappedProperty(value = "id")

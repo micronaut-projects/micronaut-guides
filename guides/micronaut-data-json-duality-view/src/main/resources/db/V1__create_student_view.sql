@@ -2,6 +2,7 @@ CREATE OR REPLACE JSON RELATIONAL DUALITY VIEW student_view AS
 SELECT JSON {
     '_id': s.id,
     'name': s.name,
+    s.extras AS FLEX COLUMN,
     'classes': [
         SELECT JSON {
             'id': sc.id,

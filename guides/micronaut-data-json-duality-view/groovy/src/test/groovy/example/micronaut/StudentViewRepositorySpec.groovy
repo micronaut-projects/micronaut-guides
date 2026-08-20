@@ -1,6 +1,5 @@
 package example.micronaut
 
-import example.micronaut.domain.Class
 import example.micronaut.domain.StudentScheduleClassSubView
 import example.micronaut.domain.StudentScheduleSubView
 import example.micronaut.domain.StudentView
@@ -9,7 +8,7 @@ import jakarta.inject.Inject
 import spock.lang.Specification
 
 @MicronautTest
-class TestStudentViewRepositorySpec extends Specification {
+class StudentViewRepositorySpec extends Specification {
 
     @Inject
     StudentViewRepository studentViewRepository
@@ -19,14 +18,18 @@ class TestStudentViewRepositorySpec extends Specification {
 
     def "test create student view"() {
         when:
-        def mathClass = classRepository.save(new Class(name: "Math"))
-        def studentView = new StudentView(name: "John", classes: [])
-        def studentScheduleClassSubView = new StudentScheduleClassSubView(classID: null, name: mathClass.name)
+        def mathClass = classRepository.save(new example.micronaut.domain.Class(name: "Math"))
+        def studentScheduleClassSubView = new StudentScheduleClassSubView(classID: mathClass.id, name: mathClass.name)
         def studentScheduleSubView = new StudentScheduleSubView(id: 0L, clazz: studentScheduleClassSubView)
+        def studentView = new StudentView(name: "John", classes: [studentScheduleSubView], extras: [department: "Research", remote: true])
         studentViewRepository.save(studentView)
         def student = studentViewRepository.findByName(studentView.name)
 
         then:
-        student != null
+        student.isPresent()
+        student.get().extras.department == "Research"
+        student.get().extras.remote == true
+        student.get().classes.size() == 1
+        student.get().classes[0].clazz.name == "Math"
     }
 }

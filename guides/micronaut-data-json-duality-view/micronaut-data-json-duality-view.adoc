@@ -31,7 +31,7 @@ In Micronaut, users don't have to use SQL to create JSON duality views and execu
 
 === High-level diagram of the classes used
 
-image:JsonView.png[]
+image:duality-json-view-diagram.png[]
 
 === Writing an entity class
 
@@ -44,6 +44,7 @@ source:domain/Student[]
 <3> `@GeneratedValue` annotation to specify that it is an auto-increment field
 <4> `@JoinTable` annotation to specify the corresponding join table
 <5> `@Relation` annotation to specify an association
+<6> `@JsonAnyGetter` and `@JsonAnySetter` expose arbitrary JSON properties through a flex column
 
 === Writing a view class
 
@@ -57,6 +58,11 @@ source:domain/StudentView[]
 <2> `@Id` annotation to specify the primary key
 <3> `@GeneratedValue` annotation to specify that it is an auto-increment field
 <4> `@Relation` annotation to specify an association
+<5> `@JsonAnyGetter` and `@JsonAnySetter` expose arbitrary JSON properties through a flex column
+
+=== Using a flex column
+
+The `extras` map on `Student` and `StudentView` is annotated with `@JsonAnyGetter` and `@JsonAnySetter`. Micronaut Data maps it to an Oracle JSON flex column: declared properties remain relational fields, while arbitrary properties such as `department` or `remote` can be added to the JSON document without adding Java, Groovy, or Kotlin fields or table columns.
 
 === Writing subview classes
 
@@ -91,6 +97,8 @@ source:domain/StudentScheduleSubView[]
 
 source:domain/StudentScheduleClassSubView[]
 
+<1> Restrict the `Class` subview to `INSERT` and `UPDATE` operations. `Class` is shared by multiple students through `TBL_STUDENT_CLASSES`, so deleting it through this view is intentionally disabled. Oracle otherwise rejects the view with https://docs.oracle.com/en/error-help/db/ora-42693/[ORA-42693]; foreign keys still protect relational integrity, and class deletion should be handled separately.
+
 === The resulting SQL CREATE statement
 
 The provided classes will generate the following view at build time:
@@ -99,13 +107,13 @@ resource:db/V1__create_student_view.sql[]
 
 == Writing Tests
 
-This is a sample repository that uses the `StudentView` class:
+This is a sample repository that uses the `StudentView` class, including arbitrary flex-column properties:
 
 source:StudentViewRepository[]
 
 Create a test to verify CRUD operations using the `StudentViewRepository`:
 
-test:TestStudentViewRepository[]
+test:StudentViewRepositoryTest[]
 
 common:testApp.adoc[]
 
