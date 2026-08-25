@@ -8,7 +8,7 @@ common:requirements.adoc[]
 
 common:completesolution.adoc[]
 
-common:create-app.adoc[]
+common:create-app-features.adoc[]
 
 === Configure Data Source and JPA
 
@@ -16,13 +16,13 @@ Add the following snippet to include the necessary dependencies:
 
 :dependencies:
 
-dependency:mybatis[groupId=org.mybatis,version=@mybatisVersion@,callout=1]
+dependency:micronaut-mybatis[groupId=io.micronaut.sql,callout=1]
 dependency:micronaut-jdbc-hikari[groupId=io.micronaut.sql,callout=2]
 dependency:h2[groupId=com.h2database,scope=runtimeOnly,callout=3]
 
 :dependencies:
 
-<1> Add the MyBatis dependency.
+<1> Add the https://micronaut-projects.github.io/micronaut-sql/latest/guide/#mybatis-customizers[Micronaut MyBatis] dependency.
 <2> Configure SQL `DataSource` instances using Hikari Connection Pool.
 <3> Add a dependency to the in-memory H2 database.
 
@@ -31,19 +31,17 @@ Define the data source in `src/main/resources/application.properties`.
 
 resource:application.properties[tag=datasource]
 
-=== MyBatis configuration
+=== MyBatis Configuration
 
-As there is no out-of-the-box support yet in Micronaut Framework for MyBatis, it is necessary to manually wire `SqlSessionFactory`.
+You can define additional beans which will be used when the MyBatis Configuration is created. Only beans of type `MyBatisConfigurationCustomizer` with an `@Named` qualifier matching the datasource name will be applied.
 
-Create the following https://docs.micronaut.io/latest/guide/#factories[@Factory] class:
+Create a bean to register additional mappers:
 
-source:MybatisFactory[]
-<.> Annotate the class with `@Factory`.
-callout:constructor-di[arg0=DataSource]
-<.> Define a `@Bean` of type `SqlSessionFactory`.
-<.> Use the `dataSource` to create a new MyBatis environment.
-<.> Define the package to scan for mappers.
-<.> Create a new `SqlSessionFactory` bean.
+source:CustomConfigurationCustomizer[]
+
+callout:at-named[]
+callout:singleton[]
+<.> Define additional mappers
 
 === Domain
 
