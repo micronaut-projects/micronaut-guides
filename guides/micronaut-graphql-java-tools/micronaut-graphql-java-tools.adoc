@@ -1,0 +1,120 @@
+common:header-top.adoc[]
+
+== Getting Started
+
+In this guide, you will create a Micronaut application written in @language@ that exposes a ToDo API with https://graphql.org/[GraphQL] and https://www.graphql-java-kickstart.com/tools/[GraphQL Java Tools].
+
+GraphQL Java Tools is a schema-first library. You define the GraphQL schema in `schema.graphqls`, then implement resolvers that match the query, mutation, and nested field names.
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+common:create-app-features.adoc[]
+
+== GraphiQL
+
+Enable GraphiQL for local exploration:
+
+resource:application.properties[]
+
+== Describe the schema
+
+Create `src/main/resources/schema.graphqls`:
+
+resource:schema.graphqls[]
+
+The schema exposes:
+
+* a `toDos` query
+* mutations to create, complete, and delete ToDos
+* a nested `author` field for every `ToDo`
+
+== Domain model
+
+Create an `Author` type:
+
+source:Author[]
+
+Create a `ToDo` type:
+
+source:ToDo[]
+
+== Repositories
+
+Store authors in memory:
+
+source:AuthorRepository[]
+
+Store ToDos in memory:
+
+source:ToDoRepository[]
+
+== DataLoader support
+
+Use a batch loader to resolve authors by id:
+
+source:AuthorDataLoader[]
+
+Register a request-scoped `DataLoaderRegistry`:
+
+source:DataLoaderRegistryFactory[]
+
+== GraphQL Java Tools resolvers
+
+Create the query resolver:
+
+source:ToDoQueryResolver[]
+
+Create the mutation resolver:
+
+source:ToDoMutationResolver[]
+
+Create a nested-field resolver for `ToDo.author`:
+
+source:ToDoResolver[]
+
+== GraphQL factory
+
+Create the executable schema with GraphQL Java Tools:
+
+source:GraphQLFactory[]
+
+common:runapp.adoc[]
+
+Query the current ToDos:
+
+[source,bash]
+----
+curl -X POST 'http://localhost:8080/graphql' \
+     -H 'content-type: application/json' \
+     --data-binary '{"query":"{ toDos { id title completed author { username } } }"}'
+----
+
+Create a new ToDo:
+
+[source,bash]
+----
+curl -X POST 'http://localhost:8080/graphql' \
+     -H 'content-type: application/json' \
+     --data-binary '{"query":"mutation { createToDo(title:\"Write GraphQL Java Tools guide\", author:\"Ada\") { id title author { username } } }"}'
+----
+
+== Test the application
+
+Create an integration test that exercises the full query and mutation flow:
+
+test:GraphQLControllerTest[]
+
+The test covers:
+
+* the initial ToDo list
+* creating a ToDo with an author
+* completing and deleting a ToDo
+* resolving the nested `author` field through the DataLoader-backed resolver
+
+== Next Steps
+
+Take a look at the https://micronaut-projects.github.io/micronaut-graphql/latest/guide/[Micronaut GraphQL documentation].
+
+common:helpWithMicronaut.adoc[]
