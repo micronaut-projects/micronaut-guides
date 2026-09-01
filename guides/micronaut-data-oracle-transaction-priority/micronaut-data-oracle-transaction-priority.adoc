@@ -1,6 +1,6 @@
 common:header.adoc[]
 
-In this guide, you will use Micronaut Data JDBC with Oracle transaction priority. A background transaction takes a row lock with `LOW` priority while a checkout transaction requests the same row with `HIGH` priority. Oracle can automatically roll back the lower-priority blocker, allowing the checkout to complete.
+In this guide, you will build a small inventory example with Micronaut Data JDBC and Oracle. A slow stock reconciliation represents background work with `LOW` priority. A customer checkout needs the same last item with `HIGH` priority. When Oracle's priority transaction settings are enabled, Oracle can roll back the reconciliation when the checkout has waited long enough, allowing the checkout to finish.
 
 Micronaut Data applies the priority by setting the Oracle session when the transaction starts and restores the session when the transaction ends. Application code only declares the priority; it does not issue `ALTER SESSION` statements.
 
@@ -20,10 +20,10 @@ resource:application.properties[tag=datasource]
 
 == Configure Oracle transaction priority
 
-Transaction priority is an Oracle instance feature. The database administrator chooses how long a higher-priority transaction waits and whether Oracle rolls back the lower-priority transaction:
+Transaction priority is an Oracle database feature. The database administrator chooses how long a higher-priority transaction waits and whether Oracle rolls back the lower-priority transaction. See Oracle's https://docs.oracle.com/en/database/oracle/oracle-database/26/admin/managing-transactions.html[Managing Transactions] documentation for the behavior and https://docs.oracle.com/en/database/oracle/oracle-database/26/refrn/PRIORITY_TXNS_MODE.html[`PRIORITY_TXNS_MODE`] parameter reference.
 
-* `PRIORITY_TXNS_HIGH_WAIT_TARGET` controls how long a `HIGH` transaction waits for a lower-priority blocker.
-* `PRIORITY_TXNS_MEDIUM_WAIT_TARGET` controls the equivalent wait for a `MEDIUM` transaction.
+* https://docs.oracle.com/en/database/oracle/oracle-database/26/refrn/PRIORITY_TXNS_HIGH_WAIT_TARGET.html[`PRIORITY_TXNS_HIGH_WAIT_TARGET`] controls how long a `HIGH` transaction waits for a lower-priority blocker.
+* https://docs.oracle.com/en/database/oracle/oracle-database/26/refrn/PRIORITY_TXNS_MEDIUM_WAIT_TARGET.html[`PRIORITY_TXNS_MEDIUM_WAIT_TARGET`] controls the equivalent wait for a `MEDIUM` transaction.
 * `PRIORITY_TXNS_MODE=ROLLBACK` enables priority-based rollback.
 
 For this guide, the Oracle Free Test Resources container copies a startup script into the database image:
@@ -40,51 +40,53 @@ resource:oracle/priority-txns.sql[]
 The startup script runs each time the database starts. If you change it while a Test Resources container is already running, run `./gradlew stopTestResourcesService` (and remove any manually started Oracle container) before retrying so the new script is applied.
 The Oracle container log should include `CONTAINER: running /container-entrypoint-startdb.d/priority-txns.sql`.
 
-== Account entity
+== Inventory item
 
-Create an account entity with a stable identifier so the two concurrent operations always target the same row:
+Create an inventory item with a stable identifier so the two operations always target the same row:
 
-source:Account[]
+source:InventoryItem[]
 
-== Repository
+== Inventory repository
 
-Declare an Oracle JDBC repository and a native `SELECT FOR UPDATE` query:
+Declare an Oracle JDBC repository and a native `SELECT FOR UPDATE` query. The query is used only by the service methods that need to hold the item lock:
 
-source:AccountRepository[]
+source:InventoryItemRepository[]
 
 <1> The `ORACLE` dialect makes Micronaut Data generate Oracle-compatible SQL.
 <2> `FOR UPDATE` holds the row lock until the surrounding transaction ends.
 
-== Priority-aware service
+== Inventory operations with different priorities
 
-The service has one method for each priority:
+The service models two business operations. Stock reconciliation is background work, so it uses `LOW` priority. Customer checkout is the critical operation, so it uses `HIGH` priority:
 
-source:AccountService[]
+source:InventoryService[]
 
 <1> `@OracleTransactional` is a transaction boundary that also applies the selected Oracle session priority.
-<2> The low-priority method updates the row, signals that the lock is held, and pauses so another transaction can contend for it.
-<3> The second update creates a JDBC round trip after the pause. If Oracle already rolled back the low-priority transaction, the Oracle priority error is reported here and Micronaut rolls the transaction back.
-<4> The high-priority checkout uses the same row lock and commits the critical update.
+<2> Reconciliation obtains the row lock, signals that it is held, and pauses while a slow external count is performed. This gives checkout time to contend for the lock.
+<3> This is the reconciliation write and an intentional post-wait JDBC round trip. If Oracle already rolled back reconciliation, the Oracle priority error is reported here and Micronaut rolls the transaction back. No earlier update is needed: `SELECT FOR UPDATE` already acquired the lock.
+<4> Checkout uses the same row lock and commits the critical update.
 
-== HTTP demo coordinator
+`@OracleTransactional` does not add an automatic retry loop. A priority rollback is a failed transaction, and Micronaut's normal transaction interceptor rolls it back. If an application wants to retry reconciliation, it should start a new transaction, re-read the item, and revalidate that the work is still needed. Blindly replaying stale inventory data could overwrite the successful checkout, so this example leaves that business decision to its caller.
 
-Use a blocking executor so the low-priority transaction can remain open while the high-priority transaction runs independently:
+== Inventory HTTP API
 
-source:TransactionPriorityDemo[]
+Expose the business operations as blocking HTTP endpoints:
 
-Expose endpoints to reset the row, start each transaction, and inspect the result:
+source:InventoryController[]
 
-source:TransactionPriorityDemoController[]
+The reconciliation request intentionally remains open while its transaction owns the row lock. Send checkout from a second HTTP request; each request is handled by Micronaut's blocking worker pool, so the application does not need to create or manage an `ExecutorService`.
+
+The controller records operation states and events so the outcome is easy to inspect while running the demo.
 
 == Test
 
-The test starts a low-priority transaction, starts a high-priority transaction while the row is locked, and waits for Oracle to report the priority rollback:
+The test sends the long-running reconciliation request asynchronously, then sends checkout as a separate request while the item is locked. The concurrency is test setup; the application code remains ordinary request-handling code:
 
-test:TransactionPriorityDemoControllerTest[]
+test:InventoryControllerTest[]
 
 <1> Disable the test transaction so the service methods create their own independent transactions.
-<2> The low operation holds the lock long enough for the configured five-second high-priority wait target to elapse.
-<3> The high-priority operation commits while the low-priority operation ends in rollback.
+<2> The reconciliation holds the lock long enough for the configured five-second high-priority wait target to elapse. The controller reports its expected rollback as `409 CONFLICT`, which the test captures explicitly.
+<3> Checkout waits for the lock and commits while reconciliation ends in rollback.
 
 common:testApp.adoc[]
 
@@ -92,40 +94,40 @@ Micronaut Test Resources starts an Oracle Free container and applies `priority-t
 
 == Run the contention demo
 
-Start the application with `./gradlew run` or `./mvnw mn:run`. Reset the demo account:
+Start the application with `./gradlew run` or `./mvnw mn:run`. Reset the demo item:
 
 [source,bash]
 ----
-curl -X POST http://localhost:8080/demo/reset
+curl -X POST http://localhost:8080/inventory/reset
 ----
 
-Start the low-priority transaction. It returns after the row lock is acquired:
-
-[source,bash]
-----
-curl -X POST 'http://localhost:8080/demo/low?holdSeconds=20'
-----
-
-While the low-priority transaction is sleeping, start the high-priority checkout:
+In one terminal, start the slow stock reconciliation. The request remains open while it owns the row lock:
 
 [source,bash]
 ----
-curl -X POST http://localhost:8080/demo/high
+curl -X POST 'http://localhost:8080/inventory/reconcile?holdSeconds=20'
+----
+
+While reconciliation is sleeping, use a second terminal for the customer checkout:
+
+[source,bash]
+----
+curl -X POST http://localhost:8080/inventory/checkout
 ----
 
 Poll the status endpoint:
 
 [source,bash]
 ----
-curl http://localhost:8080/demo
+curl http://localhost:8080/inventory
 ----
 
-With the settings from `priority-txns.sql`, the expected result is `high=COMMITTED`, `low=ROLLED_BACK`, and an account balance of `100.0`. The event list includes the Oracle error received by the low-priority transaction. Without `PRIORITY_TXNS_MODE=ROLLBACK`, both transactions can commit, because the database has not been instructed to resolve the contention by rolling back the blocker.
+With the settings from `priority-txns.sql`, the expected result is `checkout=COMMITTED`, `reconciliation=ROLLED_BACK`, and an item with `availableQuantity=0` and `status=CHECKED_OUT`. The event list includes the Oracle error received by the reconciliation request. Without `PRIORITY_TXNS_MODE=ROLLBACK`, both transactions can commit because the database has not been instructed to resolve the contention by rolling back the blocker.
 
 In a non-containerized environment, a DBA must apply the same three `ALTER SYSTEM` statements to the Oracle instance. The application user does not need access to `V$TRANSACTION` or `V$SESSION` for this feature.
 
 == Next steps
 
-Read more about https://micronaut-projects.github.io/micronaut-data/latest/guide/#transactions[Micronaut Data transactions] and https://docs.oracle.com/en/database/oracle/oracle-database/26/admin/managing-processes.html[Oracle transaction priority].
+Read more about https://micronaut-projects.github.io/micronaut-data/latest/guide/#transactions[Micronaut Data transactions] and Oracle's https://docs.oracle.com/en/database/oracle/oracle-database/26/admin/managing-transactions.html[transaction priority] documentation.
 
 common:helpWithMicronaut.adoc[]

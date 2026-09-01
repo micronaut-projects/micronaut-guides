@@ -1,6 +1,7 @@
 package example.micronaut;
 
 public enum Status {
-    ACTIVE,
-    INACTIVE
+    AVAILABLE,
+    RECONCILED,
+    CHECKED_OUT
 }
