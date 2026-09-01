@@ -15,7 +15,6 @@
  */
 package example.micronaut
 
-import groovy.transform.CompileStatic
 import io.micronaut.data.annotation.Embeddable
 import io.micronaut.data.annotation.GeneratedValue
 import io.micronaut.data.annotation.Id
@@ -26,43 +25,18 @@ import io.micronaut.data.annotation.sql.ETaggable
 import io.micronaut.data.annotation.sql.GeneratedETag
 
 // tag::generated-etag[]
-@CompileStatic
-@MappedEntity('etag_book')
+@MappedEntity
 @ETaggable // <1>
-class ETagBook {
-    @Id
-    @GeneratedValue
-    Long id
-    String title
-    @Relation(Relation.Kind.EMBEDDED)
-    BookDetails details
-    @GeneratedETag
-    String etag // <2>
-
-    ETagBook() {
-    }
-
-    ETagBook(Long id, String title, BookDetails details, String etag) {
-        this.id = id
-        this.title = title
-        this.details = details
-        this.etag = etag
-    }
-
-    @CompileStatic
+data class Book(
+    @field:Id @field:GeneratedValue val id: Long? = null,
+    val title: String,
+    @field:Relation(Relation.Kind.EMBEDDED) val details: BookDetails,
+    @field:GeneratedETag val etag: String? = null // <2>
+) {
     @Embeddable
-    static class BookDetails {
-        int pages
-        @ETagValue(exclude = true) // <3>
-        int chapters
-
-        BookDetails() {
-        }
-
-        BookDetails(int pages, int chapters) {
-            this.pages = pages
-            this.chapters = chapters
-        }
-    }
+    data class BookDetails(
+        val pages: Int,
+        @field:ETagValue(exclude = true) val chapters: Int // <3>
+    )
 }
 // end::generated-etag[]

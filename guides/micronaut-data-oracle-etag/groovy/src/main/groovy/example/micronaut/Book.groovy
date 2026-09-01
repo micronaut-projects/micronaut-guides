@@ -16,34 +16,53 @@
 package example.micronaut
 
 import groovy.transform.CompileStatic
+import io.micronaut.data.annotation.Embeddable
 import io.micronaut.data.annotation.GeneratedValue
 import io.micronaut.data.annotation.Id
 import io.micronaut.data.annotation.MappedEntity
+import io.micronaut.data.annotation.Relation
 import io.micronaut.data.annotation.sql.ETagValue
+import io.micronaut.data.annotation.sql.ETaggable
 import io.micronaut.data.annotation.sql.GeneratedETag
 
-// tag::explicit-etag[]
+// tag::generated-etag[]
 @CompileStatic
-@MappedEntity('explicit_etag_book')
-class ExplicitETagBook {
+@MappedEntity
+@ETaggable // <1>
+class Book {
     @Id
     @GeneratedValue
-    @ETagValue
     Long id
-    @ETagValue
     String title
-    String notes
-    @GeneratedETag(function = 'SYS_ROW_ETAG')
-    String etag
+    @Relation(Relation.Kind.EMBEDDED)
+    BookDetails details
+    @GeneratedETag
+    String etag // <2>
 
-    ExplicitETagBook() {
+    Book() {
     }
 
-    ExplicitETagBook(Long id, String title, String notes, String etag) {
+    Book(Long id, String title, BookDetails details, String etag) {
         this.id = id
         this.title = title
-        this.notes = notes
+        this.details = details
         this.etag = etag
     }
+
+    @CompileStatic
+    @Embeddable
+    static class BookDetails {
+        int pages
+        @ETagValue(exclude = true) // <3>
+        int chapters
+
+        BookDetails() {
+        }
+
+        BookDetails(int pages, int chapters) {
+            this.pages = pages
+            this.chapters = chapters
+        }
+    }
 }
-// end::explicit-etag[]
+// end::generated-etag[]

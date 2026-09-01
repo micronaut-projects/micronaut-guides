@@ -18,11 +18,17 @@ resource:application.properties[tag=testresources]
 
 The datasource uses the Oracle dialect and schema generation creates the sample tables. Test Resources supplies the JDBC URL, username, and password by starting an Oracle Free container.
 
+== Why use value-based optimistic locking
+
+Without optimistic locking, two transactions can read the same row and later updates can overwrite one another without detecting that the data changed in between. An ETag gives each read a value representing the selected row values. Micronaut Data includes that value in the `UPDATE` and `DELETE` predicates, so a stale entity matches no row and results in an api:data.exceptions.OptimisticLockException[].
+
+This approach is useful when you need to prevent lost updates but cannot add a dedicated version column, or when you want to use Oracle's built-in row ETag instead of maintaining one yourself. Compared with an ordinary update, it detects stale data. The trade-off is that an entity must be read with its current ETag before an update or delete. You can choose whether all eligible properties or only explicitly selected properties contribute to the ETag.
+
 == Entity with an implicit ETag
 
 Annotate a `String` property with `@GeneratedETag`. When the entity is annotated with `@ETaggable`, all eligible persistent scalar properties participate in the ETag calculation:
 
-source:ETagBook[tag=generated-etag]
+source:Book[tag=generated-etag]
 
 <1> `@ETaggable` includes eligible scalar properties such as `id`, `title`, and the embedded `pages` property.
 <2> `@GeneratedETag` marks `etag` as a generated, read-only version property. It is not a physical column.
@@ -30,7 +36,7 @@ source:ETagBook[tag=generated-etag]
 
 The `@ETagValue` annotation can also explicitly select ETag inputs when `@ETaggable` is not used:
 
-source:ExplicitETagBook[tag=explicit-etag]
+source:Article[tag=explicit-etag]
 
 In this example, only `id` and `title` participate. The `notes` property can change without changing the ETag. The explicit `function` value is the function name only; Micronaut Data supplies the input columns. If `function` is omitted, Oracle's dialect default, `SYS_ROW_ETAG`, is used.
 
@@ -38,7 +44,7 @@ In this example, only `id` and `title` participate. The `notes` property can cha
 
 Declare an Oracle JDBC repository:
 
-source:ETagBookRepository[]
+source:BookRepository[]
 
 <1> The repository dialect must match the database because Micronaut Data computes SQL at compilation time.
 
@@ -48,7 +54,7 @@ The ETag is projected when an entity is read. Micronaut Data then uses the same 
 
 Add a test that verifies a fresh ETag succeeds and a stale ETag fails:
 
-test:ETagRepositoryTest[]
+test:OptimisticLockingTest[]
 
 <1> Reload the entity after saving it to obtain the computed ETag.
 <2> A successful update changes an ETag input, so reload the entity before another optimistic-locking write.

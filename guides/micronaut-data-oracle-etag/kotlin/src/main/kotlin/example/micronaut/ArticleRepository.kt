@@ -20,4 +20,4 @@ import io.micronaut.data.model.query.builder.sql.Dialect
 import io.micronaut.data.repository.CrudRepository
 
 @JdbcRepository(dialect = Dialect.ORACLE)
-interface ExplicitETagBookRepository : CrudRepository<ExplicitETagBook, Long>
+interface ArticleRepository : CrudRepository<Article, Long>

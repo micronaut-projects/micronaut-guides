@@ -21,25 +21,25 @@ import jakarta.inject.Inject
 import spock.lang.Specification
 
 @MicronautTest(transactional = false)
-class ETagRepositorySpec extends Specification {
+class OptimisticLockingSpec extends Specification {
 
     @Inject
-    ETagBookRepository bookRepository
+    BookRepository bookRepository
 
     @Inject
-    ExplicitETagBookRepository explicitBookRepository
+    ArticleRepository articleRepository
 
     void 'stale etag prevents an update'() {
         when:
-        def saved = bookRepository.save(new ETagBook(null, 'Initial', new ETagBook.BookDetails(200, 10), null))
+        def saved = bookRepository.save(new Book(null, 'Initial', new Book.BookDetails(200, 10), null))
         def fresh = bookRepository.findById(saved.id).orElseThrow() // <1>
 
         then:
         fresh.etag != null
 
         when:
-        bookRepository.update(new ETagBook(fresh.id, 'Updated', fresh.details, fresh.etag)) // <2>
-        bookRepository.update(new ETagBook(fresh.id, 'Stale', fresh.details, fresh.etag)) // <3>
+        bookRepository.update(new Book(fresh.id, 'Updated', fresh.details, fresh.etag)) // <2>
+        bookRepository.update(new Book(fresh.id, 'Stale', fresh.details, fresh.etag)) // <3>
 
         then:
         thrown(OptimisticLockException)
@@ -47,12 +47,12 @@ class ETagRepositorySpec extends Specification {
 
     void 'changing an excluded field does not change the etag'() {
         given:
-        def saved = explicitBookRepository.save(new ExplicitETagBook(null, 'Oracle', 'Initial notes', null))
-        def fresh = explicitBookRepository.findById(saved.id).orElseThrow()
+        def saved = articleRepository.save(new Article(null, 'Oracle', 'Initial notes', null))
+        def fresh = articleRepository.findById(saved.id).orElseThrow()
 
         when:
-        explicitBookRepository.update(new ExplicitETagBook(fresh.id, fresh.title, 'Updated notes', fresh.etag))
-        def reloaded = explicitBookRepository.findById(fresh.id).orElseThrow()
+        articleRepository.update(new Article(fresh.id, fresh.title, 'Updated notes', fresh.etag))
+        def reloaded = articleRepository.findById(fresh.id).orElseThrow()
 
         then:
         reloaded.notes == 'Updated notes'

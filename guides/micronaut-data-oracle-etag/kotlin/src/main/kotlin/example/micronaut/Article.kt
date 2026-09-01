@@ -15,28 +15,18 @@
  */
 package example.micronaut
 
-import io.micronaut.data.annotation.Embeddable
 import io.micronaut.data.annotation.GeneratedValue
 import io.micronaut.data.annotation.Id
 import io.micronaut.data.annotation.MappedEntity
-import io.micronaut.data.annotation.Relation
 import io.micronaut.data.annotation.sql.ETagValue
-import io.micronaut.data.annotation.sql.ETaggable
 import io.micronaut.data.annotation.sql.GeneratedETag
 
-// tag::generated-etag[]
-@MappedEntity("etag_book")
-@ETaggable // <1>
-data class ETagBook(
-    @field:Id @field:GeneratedValue val id: Long? = null,
-    val title: String,
-    @field:Relation(Relation.Kind.EMBEDDED) val details: BookDetails,
-    @field:GeneratedETag val etag: String? = null // <2>
-) {
-    @Embeddable
-    data class BookDetails(
-        val pages: Int,
-        @field:ETagValue(exclude = true) val chapters: Int // <3>
-    )
-}
-// end::generated-etag[]
+// tag::explicit-etag[]
+@MappedEntity
+data class Article(
+    @field:Id @field:GeneratedValue @field:ETagValue val id: Long? = null,
+    @field:ETagValue val title: String,
+    val notes: String,
+    @field:GeneratedETag(function = "SYS_ROW_ETAG") val etag: String? = null
+)
+// end::explicit-etag[]

@@ -15,6 +15,7 @@
  */
 package example.micronaut
 
+import groovy.transform.CompileStatic
 import io.micronaut.data.annotation.GeneratedValue
 import io.micronaut.data.annotation.Id
 import io.micronaut.data.annotation.MappedEntity
@@ -22,11 +23,27 @@ import io.micronaut.data.annotation.sql.ETagValue
 import io.micronaut.data.annotation.sql.GeneratedETag
 
 // tag::explicit-etag[]
-@MappedEntity("explicit_etag_book")
-data class ExplicitETagBook(
-    @field:Id @field:GeneratedValue @field:ETagValue val id: Long? = null,
-    @field:ETagValue val title: String,
-    val notes: String,
-    @field:GeneratedETag(function = "SYS_ROW_ETAG") val etag: String? = null
-)
+@CompileStatic
+@MappedEntity
+class Article {
+    @Id
+    @GeneratedValue
+    @ETagValue
+    Long id
+    @ETagValue
+    String title
+    String notes
+    @GeneratedETag(function = 'SYS_ROW_ETAG')
+    String etag
+
+    Article() {
+    }
+
+    Article(Long id, String title, String notes, String etag) {
+        this.id = id
+        this.title = title
+        this.notes = notes
+        this.etag = etag
+    }
+}
 // end::explicit-etag[]

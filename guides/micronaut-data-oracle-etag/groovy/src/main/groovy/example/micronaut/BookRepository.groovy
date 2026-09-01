@@ -13,21 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package example.micronaut;
+package example.micronaut
 
-import io.micronaut.core.annotation.Nullable;
-import io.micronaut.data.annotation.GeneratedValue;
-import io.micronaut.data.annotation.Id;
-import io.micronaut.data.annotation.MappedEntity;
-import io.micronaut.data.annotation.sql.ETagValue;
-import io.micronaut.data.annotation.sql.GeneratedETag;
+import io.micronaut.data.jdbc.annotation.JdbcRepository
+import io.micronaut.data.model.query.builder.sql.Dialect
+import io.micronaut.data.repository.CrudRepository
 
-// tag::explicit-etag[]
-@MappedEntity("explicit_etag_book")
-public record ExplicitETagBook(
-    @Id @GeneratedValue @ETagValue Long id,
-    @ETagValue String title,
-    String notes,
-    @GeneratedETag(function = "SYS_ROW_ETAG") @Nullable String etag) {
+@JdbcRepository(dialect = Dialect.ORACLE) // <1>
+interface BookRepository extends CrudRepository<Book, Long> {
 }
-// end::explicit-etag[]

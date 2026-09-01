@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package example.micronaut
+package example.micronaut;
 
-import io.micronaut.data.jdbc.annotation.JdbcRepository
-import io.micronaut.data.model.query.builder.sql.Dialect
-import io.micronaut.data.repository.CrudRepository
+import io.micronaut.data.jdbc.annotation.JdbcRepository;
+import io.micronaut.data.model.query.builder.sql.Dialect;
+import io.micronaut.data.repository.CrudRepository;
 
-@JdbcRepository(dialect = Dialect.ORACLE) // <1>
-interface ETagBookRepository extends CrudRepository<ETagBook, Long> {
+@JdbcRepository(dialect = Dialect.ORACLE)
+public interface ArticleRepository extends CrudRepository<Article, Long> {
 }

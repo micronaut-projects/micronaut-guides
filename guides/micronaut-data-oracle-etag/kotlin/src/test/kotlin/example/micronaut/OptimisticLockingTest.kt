@@ -24,17 +24,17 @@ import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 
 @MicronautTest(transactional = false)
-class ETagRepositoryTest {
+class OptimisticLockingTest {
 
     @Inject
-    lateinit var bookRepository: ETagBookRepository
+    lateinit var bookRepository: BookRepository
 
     @Inject
-    lateinit var explicitBookRepository: ExplicitETagBookRepository
+    lateinit var articleRepository: ArticleRepository
 
     @Test
     fun staleEtagPreventsAnUpdate() {
-        val saved = bookRepository.save(ETagBook(title = "Initial", details = ETagBook.BookDetails(200, 10)))
+        val saved = bookRepository.save(Book(title = "Initial", details = Book.BookDetails(200, 10)))
         val fresh = bookRepository.findById(saved.id!!).orElseThrow() // <1>
         assertNotNull(fresh.etag)
 
@@ -48,13 +48,13 @@ class ETagRepositoryTest {
 
     @Test
     fun changingAnExcludedFieldDoesNotChangeTheEtag() {
-        val saved = explicitBookRepository.save(
-            ExplicitETagBook(title = "Oracle", notes = "Initial notes")
+        val saved = articleRepository.save(
+            Article(title = "Oracle", notes = "Initial notes")
         )
-        val fresh = explicitBookRepository.findById(saved.id!!).orElseThrow()
+        val fresh = articleRepository.findById(saved.id!!).orElseThrow()
 
-        explicitBookRepository.update(fresh.copy(notes = "Updated notes"))
-        val reloaded = explicitBookRepository.findById(fresh.id!!).orElseThrow()
+        articleRepository.update(fresh.copy(notes = "Updated notes"))
+        val reloaded = articleRepository.findById(fresh.id!!).orElseThrow()
 
         assertEquals("Updated notes", reloaded.notes)
         assertEquals(fresh.etag, reloaded.etag)
