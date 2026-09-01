@@ -1,0 +1,131 @@
+common:header.adoc[]
+
+In this guide, you will use Micronaut Data JDBC with Oracle transaction priority. A background transaction takes a row lock with `LOW` priority while a checkout transaction requests the same row with `HIGH` priority. Oracle can automatically roll back the lower-priority blocker, allowing the checkout to complete.
+
+Micronaut Data applies the priority by setting the Oracle session when the transaction starts and restores the session when the transaction ends. Application code only declares the priority; it does not issue `ALTER SESSION` statements.
+
+common:requirements.adoc[]
+
+* https://www.docker.io/gettingstarted/[Docker] installed to run Oracle Database with https://micronaut-projects.github.io/micronaut-test-resources/latest/guide/[Micronaut Test Resources].
+
+common:completesolution.adoc[]
+
+common:create-app-features.adoc[]
+
+common:oracle-driver.adoc[]
+
+common:datasource-configuration-oracle.adoc[]
+
+resource:application.properties[tag=datasource]
+
+== Configure Oracle transaction priority
+
+Transaction priority is an Oracle instance feature. The database administrator chooses how long a higher-priority transaction waits and whether Oracle rolls back the lower-priority transaction:
+
+* `PRIORITY_TXNS_HIGH_WAIT_TARGET` controls how long a `HIGH` transaction waits for a lower-priority blocker.
+* `PRIORITY_TXNS_MEDIUM_WAIT_TARGET` controls the equivalent wait for a `MEDIUM` transaction.
+* `PRIORITY_TXNS_MODE=ROLLBACK` enables priority-based rollback.
+
+For this guide, the Oracle Free Test Resources container copies a startup script into the database image:
+
+resource:application.properties[tag=testresources]
+
+resource:oracle/priority-txns.sql[]
+
+<1> `copy-to-container` copies the SQL file before the Oracle container starts.
+<2> The script first sets CDB defaults, then switches to `FREEPDB1`, the PDB used by the Oracle Test Resources provider, and applies the same values there.
+<3> Oracle Free executes SQL files in `/container-entrypoint-startdb.d` through `sqlplus / as sysdba`, so the script can set instance parameters without granting the application user DBA privileges.
+<4> `SCOPE=MEMORY` keeps the settings local to the throwaway container.
+
+The startup script runs each time the database starts. If you change it while a Test Resources container is already running, run `./gradlew stopTestResourcesService` (and remove any manually started Oracle container) before retrying so the new script is applied.
+The Oracle container log should include `CONTAINER: running /container-entrypoint-startdb.d/priority-txns.sql`.
+
+== Account entity
+
+Create an account entity with a stable identifier so the two concurrent operations always target the same row:
+
+source:Account[]
+
+== Repository
+
+Declare an Oracle JDBC repository and a native `SELECT FOR UPDATE` query:
+
+source:AccountRepository[]
+
+<1> The `ORACLE` dialect makes Micronaut Data generate Oracle-compatible SQL.
+<2> `FOR UPDATE` holds the row lock until the surrounding transaction ends.
+
+== Priority-aware service
+
+The service has one method for each priority:
+
+source:AccountService[]
+
+<1> `@OracleTransactional` is a transaction boundary that also applies the selected Oracle session priority.
+<2> The low-priority method updates the row, signals that the lock is held, and pauses so another transaction can contend for it.
+<3> The second update creates a JDBC round trip after the pause. If Oracle already rolled back the low-priority transaction, the Oracle priority error is reported here and Micronaut rolls the transaction back.
+<4> The high-priority checkout uses the same row lock and commits the critical update.
+
+== HTTP demo coordinator
+
+Use a blocking executor so the low-priority transaction can remain open while the high-priority transaction runs independently:
+
+source:TransactionPriorityDemo[]
+
+Expose endpoints to reset the row, start each transaction, and inspect the result:
+
+source:TransactionPriorityDemoController[]
+
+== Test
+
+The test starts a low-priority transaction, starts a high-priority transaction while the row is locked, and waits for Oracle to report the priority rollback:
+
+test:TransactionPriorityDemoControllerTest[]
+
+<1> Disable the test transaction so the service methods create their own independent transactions.
+<2> The low operation holds the lock long enough for the configured five-second high-priority wait target to elapse.
+<3> The high-priority operation commits while the low-priority operation ends in rollback.
+
+common:testApp.adoc[]
+
+Micronaut Test Resources starts an Oracle Free container and applies `priority-txns.sql` as SYSDBA before the test connects as the normal application user.
+
+== Run the contention demo
+
+Start the application with `./gradlew run` or `./mvnw mn:run`. Reset the demo account:
+
+[source,bash]
+----
+curl -X POST http://localhost:8080/demo/reset
+----
+
+Start the low-priority transaction. It returns after the row lock is acquired:
+
+[source,bash]
+----
+curl -X POST 'http://localhost:8080/demo/low?holdSeconds=20'
+----
+
+While the low-priority transaction is sleeping, start the high-priority checkout:
+
+[source,bash]
+----
+curl -X POST http://localhost:8080/demo/high
+----
+
+Poll the status endpoint:
+
+[source,bash]
+----
+curl http://localhost:8080/demo
+----
+
+With the settings from `priority-txns.sql`, the expected result is `high=COMMITTED`, `low=ROLLED_BACK`, and an account balance of `100.0`. The event list includes the Oracle error received by the low-priority transaction. Without `PRIORITY_TXNS_MODE=ROLLBACK`, both transactions can commit, because the database has not been instructed to resolve the contention by rolling back the blocker.
+
+In a non-containerized environment, a DBA must apply the same three `ALTER SYSTEM` statements to the Oracle instance. The application user does not need access to `V$TRANSACTION` or `V$SESSION` for this feature.
+
+== Next steps
+
+Read more about https://micronaut-projects.github.io/micronaut-data/latest/guide/#transactions[Micronaut Data transactions] and https://docs.oracle.com/en/database/oracle/oracle-database/26/admin/managing-processes.html[Oracle transaction priority].
+
+common:helpWithMicronaut.adoc[]
