@@ -1,0 +1,97 @@
+common:header.adoc[]
+
+== Getting Started
+
+In this guide, you will use Oracle Database as the backend for a Micronaut cache.
+
+To learn the basics of Micronaut Cache and its caching annotations, see the https://guides.micronaut.io/latest/micronaut-cache.html[Micronaut Cache guide].
+
+common:requirements.adoc[]
+
+To run the application locally, you need Docker. Micronaut Test Resources starts an Oracle Database container automatically.
+
+common:completesolution.adoc[]
+
+common:create-app.adoc[]
+
+=== Configure Oracle Database
+
+The Oracle cache uses a Micronaut Data datasource. Configure the Oracle driver, database type, and dialect:
+
+resource:application.properties[tag=datasource]
+
+<1> Use the Oracle JDBC driver.
+<2> Allow Micronaut Test Resources to detect Oracle Database.
+<3> Configure the Oracle dialect.
+
+=== Configure the Cache
+
+Add the https://micronaut-projects.github.io/micronaut-cache/latest/guide/[Micronaut Oracle Cache] dependency:
+
+dependency:micronaut-cache-oracle[groupId=io.micronaut.cache]
+
+The cache schema is initialized with Flyway when Flyway and the Oracle Flyway database support module are on the runtime classpath:
+
+dependency:micronaut-flyway[groupId=io.micronaut.flyway,scope=runtimeOnly]
+dependency:flyway-database-oracle[groupId=org.flywaydb,scope=runtimeOnly]
+
+Configure the datasource used by the cache, an SQL object prefix, and a named cache:
+
+resource:application.properties[tag=cache]
+
+<1> Select the Micronaut datasource that stores cache data.
+<2> Prefix cache tables, indexes, stored procedures, and Flyway history. The default is `MN`.
+<3> Expire entries ten minutes after they are written.
+<4> Run the Oracle scheduler cleanup job every minute.
+
+[IMPORTANT]
+.Bring your own Oracle database
+====
+For production, configure a datasource for an Oracle Database that you manage. The datasource user needs permission to create the cache tables, indexes, and stored procedures. It also needs the Oracle scheduler privileges required to create and manage cleanup jobs.
+====
+
+=== Cache Values
+
+The Oracle cache serializes cache values. Mark the value type as `@Serdeable`:
+
+source:News[]
+
+<1> Makes the cache value serializable with Micronaut Serialization.
+
+Use the standard Micronaut cache annotations. The Oracle implementation persists the cache entry instead of keeping it in process memory:
+
+source:NewsService[]
+
+callout:singleton[]
+<.> Sets `headlines` as the cache name.
+<.> Caches each result using the method argument as the key.
+
+=== Test the Cache
+
+Micronaut Test Resources starts Oracle Database in Docker for the test and local development:
+
+resource:application.properties[tag=testresources]
+
+test:NewsServiceTest[]
+
+callout:micronaut-test-start-application-false[]
+<.> Inject the cacheable service.
+<.> Verify that the second invocation returns the persisted cache value without invoking the method again.
+
+common:test-resources-benefits.adoc[]
+
+=== Cache Availability and Concurrency
+
+Oracle cache failures fail open by default: cache repository failures are logged and the underlying operation continues. Set `fail-open: false` for a cache if Oracle cache failures must reach the caller. After a fail-open failure, the cache bypasses Oracle for `fail-open-retry-interval`, which defaults to `30s`.
+
+Enable `blocking: true` to coordinate concurrent writes through Oracle. Use `lock-wait-timeout` to bound how long a writer waits for that database lock.
+
+You can also use `maximum-size`, `maximum-weight`, `cleanup-batch-size`, `expire-after-write`, and `expire-after-access` to control cache retention and cleanup.
+
+common:runapp.adoc[]
+
+== Next Steps
+
+Read about Micronaut https://docs.micronaut.io/latest/guide/#caching[Cache Advice] and the https://micronaut-projects.github.io/micronaut-cache/latest/guide/[Micronaut Cache documentation].
+
+common:helpWithMicronaut.adoc[]
