@@ -17,9 +17,13 @@ package example.micronaut;
 
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
+import org.flywaydb.core.Flyway;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import javax.sql.DataSource;
 import java.time.Month;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -28,6 +32,20 @@ class NewsServiceTest {
 
     @Inject // <2>
     NewsService newsService;
+
+    @Inject
+    DataSource dataSource;
+
+    @BeforeEach
+    void migrateCacheSchema() {
+        Flyway.configure()
+            .dataSource(dataSource)
+            .locations("classpath:db/migration/oracle-cache")
+            .placeholders(Map.of("cachePrefix", "MN"))
+            .table("FLYWAY_SCHEMA_HISTORY_MN")
+            .load()
+            .migrate();
+    }
 
     @Test
     void cachesHeadlinesInOracle() {
