@@ -1,0 +1,112 @@
+common:header-top.adoc[]
+
+== Getting Started
+
+In this guide, you will create a Micronaut application written in @language@ that secures a GraphQL API with https://jwt.io/[JSON Web Tokens].
+
+The application exposes:
+
+* a `login` mutation which authenticates a user and writes the JWT to a cookie
+* a `currentUser` query which returns the authenticated user from the Micronaut Security context
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+common:create-app-features.adoc[]
+
+== Configuration
+
+Configure JWT cookie authentication and allow anonymous access to the GraphQL endpoint so the `login` mutation can run:
+
+resource:application.properties[]
+
+== Describe the schema
+
+Create `src/main/resources/schema.graphqls`:
+
+resource:schema.graphqls[]
+
+== Domain model
+
+Create a `User` type:
+
+source:User[]
+
+Store a couple of in-memory users in a repository:
+
+source:UserRepository[]
+
+== Authentication provider
+
+Create an `AuthenticationProvider` backed by the repository:
+
+source:AuthenticationProviderUserPassword[]
+
+== Pass the request and response into GraphQL
+
+The login mutation needs access to the `HttpRequest` and `MutableHttpResponse` so it can ask Micronaut Security to write the authentication cookie.
+
+source:RequestResponseCustomizer[]
+
+== Data fetchers
+
+Create a query data fetcher that resolves the currently authenticated user:
+
+source:CurrentUserDataFetcher[]
+
+Create a payload object for the login mutation:
+
+source:LoginPayload[]
+
+Create the login mutation data fetcher:
+
+source:LoginDataFetcher[]
+
+The mutation authenticates the supplied credentials, copies the login cookie to the GraphQL HTTP response, and returns either the logged-in user or an error message.
+
+== GraphQL factory
+
+Bind the schema to the query and mutation fetchers:
+
+source:GraphQLFactory[]
+
+common:runapp.adoc[]
+
+Log in with a GraphQL mutation:
+
+[source,bash]
+----
+curl -i -X POST 'http://localhost:8080/graphql' \
+     -H 'content-type: application/json' \
+     --data-binary '{"query":"mutation { login(username:\"admin\", password:\"password\") { user { username roles } error } }"}'
+----
+
+Reuse the returned `Set-Cookie` header to query the authenticated user:
+
+[source,bash]
+----
+curl -X POST 'http://localhost:8080/graphql' \
+     -H 'content-type: application/json' \
+     -H 'Cookie: JWT=...' \
+     --data-binary '{"query":"{ currentUser { username firstName lastName roles } }"}'
+----
+
+== Test the application
+
+Create an integration test for the GraphQL authentication flow:
+
+test:GraphQLSecurityTest[]
+
+The test covers:
+
+* an anonymous `currentUser` query returning `null`
+* a successful `login` mutation setting a cookie
+* an authenticated `currentUser` query returning the logged-in user
+* a failed `login` mutation returning an error payload
+
+== Next Steps
+
+Take a look at the https://micronaut-projects.github.io/micronaut-graphql/latest/guide/[Micronaut GraphQL documentation] and the https://micronaut-projects.github.io/micronaut-security/latest/guide/#jwt[Micronaut Security JWT guide].
+
+common:helpWithMicronaut.adoc[]
