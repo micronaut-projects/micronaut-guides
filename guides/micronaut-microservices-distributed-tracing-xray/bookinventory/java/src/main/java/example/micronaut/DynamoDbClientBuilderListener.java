@@ -22,6 +22,7 @@ import io.micronaut.context.event.BeanCreatedEventListener;
 import io.micronaut.context.exceptions.ConfigurationException;
 import jakarta.inject.Singleton;
 import software.amazon.awssdk.auth.credentials.AwsCredentials;
+import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClientBuilder;
 
 import java.net.URI;
@@ -40,7 +41,7 @@ public class DynamoDbClientBuilderListener implements BeanCreatedEventListener<D
         try {
             this.endpoint = new URI("http://" + host + ":" + port);
         } catch (URISyntaxException e) {
-            throw new ConfigurationException("dynamodb.endpoint not a valid URI");
+            throw new ConfigurationException("dynamodb-local.host and dynamodb-local.port do not form a valid URI");
         }
         this.accessKeyId = "fakeMyKeyId";
         this.secretAccessKey = "fakeSecretAccessKey";
@@ -49,6 +50,7 @@ public class DynamoDbClientBuilderListener implements BeanCreatedEventListener<D
     @Override
     public DynamoDbClientBuilder onCreated(BeanCreatedEvent<DynamoDbClientBuilder> event) {
         return event.getBean().endpointOverride(endpoint)
+                .region(Region.US_EAST_1)
                 .credentialsProvider(() -> new AwsCredentials() {
                     @Override
                     public String accessKeyId() {
