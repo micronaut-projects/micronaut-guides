@@ -23,13 +23,15 @@ jobs:
   validate:
     name: Generate Python Guides
     runs-on: ubuntu-latest
+    env:
+      LOCAL_GIT_MICRONAUT_STARTER: ${{ github.workspace }}/micronaut-starter
     steps:
       - uses: actions/checkout@v6.0.2
       - uses: actions/checkout@v6.0.2
         with:
-          repository: micronaut-projects/micronaut-starter
-          # Python support landed in micronaut-starter#3130; pin its merge commit until 5.2.0 is released.
-          ref: f1cb8016c8e555bfbae1cdbc3e11eba913befbb0
+          repository: n0tl3ss/micronaut-starter
+          # Pin micronaut-starter#3136 until its fix is merged upstream.
+          ref: 763920aaa46c06aeebbaba995a66fc3bef643801
           path: micronaut-starter
       - uses: actions/setup-java@v5.2.0
         with:
@@ -41,7 +43,7 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-      - name: Validate build infrastructure and generate Python guides
-        run: ./gradlew buildSrc:test generateAllPythonGuideTestScripts --stacktrace
-        env:
-          LOCAL_GIT_MICRONAUT_STARTER: ${{ github.workspace }}/micronaut-starter
+      - name: Validate build infrastructure
+        run: ./gradlew buildSrc:test --stacktrace
+      - name: Generate Python guides
+        run: ./gradlew generateAllPythonGuideTestScripts --stacktrace
