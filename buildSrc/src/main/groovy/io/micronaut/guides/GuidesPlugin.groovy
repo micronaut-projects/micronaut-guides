@@ -54,6 +54,7 @@ class GuidesPlugin implements Plugin<Project> {
     private static final String KEY_WORKFLOW = "workflow"
     private static final String KEY_WORKFLOW_SNAPSHOT = "workflow-snapshot"
     private static final String TEST_RUNNER = "test-runner"
+    private static final String PYTHON_TEST_SCRIPT = "python-test-script"
     private static final String PYTHON_TEST_RUNNER = "python-test-runner"
     private static final String KEY_DOC = "doc"
     private static final String COMMA = ","
@@ -64,7 +65,7 @@ class GuidesPlugin implements Plugin<Project> {
     private static final String LOCAL_PYRONAUT_CORE_VERSION_ENV = "LOCAL_PYRONAUT_CORE_VERSION"
     private static final String LOCAL_PYRONAUT_PLATFORM_VERSION_PROPERTY = "local.pyronaut.platform.version"
     private static final String LOCAL_PYRONAUT_PLATFORM_VERSION_ENV = "LOCAL_PYRONAUT_PLATFORM_VERSION"
-    private static final String DEFAULT_LOCAL_PYRONAUT_CORE_VERSION = "5.2.0-SNAPSHOT"
+    private static final String DEFAULT_LOCAL_PYRONAUT_CORE_VERSION = "5.2.3"
     private static final String DEFAULT_LOCAL_PYRONAUT_PLATFORM_VERSION = "5.1.0"
     private static final String PYRONAUT_INCLUDED_BUILD_NAME = "pyronaut"
     private static final String PYRONAUT_FIXTURE_REPOSITORY = "functional-test/build/fixture-repo"
@@ -169,6 +170,7 @@ class GuidesPlugin implements Plugin<Project> {
                      (KEY_WORKFLOW)         : githubActionWorkflowTask,
                      (KEY_WORKFLOW_SNAPSHOT): githubActionSnapshotWorkflowTask,
                      (TEST_RUNNER)          : testScriptRunnerTask,
+                     (PYTHON_TEST_SCRIPT)   : pythonTestScriptTask,
                      (PYTHON_TEST_RUNNER)   : pythonTestScriptRunnerTask]
                 }).toList() as List<Map<String, TaskProvider<Task>>>
 
@@ -225,6 +227,17 @@ class GuidesPlugin implements Plugin<Project> {
             it.group = 'guides'
             it.description = 'Runs all Python Guide test scripts'
             it.dependsOn(pythonTestRunnerTasks)
+        }
+
+        List<TaskProvider<Task>> pythonTestScriptTasks = sampleTasks.stream()
+                .map(m -> m.get(PYTHON_TEST_SCRIPT))
+                .filter(Objects::nonNull)
+                .toList() as List<TaskProvider<Task>>
+
+        project.tasks.register("generateAllPythonGuideTestScripts") { Task it ->
+            it.group = 'guides'
+            it.description = 'Generates every Python guide project and test script without running Pyronaut'
+            it.dependsOn(pythonTestScriptTasks)
         }
 
         List<TaskProvider<Task>> zipTasks = sampleTasks.stream()

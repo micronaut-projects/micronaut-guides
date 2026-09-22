@@ -90,11 +90,6 @@ public class DependencyLines {
             dependencyLines.add("[source, xml]");
             dependencyLines.add(".pom.xml");
             dependencyLines.add("----");
-        } else if (buildTool == PYRONAUT) {
-            dependencyLines.add("[source, toml]");
-            dependencyLines.add(".pyproject.toml");
-            dependencyLines.add("----");
-            dependencyLines.add("[tool.pyronaut.dependencies]");
         }
 
         for (String line : lines) {
@@ -162,13 +157,6 @@ public class DependencyLines {
                         dependencyLines.add("");
                     }
                 }
-            } else if (buildTool == PYRONAUT) {
-                String coordinate = groupId + ':' + artifactId;
-                if (version != null) {
-                    coordinate += ':' + version;
-                }
-                String tomlCallout = callout.isEmpty() ? "" : " #" + callout.substring(" //".length());
-                dependencyLines.add(toPyronautScope(attributes) + " = [\"" + coordinate + "\"]" + tomlCallout);
             }
         }
 

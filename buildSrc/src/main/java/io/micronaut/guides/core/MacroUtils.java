@@ -7,6 +7,7 @@ import io.micronaut.starter.options.Language;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -25,12 +26,12 @@ public final class MacroUtils {
     }
 
     static String pythonModuleName(@NonNull String target) {
-        if (target.contains("_") || target.equals(target.toLowerCase())) {
+        if (target.equals(target.toLowerCase(Locale.ROOT))) {
             return target;
         }
         return target.replaceAll("([a-z0-9])([A-Z])", "$1_$2")
                 .replaceAll("([A-Z]+)([A-Z][a-z])", "$1_$2")
-                .toLowerCase();
+                .toLowerCase(Locale.ROOT);
     }
 
     static String pythonTestModuleName(@NonNull String target) {

@@ -1,6 +1,7 @@
 package io.micronaut.guides.core;
 
 import io.micronaut.core.annotation.NonNull;
+import io.micronaut.starter.options.Language;
 import jakarta.inject.Singleton;
 import jakarta.validation.constraints.NotNull;
 import org.gradle.api.GradleException;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static io.micronaut.core.util.StringUtils.EMPTY_STRING;
+import static io.micronaut.starter.options.BuildTool.PYRONAUT;
 import static io.micronaut.starter.options.Language.PYTHON;
 
 @Singleton
@@ -47,15 +49,15 @@ public class DefaultFilesTransferUtility implements FilesTransferUtility {
     }
 
     private static void copyGuideSourceFiles(File inputDir, Path destinationPath,
-                                             String appName, String language,
+                                             String appName, Language language,
                                              boolean ignoreMissingDirectories) throws IOException {
 
         // look for a common 'src' directory shared by multiple languages and copy those files first
         final String srcFolder = "src";
         Path srcPath = Paths.get(inputDir.getAbsolutePath(), appName, srcFolder);
-        Path sourcePath = Paths.get(inputDir.getAbsolutePath(), appName, language);
+        Path sourcePath = Paths.get(inputDir.getAbsolutePath(), appName, language.toString());
         if (Files.exists(srcPath)) {
-            if (language.equals(PYTHON.toString())) {
+            if (language == PYTHON) {
                 copySharedPythonResources(srcPath, sourcePath, destinationPath);
             } else {
                 Files.walkFileTree(srcPath, new CopyFileVisitor(Paths.get(destinationPath.toString(), srcFolder)));
@@ -162,10 +164,10 @@ public class DefaultFilesTransferUtility implements FilesTransferUtility {
 
                 if (guide.base() != null) {
                     File baseDir = new File(inputDirectory.getParentFile(), guide.base());
-                    copyGuideSourceFiles(baseDir, destinationPath, appName, guidesOption.getLanguage().toString(), true);
+                    copyGuideSourceFiles(baseDir, destinationPath, appName, guidesOption.getLanguage(), true);
                 }
 
-                copyGuideSourceFiles(inputDirectory, destinationPath, appName, guidesOption.getLanguage().toString(), false);
+                copyGuideSourceFiles(inputDirectory, destinationPath, appName, guidesOption.getLanguage(), false);
 
                 if (app.excludeSource() != null) {
                     for (String mainSource : app.excludeSource()) {
@@ -190,7 +192,7 @@ public class DefaultFilesTransferUtility implements FilesTransferUtility {
                         if (f.exists()) {
                             f.delete();
                         }
-                        if (guidesOption.getBuildTool() == io.micronaut.starter.options.BuildTool.PYRONAUT && guidesOption.getLanguage() == PYTHON) {
+                        if (guidesOption.getBuildTool() == PYRONAUT && guidesOption.getLanguage() == PYTHON) {
                             f = new File(destination, "tests/" + MacroUtils.pythonTestModuleName(testSource) + "." + guidesOption.getLanguage().getExtension());
                             if (f.exists()) {
                                 f.delete();

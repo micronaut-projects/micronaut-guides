@@ -111,7 +111,8 @@ public class DefaultGuideParser implements GuideParser {
                     app.pythonFeatures() != null ? app.pythonFeatures() : new ArrayList<>()
             ));
         }
-        boolean python = Boolean.TRUE.equals(raw.python());
+        Boolean pythonOption = config.containsKey("python") ? raw.python() : null;
+        boolean python = Boolean.TRUE.equals(pythonOption);
         List<Language> languages = raw.languages() != null
                 ? new ArrayList<>(raw.languages())
                 : new ArrayList<>(List.of(Language.JAVA, Language.GROOVY, Language.KOTLIN));
@@ -147,7 +148,7 @@ public class DefaultGuideParser implements GuideParser {
                 raw.base(),
                 raw.env() != null ? raw.env() : new HashMap<>(),
                 apps,
-                python,
+                pythonOption,
                 Boolean.TRUE.equals(raw.skipPyronautTests())
         ));
     }

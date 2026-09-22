@@ -43,6 +43,7 @@ class GuideAsciidocGenerator {
 
     public static final int DEFAULT_MIN_JDK = 21
     public static final String EXCLUDE_FOR_LANGUAGES = ':exclude-for-languages:'
+    public static final String ONLY_FOR_LANGUAGES = ':only-for-languages:'
     public static final String EXCLUDE_FOR_JDK_LOWER_THAN = ':exclude-for-jdk-lower-than:'
     public static final String EXCLUDE_FOR_BUILD = ':exclude-for-build:'
     public static final String DEFAULT_APP_NAME = "default"
@@ -81,6 +82,9 @@ class GuideAsciidocGenerator {
                     excludeLineForBuild = false
                 } else if (line == EXCLUDE_FOR_LANGUAGES) {
                     excludeLineForLanguage = false
+                } else if (line == ONLY_FOR_LANGUAGES) {
+                    excludeLineForLanguage = false
+                    continue
                 } else if (line == EXCLUDE_FOR_JDK_LOWER_THAN) {
                     excludeLineForMinJdk = false
                 }
@@ -129,6 +133,11 @@ class GuideAsciidocGenerator {
                 } else if (line.startsWith(EXCLUDE_FOR_LANGUAGES)) {
                     String[] languages = line.substring(EXCLUDE_FOR_LANGUAGES.length()).split(',')
                     if (languages.any { it == guidesOption.language.toString() }) {
+                        excludeLineForLanguage = true
+                    }
+                } else if (line.startsWith(ONLY_FOR_LANGUAGES)) {
+                    String[] languages = line.substring(ONLY_FOR_LANGUAGES.length()).split(',')
+                    if (!languages.any { it == guidesOption.language.toString() }) {
                         excludeLineForLanguage = true
                     }
                 } else if (line.startsWith(EXCLUDE_FOR_JDK_LOWER_THAN)) {

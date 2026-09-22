@@ -336,6 +336,7 @@ class IndexGenerator {
         String mavenImg = '<img src="./images/maven.svg" width="60" alt="Maven"/>'
         String gradleImg = '<img src="./images/gradle.svg" width="60" alt="Gradle"/>'
         String pyronautImg = '<span>Pyronaut</span>'
+        boolean hasPython = guidesOptionList.find { GuidesOption option -> option.language == Language.PYTHON } != null
 
         String tableHtml = """\
 <table class='build-language-grid'>
@@ -346,7 +347,9 @@ class IndexGenerator {
         tableHtml += "<th>${javaImg}</th>"
         tableHtml += "<th>${kotlinImg}</th>"
         tableHtml += "<th>${groovyImg}</th>"
-        tableHtml += "<th>${pythonImg}</th>"
+        if (hasPython) {
+            tableHtml += "<th>${pythonImg}</th>"
+        }
         tableHtml += """\
 </tr>
 </thead>
@@ -361,7 +364,9 @@ class IndexGenerator {
             tableHtml += cell(baseURL, metadata, BuildTool.GRADLE, Language.JAVA, guidesOptionList)
             tableHtml += cell(baseURL, metadata, BuildTool.GRADLE, Language.KOTLIN, guidesOptionList)
             tableHtml += cell(baseURL, metadata, BuildTool.GRADLE, Language.GROOVY, guidesOptionList)
-            tableHtml += cell(baseURL, metadata, BuildTool.GRADLE, Language.PYTHON, guidesOptionList)
+            if (hasPython) {
+                tableHtml += "<td></td>"
+            }
 
             tableHtml += """\
 </tr>
@@ -375,7 +380,9 @@ class IndexGenerator {
             tableHtml += cell(baseURL, metadata, BuildTool.MAVEN, Language.JAVA, guidesOptionList)
             tableHtml += cell(baseURL, metadata, BuildTool.MAVEN, Language.KOTLIN, guidesOptionList)
             tableHtml += cell(baseURL, metadata, BuildTool.MAVEN, Language.GROOVY, guidesOptionList)
-            tableHtml += cell(baseURL, metadata, BuildTool.MAVEN, Language.PYTHON, guidesOptionList)
+            if (hasPython) {
+                tableHtml += "<td></td>"
+            }
 
             tableHtml += """\
 </tr>
@@ -386,9 +393,7 @@ class IndexGenerator {
 <tr>
 <td>${pyronautImg}</td>
 """
-            tableHtml += cell(baseURL, metadata, BuildTool.PYRONAUT, Language.JAVA, guidesOptionList)
-            tableHtml += cell(baseURL, metadata, BuildTool.PYRONAUT, Language.KOTLIN, guidesOptionList)
-            tableHtml += cell(baseURL, metadata, BuildTool.PYRONAUT, Language.GROOVY, guidesOptionList)
+            tableHtml += "<td colspan='3'></td>"
             tableHtml += cell(baseURL, metadata, BuildTool.PYRONAUT, Language.PYTHON, guidesOptionList)
 
             tableHtml += """\

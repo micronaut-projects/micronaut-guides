@@ -166,7 +166,7 @@ public class TestScriptGeneratorTest {
         assertTrue(result.contains("run_pyronaut_install"));
         assertTrue(result.contains("run_pyronaut_process"));
         assertTrue(result.contains("run_pyronaut_cli"));
-        assertTrue(result.contains("test_args+=(--local-repository \"${PYRONAUT_DEPENDENCY_CACHE:-.pyronaut-m2}\")"));
+        assertTrue(result.contains("test_args+=(--local-repository \"$(pyronaut_dependency_cache)\")"));
         assertTrue(result.contains("run_pyronaut_cli test \"${test_args[@]}\""));
         assertFalse(result.contains("\"$PYRONAUT_TEST_EXECUTABLE\""));
         assertTrue(result.contains("set_pyronaut_local_repositories"));

@@ -8,6 +8,9 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static io.micronaut.starter.options.BuildTool.PYRONAUT;
+import static io.micronaut.starter.options.Language.PYTHON;
+
 public final class GuideUtils {
 
     private static final Logger LOG = LoggerFactory.getLogger(GuideUtils.class);
@@ -118,6 +121,25 @@ public final class GuideUtils {
     }
 
     public static Guide merge(Guide base, Guide guide) {
+        boolean python = guide.python() == null ? Boolean.TRUE.equals(base.python()) : guide.python();
+        List<Language> languages = new ArrayList<>();
+        if (guide.languages() != null) {
+            languages.addAll(guide.languages());
+        } else if (base.languages() != null) {
+            languages.addAll(base.languages());
+        }
+        if (python && !languages.contains(PYTHON)) {
+            languages.add(PYTHON);
+        }
+        List<BuildTool> buildTools = new ArrayList<>();
+        if (guide.buildTools() != null) {
+            buildTools.addAll(guide.buildTools());
+        } else if (base.buildTools() != null) {
+            buildTools.addAll(base.buildTools());
+        }
+        if (python && !buildTools.contains(PYRONAUT)) {
+            buildTools.add(PYRONAUT);
+        }
         return new Guide(
                 guide.title() == null ? base.title() : guide.title(),
                 guide.intro() == null ? base.intro() : guide.intro(),
@@ -130,9 +152,9 @@ public final class GuideUtils {
                 base.skipGradleTests() || guide.skipGradleTests(),
                 base.skipMavenTests() || guide.skipMavenTests(),
                 guide.asciidoctor(),
-                guide.languages() == null ? base.languages() : guide.languages(),
+                languages,
                 mergeLists(GuideUtils.getTags(base), GuideUtils.getTags(guide)),
-                guide.buildTools() == null ? base.buildTools() : guide.buildTools(),
+                buildTools,
                 guide.testFramework() == null ? base.testFramework() : guide.testFramework(),
                 guide.zipIncludes(),
                 guide.slug(),
@@ -140,8 +162,8 @@ public final class GuideUtils {
                 guide.base(),
                 guide.env() == null ? base.env() : guide.env(),
                 mergeApps(base.apps(), guide.apps()),
-                base.python() || guide.python(),
-                base.skipPyronautTests() || guide.skipPyronautTests()
+                python,
+                Boolean.TRUE.equals(base.skipPyronautTests()) || Boolean.TRUE.equals(guide.skipPyronautTests())
         );
     }
 

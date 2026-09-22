@@ -95,17 +95,6 @@ abstract class SourceBlockMacroSubstitution implements MacroSubstitution {
         return option.getLanguage().getExtension();
     }
 
-    protected String sourceTitle(
-            String appName,
-            String condensedTarget,
-            Classpath classpath,
-            String language,
-            String packageName) {
-        return (appName.equals(MacroSubstitution.APP_NAME_DEFAULT) ? "" : (appName + "/")) + sourceConventionFolder(classpath, language, null) + "/"
-                + (getFileType() == FileType.CODE ? (packageName.replace(".", "/") + "/") : "")
-                + condensedTarget;
-    }
-
     protected String sourceInclude(
             String slug,
             String appName,
@@ -116,10 +105,6 @@ abstract class SourceBlockMacroSubstitution implements MacroSubstitution {
             String packageName) {
         return "{sourceDir}/" + slug + "/" + getSourceDir(slug, option) + "/" +
                 sourceTitle(appName, condensedTarget, classpath, language, packageName, option);
-    }
-
-    private String sourceConventionFolder(Classpath classpath, String language) {
-        return sourceConventionFolder(classpath, language, null);
     }
 
     private String sourceConventionFolder(Classpath classpath, String language, GuidesOption option) {

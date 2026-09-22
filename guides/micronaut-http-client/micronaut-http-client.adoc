@@ -38,11 +38,11 @@ Create a record to parse the JSON response into an object:
 
 :exclude-for-languages:
 
-:exclude-for-languages:java,groovy,kotlin
+:only-for-languages:python
 
 Create a dataclass to parse the JSON response into an object:
 
-:exclude-for-languages:
+:only-for-languages:
 
 source:GithubRelease[]
 
@@ -56,13 +56,13 @@ resource:application.properties[tag=githubconfig]
 
 :exclude-for-languages:
 
-:exclude-for-languages:java,groovy,kotlin
+:only-for-languages:python
 
 Modify `config/application.toml` to create some configuration parameters.
 
 resource:application.toml[tag=githubconfig]
 
-:exclude-for-languages:
+:only-for-languages:
 
 To encapsulate type-safe configuration retrieval, we use a https://docs.micronaut.io/latest/guide/#configurationProperties[`@ConfigurationProperties`] object:
 
@@ -78,11 +78,11 @@ resource:application.properties[tag=jsoncodec]
 
 :exclude-for-languages:
 
-:exclude-for-languages:java,groovy,kotlin
+:only-for-languages:python
 
 resource:application.toml[tag=jsoncodec]
 
-:exclude-for-languages:
+:only-for-languages:
 
 ==== HTTP Client Service Configuration
 
@@ -94,11 +94,11 @@ resource:application.properties[tag=githubapi]
 
 :exclude-for-languages:
 
-:exclude-for-languages:java,groovy,kotlin
+:only-for-languages:python
 
 resource:application.toml[tag=githubapi]
 
-:exclude-for-languages:
+:only-for-languages:
 
 === Low Level Client
 
@@ -113,10 +113,10 @@ callout:singleton[]
 <.> Inject `HttpClient` via constructor injection. The `@Client` `id` member uses `github`; the service identifier set in the configuration.
 <.> Inject the previously defined configuration parameters.
 :exclude-for-languages:
-:exclude-for-languages:java,groovy,kotlin
+:only-for-languages:python
 <.> Inject `HttpClient` into an annotated class attribute. The `@Client` `id` member uses `github`; the service identifier set in the configuration.
 <.> Inject the previously defined configuration parameters into an annotated class attribute.
-:exclude-for-languages:
+:only-for-languages:
 callout:http-request[]
 <.> GitHub API requires to set the `User-Agent` header.
 <.> GitHub encourages to explicitly request the version 3 via the `Accept` header. With `@Header`, you add the `Accept: application/vnd.github.v3+json` HTTP header to every request.
@@ -145,11 +145,11 @@ Create a Controller. It uses both (low-level and declarative clients). The Micro
 
 :exclude-for-languages:
 
-:exclude-for-languages:java,groovy,kotlin
+:only-for-languages:python
 
 Create route functions. They use both low-level and declarative clients. The Micronaut framework supports Reactive Streams implementations such as https://micronaut-projects.github.io/micronaut-rxjava3/latest/guide/[RxJava] or https://micronaut-projects.github.io/micronaut-reactor/latest/guide/[Project Reactor]. Thus, you can efficiently compose multiple HTTP client calls without blocking (which will limit the throughput and scalability of your application).
 
-:exclude-for-languages:
+:only-for-languages:
 
 source:GithubController[]
 
@@ -161,13 +161,13 @@ callout:singleresult[]
 callout:get[arg0=fetchReleases,arg1=/releases]
 :exclude-for-languages:
 
-:exclude-for-languages:java,groovy,kotlin
+:only-for-languages:python
 <.> Inject beans into annotated module variables.
 <.> The @api@/io/micronaut/http/annotation/Get.html[@Get] annotation maps the route function to an HTTP GET request.
 callout:singleresult[]
 <.> The @api@/io/micronaut/http/annotation/Get.html[@Get] annotation maps the `fetch_releases` route function to `/github/releases`.
 <.> Return the `Publisher` from the declarative client.
-:exclude-for-languages:
+:only-for-languages:
 
 === Tests
 
@@ -186,7 +186,7 @@ include::{sourceDir}/micronaut-http-client/@sourceDir@/src/test/resources/single
 
 :exclude-for-languages:
 
-:exclude-for-languages:java,groovy,kotlin
+:only-for-languages:python
 
 [source, json]
 .tests-config/releases.json
@@ -194,7 +194,7 @@ include::{sourceDir}/micronaut-http-client/@sourceDir@/src/test/resources/single
 include::{sourceDir}/micronaut-http-client/@sourceDir@/tests-config/single-release.json[]
 ----
 
-:exclude-for-languages:
+:only-for-languages:
 
 Create a test to verify that both clients work as expected, and the controller echoes the output of the GitHub API in a Reactive way.
 
@@ -209,13 +209,13 @@ callout:binding-json-array[]
 <.> Use `status` to check the HTTP status code.
 callout:body-method[]
 :exclude-for-languages:
-:exclude-for-languages:java,groovy,kotlin
+:only-for-languages:python
 <.> Create a sample `releases.json` file in the `tests-config` directory. To get some test data call GitHub API with curl or provide a few entries yourself.
 <.> Use `requests.with_context(my_context)` to call the application under test with a context-bound HTTP client.
 <.> Decode the JSON response body into a Python list.
 <.> Use `status_code` to check the HTTP status code.
 <.> Validate the response body.
-:exclude-for-languages:
+:only-for-languages:
 
 
 common:testApp.adoc[]
@@ -245,9 +245,9 @@ callout:client-filter[]
 :exclude-for-languages:python
 <.> Constructor injection of the configuration parameters.
 :exclude-for-languages:
-:exclude-for-languages:java,groovy,kotlin
+:only-for-languages:python
 <.> Inject the configuration parameters into an annotated class attribute.
-:exclude-for-languages:
+:only-for-languages:
 callout:request-filter[]
 <.> Enhance every request sent to GitHub API providing Basic Authentication.
 
@@ -279,7 +279,7 @@ github.token=xxxxxxxxxxxx
 
 :exclude-for-languages:
 
-:exclude-for-languages:java,groovy,kotlin
+:only-for-languages:python
 
 Add your GitHub `username` and `token` to `config/application.toml`
 
@@ -292,7 +292,7 @@ username = "yourgithubusername"
 token = "xxxxxxxxxxxx"
 ----
 
-:exclude-for-languages:
+:only-for-languages:
 
 :exclude-for-languages:python
 
@@ -300,11 +300,11 @@ Add a logger to `src/main/resources/logback.xml` to see the HTTP client output.
 
 :exclude-for-languages:
 
-:exclude-for-languages:java,groovy,kotlin
+:only-for-languages:python
 
 Configure logging in `src/main.py` to see the HTTP client output. The Pyronaut logging module applies this Python logging configuration through Logback.
 
-:exclude-for-languages:
+:only-for-languages:
 
 :exclude-for-languages:python
 
@@ -315,11 +315,11 @@ Configure logging in `src/main.py` to see the HTTP client output. The Pyronaut l
 
 :exclude-for-languages:
 
-:exclude-for-languages:java,groovy,kotlin
+:only-for-languages:python
 
 zipInclude:src/main.py[tag=logging]
 
-:exclude-for-languages:
+:only-for-languages:
 
 If you run again the tests, you will see the that the Filter is invoked and HTTP Basic Auth is used against GitHub API.
 
