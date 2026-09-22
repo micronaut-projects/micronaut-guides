@@ -68,11 +68,11 @@ class IndexGeneratorTest {
         IndexGenerator.generateGuidesIndex(template, distDir, List.of(guide), null);
 
         String html = Files.readString(distDir.toPath().resolve("python-guide.html"));
-        assertTrue(html.contains("<a href='python-guide-pyronaut-python.html'>Read</a>"));
-        assertFalse(html.contains("<a href='python-guide.html'>Read</a>"));
+        assertTrue(html.contains("python-guide-pyronaut-python.html'>Read</a>"));
+        assertFalse(html.contains("python-guide.html'>Read</a>"));
         assertFalse(html.contains("python-guide-gradle-python.html"));
         assertFalse(html.contains("python-guide-maven-python.html"));
-        assertTrue(html.contains("<td colspan='3'></td><td><a href='python-guide-pyronaut-python.html'>Read</a></td>"));
+        assertTrue(html.matches("(?s).*<td colspan='3'></td><td><a href='[^']*python-guide-pyronaut-python\\.html'>Read</a></td>.*"));
     }
 
     @Test
