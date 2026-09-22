@@ -53,24 +53,48 @@ Replace the command:
 
 source:MicronautguideCommand[app=cli]
 
+:exclude-for-languages:python
 callout:picocli-command[]
 callout:picocli-option[]
 callout:picocli-option-required[]
 callout:picocli-completion-candidates-variables[]
 callout:field-injection[]
 <6> Publish the MQTT topic.
+:exclude-for-languages:
+
+:exclude-for-languages:java,groovy,kotlin
+<1> Inject the MQTT publisher.
+<2> Publish the MQTT topic.
+:exclude-for-languages:
 
 Replace the generated test with this:
 
+:exclude-for-languages:python
 test:MicronautguideCommandTest[app=cli]
 
 callout:mqtt-subscriber[]
 callout:mqtt-topic-listen[]
+:exclude-for-languages:
+
+:exclude-for-languages:java,groovy,kotlin
+source:TemperatureListener[app=cli]
+
+callout:mqtt-subscriber[]
+callout:mqtt-topic-listen[]
+
+test:MicronautguideCommandTest[app=cli]
+:exclude-for-languages:
 
 The MQTT server URI is configured by referencing the properties that were set up for Mosquitto via <<test-resources,Test Resources>>:
 
 
+:exclude-for-languages:python
 resource:application.properties[app=cli,tag=mqtt]
+:exclude-for-languages:
+
+:exclude-for-languages:java,groovy,kotlin
+resource:application.toml[app=cli,tag=mqtt]
+:exclude-for-languages:
 
 == Writing an MQTT Subscriber Application
 
@@ -101,7 +125,13 @@ https://guides.micronaut.io/latest/micronaut-intellij-idea-ide-setup.html[Setup 
 
 The MQTT server URI is configured by referencing the properties that were set up for Mosquitto via <<test-resources,Test Resources>>:
 
+:exclude-for-languages:python
 resource:application.properties[app=app,tag=mqtt]
+:exclude-for-languages:
+
+:exclude-for-languages:java,groovy,kotlin
+resource:application.toml[app=app,tag=mqtt]
+:exclude-for-languages:
 
 === Create Subscriber
 
@@ -112,12 +142,25 @@ callout:mqtt-topic[]
 
 === Add test
 
+:exclude-for-languages:python
 test:SubscriptionTest[app=app]
 callout:micronaut-test[]
 callout:property[]
 callout:requires-property[]
 callout:mqtt-publisher[]
 callout:mqtt-topic[]
+:exclude-for-languages:
+
+:exclude-for-languages:java,groovy,kotlin
+source:TemperatureClient[app=app]
+<1> This bean will only be loaded for the test.
+callout:mqtt-publisher[]
+callout:mqtt-topic[]
+
+test:SubscriptionTest[app=app]
+callout:micronaut-test[]
+callout:property[]
+:exclude-for-languages:
 
 == Running the Application
 
@@ -131,10 +174,23 @@ Keep it running. Once you publish a topic with the CLI application, you will see
 
 Run the CLI command, which will publish a temperature at startup.
 
+:exclude-for-languages:python
+
 [source, bash]
 ----
 ./gradlew run --args="-t 212 -s Fahrenheit"
 ----
+
+:exclude-for-languages:
+
+:exclude-for-languages:java,groovy,kotlin
+
+[source, bash]
+----
+pyronaut run -- -t 212 -s Fahrenheit
+----
+
+:exclude-for-languages:
 
 The subscriber receives the MQTT topic, as you will see in the logs:
 
@@ -147,7 +203,7 @@ The subscriber receives the MQTT topic, as you will see in the logs:
 
 common:graal-with-plugins.adoc[]
 
-:exclude-for-languages:groovy
+:exclude-for-languages:groovy,python
 
 Generate GraalVM native executables for both the CLI and the messaging application, then execute both. Publish a temperature, and you will see it in the subscriber logs.
 

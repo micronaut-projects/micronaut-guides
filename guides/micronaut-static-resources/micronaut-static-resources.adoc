@@ -10,7 +10,12 @@ common:micronaut-views-thymeleaf.adoc[]
 
 === Thymeleaf template
 
+:exclude-for-languages:python
 Create a Thymeleaf template in `src/main/resources/views/index.html`:
+:exclude-for-languages:
+:exclude-for-languages:java
+Create a Thymeleaf template in `config/views/index.html`:
+:exclude-for-languages:
 
 resource:views/index.html[]
 
@@ -20,6 +25,7 @@ resource:views/index.html[]
 
 == Message service
 
+:exclude-for-languages:python
 Create an interface that describes our message service.
 
 source:MessageService[]
@@ -28,6 +34,14 @@ And then create a default implementation of the service.
 
 source:MyMessageService[]
 callout:singleton[]
+:exclude-for-languages:
+
+:exclude-for-languages:java
+Create a singleton service that generates the message.
+
+source:MessageService[]
+callout:singleton[]
+:exclude-for-languages:
 
 == Controller
 
@@ -42,45 +56,91 @@ callout:constraints[]
 
 == Assets
 
+:exclude-for-languages:python
 Then create a static CSS file in `src/main/resources/static/css/style.css`:
+:exclude-for-languages:
+:exclude-for-languages:java
+Then create a static CSS file in `config/static/css/style.css`:
+:exclude-for-languages:
 
 resource:static/css/style.css[]
 
+:exclude-for-languages:python
 And a static PNG file in `src/main/resources/static/images/micronaut_stacked_black.png`:
+:exclude-for-languages:
+:exclude-for-languages:java
+And a static PNG file in `config/static/images/micronaut_stacked_black.png`:
+:exclude-for-languages:
 
 image:micronaut_stacked_black.png[width=253]
 
 === Configuration
 
+:exclude-for-languages:python
 We can then add a static-mapping to our `application.properties` so that any missing requests are attempted to be resolved from the static assets.
+:exclude-for-languages:
+:exclude-for-languages:java
+We can then add a static-mapping to our `application.toml` so that any missing requests are attempted to be resolved from the static assets.
+:exclude-for-languages:
 
 First configure a route `/css/*.css` to map any routes matching that pattern to be mapped to the `static/css` resources.
 
+:exclude-for-languages:python
 resource:application.properties[tag=css-assets]
+:exclude-for-languages:
+:exclude-for-languages:java
+resource:application.toml[tag=css-assets]
+:exclude-for-languages:
 
 - The first line matches any request to the server that does not match a controller route.
 - The second line defines that the classpath inside a root static directory should be searched for the resource.
 
+:exclude-for-languages:python
 This means that a request to `/css/style.css` will be resolved to `src/main/resources/static/css/style.css` (if that resource exists and there is no matching controller path).
+:exclude-for-languages:
+:exclude-for-languages:java
+This means that a request to `/css/style.css` will be resolved to `config/static/css/style.css` (if that resource exists and there is no matching controller path).
+:exclude-for-languages:
 
 And then configure a route `/images/**` to be mapped to the `static/images` resources.
 We use a wildcard here as images may have different file extensions.
 
+:exclude-for-languages:python
 resource:application.properties[tag=image-assets]
+:exclude-for-languages:
+:exclude-for-languages:java
+resource:application.toml[tag=image-assets]
+:exclude-for-languages:
 
+:exclude-for-languages:python
 This means that a request to `/images/some/image.png` will be resolved to `src/main/resources/static/images/some/image.png` (if that resource exists and there is no matching controller path).
+:exclude-for-languages:
+:exclude-for-languages:java
+This means that a request to `/images/some/image.png` will be resolved to `config/static/images/some/image.png` (if that resource exists and there is no matching controller path).
+:exclude-for-languages:
 
 === A note on wildcard mappings
 
 For every request, the framework searches for a controller route; if no route is found, it searches for a static resource.
 In the above configuration, we could have used a single wildcard mapping for all assets similar to:
 
+:exclude-for-languages:python
 [source,properties]
 .A wasteful wildcard example
 ----
 micronaut.router.static-resources.assets.mapping=/**
 micronaut.router.static-resources.assets.paths=classpath\:static
 ----
+:exclude-for-languages:
+:exclude-for-languages:java
+[source,toml]
+.A wasteful wildcard example
+----
+[micronaut.router.static-resources.assets]
+mapping = "/**"
+paths = "classpath:static"
+----
+:exclude-for-languages:
 
 However, searching for a static resource in every request is a waste.
 We know specific paths (e.g., `/bogus`) will not match any resource.

@@ -1,0 +1,40 @@
+[micronaut.application]
+name = "app"
+
+#tag::oauth2[]
+# <1>
+[micronaut.security]
+authentication = "cookie"
+
+# <2>
+# <3>
+[micronaut.security.token.jwt.signatures.secret.generator]
+secret = "${JWT_GENERATOR_SIGNATURE_SECRET:pleaseChangeThisSecretForANewOne}"
+
+# <4>
+# <5>
+[micronaut.security.oauth2.clients.github]
+client-id = "${OAUTH_CLIENT_ID:xxx}"
+# <6>
+client-secret = "${OAUTH_CLIENT_SECRET:yyy}"
+# <7>
+scopes = ["user:email", "read:user", "public_repo"]
+
+# <8>
+[micronaut.security.oauth2.clients.github.authorization]
+url = "https://github.com/login/oauth/authorize"
+
+# <9>
+[micronaut.security.oauth2.clients.github.token]
+url = "https://github.com/login/oauth/access_token"
+auth-method = "client_secret_post"
+
+[micronaut.security.endpoints.logout]
+# <10>
+get-allowed = true
+#end::oauth2[]
+
+#tag::micronaut-http-services[]
+[micronaut.http.services.githubv3]
+url = "https://api.github.com"
+#end::micronaut-http-services[]

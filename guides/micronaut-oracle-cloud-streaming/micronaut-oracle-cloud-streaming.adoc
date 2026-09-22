@@ -66,7 +66,9 @@ Create a `GameDTO` data-transfer object to represent game data:
 source:chess/dto/GameDTO[app=chess-game]
 
 callout:serdeable[]
+:exclude-for-languages:python
 <.> Annotate with `@Creator` to indicate the constructor to use when deserializing from JSON
+:exclude-for-languages:
 
 Create a `GameStateDTO` data-transfer object to represent game move data:
 
@@ -115,13 +117,20 @@ callout:executes-on[]
 
 common:default-dev-environment-application.adoc[]
 
+:exclude-for-languages:python
 source:Application[app=chess-game]
+:exclude-for-languages:
 
 Delete the `kafka.bootstrap.servers` config option from `application.properties` and move it to `application-dev.properties`.
 
 common:default-dev-environment-application-dev-yaml.adoc[]
 
+:exclude-for-languages:python
 resource:application-dev.properties[app=chess-game]
+:exclude-for-languages:
+:exclude-for-languages:java,groovy,kotlin
+resource:application-dev.toml[app=chess-game]
+:exclude-for-languages:
 
 <1> Use local Kafka in the development environment
 
@@ -130,7 +139,12 @@ resource:application-dev.properties[app=chess-game]
 Update `application.properties` to add static resource configuration:
 
 
+:exclude-for-languages:python
 resource:application.properties[app=chess-game,tag=static-resources]
+:exclude-for-languages:
+:exclude-for-languages:java,groovy,kotlin
+resource:application.toml[app=chess-game,tag=static-resources]
+:exclude-for-languages:
 
 callout:static-resources[]
 
@@ -169,11 +183,10 @@ If you use Micronaut Launch, select Micronaut Application as application type an
 
 The previous command creates a directory named `chess-listener` and a Micronaut application inside it with default package `example.micronaut`.
 
-In addition to the dependencies added by the `testcontainers` feature, we also need a test dependency for Kafka and Oracle in Testcontainers, along with one for the http://www.awaitility.org/[Awaitility] library:
+In addition to the dependencies added by the `testcontainers` feature, we also need a test dependency for Kafka in Testcontainers, along with one for the http://www.awaitility.org/[Awaitility] library:
 
 :dependencies:
 dependency:testcontainers-kafka[groupId=org.testcontainers,scope=test]
-dependency:testcontainers-oracle-xe[groupId=org.testcontainers,scope=test]
 dependency:awaitility[groupId=org.awaitility,version=@awaitilityVersion@,scope=test]
 :dependencies:
 
@@ -181,7 +194,12 @@ dependency:awaitility[groupId=org.awaitility,version=@awaitilityVersion@,scope=t
 
 Enable Flyway database migrations for all environments by adding this configuration to `application.properties`:
 
+:exclude-for-languages:python
 resource:application.properties[app=chess-listener,tag=flyway]
+:exclude-for-languages:
+:exclude-for-languages:java,groovy,kotlin
+resource:application.toml[app=chess-listener,tag=flyway]
+:exclude-for-languages:
 
 ==== DTOs
 
@@ -199,26 +217,35 @@ source:chess/entity/GameState[app=chess-listener]
 
 ==== Repositories
 
-Create a "base" `GameRepository` interface to have access to methods for `Game` entity persistence:
+Create a `GameRepository` interface to have access to methods for `Game` entity persistence:
 
 source:chess/repository/GameRepository[app=chess-listener]
 
+:exclude-for-languages:java,groovy,kotlin
+<1> Annotate with `@JdbcRepository` to make this a Micronaut Data JDBC repository.
+<2> Restrict the bean to be available in the `oraclecloud` and test environments.
+:exclude-for-languages:
+
+:exclude-for-languages:python
 and a `H2GameRepository` interface that extends `GameRepository` and specifies the `H2` dialect to use an in-memory H2 database in the development environment (we'll also be creating an Oracle repository):
 
 source:chess/repository/H2GameRepository[app=chess-listener]
 
 <1> Annotate with `@JdbcRepository` to make this a Micronaut Data JDBC repository, and specify the `H2` dialect. The Micronaut framework will generate persistence logic at compile time and use H2-specific SQL.
 <2> Restrict the bean to be available only in the development environment
+:exclude-for-languages:
 
-Create a "base" `GameStateRepository` interface to have access to methods for `GameState` entity persistence:
+Create a `GameStateRepository` interface to have access to methods for `GameState` entity persistence:
 
 source:chess/repository/GameStateRepository[app=chess-listener]
 
 <1> Override the `findById` method from `CrudRepository` to add a `@Join` annotation. This will configure the SQL query to load `Game` data when retrieving a `GameState` to resolve the `game` property.
 
+:exclude-for-languages:python
 Also create a `H2GameStateRepository` interface that extends `GameStateRepository`:
 
 source:chess/repository/H2GameStateRepository[app=chess-listener]
+:exclude-for-languages:
 
 ==== GameService
 
@@ -244,11 +271,18 @@ source:chess/ChessListener[app=chess-listener]
 
 common:default-dev-environment-application.adoc[]
 
+:exclude-for-languages:python
 source:Application[app=chess-listener]
+:exclude-for-languages:
 
 common:default-dev-environment-application-dev-yaml.adoc[]
 
+:exclude-for-languages:python
 resource:application-dev.properties[app=chess-listener]
+:exclude-for-languages:
+:exclude-for-languages:java,groovy,kotlin
+resource:application-dev.toml[app=chess-listener]
+:exclude-for-languages:
 
 <1> Run this microservice on port 8081; `chess-game` will run on the default port 8080
 <2> Use an in-memory H2 database. Delete the `datasources` block so it's only in `application-dev.properties`
@@ -379,7 +413,12 @@ dependency:micronaut-oraclecloud-atp[groupId=io.micronaut.oraclecloud]
 
 Create `src/main/resources/application-oraclecloud.properties`. The Micronaut framework applies this configuration file only for the `oraclecloud` environment.
 
+:exclude-for-languages:python
 resource:application-oraclecloud.properties[app=chess-listener,tag=atp]
+:exclude-for-languages:
+:exclude-for-languages:java,groovy,kotlin
+resource:application-oraclecloud.toml[app=chess-listener,tag=atp]
+:exclude-for-languages:
 
 <1> Set the value of the `ocid` property with the database OCID unique identifier you saved when creating the database
 <2> Set the `walletPassword` property with a password to encrypt the wallet keys (must be at least 8 characters and include at least 1 letter and either 1 numeric or special character)
@@ -391,6 +430,7 @@ resource:application-oraclecloud.properties[app=chess-listener,tag=atp]
 
 Create the `OracleGameRepository` interface that extends `GameRepository` and specifies the `ORACLE` dialect in the `oraclecloud` environment:
 
+:exclude-for-languages:python
 source:chess/repository/OracleGameRepository[app=chess-listener]
 
 <1> Annotate with `@JdbcRepository` to make this a Micronaut Data JDBC repository, and specify the `ORACLE` dialect. The Micronaut framework will generate persistence logic at compile time and use Oracle-specific SQL.
@@ -399,6 +439,7 @@ source:chess/repository/OracleGameRepository[app=chess-listener]
 Create the `OracleGameStateRepository` interface that extends `GameStateRepository`:
 
 source:chess/repository/OracleGameStateRepository[app=chess-listener]
+:exclude-for-languages:
 
 ==== Flyway
 
@@ -504,7 +545,12 @@ image::oraclecloudstream/policy3.png[]
 
 Create `src/main/resources/application-oraclecloud.properties` in the `chess-game` microservice. Add the following there, and also add it to the `application-oraclecloud.properties` you already created in the `chess-listener` microservice:
 
+:exclude-for-languages:python
 resource:application-oraclecloud.properties[app=chess-game]
+:exclude-for-languages:
+:exclude-for-languages:java,groovy,kotlin
+resource:application-oraclecloud.toml[app=chess-game,tag=kafka]
+:exclude-for-languages:
 
 <1> Use the "FQDN" URL value you saved earlier here, along with the Kafka port (9092), e.g., `cell-1.streaming.us-ashburn-1.oci.oraclecloud.com:9092`
 <2> Use the value `config: org.apache.kafka.common.security.plain.PlainLoginModule required username="<tenancy-name>/<username>/<stream-pool-ocid>" password="<auth-token>";`, replacing `<tenancy-name>` with the name of your tenancy, `<username>` with the username created above, `<stream-pool-ocid>` with the OCID of the stream pool you saved earlier, and `<auth-token>` with the auth token value you saved earlier.
@@ -602,7 +648,12 @@ callout:test-instance-per-class[]
 
 Create `application-test.properties` file in `src/test/resources` with this content:
 
+:exclude-for-languages:python
 testResource:application-test.properties[app=chess-listener]
+:exclude-for-languages:
+:exclude-for-languages:java,groovy,kotlin
+testResource:application-test.toml[app=chess-listener]
+:exclude-for-languages:
 
 === Running the tests
 
@@ -663,9 +714,11 @@ oci:
       enabled: true
 ----
 
+:exclude-for-languages:python
 common:graal-with-plugins-multi.adoc[]
+:exclude-for-languages:
 
-:exclude-for-languages:groovy
+:exclude-for-languages:groovy,python
 
 NOTE: Native executable building will fail if the H2 driver is in the classpath, so comment out that dependency in your build script before building. No other changes are needed since there are no compile dependencies on the library, so you can keep the H2 versions of the repository interfaces for use in dev mode.
 

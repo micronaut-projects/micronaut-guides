@@ -40,14 +40,21 @@ We'll use the https://www.thymeleaf.org/[Thymeleaf^] Java template engine to ren
 
 === Home
 
+:exclude-for-languages:python
 Create a controller to handle the requests to `/`. You will display the email of the authenticated person if any. Annotate the controller endpoint with `@View` since we will use a Thymeleaf template.
+:exclude-for-languages:
+:exclude-for-languages:java,groovy,kotlin
+Create a route function to handle the requests to `/`. You will display the email of the authenticated person if any. Annotate the route with `@View` since we will use a Thymeleaf template.
+:exclude-for-languages:
 
 source:HomeController[]
 
+:exclude-for-languages:python
 callout:controller[arg0=/]
+:exclude-for-languages:
 callout:secured-anonymous[]
-<.> Use https://micronaut-projects.github.io/micronaut-views/latest/api/io/micronaut/views/View.html[View^] annotation to specify which template to use to render the response.
-<.> The @api@/io/micronaut/http/annotation/Get.html[@Get^] annotation maps the `index` method to GET `/` requests.
+callout:view[]
+callout:get[arg0=index,arg1=/]
 
 Create a Thymeleaf template:
 
@@ -70,7 +77,12 @@ image::standard-oauth.svg[]
 Add the following OAuth 2.0 configuration:
 
 
+:exclude-for-languages:python
 resource:application.properties[tag=oauth2]
+:exclude-for-languages:
+:exclude-for-languages:java,groovy,kotlin
+resource:application.toml[tag=oauth2]
+:exclude-for-languages:
 
 <.> Set `micronaut.security.authentication` to `cookie` to generate a signed JWT once the user is authenticated. The token is saved in a cookie and read in subsequent requests.
 <.> You can create a https://micronaut-projects.github.io/micronaut-security/latest/api/io/micronaut/security/token/jwt/signature/secret/SecretSignatureConfiguration.html[SecretSignatureConfiguration^] named `generator` via configuration as illustrated above. The `generator` signature is used to sign the issued JWT claims.
@@ -93,7 +105,12 @@ export OAUTH_CLIENT_SECRET=YYYYYYYYYY
 
 === OAuth 2.0 Details Mapper
 
+:exclude-for-languages:python
 We need an HTTP Client to retrieve the user info. Create a POJO to represent a LinkedIn user:
+:exclude-for-languages:
+:exclude-for-languages:java,groovy,kotlin
+We need an HTTP Client to retrieve the user info. Create a dataclass to represent a LinkedIn user:
+:exclude-for-languages:
 
 source:LinkedInMe[]
 
@@ -108,7 +125,12 @@ source:LinkedInApiClient[]
 
 Specify the URL for the `linkedin` service.
 
+:exclude-for-languages:python
 resource:application.properties[tag=micronaut-http-services]
+:exclude-for-languages:
+:exclude-for-languages:java,groovy,kotlin
+resource:application.toml[tag=micronaut-http-services]
+:exclude-for-languages:
 
 Create an implementation of https://micronaut-projects.github.io/micronaut-security/latest/api/io/micronaut/security/oauth2/endpoint/token/response/OauthAuthenticationMapper.html[OauthAuthenticationMapper]. The implementation must be qualified by a name that matches the name present in the client configuration. The value specified in the client configuration is `linkedin`.
 
@@ -124,7 +146,7 @@ image::linkedIn.gif[]
 
 common:graal-with-plugins.adoc[]
 
-:exclude-for-languages:groovy
+:exclude-for-languages:groovy,python
 
 Visit `localhost:8080` and authenticate with LinkedIn.
 

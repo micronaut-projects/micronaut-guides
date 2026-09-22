@@ -4,7 +4,7 @@ common:gcp-cloud-run.adoc[]
 
 common:google-cloud-registry.adoc[]
 
-The Docker image runs a https://www.graalvm.org/reference-manual/native-image/[GraalVM Native Executable] of the Micronaut application.
+The Docker image runs a https://www.graalvm.org/reference-manual/native-image/[GraalVM Native Executable] of the generated application.
 
 common:gcp-deploy-requirements2content.adoc[]
 
@@ -16,9 +16,9 @@ common:gcp-containerregistry.adoc[]
 
 Push the Docker image of your application to https://cloud.google.com/container-registry[Google Cloud Container Registry].
 
-:exclude-for-build:
+:exclude-for-languages:python
 
-:exclude-for-build:maven
+:exclude-for-build:maven,pyronaut
 
 Modify your Gradle build and configure the
 
@@ -36,7 +36,7 @@ dockerBuildNative {
 
 common:docker-push-native-gradle.adoc[]
 
-:exclude-for-build:gradle
+:exclude-for-build:gradle,pyronaut
 
 [source, bash]
 ----
@@ -47,9 +47,33 @@ common:docker-push-native-gradle.adoc[]
 
 :exclude-for-build:
 
-The previous URL uses the pattern: `gcr.io/micronaut-guides-xxxxxx/micronautguide:latest`. Change it to use your Project ID.
+:exclude-for-languages:
+
+:exclude-for-languages:java,groovy,kotlin
+
+Configure the Pyronaut Docker image name in `pyproject.toml`:
+
+[source,toml]
+----
+[tool.pyronaut.build.docker]
+image-name = "gcr.io/micronaut-guides-xxxxxx/micronautguide"
+----
+
+Build and push the native Docker image:
+
+[source, bash]
+----
+pyronaut build --native --docker
+docker push gcr.io/micronaut-guides-xxxxxx/micronautguide:1.0.0-native
+----
+
+:exclude-for-languages:
+
+The previous image names use the pattern `gcr.io/micronaut-guides-xxxxxx/micronautguide`. Change it to use your Project ID.
 
 You get an output such as:
+
+:exclude-for-languages:python
 
 [source, bash]
 ----
@@ -59,9 +83,22 @@ You get an output such as:
 Pushing image 'gcr.io/micronaut-guides-xxxxxx/micronautguide:latest'.
 ----
 
+:exclude-for-languages:
+
+:exclude-for-languages:java,groovy,kotlin
+
+[source, bash]
+----
+Docker image build complete: gcr.io/micronaut-guides-xxxxxx/micronautguide:1.0.0-native
+----
+
+:exclude-for-languages:
+
 == Google Cloud Run Deploy
 
 You can https://cloud.google.com/sdk/gcloud/reference/run/deploy[deploy to Google Cloud Run via the CLI]. Use the value you configured in your build as the image argument's value.
+
+:exclude-for-languages:python
 
 [source, bash]
 ----
@@ -71,16 +108,40 @@ gcloud run deploy \
     --allow-unauthenticated
 ----
 
+:exclude-for-languages:
+
+:exclude-for-languages:java,groovy,kotlin
+
+[source, bash]
+----
+gcloud run deploy \
+    --image=gcr.io/micronaut-guides-xxxxxx/micronautguide:1.0.0-native \
+    --platform managed \
+    --allow-unauthenticated
+----
+
+:exclude-for-languages:
+
 common:google-cloud-run-deploy-plain.adoc[]
 
 == Cleanup
 
-common:gcloud-run-services-delete[]
+common:gcloud-run-services-delete.adoc[]
 
-common:gcloud-delete-project[]
+common:gcloud-delete-project.adoc[]
 
 == Next Steps
 
+:exclude-for-languages:python
+
 You will probably want to deploy to Google Cloud Run from your CI server. https://launch.micronaut.io[Micronaut Launch] contains the https://micronaut.io/launch?type=DEFAULT&features=github-workflow-google-cloud-run-graalvm[github-workflow-google-cloud-run-graalvm] feature, which adds a https://github.com/features/actions[GitHub Actions] Workflow that deploys a GraalVM Native executable of a Micronaut application to Google Cloud Run from Google Container Registry.
+
+:exclude-for-languages:
+
+:exclude-for-languages:java,groovy,kotlin
+
+You will probably want to deploy to Google Cloud Run from your CI server. For Pyronaut applications, run `pyronaut build --native --docker`, push the generated native image tag, and deploy that tag with `gcloud run deploy`.
+
+:exclude-for-languages:
 
 common:google-cloud-run-next.adoc[]

@@ -59,18 +59,6 @@ if [ $EXIT_STATUS -ne 0 ]; then
   echo "'base-maven-java' tests failed => exit $EXIT_STATUS"
 fi
 EXIT_STATUS=0
-cd base-maven-kotlin
-echo "-------------------------------------------------"
-echo "Executing 'base-maven-kotlin' tests"
-./mvnw -q test spotless:check || EXIT_STATUS=$?
-echo "Stopping shared test resources service (if created)"
-./mvnw -q mn:stop-testresources-service > /dev/null 2>&1 || true
-cd ..
-if [ $EXIT_STATUS -ne 0 ]; then
-  FAILED_PROJECTS=("${FAILED_PROJECTS[@]}" base-maven-kotlin)
-  echo "'base-maven-kotlin' tests failed => exit $EXIT_STATUS"
-fi
-EXIT_STATUS=0
 
 cd child-gradle-java
 echo "-------------------------------------------------"
@@ -118,18 +106,6 @@ cd ..
 if [ $EXIT_STATUS -ne 0 ]; then
   FAILED_PROJECTS=("${FAILED_PROJECTS[@]}" child-maven-java)
   echo "'child-maven-java' tests failed => exit $EXIT_STATUS"
-fi
-EXIT_STATUS=0
-cd child-maven-kotlin
-echo "-------------------------------------------------"
-echo "Executing 'child-maven-kotlin' tests"
-./mvnw -q test spotless:check || EXIT_STATUS=$?
-echo "Stopping shared test resources service (if created)"
-./mvnw -q mn:stop-testresources-service > /dev/null 2>&1 || true
-cd ..
-if [ $EXIT_STATUS -ne 0 ]; then
-  FAILED_PROJECTS=("${FAILED_PROJECTS[@]}" child-maven-kotlin)
-  echo "'child-maven-kotlin' tests failed => exit $EXIT_STATUS"
 fi
 EXIT_STATUS=0
 
@@ -181,18 +157,6 @@ if [ $EXIT_STATUS -ne 0 ]; then
   echo "'creating-your-first-micronaut-app-maven-java' tests failed => exit $EXIT_STATUS"
 fi
 EXIT_STATUS=0
-cd creating-your-first-micronaut-app-maven-kotlin
-echo "-------------------------------------------------"
-echo "Executing 'creating-your-first-micronaut-app-maven-kotlin' tests"
-./mvnw -q test spotless:check || EXIT_STATUS=$?
-echo "Stopping shared test resources service (if created)"
-./mvnw -q mn:stop-testresources-service > /dev/null 2>&1 || true
-cd ..
-if [ $EXIT_STATUS -ne 0 ]; then
-  FAILED_PROJECTS=("${FAILED_PROJECTS[@]}" creating-your-first-micronaut-app-maven-kotlin)
-  echo "'creating-your-first-micronaut-app-maven-kotlin' tests failed => exit $EXIT_STATUS"
-fi
-EXIT_STATUS=0
 
 cd hello-base-gradle-java
 
@@ -207,9 +171,6 @@ cd hello-base-maven-java
 
 cd ..
 cd hello-base-maven-groovy
-
-cd ..
-cd hello-base-maven-kotlin
 
 cd ..
 
@@ -264,4 +225,3 @@ if [ ${#FAILED_PROJECTS[@]} -ne 0 ]; then
 else
   exit 0
 fi
-

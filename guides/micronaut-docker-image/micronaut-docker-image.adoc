@@ -6,7 +6,8 @@ common:completesolution.adoc[]
 
 common:create-app-features.adoc[]
 
-:exclude-for-build:maven
+:exclude-for-languages:python
+:exclude-for-build:maven,pyronaut
 
 == Building a Docker Image with the Micronaut Gradle Plugin
 
@@ -19,7 +20,7 @@ The https://micronaut-projects.github.io/micronaut-gradle-plugin/latest/[Microna
 
 :exclude-for-build:
 
-:exclude-for-build:gradle
+:exclude-for-build:gradle,pyronaut
 
 == Building a Docker Image with the Micronaut Maven Plugin
 
@@ -32,20 +33,42 @@ https://micronaut-projects.github.io/micronaut-maven-plugin/latest/[Micronaut Ma
 Moreover, you can combine AOT build optimizations with Docker packaging by including the system property `micronaut.aot.enabled`.
 
 :exclude-for-build:
+:exclude-for-languages:
 
+:exclude-for-languages:java,groovy,kotlin
+== Building a Docker Image with Pyronaut
+
+The `pyronaut build` command can build Docker images for Pyronaut applications:
+
+* `pyronaut build --docker` - Builds a JVM Docker image
+* `pyronaut build --native --docker` - Builds a native Docker image using GraalVM Native Image inside Docker
+
+:exclude-for-languages:
+
+:exclude-for-languages:python
 external:distribution-base/hellocontroller.adoc[]
+:exclude-for-languages:
+
+:exclude-for-languages:java,groovy,kotlin
+== Controller
+
+The generated application contains classless route functions that respond to HTTP requests:
+
+zipInclude:src/example/micronaut/controller.py[]
+
+:exclude-for-languages:
 
 == Time To First Request Measurement script
 
 In this guide, we use the following script to measure time to first request of a Docker image.
 
-resource:../../../ttfr.sh[]
+zipInclude:ttfr.sh[]
 
 === Docker Image
 
 Generate a Docker image with:
 
-:exclude-for-build:maven
+:exclude-for-build:maven,pyronaut
 
 [source, bash]
 ----
@@ -66,7 +89,7 @@ Created image with ID 'e5c1b8b8dbcb'.
 
 :exclude-for-build:
 
-:exclude-for-build:gradle
+:exclude-for-build:gradle,pyronaut
 
 [source, bash]
 ----
@@ -92,8 +115,23 @@ Created image with ID 'e5c1b8b8dbcb'.
 
 :exclude-for-build:
 
+:exclude-for-languages:java,groovy,kotlin
+[source, bash]
+----
+pyronaut build --docker
+----
+
+[source, bash]
+----
+...
+Docker image build complete: default:1.0.0
+----
+
+:exclude-for-languages:
+
 Supply the image name and tag to the time to first request script:
 
+:exclude-for-languages:python
 [source, bash]
 ----
 ./ttfr.sh micronautguide:latest
@@ -102,12 +140,24 @@ micronautguide:latest
 .
 2.473 seconds
 ----
+:exclude-for-languages:
+
+:exclude-for-languages:java,groovy,kotlin
+[source, bash]
+----
+./ttfr.sh default:1.0.0
+default:1.0.0
+...
+.
+2.473 seconds
+----
+:exclude-for-languages:
 
 === Docker image with a GraalVM native executable inside
 
 Generate a Docker image with:
 
-:exclude-for-build:maven
+:exclude-for-build:maven,pyronaut
 
 [source, bash]
 ----
@@ -144,7 +194,7 @@ BUILD SUCCESSFUL in 2m 26s
 ----
 :exclude-for-build:
 
-:exclude-for-build:gradle
+:exclude-for-build:gradle,pyronaut
 
 [source, bash]
 ----
@@ -189,8 +239,23 @@ BUILD SUCCESSFUL in 2m 26s
 
 :exclude-for-build:
 
+:exclude-for-languages:java,groovy,kotlin
+[source, bash]
+----
+pyronaut build --native --docker
+----
+
+[source, bash]
+----
+...
+Docker image build complete: default:1.0.0-native
+----
+
+:exclude-for-languages:
+
 Run the time to first request script with the native Docker image:
 
+:exclude-for-languages:python
 [source, bash]
 ----
 ./ttfr.sh micronautguide:latest
@@ -200,7 +265,21 @@ micronautguide:latest
 0.047
 seconds
 ----
+:exclude-for-languages:
 
+:exclude-for-languages:java,groovy,kotlin
+[source, bash]
+----
+./ttfr.sh default:1.0.0-native
+default:1.0.0-native
+...
+.
+0.047
+seconds
+----
+:exclude-for-languages:
+
+:exclude-for-languages:python
 common:docker-crac.adoc[]
 
 Run the time to first request script with the CRaC Docker image:
@@ -213,10 +292,12 @@ micronautguide:latest
 .
 0.462 seconds
 ----
+:exclude-for-languages:
 
+:exclude-for-languages:python
 === AOT Optimized Docker Image
 
-:exclude-for-build:maven
+:exclude-for-build:maven,pyronaut
 
 [source, bash]
 ----
@@ -225,7 +306,7 @@ micronautguide:latest
 
 :exclude-for-build:
 
-:exclude-for-build:gradle
+:exclude-for-build:gradle,pyronaut
 
 [source, bash]
 ----
@@ -248,7 +329,7 @@ micronautguide:latest
 === AOT Optimized Docker Image with a native executable inside
 
 
-:exclude-for-build:maven
+:exclude-for-build:maven,pyronaut
 
 [source, bash]
 ----
@@ -257,7 +338,7 @@ micronautguide:latest
 
 :exclude-for-build:
 
-:exclude-for-build:gradle
+:exclude-for-build:gradle,pyronaut
 
 [source, bash]
 ----
@@ -317,19 +398,29 @@ I used the following hardware to calculate the previous benchmarks
 |Operating System
 |Mac OS X 10.15.7 (Mojave)
 |===
+:exclude-for-languages:
+
+:exclude-for-languages:java,groovy,kotlin
+== Comparisons
+
+Pyronaut supports JVM Docker images and native Docker images. Native Docker images compile inside a container, which keeps the image Linux-compatible even when the build starts from macOS.
+
+:exclude-for-languages:
 
 common:next.adoc[]
 
 Learn more about:
 
 * https://docs.micronaut.io/latest/guide/#graal[GraalVM integration in the Micronaut Framework]
+:exclude-for-languages:python
 * https://micronaut-projects.github.io/micronaut-crac/latest/guide/[Micronaut CRaC (Coordinated Restore at checkpoint)]
-:exclude-for-build:maven
+:exclude-for-build:maven,pyronaut
 * https://micronaut-projects.github.io/micronaut-gradle-plugin/latest/[Micronaut Gradle Plugin]
 :exclude-for-build:
-:exclude-for-build:gradle
+:exclude-for-build:gradle,pyronaut
 * https://micronaut-projects.github.io/micronaut-maven-plugin/latest/[Micronaut Maven Plugin]
 
 :exclude-for-build:
+:exclude-for-languages:
 
 common:helpWithMicronaut.adoc[]

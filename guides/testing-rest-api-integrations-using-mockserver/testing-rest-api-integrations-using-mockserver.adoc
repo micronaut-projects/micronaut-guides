@@ -35,7 +35,12 @@ Testcontainers provides the https://testcontainers.com/modules/wiremock/[Testcon
 so that we can run WireMock as a Docker container.
 
 == Create Album and Photo models
+:exclude-for-languages:python
 First, create *Album* and *Photo* models using Java records.
+:exclude-for-languages:
+:exclude-for-languages:java
+First, create *Album* and *Photo* models using Python dataclasses.
+:exclude-for-languages:
 
 source:Photo[]
 
@@ -54,9 +59,16 @@ source:PhotoServiceClient[]
 callout:client[]
 
 We have externalized the photo-service base URL as a configurable property.
+:exclude-for-languages:python
 So, let us add the following property in the *src/main/resources/application.properties* file.
 
 resource:application.properties[]
+:exclude-for-languages:
+:exclude-for-languages:java
+So, let us add the following property in the *config/application.toml* file.
+
+resource:application.toml[]
+:exclude-for-languages:
 
 == Implement API endpoint to get an album by id
 
@@ -119,6 +131,7 @@ Let us write the test for our GET `/api/albums/\{albumId}` API endpoint as follo
 
 test:AlbumControllerTest[]
 
+:exclude-for-languages:python
 callout:test-containers-disabled-without-docker[]
 <.> We can create an instance of WireMock server using *WireMockExtension* .
 <.> We have registered the *"micronaut.http.services.photosapi.url"* property pointing to WireMock endpoint URL.
@@ -126,6 +139,15 @@ callout:test-containers-disabled-without-docker[]
 <.> We are using the RestAssured library to test our API endpoint, so we captured the random port on which the application started and initialized RestAssured *port*.
 <.> Set the expectations for an API call.
 <.> In the *shouldReturnServerErrorWhenPhotoServiceCallFailed()* test, we have set the expected mock response for `/albums/\{albumId}/photos` API call to return InternalServerError status code 500 and make a request to our application endpoint `/api/albums/\{albumId}` and verified the response.
+:exclude-for-languages:
+:exclude-for-languages:java
+<.> Create and stop a WireMock server for each test.
+<.> Register the *"micronaut.http.services.photosapi.url"* property pointing to the WireMock server URL.
+<.> In the *test_should_get_album_by_id()* test, set the expected mock response for `/albums/\{albumId}/photos`.
+<.> Set the expectations for an API call.
+<.> Make a request to our application endpoint `/api/albums/\{albumId}` and verify the response.
+<.> In the *test_should_return_server_error_when_photo_service_call_failed()* test, set the expected mock response for `/albums/\{albumId}/photos` to return Internal Server Error status code 500 and verify the response.
+:exclude-for-languages:
 
 === Stubbing using JSON mapping files
 
@@ -150,6 +172,7 @@ test:AlbumControllerWireMockMappingTests[tag=shouldGetAlbumById]
 
 === Using Testcontainers WireMock Module
 
+:exclude-for-languages:python
 The https://testcontainers.com/modules/wiremock/[Testcontainers WireMock module] allows provisioning the WireMock server
 as a standalone container within your tests, based on https://github.com/wiremock/wiremock-docker[WireMock Docker].
 
@@ -168,6 +191,7 @@ testResource:example/micronaut/AlbumControllerTestcontainersTests/mocks-config.j
 
 If you run the test, the call to photo API will receive the response using WireMock stubbings
 defined in *mocks-config.json* file.
+:exclude-for-languages:
 
 
 === Testing with MockServer
@@ -194,6 +218,7 @@ You can write a test using MockServer as follows:
 
 test:AlbumControllerMockServerTest[]
 
+:exclude-for-languages:python
 callout:micronaut-test[]
 callout:test-instance-per-class[]
 callout:test-containers-disabled-without-docker[]
@@ -201,6 +226,14 @@ callout:test-property-provider[]
 <.> We have registered the *"micronaut.http.services.photosapi.url"* property pointing to MockServer container endpoint.
 callout:injection-request-specification[]
 callout:rest-assured-spec-port[]
+:exclude-for-languages:
+:exclude-for-languages:java
+<.> Start a MockServer Testcontainers container for the test module.
+<.> Register the *"micronaut.http.services.photosapi.url"* property pointing to MockServer container endpoint.
+<.> Configure the application HTTP client to use the MockServer endpoint.
+<.> In the *test_should_get_album_by_id()* test, create the MockServer expectation for `/albums/\{albumId}/photos`.
+<.> Make a request to our application endpoint `/api/albums/\{albumId}` and verify the response.
+:exclude-for-languages:
 
 common:testApp.adoc[]
 
@@ -209,7 +242,12 @@ which will act as the photo-service, serving the mock responses as per the confi
 
 == Summary
 We have learned how to integrate 3rd party HTTP APIs in a Micronaut application
+:exclude-for-languages:python
 and test it using https://testcontainers.com/modules/wiremock/[Testcontainers WireMock module] or https://www.mock-server.com/[MockServer].
+:exclude-for-languages:
+:exclude-for-languages:java
+and test it using https://wiremock.org[WireMock] or https://www.mock-server.com/[MockServer].
+:exclude-for-languages:
 
 
 == Next Steps
@@ -219,4 +257,3 @@ Refer to https://wiremock.org/docs/solutions/testcontainers/[Testcontainers Wire
 Learn more about https://micronaut-projects.github.io/micronaut-test/latest/guide/[Micronaut Test] and http://testcontainers.com[Testcontainers].
 
 common:helpWithMicronaut.adoc[]
-

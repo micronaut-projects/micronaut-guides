@@ -6,9 +6,15 @@ common:create-app-features.adoc[]
 
 Several groups of metrics are enabled by default. These include system metrics (JVM info, uptime, etc.), as well as metrics tracking web requests, DataSource activity, and others. Overall metrics can be enabled or disabled, and groups can be individually enabled or disabled in configuration.
 
-Add the following to `application.properties`:
+Add the following to your application configuration:
 
+:exclude-for-languages:python
 resource:application.properties[tag=metrics]
+:exclude-for-languages:
+
+:exclude-for-languages:java,groovy,kotlin
+resource:application.toml[tag=metrics]
+:exclude-for-languages:
 
 <1> Change to `false` to disable all metrics, for example, per environment.
 <2> These default to `true` and are only here for convenience, to be able to disable a subset of metrics.
@@ -84,7 +90,7 @@ We'll need a data class to represent the REST response. Create the `BitcoinPrice
 
 source:crypto/BitcoinPrice[]
 
-callout:introspected[]
+callout:serdeable[]
 
 ==== Kucoin Declarative HTTP Client
 
@@ -96,9 +102,15 @@ callout:client[]
 
 ==== HTTP Service Configuration
 
-Modify `application.properties` to configure the URL for the `kucoin` Service ID:
+Modify the application configuration to configure the URL for the `kucoin` Service ID:
 
+:exclude-for-languages:python
 resource:application.properties[tag=http-services]
+:exclude-for-languages:
+
+:exclude-for-languages:java,groovy,kotlin
+resource:application.toml[tag=http-services]
+:exclude-for-languages:
 
 <1> The ID we used with `@Client` and the URL for the `kucoin` service
 
@@ -108,7 +120,7 @@ Create a `CryptoService` class that uses `PriceClient` and updates three custom 
 
 source:crypto/CryptoService[]
 callout:singleton[]
-<.> Use constructor injection to inject `PriceClient`, `MeterRegistry`, and `ObjectMapper` beans
+<.> Use constructor injection to inject `PriceClient` and `MeterRegistry` beans
 <.> Create a `Counter` to track the total number of updates
 <.> Create a `Timer` to track the total time performing updates
 <.> Create a `Gauge` to track the most recent update
@@ -119,9 +131,17 @@ callout:singleton[]
 
 == Testing the Application
 
+:exclude-for-languages:python
 Create the `src/test/resources/application-test.properties` configuration file for tests.
 
 testResource:application-test.properties[]
+:exclude-for-languages:
+
+:exclude-for-languages:java,groovy,kotlin
+Create the `tests-config/application-test.toml` configuration file for tests.
+
+testResource:application-test.toml[]
+:exclude-for-languages:
 
 <1> Disable crypto price lookups with a long initial delay
 
@@ -163,6 +183,14 @@ Alternatively, to make the Bitcoin price update occur more frequently to see the
 [source,bash]
 ----
 ./mvnw mn:run -Dmn.appArgs="-crypto.updateFrequency=5s"
+----
+
+:exclude-for-build:
+:exclude-for-build:gradle,maven
+
+[source,bash]
+----
+pyronaut run -- -crypto.updateFrequency=5s
 ----
 
 :exclude-for-build:
@@ -258,7 +286,7 @@ curl localhost:8080/metrics/bitcoin.price.time
 
 common:graal-with-plugins.adoc[]
 
-:exclude-for-languages:groovy
+:exclude-for-languages:groovy,python
 
 Start the native image and run the cURL commands above to see that the application works the same way as before, with faster startup and response times.
 

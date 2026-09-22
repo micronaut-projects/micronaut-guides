@@ -27,7 +27,8 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @MicronautTest
-@Sql(scripts = "classpath:sql/seed-data.sql", phase = Sql.Phase.BEFORE_EACH) // <1>
+@Sql(scripts = {"classpath:sql/init-db.sql", "classpath:sql/seed-data.sql"},
+        phase = Sql.Phase.BEFORE_EACH) // <1>
 class ProductRepositoryTest {
 
     @Inject

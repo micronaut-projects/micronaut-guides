@@ -54,7 +54,7 @@ Before being able to send and receive messages using RabbitMQ, it is necessary t
 One option is to create them directly in the RabbitMQ Admin UI available on http://localhost:15672.
 Use `guest` for both username and password.
 
-Another option is to create them programmatically. Create the class `ChannelPoolListener.java`:
+Another option is to create them programmatically. Create the class `ChannelPoolListener`:
 
 source:ChannelPoolListener[app=bookcatalogue]
 
@@ -104,7 +104,12 @@ The previous command creates a directory named `bookinventory` and a Micronaut a
 
 ==== Create RabbitMQ exchange, queue and binding
 
+:exclude-for-languages:python
 Copy the `ChannelPoolListener` class you created in the `bookcatalogue` microservice to `bookinventory/src/main/@lang@/example/micronaut/bookinventory`.
+:exclude-for-languages:
+:exclude-for-languages:java,groovy,kotlin
+Copy the `ChannelPoolListener` class you created in the `bookcatalogue` microservice to `bookinventory/src/example/micronaut`.
+:exclude-for-languages:
 
 ==== Create consumer
 
@@ -140,7 +145,12 @@ diffLink:[app=bookrecommendation]
 
 ==== Create RabbitMQ exchange, queue and binding
 
+:exclude-for-languages:python
 Copy the `ChannelPoolListener` class you created in the `bookcatalogue` microservice to `bookrecommendation/src/main/@lang@/example/micronaut/bookrecommendation`.
+:exclude-for-languages:
+:exclude-for-languages:java,groovy,kotlin
+Copy the `ChannelPoolListener` class you created in the `bookcatalogue` microservice to `bookrecommendation/src/example/micronaut`.
+:exclude-for-languages:
 
 ==== Create clients
 
@@ -159,7 +169,7 @@ will create a temporary queue for the callback.
 return a reactive type, but on the client side it is. Also, it is necessary to send something, even if it's not
 used in the consumer.
 
-Create `InventoryClient.java`:
+Create `InventoryClient`:
 
 source:InventoryClient[app=bookrecommendation]
 
@@ -175,9 +185,15 @@ Create a Controller that injects both clients.
 
 source:BookController[app=bookrecommendation]
 
+:exclude-for-languages:python
 callout:controller[arg0=/books]
 <.> Clients are injected via constructor injection
 callout:get[arg0=index,arg1=/books]
+:exclude-for-languages:
+:exclude-for-languages:java,groovy,kotlin
+<1> Inject the RabbitMQ clients.
+<2> Expose a route that returns the book recommendations.
+:exclude-for-languages:
 
 The previous controller returns a `Publisher<BookRecommendation>`. Create the `BookRecommendation` POJO:
 
@@ -208,7 +224,12 @@ Alternatively you can https://www.rabbitmq.com/download.html[install and run a l
 Configure `bookinventory` to run on port 8082:
 
 
+:exclude-for-languages:python
 resource:application.properties[app=bookinventory,tag=port]
+:exclude-for-languages:
+:exclude-for-languages:java,groovy,kotlin
+resource:application.toml[app=bookinventory,tag=port]
+:exclude-for-languages:
 
 Run `bookinventory` microservice:
 
@@ -244,7 +265,12 @@ Run `bookinventory` microservice:
 
 Configure `bookcatalogue` to run on port 8081:
 
+:exclude-for-languages:python
 resource:application.properties[app=bookcatalogue,tag=port]
+:exclude-for-languages:
+:exclude-for-languages:java,groovy,kotlin
+resource:application.toml[app=bookcatalogue,tag=port]
+:exclude-for-languages:
 
 Run `bookcatalogue` microservice:
 
@@ -280,7 +306,12 @@ Run `bookcatalogue` microservice:
 
 Configure `bookrecommendation` to run on port 8080:
 
+:exclude-for-languages:python
 resource:application.properties[app=bookrecommendation,tag=port]
+:exclude-for-languages:
+:exclude-for-languages:java,groovy,kotlin
+resource:application.toml[app=bookrecommendation,tag=port]
+:exclude-for-languages:
 
 NOTE: 8080 is the default port if you don't specify `micronaut.server.port` property
 

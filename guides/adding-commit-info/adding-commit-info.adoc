@@ -47,8 +47,17 @@ dependency:micronaut-management[]
 
 Enable the info endpoint:
 
+:exclude-for-languages:python
 
 resource:application.properties[tag=endpoints]
+
+:exclude-for-languages:
+
+:exclude-for-languages:java,groovy,kotlin
+
+resource:application.toml[tag=endpoints]
+
+:exclude-for-languages:
 
 :exclude-for-build:maven
 
@@ -100,9 +109,19 @@ rocker:gitCommitIdPlugin[]
 
 :exclude-for-build:
 
+:exclude-for-languages:java,groovy,kotlin
+
+For the Pyronaut example, use a small Python build helper to generate `git.properties` from the local Git repository and write it to the resource directory:
+
+source:GenerateGitProperties[]
+
+The Python `setup.py` build command can call the same helper before packaging so the generated `git.properties` file is available on the classpath.
+
+:exclude-for-languages:
+
 == Test
 
-Create a JUnit test to verify that when you make a GET request to `/info` you get a payload such as:
+Create a test to verify that when you make a GET request to `/info` you get a payload such as:
 
 [source, json]
 ----
@@ -127,22 +146,33 @@ Create a JUnit test to verify that when you make a GET request to `/info` you ge
 }
 ----
 
-Create a JUnit test to verify the behaviour:
+Create a test to verify the behaviour:
 
 test:InfoTest[]
 
 callout:micronaut-test[]
+
+:exclude-for-languages:python
 callout:http-client[]
 callout:http-request[]
 callout:body-method[]
+:exclude-for-languages:
+
+:exclude-for-languages:java,groovy,kotlin
+<.> Use `requests.with_context` to send HTTP requests to the running test server.
+<.> Make a GET request to the `/info` endpoint.
+<.> The `requests` response exposes JSON payloads as Python dictionaries.
+:exclude-for-languages:
 
 common:testApp.adoc[]
 
 common:runapp.adoc[]
 
+:exclude-for-languages:python
+
 common:graal-with-plugins.adoc[]
 
-:exclude-for-languages:groovy
+:exclude-for-languages:groovy,python
 
 Annotate the `Application` class with `@Introspected`. This won't be necessary in a real-world application because there
 will be Micronaut beans defined (something annotated with `@Singleton`, `@Controller`,...), but for this case you need to

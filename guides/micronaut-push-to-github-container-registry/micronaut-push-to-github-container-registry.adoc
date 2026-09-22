@@ -19,7 +19,8 @@ scopes.
 
 image:personal-access-token-packages-scopes.png[]
 
-:exclude-for-build:maven
+:exclude-for-languages:python
+:exclude-for-build:maven,pyronaut
 
 == Micronaut Gradle Plugin
 
@@ -74,3 +75,33 @@ You can push to GitHub Container Registry via the `dockerPush` Gradle task.
 common:docker-push-gradle.adoc[]
 
 :exclude-for-build:
+:exclude-for-languages:
+
+:exclude-for-languages:java,groovy,kotlin
+
+== Pyronaut
+
+Configure the Pyronaut Docker image name in `pyproject.toml`:
+
+[source,toml]
+----
+[tool.pyronaut.build.docker]
+image-name = "ghcr.io/githubOrganizationOrUsername/micronautguide"
+----
+
+Log in to GitHub Container Registry:
+
+[source,bash]
+----
+echo "${GITHUB_PERSONAL_ACCESS_TOKEN}" | docker login ghcr.io -u githubOrganizationOrUsername --password-stdin
+----
+
+Build and push the Docker image:
+
+[source,bash]
+----
+pyronaut build --docker
+docker push ghcr.io/githubOrganizationOrUsername/micronautguide:1.0.0
+----
+
+:exclude-for-languages:

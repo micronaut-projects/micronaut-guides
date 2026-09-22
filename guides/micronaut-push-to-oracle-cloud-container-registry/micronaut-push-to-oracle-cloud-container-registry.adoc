@@ -32,7 +32,8 @@ ____
 ____
 
 
-:exclude-for-build:maven
+:exclude-for-languages:python
+:exclude-for-build:maven,pyronaut
 
 == Micronaut Gradle Plugin
 
@@ -89,3 +90,33 @@ You can push to Oracle Cloud Container Registry via the `dockerPush` Gradle task
 common:docker-push-gradle.adoc[]
 
 :exclude-for-build:
+:exclude-for-languages:
+
+:exclude-for-languages:java,groovy,kotlin
+
+== Pyronaut
+
+Configure the Pyronaut Docker image name in `pyproject.toml`:
+
+[source,toml]
+----
+[tool.pyronaut.build.docker]
+image-name = "ocir.eu-madrid-1.oci.oraclecloud.com/bzcsmyxwoeez/micronaut-guides"
+----
+
+Log in to Oracle Cloud Container Registry:
+
+[source,bash]
+----
+echo "${REGISTRY_TOKEN}" | docker login ocir.eu-madrid-1.oci.oraclecloud.com -u "bzcsmyxwoeez/email@example.com" --password-stdin
+----
+
+Build and push the Docker image:
+
+[source,bash]
+----
+pyronaut build --docker
+docker push ocir.eu-madrid-1.oci.oraclecloud.com/bzcsmyxwoeez/micronaut-guides:1.0.0
+----
+
+:exclude-for-languages:

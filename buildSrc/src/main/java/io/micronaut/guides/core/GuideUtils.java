@@ -31,6 +31,7 @@ public final class GuideUtils {
             addAllSafe(allFeatures, app.javaFeatures());
             addAllSafe(allFeatures, app.kotlinFeatures());
             addAllSafe(allFeatures, app.groovyFeatures());
+            addAllSafe(allFeatures, app.pythonFeatures());
             for (String featureName : allFeatures) {
                 String tagToAdd = featureName;
                 for (String prefix : FEATURES_PREFIXES) {
@@ -56,6 +57,9 @@ public final class GuideUtils {
         if (language == Language.GROOVY) {
             return mergeLists(app.features(), getAppInvisibleFeatures(app), app.groovyFeatures());
         }
+        if (language == Language.PYTHON) {
+            return mergeLists(app.features(), getAppInvisibleFeatures(app), app.pythonFeatures());
+        }
         return mergeLists(app.features(), getAppInvisibleFeatures(app));
     }
 
@@ -79,10 +83,16 @@ public final class GuideUtils {
         if (language == Language.GROOVY) {
             return mergeLists(app.features(), app.groovyFeatures());
         }
+        if (language == Language.PYTHON) {
+            return mergeLists(app.features(), app.pythonFeatures());
+        }
         return app.features();
     }
 
     public static boolean isSupported(BuildTool buildTool, Language language) {
+        if (buildTool == BuildTool.PYRONAUT || language == Language.PYTHON) {
+            return buildTool == BuildTool.PYRONAUT && language == Language.PYTHON;
+        }
         return !(buildTool == BuildTool.MAVEN && language == Language.KOTLIN);
     }
 
@@ -95,6 +105,9 @@ public final class GuideUtils {
         }
         if (buildTool == BuildTool.MAVEN) {
             return guide.skipMavenTests();
+        }
+        if (buildTool == BuildTool.PYRONAUT) {
+            return guide.skipPyronautTests();
         }
 
         return false;
@@ -126,7 +139,9 @@ public final class GuideUtils {
                 guide.publish(),
                 guide.base(),
                 guide.env() == null ? base.env() : guide.env(),
-                mergeApps(base.apps(), guide.apps())
+                mergeApps(base.apps(), guide.apps()),
+                base.python() || guide.python(),
+                base.skipPyronautTests() || guide.skipPyronautTests()
         );
     }
 
@@ -170,7 +185,8 @@ public final class GuideUtils {
                     guideApp.testFramework(),
                     guideApp.excludeTest(),
                     guideApp.excludeSource(),
-                    baseApp.validateLicense()
+                    baseApp.validateLicense(),
+                    mergeLists(guideApp.pythonFeatures(), baseApp.pythonFeatures())
             );
             merged.add(mergedApp);
         }

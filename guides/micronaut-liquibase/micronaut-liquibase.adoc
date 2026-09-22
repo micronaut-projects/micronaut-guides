@@ -25,16 +25,53 @@ https://guides.micronaut.io/latest/micronaut-intellij-idea-ide-setup.html[Setup 
 
 === Create Entity
 
+:exclude-for-languages:python
+
 Create a `@MappedEntity` to save persons. Initially, consider name and age required. Use `int` primitive for the age.
 
 source:Person[tags=package|clazz1|ageint|clazz2]
+
+:exclude-for-languages:
+
+:exclude-for-languages:java,groovy,kotlin
+
+Create a dataclass annotated with `@MappedEntity` to save persons:
+
+source:Person[]
+
+:exclude-for-languages:
 
 callout:mapped-entity[]
 callout:mapped-entity-id[]
 callout:generated-value[]
 callout:version-optimistic-locking[]
 
+:exclude-for-languages:python
+
 common:liquibase.adoc[]
+
+:exclude-for-languages:
+
+:exclude-for-languages:java,groovy,kotlin
+
+=== Database Migration with Liquibase
+
+We need a way to create the database schema. For that, we use
+https://micronaut-projects.github.io/micronaut-liquibase/latest/guide/[Micronaut integration with Liquibase].
+
+Add the following snippet to include the necessary dependencies:
+
+dependency:micronaut-liquibase[groupId=io.micronaut.liquibase]
+
+Configure the database migrations directory for http://www.liquibase.org[Liquibase] in `application.toml`.
+
+resource:application.toml[tag=liquibase]
+
+Create the following files with the database schema creation:
+
+resource:db/liquibase-changelog.xml[]
+
+:exclude-for-languages:
 
 resource:db/changelog/01-create-person.xml[]
 
@@ -67,9 +104,19 @@ The `person` table looks like:
 
 === Drop Not Null Constraint
 
+:exclude-for-languages:python
+
 Applications change. Make `age` optional:
 
 source:Person[tags=nullableage]
+
+:exclude-for-languages:
+
+:exclude-for-languages:java,groovy,kotlin
+
+Applications change. The Python dataclass uses `int | None` for the optional `age` field.
+
+:exclude-for-languages:
 
 Add a new changeset to drop the null constraint:
 
@@ -103,7 +150,17 @@ dependency:micronaut-management[]
 
 Enable the Liquibase endpoint:
 
+:exclude-for-languages:python
+
 resource:application.properties[tag=endpoints]
+
+:exclude-for-languages:
+
+:exclude-for-languages:java,groovy,kotlin
+
+resource:application.toml[tag=endpoints]
+
+:exclude-for-languages:
 
 common:test-resources-postgres.adoc[]
 
@@ -113,14 +170,30 @@ Create a test that invokes the Liquibase endpoint
 
 test:LiquibaseEndpointTest[]
 
+:exclude-for-languages:python
 callout:micronaut-test[]
 callout:http-client[]
+:exclude-for-languages:
+:exclude-for-languages:java,groovy,kotlin
+<1> Create a Micronaut test fixture for the application under test.
+<2> Use `requests.with_context(my_context)` to call the application under test with a context-bound HTTP client.
+:exclude-for-languages:
 
 === Running the application
 
-Although the URL is configured automatically via <<test-resources,Test Resources>>, we must configure the PostgreSQL driver and dialect in `application.properties`:
+Although the URL is configured automatically via <<test-resources,Test Resources>>, we must configure the PostgreSQL driver and dialect:
+
+:exclude-for-languages:python
 
 resource:application.properties[tag=datasource]
+
+:exclude-for-languages:
+
+:exclude-for-languages:java,groovy,kotlin
+
+resource:application.toml[tag=datasource]
+
+:exclude-for-languages:
 
 <1> Use PostgreSQL driver.
 <2> Configure the PostgreSQL dialect.

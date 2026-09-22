@@ -8,6 +8,7 @@ import java.util.*;
 
 import static io.micronaut.starter.options.BuildTool.GRADLE;
 import static io.micronaut.starter.options.BuildTool.MAVEN;
+import static io.micronaut.starter.options.BuildTool.PYRONAUT;
 import static io.micronaut.starter.options.Language.GROOVY;
 import static io.micronaut.starter.options.Language.KOTLIN;
 
@@ -58,11 +59,26 @@ public class DependencyLines {
         }
     }
 
+    private static String toPyronautScope(Map<String, String> attributes) {
+        String s = attributes.get("scope");
+        if (s == null) {
+            return "runtime";
+        }
+        return switch (s) {
+            case "annotationProcessor", "compileOnly" -> "build";
+            case "testCompile", "test", "testRuntimeOnly", "testImplementation", "testCompileOnly", "testAnnotationProcessor" -> "test";
+            default -> "runtime";
+        };
+    }
+
     public static List<String> asciidoc(String line, BuildTool buildTool, Language language) {
         return asciidoc(Collections.singletonList(line), buildTool, language);
     }
 
     public static List<String> asciidoc(List<String> lines, BuildTool buildTool, Language language) {
+        if (buildTool == PYRONAUT) {
+            return pyronautAsciidoc(lines);
+        }
         List<String> dependencyLines = new ArrayList<>();
 
         // Open Asciidoctor code block
@@ -74,6 +90,11 @@ public class DependencyLines {
             dependencyLines.add("[source, xml]");
             dependencyLines.add(".pom.xml");
             dependencyLines.add("----");
+        } else if (buildTool == PYRONAUT) {
+            dependencyLines.add("[source, toml]");
+            dependencyLines.add(".pyproject.toml");
+            dependencyLines.add("----");
+            dependencyLines.add("[tool.pyronaut.dependencies]");
         }
 
         for (String line : lines) {
@@ -141,12 +162,62 @@ public class DependencyLines {
                         dependencyLines.add("");
                     }
                 }
+            } else if (buildTool == PYRONAUT) {
+                String coordinate = groupId + ':' + artifactId;
+                if (version != null) {
+                    coordinate += ':' + version;
+                }
+                String tomlCallout = callout.isEmpty() ? "" : " #" + callout.substring(" //".length());
+                dependencyLines.add(toPyronautScope(attributes) + " = [\"" + coordinate + "\"]" + tomlCallout);
             }
         }
 
         // Close Asciidoctor code block
         dependencyLines.add("----");
 
+        return dependencyLines;
+    }
+
+    private static List<String> pyronautAsciidoc(List<String> lines) {
+        Map<String, List<String>> dependencies = new LinkedHashMap<>();
+        dependencies.put("runtime", new ArrayList<>());
+        dependencies.put("build", new ArrayList<>());
+        dependencies.put("test", new ArrayList<>());
+
+        for (String line : lines) {
+            String artifactId = line.substring("dependency:".length(), line.indexOf("["));
+            Map<String, String> attributes = new HashMap<>();
+            String attributesStr = line.substring(line.indexOf("[") + "[".length(), line.indexOf("]"));
+            String[] attrs = attributesStr.split(",");
+            for (String att : attrs) {
+                String[] keyValues = att.split("=");
+                if (keyValues.length == 2) {
+                    attributes.put(keyValues[0], keyValues[1]);
+                }
+            }
+
+            String groupId = attributes.getOrDefault("groupId", "io.micronaut");
+            String version = attributes.get("version");
+            String coordinate = groupId + ':' + artifactId + (version != null ? ':' + version : "");
+            String callout = extractCallout(attributes);
+            String tomlCallout = callout.isEmpty() ? "" : " #" + callout.substring(" //".length());
+            dependencies.get(toPyronautScope(attributes)).add("\"" + coordinate + "\"," + tomlCallout);
+        }
+
+        List<String> dependencyLines = new ArrayList<>();
+        dependencyLines.add("[source, toml]");
+        dependencyLines.add(".pyproject.toml");
+        dependencyLines.add("----");
+        dependencyLines.add("[tool.pyronaut.dependencies]");
+        for (Map.Entry<String, List<String>> entry : dependencies.entrySet()) {
+            if (entry.getValue().isEmpty()) {
+                continue;
+            }
+            dependencyLines.add(entry.getKey() + " = [");
+            entry.getValue().forEach(value -> dependencyLines.add("    " + value));
+            dependencyLines.add("]");
+        }
+        dependencyLines.add("----");
         return dependencyLines;
     }
 

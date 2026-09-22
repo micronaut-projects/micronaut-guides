@@ -1,6 +1,8 @@
 package io.micronaut.guides.core;
 
 import io.micronaut.core.annotation.NonNull;
+import io.micronaut.starter.options.BuildTool;
+import io.micronaut.starter.options.Language;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,6 +18,25 @@ public final class MacroUtils {
     @NonNull
     static String getSourceDir(@NonNull String slug, @NonNull GuidesOption option) {
         return slug + "-" + option.getBuildTool() + "-" + option.getLanguage();
+    }
+
+    static boolean isPyronautPython(@NonNull GuidesOption option) {
+        return option.getBuildTool() == BuildTool.PYRONAUT && option.getLanguage() == Language.PYTHON;
+    }
+
+    static String pythonModuleName(@NonNull String target) {
+        if (target.contains("_") || target.equals(target.toLowerCase())) {
+            return target;
+        }
+        return target.replaceAll("([a-z0-9])([A-Z])", "$1_$2")
+                .replaceAll("([A-Z]+)([A-Z][a-z])", "$1_$2")
+                .toLowerCase();
+    }
+
+    static String pythonTestModuleName(@NonNull String target) {
+        String normalized = target.endsWith("Test") ? target.substring(0, target.length() - "Test".length()) : target;
+        normalized = pythonModuleName(normalized);
+        return normalized.startsWith("test_") ? normalized : "test_" + normalized;
     }
 
     static List<String> findMacroLines(@NonNull String str, @NonNull String macro) {

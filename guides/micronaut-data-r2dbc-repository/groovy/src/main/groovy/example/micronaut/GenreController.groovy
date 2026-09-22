@@ -21,7 +21,6 @@ import io.micronaut.data.model.Page
 import io.micronaut.data.model.Pageable
 import io.micronaut.http.HttpHeaders
 import io.micronaut.http.HttpResponse
-import io.micronaut.http.HttpStatus
 import io.micronaut.http.MutableHttpResponse
 import io.micronaut.http.annotation.Body
 import io.micronaut.http.annotation.Controller
@@ -29,7 +28,6 @@ import io.micronaut.http.annotation.Delete
 import io.micronaut.http.annotation.Get
 import io.micronaut.http.annotation.Post
 import io.micronaut.http.annotation.Put
-import io.micronaut.http.annotation.Status
 import reactor.core.publisher.Mono
 
 import jakarta.validation.Valid
@@ -78,10 +76,9 @@ class GenreController {
     }
 
     @Delete("/{id}") // <12>
-    @Status(HttpStatus.NO_CONTENT)
-    Mono<Void> delete(long id) {
+    Mono<HttpResponse<?>> delete(long id) {
         return genreRepository.deleteById(id)
-                .then()
+                .thenReturn(HttpResponse.noContent())
     }
 
     @NonNull

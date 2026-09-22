@@ -48,11 +48,28 @@ NAME        NETWORK  DIRECTION  PRIORITY  ALLOW     DENY  DISABLED
 allow-8080  default  INGRESS    1000      tcp:8080        False
 ----
 
-=== Generate JAR
+=== Generate Application Artifact
 
+:exclude-for-languages:python
 common:shade.adoc[]
+:exclude-for-languages:
 
-=== Copy the JAR to the Instance
+:exclude-for-languages:java,groovy,kotlin
+
+Use the `pyronaut build` command to produce a Python wheel:
+
+[source,bash]
+----
+pyronaut build
+----
+
+The command writes the wheel to the `dist/` directory.
+
+:exclude-for-languages:
+
+=== Copy the Application Artifact to the Instance
+
+:exclude-for-languages:python
 
 :exclude-for-build:maven
 
@@ -74,6 +91,18 @@ gcloud compute scp target/micronautguide-0.1.jar \
 
 :exclude-for-build:
 
+:exclude-for-languages:
+
+:exclude-for-languages:java,groovy,kotlin
+
+[source,bash]
+----
+gcloud compute scp dist/*.whl \
+    guide-micronaut-jdbc-compute:.
+----
+
+:exclude-for-languages:
+
 NOTE: If you do not have an SSH key file for `gcloud`, you will be prompted to set a passphrase to create a public/private RSA key pair.
 
 === Start the Micronaut Application
@@ -86,6 +115,8 @@ gcloud compute ssh guide-micronaut-jdbc-compute
 ----
 
 Now we are connected to our instance.
+
+:exclude-for-languages:python
 
 Let's make sure it is up-to-date and install the Java JRE.
 
@@ -115,6 +146,29 @@ java -jar micronautguide-0.1.jar
 
 :exclude-for-build:
 
+:exclude-for-languages:
+
+:exclude-for-languages:java,groovy,kotlin
+
+Let's make sure it is up-to-date and install the Python runtime.
+
+[source,bash]
+----
+sudo apt update
+sudo apt install python3 python3-pip python3-venv
+----
+
+Create a virtual environment, install the wheel, and run the generated console script. The generated guide project uses `default`:
+
+[source,bash]
+----
+python3 -m venv micronautguide
+source micronautguide/bin/activate
+python -m pip install *.whl
+default
+----
+
+:exclude-for-languages:
 
 === Running Application
 

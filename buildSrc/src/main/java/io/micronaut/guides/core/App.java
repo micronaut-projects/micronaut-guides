@@ -22,6 +22,7 @@ import java.util.List;
  * @param kotlinFeatures    The app's Kotlin features
  * @param javaFeatures      The app's Java features
  * @param groovyFeatures    The app's Groovy features
+ * @param pythonFeatures    The app's Python features
  * @param testFramework     The app's test framework
  * @param excludeTest       The tests that should not be run
  * @param excludeSource     The source files that should not be included
@@ -72,7 +73,26 @@ public record App(
 
         @JsonProperty(defaultValue = StringUtils.TRUE)
         @Nullable
-        Boolean validateLicense
-) {
-}
+        Boolean validateLicense,
 
+        @Nullable
+        List<String> pythonFeatures
+) {
+    public App(
+            @NonNull String name,
+            @Nullable String packageName,
+            @Nullable ApplicationType applicationType,
+            @Nullable String framework,
+            @Nullable List<String> features,
+            @Nullable List<String> invisibleFeatures,
+            @Nullable List<String> kotlinFeatures,
+            @Nullable List<String> javaFeatures,
+            @Nullable List<String> groovyFeatures,
+            @Nullable TestFramework testFramework,
+            @Nullable List<String> excludeTest,
+            @Nullable List<String> excludeSource,
+            @Nullable Boolean validateLicense) {
+        this(name, packageName, applicationType, framework, features, invisibleFeatures, kotlinFeatures, javaFeatures,
+                groovyFeatures, testFramework, excludeTest, excludeSource, validateLicense, null);
+    }
+}

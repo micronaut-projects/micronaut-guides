@@ -44,6 +44,8 @@ abstract class SampleProjectGenerationTask extends DefaultTask {
 
     @TaskAction
     def perform() {
-        guidesGenerator.generateOne(metadata, inputDirectory.get().asFile, outputDir.get().asFile)
+        File outputDirectory = outputDir.get().asFile
+        project.delete(outputDirectory)
+        guidesGenerator.generateOne(metadata, inputDirectory.get().asFile, outputDirectory)
     }
 }
