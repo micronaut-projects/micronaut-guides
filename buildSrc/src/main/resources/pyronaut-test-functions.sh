@@ -206,7 +206,7 @@ run_pyronaut_tests () {
 
   local tmp_dir
   tmp_dir="$(mktemp -d "${TMPDIR:-/tmp}/pyronaut-guide.XXXXXX")"
-  tar --exclude='./__pyronaut__' --exclude='./.pytest_cache' --exclude='./build' --exclude='./dist' --exclude='./*.egg-info' -cf - . | (cd "$tmp_dir" && tar -xf -)
+  tar --exclude='./.micronaut' --exclude='./__pyronaut__' --exclude='./.pytest_cache' --exclude='./build' --exclude='./dist' --exclude='./*.egg-info' -cf - . | (cd "$tmp_dir" && tar -xf -)
   (
     cd "$tmp_dir"
     set_pyronaut_local_repositories
