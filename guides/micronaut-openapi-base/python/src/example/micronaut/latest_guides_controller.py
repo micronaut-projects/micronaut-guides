@@ -61,5 +61,5 @@ class LatestGuidesController:
     ]
 
     @Get("/guides.json")  # <2>
-    def latestGuides(self) -> list[Guide]:
+    def latest_guides(self) -> list[Guide]:
         return self.GUIDES
