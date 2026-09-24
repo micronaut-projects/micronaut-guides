@@ -298,7 +298,7 @@ public class DefaultTestScriptGenerator implements TestScriptGenerator {
             if (stream == null) {
                 throw new IllegalStateException("Missing pyronaut-test-functions.sh resource");
             }
-            return new String(stream.readAllBytes(), StandardCharsets.UTF_8).stripTrailing();
+            return new String(stream.readAllBytes(), StandardCharsets.UTF_8).stripTrailing() + "\n";
         } catch (IOException e) {
             throw new IllegalStateException("Unable to read pyronaut-test-functions.sh resource", e);
         }
