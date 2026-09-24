@@ -18,9 +18,19 @@ common:create-app-features.adoc[]
 
 === Configuration
 
-Note the following configuration in the generated `application.properties`:
+Note the following configuration in the generated configuration file:
+
+:exclude-for-languages:python
 
 resource:application.properties[tag=security]
+
+:exclude-for-languages:
+
+:only-for-languages:python
+
+resource:application.toml[tag=security]
+
+:only-for-languages:
 
 <1> Set `authentication` to `bearer` to receive a JSON response from the login endpoint.
 <2> Change this to your own secret and keep it safe (do not store this in your VCS).
@@ -41,8 +51,8 @@ Create `HomeController` which resolves the base URL `/`:
 source:HomeController[]
 
 <1> Annotate with `io.micronaut.security.Secured` to configure secured access. The `isAuthenticated()` expression will allow access only to authenticated users.
-<2> Annotate with `io.micronaut.http.annotation.Controller` to designate the class as a Micronaut controller.
-<3> You can specify the HTTP verb that a controller action responds to. To respond to a GET request, use the `io.micronaut.http.annotation.Get` annotation.
+<2> You can specify the HTTP verb that a controller action responds to. To respond to a GET request, use the `io.micronaut.http.annotation.Get` annotation.
+<3> The root route responds to `/`.
 <4> If a user is authenticated, the Micronaut framework will bind the user object to an argument of type `java.security.Principal` (if present).
 
 == Tests
@@ -52,12 +62,30 @@ Create a test to verify a user is able to login and access a secured endpoint.
 test:JwtAuthenticationTest[]
 
 callout:micronaut-test[]
+
+:exclude-for-languages:python
 callout:http-client[]
+:exclude-for-languages:
+
+:only-for-languages:python
+<.> Use `requests.with_context` to send HTTP requests to the running test server.
+:only-for-languages:
+
 <.> When you include the security dependencies, security is considered enabled and every endpoint is secured by default.
 <.> To login, do a POST request to `/login` with your credentials as a JSON payload in the body of the request.
+:exclude-for-languages:python
 <.> The framework makes it easy to bind JSON responses into Java objects.
+:exclude-for-languages:
+:only-for-languages:python
+<.> The `requests` response exposes JSON payloads as Python dictionaries.
+:only-for-languages:
 <.> The framework supports the https://tools.ietf.org/html/rfc6750[RFC 6750 Bearer Token] specification out-of-the-box. We supply the JWT token in the `Authorization` HTTP header.
+:exclude-for-languages:python
 callout:body-method[]
+:exclude-for-languages:
+:only-for-languages:python
+<.> The `requests` response exposes the response body through `text`.
+:only-for-languages:
 
 === Use the Micronaut HTTP Client and JWT
 
@@ -81,7 +109,17 @@ Access tokens expire. You can control the expiration with `micronaut.security.to
 
 First, add the following configuration:
 
+:exclude-for-languages:python
+
 resource:application.properties[tag=refresh]
+
+:exclude-for-languages:
+
+:only-for-languages:python
+
+resource:application.toml[tag=refresh]
+
+:only-for-languages:
 
 <1> To generate a refresh token your application must have beans of type:
 https://micronaut-projects.github.io/micronaut-security/latest/api/io/micronaut/security/token/generator/RefreshTokenGenerator.html[RefreshTokenGenerator],
@@ -128,7 +166,17 @@ dependency:h2[groupId=com.h2database,scope=runtimeOnly,callout=4]
 
 Create an entity to save the issued refresh tokens.
 
+:exclude-for-languages:python
+
 source:RefreshTokenEntity[tags=package|clazzwithoutsettersandgetters|endclass]
+
+:exclude-for-languages:
+
+:only-for-languages:python
+
+source:RefreshTokenEntity[tags=clazzwithoutsettersandgetters]
+
+:only-for-languages:
 
 <1> Specifies the entity is mapped to the database
 <2> Specifies the ID of an entity
@@ -222,9 +270,13 @@ curl -X "POST" "http://localhost:8080/login" -H 'Content-Type: application/json'
 {"username":"sherlock","access_token":"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzaGVybG9jayIsIm5iZiI6MTYxNDc2NDEzNywicm9sZXMiOltdLCJpc3MiOiJjb21wbGV0ZSIsImV4cCI6MTYxNDc2NzczNywiaWF0IjoxNjE0NzY0MTM3fQ.cn8bOjlccFqeUQA7x7MnfacMNPjSVAtWP65z1c8eaJc","refresh_token":"eyJhbGciOiJIUzI1NiJ9.NDI1ZjAxZTktYTRmYS00MmU5LTllYjctOWU2ZTNhNTI5YmQ1.RUc2iCfZdPQdwg2U0Nw_LLzZQIIDp5_Is2UWeHVZT7E","token_type":"Bearer","expires_in":3600}
 ----
 
+:exclude-for-languages:python
+
 common:graal-with-plugins.adoc[]
 
-:exclude-for-languages:groovy
+:exclude-for-languages:
+
+:exclude-for-languages:groovy,python
 
 Send the same `curl` request as before to test that the native executable application works.
 

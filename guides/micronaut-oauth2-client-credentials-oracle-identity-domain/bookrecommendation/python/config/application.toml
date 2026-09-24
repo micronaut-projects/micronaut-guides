@@ -1,0 +1,44 @@
+#tag::mn[]
+[micronaut.application]
+name = "bookrecommendation"
+#end::mn[]
+
+#tag::server[]
+[micronaut.server]
+port = 8080
+#end::server[]
+
+[endpoints.health]
+enabled = true
+sensitive = false
+
+#tag::httpservices[]
+[micronaut.http.services.bookcatalogue]
+url = "http://localhost:8081"
+
+[micronaut.http.services.bookinventory]
+url = "http://localhost:8082"
+#end::httpservices[]
+
+#tag::oauth2[]
+# <1>
+[micronaut.security.oauth2.clients.oci]
+# <2>
+client-id = "${OAUTH_CLIENT_ID:xxx}"
+# <3>
+client-secret = "${OAUTH_CLIENT_SECRET:yyy}"
+# <4>
+grant-type = "client_credentials"
+
+[micronaut.security.oauth2.clients.oci.token]
+# <5>
+url = "${OAUTH_TOKEN_URL:https://idcs-12bzlaba1124141.identity.oraclecloud.com/oauth2/v1/token}"
+# <6>
+authentication-method = "client_secret_post"
+
+[micronaut.security.oauth2.clients.oci.client-credentials]
+# <7>
+scope = "${OAUTH_SCOPE:BookInventory}"
+# <8>
+service-id-regex = "bookcatalogue|bookinventory"
+#end::oauth2[]

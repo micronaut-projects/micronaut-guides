@@ -1,0 +1,44 @@
+[micronaut.application]
+name = "micronautguide"
+
+# tag::datasource[]
+[datasources.default]
+password = ""
+dialect = "H2"
+schema-generate = "CREATE_DROP"
+url = "jdbc:h2:mem:devDb;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
+username = "sa"
+driver-class-name = "org.h2.Driver"
+# end::datasource[]
+
+# tag::security[]
+[micronaut.security]
+# <1>
+authentication = "bearer"
+
+[micronaut.security.token.jwt.signatures.secret.generator]
+# <2>
+# <3>
+secret = "${JWT_GENERATOR_SIGNATURE_SECRET:pleaseChangeThisSecretForANewOne}"
+# end::security[]
+
+# tag::ldap[]
+# <1>
+# <2>
+[micronaut.security.ldap.default.context]
+server = "ldaps://db.debian.org"
+# <3>
+manager-dn = "cn=read-only-admin,dc=debian,dc=org"
+# <4>
+manager-password = "password"
+
+[micronaut.security.ldap.default.search]
+# <5>
+base = "dc=debian,dc=org"
+
+[micronaut.security.ldap.default.groups]
+# <6>
+enabled = true
+# <7>
+base = "dc=debian,dc=org"
+# end::ldap[]

@@ -6,7 +6,12 @@ To complete this guide, you will need the following:
 
 * Some time on your hands
 * A decent text editor or IDE
+:exclude-for-languages:python
 * JDK 17 or greater installed with `JAVA_HOME` configured appropriately
+:exclude-for-languages:
+:only-for-languages:python
+* GraalPy installed and the Pyronaut CLI available locally
+:only-for-languages:
 common:oracle-cloud-account.adoc[]
 
 common:completesolution.adoc[]
@@ -68,9 +73,26 @@ First, ensure that the private key you downloaded has the correct permissions:
 chmod 400 /path/to/ssh-key-*.key
 ----
 
+:exclude-for-languages:python
 common:executable-jar.adoc[]
+:exclude-for-languages:
 
-Push the JAR file to your VM:
+:only-for-languages:python
+
+Use the `pyronaut build` command to produce a Python wheel:
+
+[source,bash]
+----
+pyronaut build
+----
+
+The command writes the wheel to the `dist/` directory.
+
+:only-for-languages:
+
+Push the application artifact to your VM:
+
+:exclude-for-languages:python
 
 :exclude-for-build:maven
 
@@ -90,6 +112,17 @@ scp -i /path/to/ssh-key-*.key target/micronautguide-0.1.jar opc@[VM IP Address]:
 
 :exclude-for-build:
 
+:exclude-for-languages:
+
+:only-for-languages:python
+
+[source,bash]
+----
+scp -i /path/to/ssh-key-*.key dist/*.whl opc@[VM IP Address]:/home/opc/
+----
+
+:only-for-languages:
+
 To run on the VM, first SSH in:
 
 [source,bash]
@@ -97,9 +130,30 @@ To run on the VM, first SSH in:
 ssh -i /path/to/ssh-key-*.key opc@[YOUR IP]
 ----
 
+:exclude-for-languages:python
+
 Then install Java:
 
 common:install-graalvm-ee.adoc[]
+
+:exclude-for-languages:
+
+:only-for-languages:python
+
+Then install GraalPy. Oracle Linux images provide the build tools needed by `pyenv` through `dnf`:
+
+[source,bash]
+----
+sudo dnf install -y git gcc openssl-devel bzip2-devel libffi-devel zlib-devel xz-devel
+curl https://pyenv.run | bash
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init -)"
+pyenv install graalpy-25.0.2
+pyenv global graalpy-25.0.2
+----
+
+:only-for-languages:
 
 Open up the firewall to port 8080:
 
@@ -111,10 +165,29 @@ sudo firewall-cmd --reload
 
 Finally, start the application:
 
+:exclude-for-languages:python
+
 [source,bash]
 ----
 java -jar application.jar
 ----
+
+:exclude-for-languages:
+
+:only-for-languages:python
+
+Create a virtual environment, install the wheel, and run the generated console script. The generated guide project uses `default`:
+
+[source,bash]
+----
+python -m venv micronautguide
+source micronautguide/bin/activate
+python -m pip install --upgrade pip
+python -m pip install *.whl
+default
+----
+
+:only-for-languages:
 
 Verify that the application is running by invoking the controller at http://[VM IP Address]:8080 in a browser or using cURL:
 

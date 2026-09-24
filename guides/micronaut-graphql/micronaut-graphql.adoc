@@ -26,7 +26,17 @@ By default, the GraphQL endpoint `/graphql` is enabled, so you don't need to add
 
 === Describe your schema
 
+:exclude-for-languages:python
+
 Create the file `schema.graphqls` in `src/main/resources` directory:
+
+:exclude-for-languages:
+
+:only-for-languages:python
+
+Create the file `schema.graphqls` in the `config` directory:
+
+:only-for-languages:
 
 resource:schema.graphqls[]
 
@@ -38,7 +48,17 @@ resource:schema.graphqls[]
 
 For Jackson serialization with GraphQL it's necessary to add the following configuration:
 
+:exclude-for-languages:python
+
 resource:application.properties[tag=jackson]
+
+:exclude-for-languages:
+
+:only-for-languages:python
+
+resource:application.toml[tag=jackson]
+
+:only-for-languages:
 
 This prevents Jackson from removing null or empty values from the response.
 These are often required by GraphQL clients.
@@ -144,14 +164,25 @@ Notice that now the application only responds with `pageCount`, `name` and `id` 
 
 == Test the application
 
+:exclude-for-languages:python
+
 For testing the application we will use Micronaut HTTP Client to send a `POST` request to the `/graphql` endpoint.
 Create the following class:
+
+:exclude-for-languages:
+
+:only-for-languages:python
+
+For testing the application we will use a context-bound Pyronaut requests client to send a `POST` request to the `/graphql` endpoint.
+Create the following test module:
+
+:only-for-languages:
 
 test:GraphQLControllerTest[]
 
 To run the tests:
 
-:exclude-for-build:maven
+:exclude-for-build:maven,pyronaut
 
 [source, bash]
 ----
@@ -162,11 +193,22 @@ Then open `build/reports/tests/test/index.html` in a browser to see the results.
 
 :exclude-for-build:
 
-:exclude-for-build:gradle
+:exclude-for-build:gradle,pyronaut
 
 [source, bash]
 ----
 ./mvnw test
+----
+
+:exclude-for-build:
+
+:exclude-for-build:gradle,maven
+
+[source, bash]
+----
+pyronaut install
+pyronaut validate-config
+pyronaut test
 ----
 
 :exclude-for-build:
@@ -178,7 +220,17 @@ GraphiQL is the GraphQL integrated development environment, and it helps to exec
 
 It should only be used for development, so it's not enabled by default. Add the following configuration to enable it:
 
+:exclude-for-languages:python
+
 resource:application.properties[tag=graphiql]
+
+:exclude-for-languages:
+
+:only-for-languages:python
+
+resource:application.toml[tag=graphiql]
+
+:only-for-languages:
 
 Start the application again and open http://localhost:8080/graphiql in your browser. You can write your GraphQL queries
 with integrated auto-completion and execute them to get the results in an easier and nicer way:
@@ -187,7 +239,7 @@ image:graphiql-01.png[]
 
 common:graal-with-plugins.adoc[]
 
-:exclude-for-languages:groovy
+:exclude-for-languages:groovy,python
 
 Start the native executable and execute the same curl request as before. You can also use the included GraphiQL browser to
 execute the queries.

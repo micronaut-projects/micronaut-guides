@@ -176,7 +176,8 @@ class AppTest {
                         "JUNIT",
                         "SPOCK",
                         "KOTLINTEST",
-                        "KOTEST"
+                        "KOTEST",
+                        "PYTEST"
                       ]
                     },
                     "validateLicense": {

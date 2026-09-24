@@ -37,7 +37,12 @@ dependency:micronaut-security-jwt[groupId=io.micronaut.security]
 Add the following OAuth 2.0 configuration:
 
 
+:exclude-for-languages:python
 resource:application.properties[tag=oauth2]
+:exclude-for-languages:
+:only-for-languages:python
+resource:application.toml[tag=oauth2]
+:only-for-languages:
 
 callout:authentication-idtoken[arg0=Google]
 <2> You can choose any name. The name you select will be used in your routes. For example, if you set `google`, the login route for this OAuth 2.0 client is `/oauth/login/google`.
@@ -62,14 +67,21 @@ image::diagramm.png[]
 
 === Home
 
+:exclude-for-languages:python
 Create a controller to handle the requests to `/`. You will display the email of the authenticated person if any. Annotate the controller endpoint with `@View` since we will use a Thymeleaf template.
+:exclude-for-languages:
+:only-for-languages:python
+Create a route function to handle the requests to `/`. You will display the email of the authenticated person if any. Annotate the route with `@View` since we will use a Thymeleaf template.
+:only-for-languages:
 
 source:HomeController[]
 
+:exclude-for-languages:python
 callout:controller[arg0=/]
+:exclude-for-languages:
 callout:secured-anonymous[]
-<3> Use https://micronaut-projects.github.io/micronaut-views/latest/api/io/micronaut/views/View.html[View] annotation to specify which template to use to render the response.
-<4> The @api@/io/micronaut/http/annotation/Get.html[@Get] annotation maps the `index` method to GET `/` requests.
+callout:view[]
+callout:get[arg0=index,arg1=/]
 
 Create a Thymeleaf template:
 
@@ -97,26 +109,41 @@ We can create a configuration object:
 
 source:ApplicationConfiguration[]
 
+:exclude-for-languages:python
 Backed by a `@ConfigurationProperties` annotated class:
 
 source:ApplicationConfigurationProperties[]
+:exclude-for-languages:
 
 and then implement an `OpenIdClaimsValidator` bean. The Micronaut framework validates the ID token against every bean of type `OpenIdClaimsValidator`. If the ID token `hd` claim does not match the value configured, it is considered invalid.
 
 source:HostedDomainClaimValidator[]
 
+:exclude-for-languages:python
 Add to `src/main/resources/application.properties`
 
 [source, properties]
 ----
 app.hosted-domain=objectcomputing.com
 ----
+:exclude-for-languages:
+
+:only-for-languages:python
+Add to `config/application.toml`
+
+[source, toml]
+----
+[app]
+hosted-domain = "objectcomputing.com"
+----
+
+:only-for-languages:
 
 If you start the application, you will only be able to sign in with a Google Account within the OCI organization.
 
 common:graal-with-plugins.adoc[]
 
-:exclude-for-languages:groovy
+:exclude-for-languages:groovy,python
 
 After you execute the native executable, navigate to `localhost:8080` and authenticate with Google.
 

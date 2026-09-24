@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+  <changeSet id="01" author="username">
+    <createTable tableName="contact">
+      <column name="id" type="BIGINT" autoIncrement="true">
+        <constraints nullable="false"
+                     unique="true"
+                     primaryKey="true"
+                     primaryKeyName="pk_contact"/>
+      </column>
+
+      <column name="first_name" type="VARCHAR(255)">
+        <constraints nullable="true"/>
+      </column>
+
+      <column name="last_name" type="VARCHAR(255)">
+        <constraints nullable="true"/>
+      </column>
+    </createTable>
+
+    <createTable tableName="phone">
+      <column name="id" type="BIGINT" autoIncrement="true">
+        <constraints nullable="false"
+                     unique="true"
+                     primaryKey="true"
+                     primaryKeyName="pk_phone"/>
+      </column>
+      <column name="phone" type="VARCHAR(20)">
+        <constraints nullable="false"/>
+      </column>
+
+      <column name="contact_id" type="BIGINT">
+        <constraints nullable="false"/>
+      </column>
+    </createTable>
+
+    <addForeignKeyConstraint baseTableName="phone"
+                             baseColumnNames="contact_id"
+                             constraintName="fk_phone_contact"
+                             referencedTableName="contact"
+                             referencedColumnNames="id"/>
+    <rollback>
+      <dropTable tableName="phone"/>
+      <dropTable tableName="contact"/>
+    </rollback>
+  </changeSet>
+</databaseChangeLog>

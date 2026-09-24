@@ -21,6 +21,7 @@ import io.micronaut.core.io.buffer.ReferenceCounted;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Get;
+import io.micronaut.http.client.DefaultHttpClientConfiguration;
 import io.micronaut.reactor.http.client.ReactorStreamingHttpClient;
 import jakarta.annotation.PreDestroy;
 import org.slf4j.Logger;
@@ -30,11 +31,12 @@ import reactor.core.publisher.Flux;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.time.Duration;
 
 @Controller // <1>
 class HomeController implements AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(HomeController.class);
-    private static final URI DEFAULT_URI = URI.create("https://guides.micronaut.io/micronaut5K.png");
+    private static final URI DEFAULT_URI = URI.create("https://raw.githubusercontent.com/micronaut-projects/micronaut-guides/master/guides/micronaut-reactor-streaming-http-client/src/test/resources/micronaut5K.png");
 
     private final ReactorStreamingHttpClient reactorStreamingHttpClient;
 
@@ -46,7 +48,9 @@ class HomeController implements AutoCloseable {
         } catch (MalformedURLException e) {
             throw new ConfigurationException("malformed URL" + urlStr);
         }
-        this.reactorStreamingHttpClient = ReactorStreamingHttpClient.create(url); // <2>
+        DefaultHttpClientConfiguration configuration = new DefaultHttpClientConfiguration();
+        configuration.setReadTimeout(Duration.ofSeconds(30));
+        this.reactorStreamingHttpClient = ReactorStreamingHttpClient.create(url, configuration); // <2>
     }
 
     @Get // <3>

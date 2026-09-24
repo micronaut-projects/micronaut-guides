@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>Micronaut - OpenID Connect</title>
+</head>
+<body>
+<h1>Micronaut - OpenID Connect</h1>
+
+<h2 th:if="${security}">Username: <span th:text="${security.get('name')}"></span></h2>
+<h2 th:unless="${security}">Username: Anonymous</h2>
+
+<nav>
+    <ul>
+        <li th:unless="${security}"><a href="/oauth/login/micronaut">Enter</a></li>
+        <li th:if="${security}"><a href="/logout">Logout</a></li>
+    </ul>
+</nav>
+<div th:if="${security}">
+    <h2>User Information:</h2>
+    <ul>
+        <tr th:each="key : ${#lists.sort(#lists.toList(security.attributes.keySet()))}">
+            <li><span th:text="${key}"></span>: <span th:text="${security.attributes.get(key)}"></span></li>
+        </tr>
+    </ul>
+</div>
+</body>
+</html>

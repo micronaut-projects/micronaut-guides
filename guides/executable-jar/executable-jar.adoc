@@ -17,11 +17,25 @@ common:default-package.adoc[]
 
 == Introduction
 
+:exclude-for-languages:python
+
 To distribute a self-contained Micronaut application that can be run from the command line, you can generate a fat JAR or uber JAR. A fat JAR combines the project's dependency classes and resources into a single output JAR: an executable JAR.
 
 If you use https://launch.micronaut.io[Micronaut Launch] or the Micronaut CLI to generate a Micronaut application, the application's build contains everything you need to produce an executable JAR.
 
+:exclude-for-languages:
+
+:only-for-languages:python
+
+To distribute a self-contained Pyronaut application that can be run from the command line, you can generate a Python wheel. The wheel contains the processed application classes, resources, and a console script launcher for the application.
+
+If you use Micronaut Launch or the Micronaut CLI to generate a Pyronaut application, the application's configuration contains everything you need to produce a wheel.
+
+:only-for-languages:
+
 == Main Class
+
+:exclude-for-languages:python
 
 The generated application contains an `Application` class, the entry point of the Micronaut application. It also has the build configuration to define that class as the application's main class.
 
@@ -35,9 +49,43 @@ The application contains the only mandatory configuration for the Application pl
 
 common:mainclass.adoc[]
 
+:exclude-for-languages:
+
+:only-for-languages:python
+
+The generated application contains a `main.py` script, the entry point of the Pyronaut application.
+
+zipInclude:src/main.py[]
+
+:only-for-languages:
+
+:exclude-for-languages:python
+
 external:distribution-base/hellocontroller.adoc[]
 
+:exclude-for-languages:
+
+:only-for-languages:python
+
+== Controller
+
+The generated application contains classless route functions that respond to HTTP requests:
+
+zipInclude:src/example/micronaut/controller.py[]
+
+:only-for-languages:
+
+:exclude-for-languages:python
+
 == Generate Executable JAR
+
+:exclude-for-languages:
+
+:only-for-languages:python
+
+== Generate Distribution Wheel
+
+:exclude-for-languages:python
 
 :exclude-for-build:maven
 
@@ -55,12 +103,52 @@ The Micronaut Maven Plugin delegates to the `maven-shade-plugin` to produce a JA
 
 :exclude-for-build:
 
+:only-for-languages:
+
+:only-for-languages:python
+
+For Pyronaut, use the `pyronaut build` command to produce a wheel:
+
+[source,bash]
+----
+pyronaut build
+----
+
+The command runs production configuration validation, installs dependencies, processes the application sources, and writes the wheel to the `dist/` directory.
+
+:only-for-languages:
+
+:exclude-for-languages:python
+
 == Run the Executable JAR
+
+:exclude-for-languages:
+
+:only-for-languages:python
+
+== Run the Wheel
+
+:exclude-for-languages:python
 
 Run the application packaged as a JAR file:
 
 common:executable-jar-run.adoc[]
 
+:only-for-languages:
+
+:only-for-languages:python
+
+Install the wheel and run the generated console script printed by `pyronaut build`. The generated guide project uses `default`:
+
+[source,bash]
+----
+python -m pip install dist/*.whl
+default
+----
+
+:only-for-languages:
+
+:exclude-for-languages:python
 
 == Time To First Request
 
@@ -90,6 +178,8 @@ resource:../../../ttfr.sh[]
 16:00:32.037 [main] INFO  io.micronaut.runtime.Micronaut - Startup completed in 439ms. Server Running: http://localhost:8080
 0.734 seconds
 ----
+
+:exclude-for-languages:
 
 common:next.adoc[]
 
