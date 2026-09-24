@@ -288,7 +288,7 @@ EXIT_STATUS=0
             throw new IllegalStateException('Missing pyronaut-test-functions.sh resource')
         }
         try (stream) {
-            new String(stream.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8).stripTrailing()
+            new String(stream.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8).stripTrailing() + '\n'
         }
     }
 
