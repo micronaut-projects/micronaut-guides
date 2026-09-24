@@ -171,7 +171,7 @@ public class TestScriptGeneratorTest {
         assertFalse(result.contains("\"$PYRONAUT_TEST_EXECUTABLE\""));
         assertTrue(result.contains("set_pyronaut_local_repositories"));
         assertTrue(result.contains("cd python-guide-pyronaut-python"));
-        assertTrue(result.contains("}\ncd python-guide-pyronaut-python"));
+        assertFalse(result.contains("}cd python-guide-pyronaut-python"));
         assertTrue(result.contains("run_pyronaut_tests || EXIT_STATUS=$?"));
         assertTrue(result.contains("tar --exclude='./.micronaut'"));
         assertFalse(result.contains("./gradlew -q check"));
