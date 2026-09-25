@@ -405,7 +405,7 @@ class IndexGenerator {
                 case Category.CORE_BASICS:
                     return './images/core.svg'
                 case Category.CACHE:
-                    return 'https://micronaut.io/wp-content/uploads/2020/12/cache.svg'
+                    return 'https://legacy.micronaut.io/wp-content/uploads/2020/12/cache.svg'
                 case Category.HTTP:
                     return './images/http.svg'
                 case Category.GRAPHQL:
@@ -443,7 +443,7 @@ class IndexGenerator {
                 case Category.DATA_JPA:
                 case Category.DATA_RDBC:
                 case Category.DATA_ACCESS:
-                    return 'https://micronaut.io/wp-content/uploads/2020/11/dataaccess.svg'
+                    return 'https://legacy.micronaut.io/wp-content/uploads/2020/11/dataaccess.svg'
                 case Category.DEVELOPMENT:
                     return "./images/programming.svg"
                 case Category.AWS_LAMBDA:
@@ -451,7 +451,7 @@ class IndexGenerator {
                 case Category.SCALE_TO_ZERO_CONTAINERS:
                     return "./images/container.svg"
                 case Category.SERVICE_DISCOVERY:
-                    return 'https://micronaut.io/wp-content/uploads/2020/12/Service_Discovery.svg'
+                    return 'https://legacy.micronaut.io/wp-content/uploads/2020/12/Service_Discovery.svg'
                 case Category.KUBERNETES:
                     return "./images/k8s.svg"
                 case Category.VIEWS:
@@ -459,27 +459,27 @@ class IndexGenerator {
                 case Category.GRAALPY:
                     return "./images/python.svg"
                 case Category.SCHEMA_MIGRATION:
-                    return "https://micronaut.io/wp-content/uploads/2020/11/database-migration.svg"
+                    return "https://legacy.micronaut.io/wp-content/uploads/2020/11/database-migration.svg"
                 case Category.SECURITY:
                 case Category.AUTHORIZATION_CODE:
                 case Category.CLIENT_CREDENTIALS:
                 case Category.SECRETS_MANAGER:
-                    return 'https://micronaut.io/wp-content/uploads/2020/12/Security.svg'
+                    return 'https://legacy.micronaut.io/wp-content/uploads/2020/12/Security.svg'
 
                 case Category.MESSAGING:
-                    return  'https://micronaut.io/wp-content/uploads/2020/11/Messaging.svg'
+                    return  'https://legacy.micronaut.io/wp-content/uploads/2020/11/Messaging.svg'
 
                 case Category.DISTRIBUTED_TRACING:
-                    return 'https://micronaut.io/wp-content/uploads/2020/12/Distributed_Tracing.svg'
+                    return 'https://legacy.micronaut.io/wp-content/uploads/2020/12/Distributed_Tracing.svg'
 
                 case Category.OBJECT_STORAGE:
                     return './images/objectstorage.svg'
 
                 case Category.GETTING_STARTED:
-                    return 'https://micronaut.io/wp-content/uploads/2020/11/Misc.svg'
+                    return 'https://legacy.micronaut.io/wp-content/uploads/2020/11/Misc.svg'
 
                 case Category.EMAIL:
-                    return 'https://micronaut.io/wp-content/uploads/2022/02/email.svg'
+                    return 'https://legacy.micronaut.io/wp-content/uploads/2022/02/email.svg'
 
                 case Category.TEST:
                     return './images/test.svg'
@@ -498,17 +498,17 @@ class IndexGenerator {
                     return './images/http-client.svg'
 
                 case Category.KOTLIN:
-                    return 'https://micronaut.io/wp-content/uploads/2021/05/Kotlin.svg'
+                    return 'https://legacy.micronaut.io/wp-content/uploads/2021/05/Kotlin.svg'
 
                 case Category.SPRING_BOOT_TO_MICRONAUT_BUILDING_A_REST_API:
                 case Category.SPRING:
                     return './images/spring.svg'
 
                 default:
-                    return 'https://micronaut.io/wp-content/uploads/2020/11/Misc.svg'
+                    return 'https://legacy.micronaut.io/wp-content/uploads/2020/11/Misc.svg'
             }
         }
-        return 'https://micronaut.io/wp-content/uploads/2020/11/Misc.svg'
+        return 'https://legacy.micronaut.io/wp-content/uploads/2020/11/Misc.svg'
     }
 
     private static String category(Object cat) {
