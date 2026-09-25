@@ -24,14 +24,17 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.time.LocalDate
+import java.util.Locale
 import java.util.regex.Pattern
 
 import static groovy.io.FileType.FILES
 import static io.micronaut.core.util.StringUtils.EMPTY_STRING
 import static io.micronaut.starter.api.TestFramework.JUNIT
+import static io.micronaut.starter.api.TestFramework.PYTEST
 import static io.micronaut.starter.api.TestFramework.SPOCK
 import static io.micronaut.starter.options.JdkVersion.JDK_25
 import static io.micronaut.starter.options.Language.GROOVY
+import static io.micronaut.starter.options.Language.PYTHON
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING
 
 @CompileStatic
@@ -151,13 +154,17 @@ class GuideProjectGenerator implements AutoCloseable {
 
                 copyGuideSourceFiles(inputDir, destinationPath, appName, guidesOption.language.toString())
 
+                if (buildTool == BuildTool.PYRONAUT && lang == PYTHON) {
+                    ensurePyronautBlockingExecutorConfig(destinationPath.resolve('config/application.toml'))
+                }
+
                 if (app.excludeSource()) {
                     for (String mainSource : app.excludeSource()) {
-                        File f = fileToDelete(destination, GuideAsciidocGenerator.mainPath(appName, mainSource), guidesOption)
+                        File f = fileToDelete(destination, GuideAsciidocGenerator.mainPath(appName, mainSource, guidesOption), guidesOption)
                         if (f.exists()) {
                             f.delete()
                         }
-                        f = fileToDelete(destination, GuideAsciidocGenerator.mainPath(EMPTY_STRING, mainSource), guidesOption)
+                        f = fileToDelete(destination, GuideAsciidocGenerator.mainPath(EMPTY_STRING, mainSource, guidesOption), guidesOption)
                         if (f.exists()) {
                             f.delete()
                         }
@@ -166,13 +173,19 @@ class GuideProjectGenerator implements AutoCloseable {
 
                 if (app.excludeTest()) {
                     for (String testSource : app.excludeTest()) {
-                        File f = fileToDelete(destination, GuideAsciidocGenerator.testPath(appName, testSource, testFramework), guidesOption)
+                        File f = fileToDelete(destination, GuideAsciidocGenerator.testPath(appName, testSource, guidesOption), guidesOption)
                         if (f.exists()) {
                             f.delete()
                         }
-                        f = fileToDelete(destination, GuideAsciidocGenerator.testPath(EMPTY_STRING, testSource, testFramework), guidesOption)
+                        f = fileToDelete(destination, GuideAsciidocGenerator.testPath(EMPTY_STRING, testSource, guidesOption), guidesOption)
                         if (f.exists()) {
                             f.delete()
+                        }
+                        if (buildTool == BuildTool.PYRONAUT && lang == PYTHON) {
+                            f = new File(destination, "tests/${pythonTestModuleName(testSource)}.${lang.extension}")
+                            if (f.exists()) {
+                                f.delete()
+                            }
                         }
                     }
                 }
@@ -183,9 +196,35 @@ class GuideProjectGenerator implements AutoCloseable {
                         copyFile(inputDir, destinationRoot, zipInclude)
                     }
                 }
+                if (buildTool == BuildTool.PYRONAUT && lang == PYTHON) {
+                    removePythonPackageMarkerFiles(destination)
+                }
                 addLicenses(new File(outputDir.absolutePath, folder))
             }
         }
+    }
+
+    private static void removePythonPackageMarkerFiles(File destination) {
+        destination.eachFileRecurse(FILES) { File file ->
+            if (file.name == '__init__.py') {
+                file.delete()
+            }
+        }
+    }
+
+    private static String pythonModuleName(String target) {
+        if (target.contains('_') || target == target.toLowerCase(Locale.ENGLISH)) {
+            return target
+        }
+        target.replaceAll(/([a-z0-9])([A-Z])/, '$1_$2')
+                .replaceAll(/([A-Z]+)([A-Z][a-z])/, '$1_$2')
+                .toLowerCase(Locale.ENGLISH)
+    }
+
+    private static String pythonTestModuleName(String target) {
+        String normalized = target.endsWith('Test') ? target.substring(0, target.length() - 'Test'.length()) : target
+        normalized = pythonModuleName(normalized)
+        normalized.startsWith('test_') ? normalized : "test_${normalized}"
     }
 
     void addLicenses(File folder) {
@@ -214,11 +253,15 @@ class GuideProjectGenerator implements AutoCloseable {
         // look for a common 'src' directory shared by multiple languages and copy those files first
         final String srcFolder = 'src'
         Path srcPath = Paths.get(inputDir.absolutePath, appName, srcFolder)
+        Path sourcePath = Paths.get(inputDir.absolutePath, appName, language)
         if (Files.exists(srcPath)) {
-            Files.walkFileTree(srcPath, new CopyFileVisitor(Paths.get(destinationPath.toString(), srcFolder)))
+            if (language == PYTHON.toString()) {
+                copySharedPythonResources(srcPath, sourcePath, destinationPath)
+            } else {
+                Files.walkFileTree(srcPath, new CopyFileVisitor(Paths.get(destinationPath.toString(), srcFolder)))
+            }
         }
 
-        Path sourcePath = Paths.get(inputDir.absolutePath, appName, language)
         if (!Files.exists(sourcePath)) {
             sourcePath.toFile().mkdir()
         }
@@ -228,6 +271,80 @@ class GuideProjectGenerator implements AutoCloseable {
         } else if (!ignoreMissingDirectories) {
             throw new GradleException("source directory ${sourcePath.toFile().absolutePath} does not exist")
         }
+    }
+
+    private static void ensurePyronautBlockingExecutorConfig(Path applicationConfig) {
+        String config = Files.exists(applicationConfig) ? Files.readString(applicationConfig) : ''
+        if (config.contains('[micronaut.executors.blocking]')) {
+            return
+        }
+        String suffix = config.isEmpty() || config.endsWith('\n') ? '' : '\n'
+        Files.createDirectories(applicationConfig.parent)
+        Files.writeString(applicationConfig, config + suffix + '''
+[micronaut.executors.blocking]
+type = 'CACHED'
+virtual = false
+''')
+    }
+
+    private static void copySharedPythonResources(Path srcPath, Path sourcePath, Path destinationPath) {
+        Path pythonConfigPath = sourcePath.resolve('config')
+        copySharedPythonResourceDirectory(srcPath.resolve('main/resources'), destinationPath.resolve('config'), pythonConfigPath)
+        Path pythonTestConfigPath = sourcePath.resolve('tests-config')
+        copySharedPythonResourceDirectory(srcPath.resolve('test/resources'), destinationPath.resolve('tests-config'), pythonTestConfigPath)
+        copySharedPythonResourceDirectory(srcPath.resolve('test-resources'), destinationPath.resolve('tests-config'), pythonTestConfigPath)
+    }
+
+    private static void copySharedPythonResourceDirectory(Path resourcePath, Path destinationPath, Path pythonSpecificPath) {
+        if (!Files.exists(resourcePath)) {
+            return
+        }
+        def paths = Files.walk(resourcePath)
+        try {
+            paths.filter(Files::isRegularFile).forEach { Path source ->
+                Path relative = resourcePath.relativize(source)
+                if (!isOverriddenByPythonConfig(relative, pythonSpecificPath)) {
+                    Path destination = destinationPath.resolve(relative)
+                    Files.createDirectories(destination.parent)
+                    Files.copy(source, destination, REPLACE_EXISTING)
+                }
+            }
+        } finally {
+            paths.close()
+        }
+    }
+
+    private static boolean isOverriddenByPythonConfig(Path relative, Path pythonSpecificPath) {
+        if (Files.exists(pythonSpecificPath.resolve(relative))) {
+            return true
+        }
+        if (relative.nameCount != 1 || !Files.isDirectory(pythonSpecificPath)) {
+            return false
+        }
+        String filename = relative.fileName.toString()
+        int extensionIndex = filename.lastIndexOf('.')
+        if (extensionIndex < 1) {
+            return false
+        }
+        String basename = filename.substring(0, extensionIndex)
+        if (!isEnvironmentConfigBasename(basename)) {
+            return false
+        }
+        def paths = Files.list(pythonSpecificPath)
+        try {
+            paths.filter(Files::isRegularFile)
+                    .map { Path path -> path.fileName.toString() }
+                    .anyMatch { String name -> name.startsWith("${basename}.") }
+        } finally {
+            paths.close()
+        }
+    }
+
+    private static boolean isEnvironmentConfigBasename(String basename) {
+        basename == 'application' ||
+                basename.startsWith('application-') ||
+                basename == 'bootstrap' ||
+                basename.startsWith('bootstrap-')
     }
 
     private static File fileToDelete(File destination, String path, GuidesOption guidesOption) {
@@ -282,6 +399,9 @@ class GuideProjectGenerator implements AutoCloseable {
 
     private static TestFramework testFrameworkOption(@NonNull Language language,
                                                      @Nullable TestFramework testFramework) {
+        if (language == PYTHON) {
+            return PYTEST
+        }
         if (testFramework != null) {
             return testFramework
         }
