@@ -17,8 +17,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static io.micronaut.starter.api.TestFramework.JUNIT;
+import static io.micronaut.starter.api.TestFramework.PYTEST;
 import static io.micronaut.starter.api.TestFramework.SPOCK;
 import static io.micronaut.starter.options.Language.GROOVY;
+import static io.micronaut.starter.options.Language.PYTHON;
 
 public class GuideGenerationUtils {
 
@@ -57,6 +59,17 @@ public class GuideGenerationUtils {
                                @NonNull GuidesOption option,
                                @NonNull GuidesConfiguration configuration) {
         String module = StringUtils.isNotEmpty(appName) ? appName + "/" : "";
+        if (MacroUtils.isPyronautPython(option)) {
+            String sourceFolder = folder.equals("test") ? "tests" : "src";
+            String target = folder.equals("test")
+                    ? MacroUtils.pythonTestModuleName(fileName)
+                    : MacroUtils.pythonModuleName(fileName);
+            Path path = Path.of(module,
+                    sourceFolder,
+                    configuration.getPackageName().replace(".", "/"),
+                    target + "." + option.getLanguage().getExtension());
+            return path.toString();
+        }
         Path path = Path.of(module,
                 "src",
                 folder,
@@ -92,6 +105,9 @@ public class GuideGenerationUtils {
     @NonNull
     static TestFramework testFrameworkOption(@NonNull Language language,
                                              @Nullable TestFramework testFramework) {
+        if (language == PYTHON) {
+            return PYTEST;
+        }
         if (testFramework != null) {
             return testFramework;
         }

@@ -39,6 +39,8 @@ import java.util.Map;
  * @param base               Defaults to null; if set, indicates directory name of the base guide to copy before copying the current one
  * @param env                The guide's environment variables
  * @param apps               Applications created for the guide
+ * @param python             Whether this guide should generate a Python/Pyronaut variant
+ * @param skipPyronautTests  Set it to true to skip running the Pyronaut application tests for the guide
  */
 @JsonSchema
 @Serdeable
@@ -113,6 +115,40 @@ public record Guide(
 
         @NotEmpty
         @NonNull
-        List<App> apps
+        List<App> apps,
+
+        @JsonProperty(defaultValue = StringUtils.FALSE)
+        @Nullable
+        Boolean python,
+
+        @JsonProperty(defaultValue = StringUtils.FALSE)
+        @Nullable
+        Boolean skipPyronautTests
 ) {
+    public Guide(
+            @NonNull String title,
+            @NonNull String intro,
+            @NonNull List<String> authors,
+            @NonNull List<String> categories,
+            @NonNull LocalDate publicationDate,
+            @Nullable Integer minimumJavaVersion,
+            @Nullable Integer maximumJavaVersion,
+            @Nullable Cloud cloud,
+            @Nullable Boolean skipGradleTests,
+            @Nullable Boolean skipMavenTests,
+            @Nullable String asciidoctor,
+            @Nullable List<Language> languages,
+            @Nullable List<String> tags,
+            @Nullable List<BuildTool> buildTools,
+            @Nullable TestFramework testFramework,
+            @Nullable List<String> zipIncludes,
+            @Nullable String slug,
+            @Nullable Boolean publish,
+            @Nullable String base,
+            @Nullable Map<String, String> env,
+            @NonNull List<App> apps) {
+        this(title, intro, authors, categories, publicationDate, minimumJavaVersion, maximumJavaVersion, cloud,
+                skipGradleTests, skipMavenTests, asciidoctor, languages, tags, buildTools, testFramework, zipIncludes,
+                slug, publish, base, env, apps, false, false);
+    }
 }

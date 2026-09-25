@@ -1,6 +1,7 @@
 package io.micronaut.guides.core;
 
 import io.micronaut.core.annotation.NonNull;
+import io.micronaut.starter.options.Language;
 import jakarta.inject.Singleton;
 import jakarta.validation.constraints.NotNull;
 import org.gradle.api.GradleException;
@@ -9,14 +10,18 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static io.micronaut.core.util.StringUtils.EMPTY_STRING;
+import static io.micronaut.starter.options.BuildTool.PYRONAUT;
+import static io.micronaut.starter.options.Language.PYTHON;
 
 @Singleton
 public class DefaultFilesTransferUtility implements FilesTransferUtility {
@@ -44,17 +49,21 @@ public class DefaultFilesTransferUtility implements FilesTransferUtility {
     }
 
     private static void copyGuideSourceFiles(File inputDir, Path destinationPath,
-                                             String appName, String language,
+                                             String appName, Language language,
                                              boolean ignoreMissingDirectories) throws IOException {
 
         // look for a common 'src' directory shared by multiple languages and copy those files first
         final String srcFolder = "src";
         Path srcPath = Paths.get(inputDir.getAbsolutePath(), appName, srcFolder);
+        Path sourcePath = Paths.get(inputDir.getAbsolutePath(), appName, language.toString());
         if (Files.exists(srcPath)) {
-            Files.walkFileTree(srcPath, new CopyFileVisitor(Paths.get(destinationPath.toString(), srcFolder)));
+            if (language == PYTHON) {
+                copySharedPythonResources(srcPath, sourcePath, destinationPath);
+            } else {
+                Files.walkFileTree(srcPath, new CopyFileVisitor(Paths.get(destinationPath.toString(), srcFolder)));
+            }
         }
 
-        Path sourcePath = Paths.get(inputDir.getAbsolutePath(), appName, language);
         if (!Files.exists(sourcePath)) {
             sourcePath.toFile().mkdir();
         }
@@ -64,6 +73,67 @@ public class DefaultFilesTransferUtility implements FilesTransferUtility {
         } else if (!ignoreMissingDirectories) {
             throw new GradleException("source directory " + sourcePath.toFile().getAbsolutePath() + " does not exist");
         }
+    }
+
+    private static void copySharedPythonResources(Path srcPath, Path sourcePath, Path destinationPath) throws IOException {
+        Path pythonConfigPath = sourcePath.resolve("config");
+        copySharedPythonResourceDirectory(srcPath.resolve("main/resources"), destinationPath.resolve("config"), pythonConfigPath);
+        Path pythonTestConfigPath = sourcePath.resolve("tests-config");
+        copySharedPythonResourceDirectory(srcPath.resolve("test/resources"), destinationPath.resolve("tests-config"), pythonTestConfigPath);
+        copySharedPythonResourceDirectory(srcPath.resolve("test-resources"), destinationPath.resolve("tests-config"), pythonTestConfigPath);
+    }
+
+    private static void copySharedPythonResourceDirectory(Path resourcePath, Path destinationPath, Path pythonSpecificPath) throws IOException {
+        if (!Files.exists(resourcePath)) {
+            return;
+        }
+        try (Stream<Path> paths = Files.walk(resourcePath)) {
+            paths.filter(Files::isRegularFile).forEach(source -> {
+                try {
+                    Path relative = resourcePath.relativize(source);
+                    if (isOverriddenByPythonConfig(relative, pythonSpecificPath)) {
+                        return;
+                    }
+                    Path destination = destinationPath.resolve(relative);
+                    Files.createDirectories(destination.getParent());
+                    Files.copy(source, destination, StandardCopyOption.REPLACE_EXISTING);
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            });
+        } catch (UncheckedIOException e) {
+            throw e.getCause();
+        }
+    }
+
+    private static boolean isOverriddenByPythonConfig(Path relative, Path pythonSpecificPath) throws IOException {
+        if (Files.exists(pythonSpecificPath.resolve(relative))) {
+            return true;
+        }
+        if (relative.getNameCount() != 1 || !Files.isDirectory(pythonSpecificPath)) {
+            return false;
+        }
+        String filename = relative.getFileName().toString();
+        int extensionIndex = filename.lastIndexOf('.');
+        if (extensionIndex < 1) {
+            return false;
+        }
+        String basename = filename.substring(0, extensionIndex);
+        if (!isEnvironmentConfigBasename(basename)) {
+            return false;
+        }
+        try (Stream<Path> paths = Files.list(pythonSpecificPath)) {
+            return paths.filter(Files::isRegularFile)
+                    .map(path -> path.getFileName().toString())
+                    .anyMatch(name -> name.startsWith(basename + "."));
+        }
+    }
+
+    private static boolean isEnvironmentConfigBasename(String basename) {
+        return basename.equals("application")
+                || basename.startsWith("application-")
+                || basename.equals("bootstrap")
+                || basename.startsWith("bootstrap-");
     }
 
     private static File fileToDelete(File destination, String path) {
@@ -94,10 +164,10 @@ public class DefaultFilesTransferUtility implements FilesTransferUtility {
 
                 if (guide.base() != null) {
                     File baseDir = new File(inputDirectory.getParentFile(), guide.base());
-                    copyGuideSourceFiles(baseDir, destinationPath, appName, guidesOption.getLanguage().toString(), true);
+                    copyGuideSourceFiles(baseDir, destinationPath, appName, guidesOption.getLanguage(), true);
                 }
 
-                copyGuideSourceFiles(inputDirectory, destinationPath, appName, guidesOption.getLanguage().toString(), false);
+                copyGuideSourceFiles(inputDirectory, destinationPath, appName, guidesOption.getLanguage(), false);
 
                 if (app.excludeSource() != null) {
                     for (String mainSource : app.excludeSource()) {
@@ -121,6 +191,12 @@ public class DefaultFilesTransferUtility implements FilesTransferUtility {
                         f = fileToDelete(destination, GuideGenerationUtils.testPath(appName, testSource, guidesOption, guidesConfiguration));
                         if (f.exists()) {
                             f.delete();
+                        }
+                        if (guidesOption.getBuildTool() == PYRONAUT && guidesOption.getLanguage() == PYTHON) {
+                            f = new File(destination, "tests/" + MacroUtils.pythonTestModuleName(testSource) + "." + guidesOption.getLanguage().getExtension());
+                            if (f.exists()) {
+                                f.delete();
+                            }
                         }
                     }
                 }

@@ -256,7 +256,8 @@ class GuideTest {
         "enum": [
           "GRADLE",
           "GRADLE_KOTLIN",
-          "MAVEN"
+          "MAVEN",
+          "PYRONAUT"
         ]
       }
     },
@@ -298,7 +299,8 @@ class GuideTest {
         "enum": [
           "JAVA",
           "GROOVY",
-          "KOTLIN"
+          "KOTLIN",
+          "PYTHON"
         ]
       }
     },
@@ -345,7 +347,8 @@ class GuideTest {
         "JUNIT",
         "SPOCK",
         "KOTLINTEST",
-        "KOTEST"
+        "KOTEST",
+        "PYTEST"
       ]
     },
     "title": {

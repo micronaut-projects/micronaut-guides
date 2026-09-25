@@ -60,6 +60,7 @@ abstract class SourceBlockMacroSubstitution implements MacroSubstitution {
                     language = arr[arr.length - 1];
                     language = resolveAsciidoctorLanguage(language);
                 } else {
+                    condensedTarget = sourceTarget(condensedTarget, getClasspath(), option);
                     condensedTarget = condensedTarget + "." + extension;
                 }
 
@@ -68,7 +69,7 @@ abstract class SourceBlockMacroSubstitution implements MacroSubstitution {
 
                 IncludeDirective.Builder includeDirectiveBuilder = IncludeDirective.builder().attributes(asciidocMacro.attributes())
                         .target(target);
-                if (getFileType() == FileType.CODE) {
+                if (getFileType() == FileType.CODE && !isPyronautPython(option)) {
                     Range range = new Range(getLicenseLoader().getNumberOfLines(), -1);
                     if (range.isValid() && asciidocMacro.attributes().stream().noneMatch(attribute -> attribute.key().equals(ATTRIBUTE_LINES))) {
                         includeDirectiveBuilder.lines(range);
@@ -94,17 +95,6 @@ abstract class SourceBlockMacroSubstitution implements MacroSubstitution {
         return option.getLanguage().getExtension();
     }
 
-    protected String sourceTitle(
-            String appName,
-            String condensedTarget,
-            Classpath classpath,
-            String language,
-            String packageName) {
-        return (appName.equals(MacroSubstitution.APP_NAME_DEFAULT) ? "" : (appName + "/")) + sourceConventionFolder(classpath, language) + "/"
-                + (getFileType() == FileType.CODE ? (packageName.replace(".", "/") + "/") : "")
-                + condensedTarget;
-    }
-
     protected String sourceInclude(
             String slug,
             String appName,
@@ -114,16 +104,43 @@ abstract class SourceBlockMacroSubstitution implements MacroSubstitution {
             String language,
             String packageName) {
         return "{sourceDir}/" + slug + "/" + getSourceDir(slug, option) + "/" +
-                sourceTitle(appName, condensedTarget, classpath, language, packageName);
+                sourceTitle(appName, condensedTarget, classpath, language, packageName, option);
     }
 
-    private String sourceConventionFolder(Classpath classpath, String language) {
+    private String sourceConventionFolder(Classpath classpath, String language, GuidesOption option) {
+        if (option != null && isPyronautPython(option)) {
+            if (getFileType() == FileType.CODE) {
+                return classpath == Classpath.TEST ? "tests" : "src";
+            }
+            if (getFileType() == FileType.RESOURCE) {
+                return classpath == Classpath.TEST ? "tests-config" : "config";
+            }
+        }
         if (getFileType() == FileType.CODE) {
             return "src/" + classpath + "/" + language;
         } else if (getFileType() == FileType.RESOURCE) {
             return "src/" + classpath + "/resources";
         }
         throw new UnsupportedOperationException("Unimplemented sourceConventionFolder for " + getFileType());
+    }
+
+    private String sourceTarget(String target, Classpath classpath, GuidesOption option) {
+        if (isPyronautPython(option) && getFileType() == FileType.CODE) {
+            return classpath == Classpath.TEST ? pythonTestModuleName(target) : pythonModuleName(target);
+        }
+        return target;
+    }
+
+    protected String sourceTitle(
+            String appName,
+            String condensedTarget,
+            Classpath classpath,
+            String language,
+            String packageName,
+            GuidesOption option) {
+        return (appName.equals(MacroSubstitution.APP_NAME_DEFAULT) ? "" : (appName + "/")) + sourceConventionFolder(classpath, language, option) + "/"
+                + (getFileType() == FileType.CODE ? (packageName.replace(".", "/") + "/") : "")
+                + condensedTarget;
     }
 
     protected String condensedTarget(@NotNull AsciidocMacro asciidocMacro, GuidesOption option) {

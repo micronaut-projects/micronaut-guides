@@ -15,6 +15,7 @@ import java.util.stream.Collectors
 import static io.micronaut.guides.GuideProjectGenerator.DEFAULT_APP_NAME
 import static io.micronaut.starter.options.BuildTool.GRADLE
 import static io.micronaut.starter.options.BuildTool.MAVEN
+import static io.micronaut.starter.options.BuildTool.PYRONAUT
 import io.micronaut.starter.api.TestFramework
 import io.micronaut.starter.options.Language
 import io.micronaut.starter.options.BuildTool
@@ -105,6 +106,13 @@ exit 0
         generateTestScript(output, script, 'native-test.sh')
     }
 
+    static void generatePythonTestScript(File output,
+                                         List<Guide> metadatas,
+                                         boolean stopIfFailure) {
+        String script = generateScript(metadatas, stopIfFailure, false, true)
+        generateTestScript(output, script, 'python-test.sh')
+    }
+
     static void generateTestScript(File output, String script, String scriptFileName = "test.sh") {
         File testScript = new File(output, scriptFileName)
         testScript.createNewFile()
@@ -130,7 +138,8 @@ exit 0
 
     static String generateScript(List<Guide> metadatas,
                                  boolean stopIfFailure,
-                                 boolean nativeTest = false) {
+                                 boolean nativeTest = false,
+                                 boolean pythonTest = false) {
         StringBuilder bashScript = new StringBuilder('''\
 #!/usr/bin/env bash
 set -e
@@ -146,6 +155,9 @@ kill_kotlin_daemon () {
   done
 }
 ''')
+        if (pythonTest) {
+            bashScript << "\n\n" << pyronautFunctions()
+        }
 
         metadatas.sort { it.slug() }
         for (Guide metadata : metadatas) {
@@ -153,8 +165,11 @@ kill_kotlin_daemon () {
             bashScript << """\
 """
             for (GuidesOption guidesOption : guidesOptionList) {
+                if (pythonTest != isPyronautPython(guidesOption)) {
+                    continue
+                }
                 String folder = GuideProjectGenerator.folderName(metadata.slug(), guidesOption)
-                BuildTool buildTool = folder.containsIgnoreCase(MAVEN.toString()) ? MAVEN : GRADLE
+                BuildTool buildTool = guidesOption.buildTool
                 if (metadata.apps().any { it.name() == DEFAULT_APP_NAME } ) {
                     if (GuideUtils.shouldSkip(metadata,buildTool, guidesOption.getLanguage())) {
                         continue
@@ -229,6 +244,10 @@ if (nativeTest) {
 bashScript += """\
 ${buildTool == MAVEN ? './mvnw -Pnative test' : './gradlew nativeTest'} || EXIT_STATUS=\$?
 """
+} else if (buildTool == PYRONAUT) {
+bashScript += """\
+run_pyronaut_tests || EXIT_STATUS=\$?
+"""
 } else {
 String mavenCommand = validateLicense ? './mvnw -q test spotless:check' : './mvnw -q test'
 bashScript += """\
@@ -261,5 +280,19 @@ EXIT_STATUS=0
         }
 
         bashScript
+    }
+
+    static String pyronautFunctions() {
+        java.io.InputStream stream = TestScriptGenerator.class.getResourceAsStream('/pyronaut-test-functions.sh')
+        if (stream == null) {
+            throw new IllegalStateException('Missing pyronaut-test-functions.sh resource')
+        }
+        try (stream) {
+            new String(stream.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8).stripTrailing() + '\n'
+        }
+    }
+
+    private static boolean isPyronautPython(GuidesOption guidesOption) {
+        guidesOption.buildTool == PYRONAUT && guidesOption.language == Language.PYTHON
     }
 }

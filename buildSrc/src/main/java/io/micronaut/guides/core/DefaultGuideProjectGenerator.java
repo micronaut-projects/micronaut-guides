@@ -24,16 +24,22 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static io.micronaut.core.util.StringUtils.EMPTY_STRING;
 import static io.micronaut.http.HttpStatus.BAD_REQUEST;
 import static io.micronaut.starter.options.BuildTool.GRADLE;
+import static io.micronaut.starter.options.BuildTool.PYRONAUT;
 import static io.micronaut.starter.options.JdkVersion.JDK_25;
+import static io.micronaut.starter.options.Language.GROOVY;
+import static io.micronaut.starter.options.Language.PYTHON;
 
 @Singleton
 public class DefaultGuideProjectGenerator implements GuideProjectGenerator {
@@ -86,7 +92,8 @@ public class DefaultGuideProjectGenerator implements GuideProjectGenerator {
                          @NonNull JdkVersion javaVersion,
                          @NonNull App app) throws IOException {
         List<String> appFeatures = new ArrayList<>(GuideUtils.getAppFeatures(app, guidesOption.getLanguage()));
-        if (!guidesConfiguration.getJdkVersionsSupportedByGraalvm().contains(javaVersion)) {
+        if (guidesOption.getLanguage() == GROOVY ||
+                !guidesConfiguration.getJdkVersionsSupportedByGraalvm().contains(javaVersion)) {
             appFeatures.remove("graalvm");
         }
 
@@ -113,9 +120,28 @@ public class DefaultGuideProjectGenerator implements GuideProjectGenerator {
                     generatorContext.getProject(),
                     new FileSystemOutputHandler(destination, ConsoleOutput.NOOP),
                     generatorContext);
+            if (guidesOption.getBuildTool() == PYRONAUT && guidesOption.getLanguage() == PYTHON) {
+                removePythonPackageMarkerFiles(destination);
+            }
         } catch (Exception e) {
             LOG.error("Error generating application: " + e.getMessage(), e);
             throw new IOException(e.getMessage(), e);
+        }
+    }
+
+    private static void removePythonPackageMarkerFiles(File destination) throws IOException {
+        try (Stream<Path> paths = Files.walk(destination.toPath())) {
+            paths.filter(Files::isRegularFile)
+                    .filter(path -> "__init__.py".equals(path.getFileName().toString()))
+                    .forEach(path -> {
+                        try {
+                            Files.deleteIfExists(path);
+                        } catch (IOException e) {
+                            throw new UncheckedIOException(e);
+                        }
+                    });
+        } catch (UncheckedIOException e) {
+            throw e.getCause();
         }
     }
 
