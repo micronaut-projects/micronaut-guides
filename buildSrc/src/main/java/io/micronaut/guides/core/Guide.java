@@ -39,7 +39,6 @@ import java.util.Map;
  * @param base               Defaults to null; if set, indicates directory name of the base guide to copy before copying the current one
  * @param env                The guide's environment variables
  * @param apps               Applications created for the guide
- * @param python             Whether this guide should generate a Python/Pyronaut variant
  * @param skipPyronautTests  Set it to true to skip running the Pyronaut application tests for the guide
  */
 @JsonSchema
@@ -119,10 +118,6 @@ public record Guide(
 
         @JsonProperty(defaultValue = StringUtils.FALSE)
         @Nullable
-        Boolean python,
-
-        @JsonProperty(defaultValue = StringUtils.FALSE)
-        @Nullable
         Boolean skipPyronautTests
 ) {
     public Guide(
@@ -149,6 +144,6 @@ public record Guide(
             @NonNull List<App> apps) {
         this(title, intro, authors, categories, publicationDate, minimumJavaVersion, maximumJavaVersion, cloud,
                 skipGradleTests, skipMavenTests, asciidoctor, languages, tags, buildTools, testFramework, zipIncludes,
-                slug, publish, base, env, apps, false, false);
+                slug, publish, base, env, apps, false);
     }
 }

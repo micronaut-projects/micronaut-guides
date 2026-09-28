@@ -121,15 +121,11 @@ public final class GuideUtils {
     }
 
     public static Guide merge(Guide base, Guide guide) {
-        boolean python = guide.python() == null ? Boolean.TRUE.equals(base.python()) : guide.python();
         List<Language> languages = new ArrayList<>();
         if (guide.languages() != null) {
             languages.addAll(guide.languages());
         } else if (base.languages() != null) {
             languages.addAll(base.languages());
-        }
-        if (python && !languages.contains(PYTHON)) {
-            languages.add(PYTHON);
         }
         List<BuildTool> buildTools = new ArrayList<>();
         if (guide.buildTools() != null) {
@@ -137,7 +133,7 @@ public final class GuideUtils {
         } else if (base.buildTools() != null) {
             buildTools.addAll(base.buildTools());
         }
-        if (python && !buildTools.contains(PYRONAUT)) {
+        if (languages.contains(PYTHON) && !buildTools.contains(PYRONAUT)) {
             buildTools.add(PYRONAUT);
         }
         return new Guide(
@@ -162,7 +158,6 @@ public final class GuideUtils {
                 guide.base(),
                 guide.env() == null ? base.env() : guide.env(),
                 mergeApps(base.apps(), guide.apps()),
-                python,
                 Boolean.TRUE.equals(base.skipPyronautTests()) || Boolean.TRUE.equals(guide.skipPyronautTests())
         );
     }

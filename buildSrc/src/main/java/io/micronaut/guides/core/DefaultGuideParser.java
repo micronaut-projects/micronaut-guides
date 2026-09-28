@@ -111,18 +111,13 @@ public class DefaultGuideParser implements GuideParser {
                     app.pythonFeatures() != null ? app.pythonFeatures() : new ArrayList<>()
             ));
         }
-        Boolean pythonOption = config.containsKey("python") ? raw.python() : null;
-        boolean python = Boolean.TRUE.equals(pythonOption);
         List<Language> languages = raw.languages() != null
                 ? new ArrayList<>(raw.languages())
                 : new ArrayList<>(List.of(Language.JAVA, Language.GROOVY, Language.KOTLIN));
-        if (python && !languages.contains(PYTHON)) {
-            languages.add(PYTHON);
-        }
         List<BuildTool> buildTools = raw.buildTools() != null
                 ? new ArrayList<>(raw.buildTools())
                 : new ArrayList<>(List.of(BuildTool.GRADLE, BuildTool.MAVEN));
-        if (python && !buildTools.contains(PYRONAUT)) {
+        if (languages.contains(PYTHON) && !buildTools.contains(PYRONAUT)) {
             buildTools.add(PYRONAUT);
         }
 
@@ -148,7 +143,6 @@ public class DefaultGuideParser implements GuideParser {
                 raw.base(),
                 raw.env() != null ? raw.env() : new HashMap<>(),
                 apps,
-                pythonOption,
                 Boolean.TRUE.equals(raw.skipPyronautTests())
         ));
     }
