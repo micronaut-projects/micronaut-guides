@@ -83,6 +83,9 @@ public final class GuideUtils {
     }
 
     public static boolean isSupported(BuildTool buildTool, Language language) {
+        if (buildTool == BuildTool.PYRONAUT || language == Language.PYTHON) {
+            return buildTool == BuildTool.PYRONAUT && language == Language.PYTHON;
+        }
         return !(buildTool == BuildTool.MAVEN && language == Language.KOTLIN);
     }
 

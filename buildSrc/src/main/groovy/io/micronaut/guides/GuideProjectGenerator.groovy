@@ -29,9 +29,12 @@ import java.util.regex.Pattern
 import static groovy.io.FileType.FILES
 import static io.micronaut.core.util.StringUtils.EMPTY_STRING
 import static io.micronaut.starter.api.TestFramework.JUNIT
+import static io.micronaut.starter.api.TestFramework.PYTEST
 import static io.micronaut.starter.api.TestFramework.SPOCK
+import static io.micronaut.starter.options.BuildTool.PYRONAUT
 import static io.micronaut.starter.options.JdkVersion.JDK_25
 import static io.micronaut.starter.options.Language.GROOVY
+import static io.micronaut.starter.options.Language.PYTHON
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING
 
 @CompileStatic
@@ -259,6 +262,11 @@ class GuideProjectGenerator implements AutoCloseable {
         TestFramework testFramework = guideMetadata.testFramework()
         List<GuidesOption> guidesOptionList = []
 
+        if (languages.contains(PYTHON) && !buildTools.contains(PYRONAUT)) {
+            buildTools = new ArrayList<>(buildTools)
+            buildTools << PYRONAUT
+        }
+
         for (BuildTool buildTool : buildTools) {
             for (Language language : Language.values()) {
                 if (!GuideUtils.isSupported(buildTool, language)) {
@@ -284,6 +292,9 @@ class GuideProjectGenerator implements AutoCloseable {
                                                      @Nullable TestFramework testFramework) {
         if (testFramework != null) {
             return testFramework
+        }
+        if (language == PYTHON) {
+            return PYTEST
         }
         if (language == GROOVY) {
             return SPOCK
