@@ -49,6 +49,9 @@ class GuideAsciidocGenerator {
     public static final String EXCLUDE_FOR_BUILD = ':exclude-for-build:'
     public static final String DEFAULT_APP_NAME = "default"
     private static final String COMMON_LICENSE = "common:license.adoc[]"
+    private static final Map<String, String> PYTHON_TEXT_REPLACEMENTS = [
+            'Micronaut application': 'Pyronaut application'
+    ]
 
     static void generate(Guide metadata, File inputDir,
                          File asciidocDir, File projectDir) {
@@ -203,11 +206,21 @@ class GuideAsciidocGenerator {
                 }
             }
             text = text.replace("@micronautVersion@", VersionInfo.getMicronautVersion())
+            text = postProcessAsciidoc(text, guidesOption)
 
             File renderedAsciidocFile = new File(asciidocDir, projectName + '.adoc')
             renderedAsciidocFile.createNewFile()
             renderedAsciidocFile.setText(text, 'UTF-8')
         }
+    }
+
+    private static String postProcessAsciidoc(String text, GuidesOption guidesOption) {
+        if (guidesOption.language == PYTHON) {
+            for (Entry<String, String> replacement : PYTHON_TEXT_REPLACEMENTS.entrySet()) {
+                text = text.replace(replacement.key, replacement.value)
+            }
+        }
+        text
     }
 
     private static Optional<String> cliCommandForApp(Guide metadata,

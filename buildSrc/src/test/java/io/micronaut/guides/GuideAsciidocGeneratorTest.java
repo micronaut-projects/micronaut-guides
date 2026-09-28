@@ -28,6 +28,8 @@ class GuideAsciidocGeneratorTest {
         Path outputDir = Files.createDirectory(tempDir.resolve("output"));
         Files.writeString(inputDir.resolve("macro-test.adoc"), """
                 Before
+
+                Micronaut application
                 
                 :only-for-languages:python
                 Python only
@@ -83,8 +85,11 @@ class GuideAsciidocGeneratorTest {
 
         assertFalse(javaOutput.contains("Python only"));
         assertFalse(javaOutput.contains(":only-for-languages:"));
+        assertTrue(javaOutput.contains("Micronaut application"));
         assertTrue(pythonOutput.contains("Python only"));
         assertFalse(pythonOutput.contains(":only-for-languages:"));
+        assertTrue(pythonOutput.contains("Pyronaut application"));
+        assertFalse(pythonOutput.contains("Micronaut application"));
         assertTrue(pythonOutput.contains("src/example/micronaut/hello_controller.py"));
         assertTrue(pythonOutput.contains("tests/example/micronaut/test_hello_controller.py"));
     }
