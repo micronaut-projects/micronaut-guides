@@ -332,8 +332,10 @@ class IndexGenerator {
         String kotlinImg = '<img src="./images/kotlin.svg" width="60" alt="Kotlin"/>'
         String groovyImg = '<img src="./images/groovy.svg" width="60" alt="Groovy"/>'
         String javaImg = '<img src="./images/java.svg" width="60" alt="Java"/>'
+        String pythonImg = '<img src="./images/python.png" width="60" alt="Python"/>'
         String mavenImg = '<img src="./images/maven.svg" width="60" alt="Maven"/>'
         String gradleImg = '<img src="./images/gradle.svg" width="60" alt="Gradle"/>'
+        String pyronautImg = '<img src="./images/pyronaut.svg" width="100" alt="Pyronaut"/>'
 
         String tableHtml = """\
 <table class='build-language-grid'>
@@ -344,6 +346,7 @@ class IndexGenerator {
         tableHtml += "<th>${javaImg}</th>"
         tableHtml += "<th>${kotlinImg}</th>"
         tableHtml += "<th>${groovyImg}</th>"
+        tableHtml += "<th>${pythonImg}</th>"
         tableHtml += """\
 </tr>
 </thead>
@@ -358,6 +361,7 @@ class IndexGenerator {
             tableHtml += cell(baseURL, metadata, BuildTool.GRADLE, Language.JAVA, guidesOptionList)
             tableHtml += cell(baseURL, metadata, BuildTool.GRADLE, Language.KOTLIN, guidesOptionList)
             tableHtml += cell(baseURL, metadata, BuildTool.GRADLE, Language.GROOVY, guidesOptionList)
+            tableHtml += cell(baseURL, metadata, BuildTool.GRADLE, Language.PYTHON, guidesOptionList)
 
             tableHtml += """\
 </tr>
@@ -371,6 +375,21 @@ class IndexGenerator {
             tableHtml += cell(baseURL, metadata, BuildTool.MAVEN, Language.JAVA, guidesOptionList)
             tableHtml += cell(baseURL, metadata, BuildTool.MAVEN, Language.KOTLIN, guidesOptionList)
             tableHtml += cell(baseURL, metadata, BuildTool.MAVEN, Language.GROOVY, guidesOptionList)
+            tableHtml += cell(baseURL, metadata, BuildTool.MAVEN, Language.PYTHON, guidesOptionList)
+
+            tableHtml += """\
+</tr>
+"""
+        }
+        if (guidesOptionList.find {GuidesOption option -> option.buildTool == BuildTool.PYRONAUT }) {
+            tableHtml += """\
+<tr>
+<td>${pyronautImg}</td>
+"""
+            tableHtml += cell(baseURL, metadata, BuildTool.PYRONAUT, Language.JAVA, guidesOptionList)
+            tableHtml += cell(baseURL, metadata, BuildTool.PYRONAUT, Language.KOTLIN, guidesOptionList)
+            tableHtml += cell(baseURL, metadata, BuildTool.PYRONAUT, Language.GROOVY, guidesOptionList)
+            tableHtml += cell(baseURL, metadata, BuildTool.PYRONAUT, Language.PYTHON, guidesOptionList)
 
             tableHtml += """\
 </tr>
@@ -525,6 +544,14 @@ class IndexGenerator {
     }
 
     static String generateGuidesJsonIndex(File guidesFolder, String metadataConfigName) {
+        generateJsonIndex(guidesFolder, metadataConfigName, null)
+    }
+
+    static String generatePythonJsonIndex(File guidesFolder, String metadataConfigName) {
+        generateJsonIndex(guidesFolder, metadataConfigName, Language.PYTHON)
+    }
+
+    private static String generateJsonIndex(File guidesFolder, String metadataConfigName, Language languageFilter) {
         String baseURL = System.getenv("CI") ? LATEST_GUIDES_URL : ""
 
         //TOO get both from an application context
@@ -532,7 +559,7 @@ class IndexGenerator {
         JsonSchemaProvider jsonSchemaProvider = new DefaultJsonSchemaProvider();
         GuideParser guideParser = new DefaultGuideParser(jsonSchemaProvider, jsonMapper);
         List<Guide> metadatas = guideParser.parseGuidesMetadata(guidesFolder, metadataConfigName)
-                .findAll { it.publish() }
+                .findAll { it.publish() && (languageFilter == null || it.languages().contains(languageFilter)) }
 
         List<Map> result = metadatas
             .collect {guide -> [
@@ -545,7 +572,9 @@ class IndexGenerator {
                 publicationDate: guide.publicationDate().toString(),
                 slug: guide.slug(),
                 url: "${baseURL}${guide.slug()}.html",
-                options: GuideProjectGenerator.guidesOptions(guide).collect {option -> [
+                options: GuideProjectGenerator.guidesOptions(guide)
+                        .findAll { option -> languageFilter == null || option.language == languageFilter }
+                        .collect { option -> [
                     buildTool: option.buildTool,
                     language: option.language,
                     url: "${baseURL}${guide.slug()}-${option.buildTool.toString().toLowerCase()}-${option.language.toString().toLowerCase()}.html"
