@@ -20,23 +20,35 @@ image::keycloak/keycloak-client-step3.png[]
 
 common:create-app-features.adoc[]
 
+:exclude-for-languages:python
 common:dev-env.adoc[]
+:exclude-for-languages:
 
 === Start in Port 8081
 
+:exclude-for-languages:python
 common:default-dev-environment-application-dev-yaml.adoc[]
+:exclude-for-languages:
+:exclude-for-languages:java
+Create `config/application.toml`.
+:exclude-for-languages:
 
 Configure the application to start in port 8081:
 
+:exclude-for-languages:python
 resource:application-dev.properties[tag=port]
+:exclude-for-languages:
+:exclude-for-languages:java
+resource:application.toml[tag=port]
+:exclude-for-languages:
 
 === Views
 
 Although the Micronaut framework is primarily designed around message encoding / decoding, there are occasions where it is convenient to render a view on the server side.
 
-To use the https://www.thymeleaf.org/[Thymeleaf] Java template engine to render views in a Micronaut application, add the following dependency to your classpath.
+To use the https://github.com/HubSpot/jinjava[Jinjava] template engine to render views in a Micronaut application, add the following dependency to your classpath.
 
-dependency:micronaut-views-thymeleaf[groupId=io.micronaut.views]
+dependency:micronaut-views-jinjava[groupId=io.micronaut.views]
 
 === OAuth 2.0
 
@@ -53,7 +65,12 @@ dependency:micronaut-security-jwt[groupId=io.micronaut.security]
 
 Add the following OAuth 2.0 configuration:
 
+:exclude-for-languages:python
 resource:application-dev.properties[tag=oauth2]
+:exclude-for-languages:
+:exclude-for-languages:java
+resource:application.toml[tag=oauth2]
+:exclude-for-languages:
 
 callout:authentication-idtoken[arg0=Keycloak]
 <2> The provider identifier should match the last part of the URL you entered as a redirect URL: `/oauth/callback/keycloak`.
@@ -86,20 +103,27 @@ image::diagramm.png[]
 
 === Home
 
-Create a controller to handle the requests to `/`. You will display the email of the authenticated person if any. Annotate the controller endpoint with `@View` since we will use a Thymeleaf template.
+:exclude-for-languages:python
+Create a controller to handle the requests to `/`. You will display the email of the authenticated person if any. Annotate the controller endpoint with `@View` since we will use a Jinjava template.
+:exclude-for-languages:
+:exclude-for-languages:java
+Create a route function to handle the requests to `/`. You will display the email of the authenticated person if any. Annotate the route with `@View` since we will use a Jinjava template.
+:exclude-for-languages:
 
 source:HomeController[]
 
+:exclude-for-languages:python
 callout:controller[arg0=/]
+:exclude-for-languages:
 callout:secured-anonymous[]
-<3> Use https://micronaut-projects.github.io/micronaut-views/latest/api/io/micronaut/views/View.html[View] annotation to specify which template to use to render the response.
-<4> The @api@/io/micronaut/http/annotation/Get.html[@Get] annotation maps the `index` method to GET `/` requests.
+callout:view[]
+callout:get[arg0=index,arg1=/]
 
-Create a Thymeleaf template:
+Create a Jinjava template:
 
 resource:views/home.html[]
 
-Also, note that we return an empty model in the controller. However, we are accessing `security` in the Thymeleaf template.
+Also, note that we return an empty model in the controller. However, we are accessing `security` in the Jinjava template.
 
 - The https://micronaut-projects.github.io/micronaut-views/latest/api/io/micronaut/views/model/security/SecurityViewModelProcessor.html[SecurityViewModelProcessor]
 injects into the model a `security` map with the authenticated user.  See
@@ -113,6 +137,8 @@ source:EndSessionEndpointResolverReplacement[]
 
 == Running the Application
 
+:exclude-for-languages:python
+
 :exclude-for-build:maven
 
 To run the application, use the `./gradlew run` command, which starts the application on port 8081.
@@ -125,11 +151,19 @@ To run the application, use the `./mvnw mn:run` command, which starts the applic
 
 :exclude-for-build:
 
+:exclude-for-languages:
+
+:exclude-for-languages:java
+
+To run the application, use the `pyronaut run` command, which starts the application on port 8081.
+
+:exclude-for-languages:
+
 image::keycloak.gif[]
 
 common:graal-with-plugins.adoc[]
 
-:exclude-for-languages:groovy
+:exclude-for-languages:groovy,python
 
 After you execute the native image, navigate to `localhost:8081` and authenticate with Keycloak.
 
