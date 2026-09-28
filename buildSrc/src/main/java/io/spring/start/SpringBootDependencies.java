@@ -21,6 +21,9 @@ public final class SpringBootDependencies {
     public static final String GROUP_ID_ORG_SPRINGFRAMEWORK_BOOT = "org.springframework.boot";
     private static final String ARTIFACT_ID_SPRING_BOOT_STARTER = "spring-boot-starter";
     private static final String ARTIFACT_ID_SPRING_BOOT_STARTER_WEB = "spring-boot-starter-web";
+
+    private static final String ARTIFACT_ID_SPRING_BOOT_STARTER_WEBFLUX = "spring-boot-starter-webflux";
+
     private static final String ARTIFACT_ID_SPRING_BOOT_STARTER_TEST = "spring-boot-starter-test";
 
     public static final Dependency.Builder DEPENDENCY_SPRINGBOOT_STARTER = Dependency.builder()
@@ -31,6 +34,11 @@ public final class SpringBootDependencies {
     public static final Dependency.Builder DEPENDENCY_SPRING_BOOT_STARTER_WEB = Dependency.builder()
             .groupId(GROUP_ID_ORG_SPRINGFRAMEWORK_BOOT)
             .artifactId(ARTIFACT_ID_SPRING_BOOT_STARTER_WEB)
+            .compile();
+
+    public static final Dependency.Builder DEPENDENCY_SPRING_BOOT_STARTER_WEBFLUX = Dependency.builder()
+            .groupId(GROUP_ID_ORG_SPRINGFRAMEWORK_BOOT)
+            .artifactId(ARTIFACT_ID_SPRING_BOOT_STARTER_WEBFLUX)
             .compile();
     public static final Dependency.Builder DEPENDENCY_SPRINGBOOT_STARTER_TEST = Dependency.builder()
             .groupId(GROUP_ID_ORG_SPRINGFRAMEWORK_BOOT)
