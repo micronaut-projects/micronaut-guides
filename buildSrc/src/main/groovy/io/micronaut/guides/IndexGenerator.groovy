@@ -563,8 +563,8 @@ class IndexGenerator {
 
         List<Map> result = metadatas
             .collect {guide -> [
-                title: guide.title(),
-                intro: guide.intro(),
+                title: GuideAsciidocGenerator.postProcessText(guide.title(), languageFilter),
+                intro: GuideAsciidocGenerator.postProcessText(guide.intro(), languageFilter),
                 authors: guide.authors(),
                 tags: generateTags(guide),
                 category: guide.categories() ? guide.categories().first().toString() : null, // Deprecated

@@ -12,6 +12,7 @@ import io.micronaut.starter.api.TestFramework
 import io.micronaut.starter.build.dependencies.Coordinate
 import io.micronaut.starter.build.dependencies.PomDependencyVersionResolver
 import io.micronaut.starter.options.JdkVersion
+import io.micronaut.starter.options.Language
 import io.micronaut.starter.util.VersionInfo
 import org.gradle.api.GradleException
 
@@ -52,6 +53,7 @@ class GuideAsciidocGenerator {
     private static final Map<String, String> PYTHON_TEXT_REPLACEMENTS = [
             'Micronaut application': 'Pyronaut application'
     ]
+    private static final Pattern PYTHON_METADATA_LINES = ~/(?m)^(Authors:|Micronaut Version:).*\R?/
 
     static void generate(Guide metadata, File inputDir,
                          File asciidocDir, File projectDir) {
@@ -184,10 +186,11 @@ class GuideAsciidocGenerator {
 
             text = text.replaceAll(~/@([\w-]*):?cli-command@/) { List<String> matches ->
                 String app = matches[1] ?: 'default'
-                cliCommandForApp(metadata, app)
+                String cliCommand = cliCommandForApp(metadata, app)
                         .orElseThrow {
                             new GradleException("No CLI command found for app: $app -- should be one of ${String.join(", ", metadata.apps().stream().map(App::name).map(n -> "@${n}:cli-command@").toList())}")
                         }
+                guidesOption.language == PYTHON && cliCommand == CLI_DEFAULT ? 'create' : cliCommand
             }
 
             text = text.replaceAll(~/@([\w-]*):?features@/) { List<String> matches ->
@@ -206,7 +209,7 @@ class GuideAsciidocGenerator {
                 }
             }
             text = text.replace("@micronautVersion@", VersionInfo.getMicronautVersion())
-            text = postProcessAsciidoc(text, guidesOption)
+            text = postProcessText(text, guidesOption)
 
             File renderedAsciidocFile = new File(asciidocDir, projectName + '.adoc')
             renderedAsciidocFile.createNewFile()
@@ -214,8 +217,13 @@ class GuideAsciidocGenerator {
         }
     }
 
-    private static String postProcessAsciidoc(String text, GuidesOption guidesOption) {
-        if (guidesOption.language == PYTHON) {
+    static String postProcessText(String text, GuidesOption guidesOption) {
+        postProcessText(text, guidesOption.language)
+    }
+
+    static String postProcessText(String text, Language language) {
+        if (language == PYTHON) {
+            text = text.replaceAll(PYTHON_METADATA_LINES, '')
             for (Entry<String, String> replacement : PYTHON_TEXT_REPLACEMENTS.entrySet()) {
                 text = text.replace(replacement.key, replacement.value)
             }

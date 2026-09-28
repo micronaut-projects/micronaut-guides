@@ -29,7 +29,11 @@ class GuideAsciidocGeneratorTest {
         Files.writeString(inputDir.resolve("macro-test.adoc"), """
                 Before
 
-                Micronaut application
+                @guideTitle@
+                @guideIntro@
+                Authors: @authors@
+                Micronaut Version: @micronaut@
+                mn @cli-command@ example.micronaut.micronautguide
                 
                 :only-for-languages:python
                 Python only
@@ -41,8 +45,8 @@ class GuideAsciidocGeneratorTest {
                 """);
 
         Guide guide = new Guide(
-                "Macro test",
-                "Tests language macros",
+                "Micronaut application guide",
+                "Description for a Micronaut application.",
                 List.of("Author"),
                 List.of("Getting Started"),
                 LocalDate.of(2026, 1, 1),
@@ -86,8 +90,17 @@ class GuideAsciidocGeneratorTest {
         assertFalse(javaOutput.contains("Python only"));
         assertFalse(javaOutput.contains(":only-for-languages:"));
         assertTrue(javaOutput.contains("Micronaut application"));
+        assertTrue(javaOutput.contains("Authors: Author"));
+        assertTrue(javaOutput.contains("Micronaut Version:"));
+        assertTrue(javaOutput.contains("mn create-app example.micronaut.micronautguide"));
         assertTrue(pythonOutput.contains("Python only"));
         assertFalse(pythonOutput.contains(":only-for-languages:"));
+        assertFalse(pythonOutput.contains("Authors:"));
+        assertFalse(pythonOutput.contains("Micronaut Version:"));
+        assertTrue(pythonOutput.contains("mn create example.micronaut.micronautguide"));
+        assertFalse(pythonOutput.contains("mn create-app example.micronaut.micronautguide"));
+        assertTrue(pythonOutput.contains("Pyronaut application guide"));
+        assertTrue(pythonOutput.contains("Description for a Pyronaut application."));
         assertTrue(pythonOutput.contains("Pyronaut application"));
         assertFalse(pythonOutput.contains("Micronaut application"));
         assertTrue(pythonOutput.contains("src/example/micronaut/hello_controller.py"));
