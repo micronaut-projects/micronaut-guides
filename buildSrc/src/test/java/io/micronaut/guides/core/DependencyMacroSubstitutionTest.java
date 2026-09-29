@@ -67,4 +67,29 @@ public class DependencyMacroSubstitutionTest {
                 """;
         assertEquals(expectedJava, resJava);
     }
+
+    @Test
+    void pythonDependencyMacrosAreOmitted() {
+        String source = """
+                Before
+
+                dependency:micronaut-views-thymeleaf[groupId=io.micronaut.views]
+
+                After
+                """;
+
+        String result = dependencyMacroSubstitution.substitute(
+                source,
+                GuideTestUtils.guideWithSlug("micronaut-content-negotiation"),
+                new GuidesOption(BuildTool.PYRONAUT, Language.PYTHON, TestFramework.PYTEST)
+        );
+
+        assertEquals("""
+                Before
+
+
+
+                After
+                """, result);
+    }
 }

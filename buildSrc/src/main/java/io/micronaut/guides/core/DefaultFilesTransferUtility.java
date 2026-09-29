@@ -1,6 +1,7 @@
 package io.micronaut.guides.core;
 
 import io.micronaut.core.annotation.NonNull;
+import io.micronaut.starter.options.Language;
 import jakarta.inject.Singleton;
 import jakarta.validation.constraints.NotNull;
 import org.gradle.api.GradleException;
@@ -9,10 +10,13 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 import java.util.List;
 
@@ -51,7 +55,31 @@ public class DefaultFilesTransferUtility implements FilesTransferUtility {
         final String srcFolder = "src";
         Path srcPath = Paths.get(inputDir.getAbsolutePath(), appName, srcFolder);
         if (Files.exists(srcPath)) {
-            Files.walkFileTree(srcPath, new CopyFileVisitor(Paths.get(destinationPath.toString(), srcFolder)));
+            Path resourcesPath = srcPath.resolve("main").resolve("resources");
+            if (Language.PYTHON.toString().equals(language) && Files.exists(resourcesPath)) {
+                Path configPath = Paths.get(destinationPath.toString(), "config");
+                Files.createDirectories(configPath);
+                Files.walkFileTree(resourcesPath, new CopyFileVisitor(configPath));
+                Path destinationResourcesPath = Paths.get(destinationPath.toString(), srcFolder, "main", "resources");
+                Files.walkFileTree(resourcesPath, new SimpleFileVisitor<>() {
+                    @Override
+                    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                        Files.deleteIfExists(destinationResourcesPath.resolve(resourcesPath.relativize(file)));
+                        return FileVisitResult.CONTINUE;
+                    }
+                });
+                Files.walkFileTree(srcPath, new CopyFileVisitor(Paths.get(destinationPath.toString(), srcFolder)) {
+                    @Override
+                    public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+                        if (dir.equals(resourcesPath)) {
+                            return FileVisitResult.SKIP_SUBTREE;
+                        }
+                        return super.preVisitDirectory(dir, attrs);
+                    }
+                });
+            } else {
+                Files.walkFileTree(srcPath, new CopyFileVisitor(Paths.get(destinationPath.toString(), srcFolder)));
+            }
         }
 
         Path sourcePath = Paths.get(inputDir.getAbsolutePath(), appName, language);
@@ -91,6 +119,10 @@ public class DefaultFilesTransferUtility implements FilesTransferUtility {
                 String folder = MacroUtils.getSourceDir(guide.slug(), guidesOption);
                 Path destinationPath = Paths.get(outputDirectory.getAbsolutePath(), folder, appName);
                 File destination = destinationPath.toFile();
+
+                if (Language.PYTHON.toString().equals(guidesOption.getLanguage().toString())) {
+                    movePythonResources(destinationPath);
+                }
 
                 if (guide.base() != null) {
                     File baseDir = new File(inputDirectory.getParentFile(), guide.base());
@@ -134,6 +166,40 @@ public class DefaultFilesTransferUtility implements FilesTransferUtility {
                 addLicenses(new File(outputDirectory.getAbsolutePath(), folder));
             }
         }
+    }
+
+    private static void movePythonResources(Path destinationPath) throws IOException {
+        movePythonResourceFolder(destinationPath, "views");
+        movePythonResourceFolder(destinationPath, "static");
+    }
+
+    private static void movePythonResourceFolder(Path destinationPath, String resourceFolder) throws IOException {
+        Path sourcePath = destinationPath.resolve("src").resolve("main").resolve("resources").resolve(resourceFolder);
+        if (!Files.exists(sourcePath)) {
+            return;
+        }
+
+        Path targetPath = destinationPath.resolve("config").resolve(resourceFolder);
+        Files.createDirectories(targetPath);
+        Files.walkFileTree(sourcePath, new SimpleFileVisitor<>() {
+            @Override
+            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+                Files.createDirectories(targetPath.resolve(sourcePath.relativize(dir)));
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                Files.move(file, targetPath.resolve(sourcePath.relativize(file)), StandardCopyOption.REPLACE_EXISTING);
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                Files.delete(dir);
+                return FileVisitResult.CONTINUE;
+            }
+        });
     }
 
     void addLicenses(File folder) {

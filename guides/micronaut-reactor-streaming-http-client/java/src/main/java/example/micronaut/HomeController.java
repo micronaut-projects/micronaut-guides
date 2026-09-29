@@ -34,12 +34,12 @@ import java.net.URL;
 @Controller // <1>
 class HomeController implements AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(HomeController.class);
-    private static final URI DEFAULT_URI = URI.create("https://guides.micronaut.io/micronaut5K.png");
+    private static final URI DEFAULT_URI = URI.create("https://micronaut-projects.github.io/micronaut-guides//micronaut5K.png");
 
     private final ReactorStreamingHttpClient reactorStreamingHttpClient;
 
     HomeController() {
-        String urlStr = "https://guides.micronaut.io/";
+        String urlStr = "https://micronaut-projects.github.io/micronaut-guides//";
         URL url;
         try {
             url = new URL(urlStr);

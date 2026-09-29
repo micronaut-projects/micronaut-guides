@@ -83,6 +83,9 @@ public final class GuideUtils {
     }
 
     public static boolean isSupported(BuildTool buildTool, Language language) {
+        if (buildTool == BuildTool.PYRONAUT || language == Language.PYTHON) {
+            return buildTool == BuildTool.PYRONAUT && language == Language.PYTHON;
+        }
         return !(buildTool == BuildTool.MAVEN && language == Language.KOTLIN);
     }
 
@@ -164,8 +167,8 @@ public final class GuideUtils {
                     guideApp.framework(),
                     mergeLists(guideApp.features(), baseApp.features()),
                     mergeLists(guideApp.invisibleFeatures(), baseApp.invisibleFeatures()),
-                    mergeLists(guideApp.javaFeatures(), baseApp.javaFeatures()),
                     mergeLists(guideApp.kotlinFeatures(), baseApp.kotlinFeatures()),
+                    mergeLists(guideApp.javaFeatures(), baseApp.javaFeatures()),
                     mergeLists(guideApp.groovyFeatures(), baseApp.groovyFeatures()),
                     guideApp.testFramework(),
                     guideApp.excludeTest(),
