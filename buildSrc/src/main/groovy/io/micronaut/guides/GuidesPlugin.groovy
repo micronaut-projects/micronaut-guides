@@ -50,6 +50,7 @@ class GuidesPlugin implements Plugin<Project> {
     private static final String KEY_WORKFLOW = "workflow"
     private static final String KEY_WORKFLOW_SNAPSHOT = "workflow-snapshot"
     private static final String TEST_RUNNER = "test-runner"
+    private static final String PYTHON_TEST_RUNNER = "python-test-runner"
     private static final String KEY_DOC = "doc"
     private static final String KEY_PYTHON_BUILD = "python-build"
     private static final String COMMA = ","
@@ -102,6 +103,7 @@ class GuidesPlugin implements Plugin<Project> {
 
                     registerGuideBuild(project, taskSlug, metadata, docTask, zip, indexTask, testScriptTask, testScriptRunnerTask, nativeTestScriptTask, nativeTestScriptRunnerTask)
                     TaskProvider<Task> pythonBuildTask = null
+                    TaskProvider<Task> pythonTestRunnerTask = null
                     List<Language> languages = options.stream()
                             .map(option -> option.language)
                             .distinct()
@@ -116,6 +118,7 @@ class GuidesPlugin implements Plugin<Project> {
                         TaskProvider<Task> languageBuildTask = registerGuideBuildForLanguage(project, taskSlug, language.toString().capitalize(), metadata, languageDocTask, languageZipTask, languageTestScriptTask, languageTestScriptRunnerTask)
                         if (language == Language.PYTHON) {
                             pythonBuildTask = languageBuildTask
+                            pythonTestRunnerTask = languageTestScriptRunnerTask as TaskProvider<Task>
                         }
                     }
                     Map<String, TaskProvider<Task>> taskMap = [(KEY_DOC)              : docTask,
@@ -125,6 +128,9 @@ class GuidesPlugin implements Plugin<Project> {
                      (TEST_RUNNER)          : testScriptRunnerTask] as Map<String, TaskProvider<Task>>
                     if (pythonBuildTask != null) {
                         taskMap.put(KEY_PYTHON_BUILD, pythonBuildTask)
+                    }
+                    if (pythonTestRunnerTask != null) {
+                        taskMap.put(PYTHON_TEST_RUNNER, pythonTestRunnerTask)
                     }
                     taskMap
                 }).toList() as List<Map<String, TaskProvider<Task>>>
@@ -166,6 +172,17 @@ class GuidesPlugin implements Plugin<Project> {
             it.group = 'guides'
             it.description = 'Runs all Guide test scripts'
             it.dependsOn(sampleTasks.stream().map(m -> m.get(TEST_RUNNER)).collect(Collectors.toList()))
+        }
+
+        List<TaskProvider<Task>> pythonTestRunnerTasks = sampleTasks.stream()
+                .map(m -> m.get(PYTHON_TEST_RUNNER))
+                .filter(task -> task != null)
+                .toList() as List<TaskProvider<Task>>
+
+        project.tasks.register("runAllPythonGuidesTests") { Task it ->
+            it.group = 'guides'
+            it.description = 'Runs all Python Guide test scripts'
+            it.dependsOn(pythonTestRunnerTasks)
         }
 
         List<TaskProvider<Task>> zipTasks = sampleTasks.stream()
