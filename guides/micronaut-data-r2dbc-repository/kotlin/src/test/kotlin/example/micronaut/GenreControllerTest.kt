@@ -19,7 +19,6 @@ import example.micronaut.domain.Genre
 import io.micronaut.core.type.Argument
 import io.micronaut.http.HttpHeaders
 import io.micronaut.http.HttpRequest
-import io.micronaut.http.HttpResponse
 import io.micronaut.http.HttpStatus
 import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
@@ -47,31 +46,28 @@ class GenreControllerTest(@Client("/") val client: HttpClient) { // <2>
     @Test
     fun testGenreCrudOperations() {
 
-        val genreIds = mutableListOf<Long>()
-
         var request = HttpRequest.POST("/genres", mapOf("name" to "DevOps")) // <3>
         var response = client.toBlocking().exchange(request, Genre::class.java)
 
         assertEquals(HttpStatus.CREATED, response.status)
-        genreIds.add(entityId(response))
+        assertEquals("/genres/1", response.header(HttpHeaders.LOCATION))
 
         request = HttpRequest.POST("/genres", mapOf("name" to "Microservices")) // <3>
         response = client.toBlocking().exchange(request, Genre::class.java)
 
         assertEquals(HttpStatus.CREATED, response.status)
-        val genreId = entityId(response)
-        genreIds.add(genreId)
+        assertEquals("/genres/2", response.header(HttpHeaders.LOCATION))
 
-        var genre = client.toBlocking().retrieve("/genres/$genreId", Genre::class.java) // <4>
+        var genre = client.toBlocking().retrieve("/genres/2", Genre::class.java) // <4>
 
         assertEquals("Microservices", genre.name)
 
-        var cmdRequest = HttpRequest.PUT("/genres", GenreUpdateCommand(genreId, "Micro-services"))
+        var cmdRequest = HttpRequest.PUT("/genres", GenreUpdateCommand(2, "Micro-services"))
         response = client.toBlocking().exchange(cmdRequest) // <5>
 
         assertEquals(HttpStatus.NO_CONTENT, response.status())
 
-        genre = client.toBlocking().retrieve("/genres/$genreId", Genre::class.java)
+        genre = client.toBlocking().retrieve("/genres/2", Genre::class.java)
 
         assertEquals("Micro-services", genre.name)
 
@@ -107,8 +103,8 @@ class GenreControllerTest(@Client("/") val client: HttpClient) { // <2>
 
         assertEquals(0, genres.size)
 
-        for (id in genreIds) {
-            request = HttpRequest.DELETE("/genres/$id")
+        for (i in 1..2) {
+            request = HttpRequest.DELETE("/genres/$i")
             response = client.toBlocking().exchange(request)
 
             assertEquals(HttpStatus.NO_CONTENT, response.status)
@@ -119,12 +115,6 @@ class GenreControllerTest(@Client("/") val client: HttpClient) { // <2>
 
         assertEquals(0, genres.size)
 
-    }
-
-    private fun entityId(response: HttpResponse<*>): Long {
-        val location = response.header(HttpHeaders.LOCATION)
-        assertNotNull(location)
-        return location!!.substring("/genres/".length).toLong()
     }
 
 }

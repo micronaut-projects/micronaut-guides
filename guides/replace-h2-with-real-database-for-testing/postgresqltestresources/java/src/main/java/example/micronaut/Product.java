@@ -15,18 +15,25 @@
  */
 package example.micronaut;
 
-import io.micronaut.data.annotation.Id;
-import io.micronaut.data.annotation.MappedEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
-@MappedEntity("products") // <1>
+@Entity // <1>
+@Table(name = "products") // <2>
 public class Product {
 
-    @Id // <2>
+    @Id // <3>
     private Long id;
 
+    @Column(nullable = false, unique = true)  // <4>
     private String code;
 
+    @Column(nullable = false) // <4>
     private String name;
+
+    public Product() {}
 
     public Product(Long id, String code, String name) {
         this.id = id;

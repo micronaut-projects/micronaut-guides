@@ -17,12 +17,11 @@ package example.micronaut;
 
 //tag::clazz[]
 import io.micronaut.data.annotation.Query;
-import io.micronaut.data.jdbc.annotation.JdbcRepository;
-import io.micronaut.data.model.query.builder.sql.Dialect;
-import io.micronaut.data.repository.CrudRepository;
+import io.micronaut.data.annotation.Repository;
+import io.micronaut.data.jpa.repository.JpaRepository;
 
-@JdbcRepository(dialect = Dialect.H2) // <1>
-interface ProductRepository extends CrudRepository<Product, Long> { // <2>
+@Repository // <1>
+interface ProductRepository extends JpaRepository<Product, Long> { // <2>
 //end::clazz[]
 
 //tag::method[]

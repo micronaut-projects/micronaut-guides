@@ -20,9 +20,8 @@ import io.micronaut.core.type.Argument;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import io.micronaut.transaction.TransactionOperations;
 import jakarta.inject.Inject;
+import org.hibernate.Session;
 import org.junit.jupiter.api.Test;
-
-import java.sql.Connection;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -35,6 +34,6 @@ public class TransactionOperationsTest {
     @Test
     void beanOfTypeTransactionOperations() {
         assertTrue(beanContext.containsBean(TransactionOperations.class));
-        assertTrue(beanContext.findBean(Argument.of(TransactionOperations.class, Connection.class)).isPresent());
+        assertTrue(beanContext.findBean(Argument.of(TransactionOperations.class, Session.class)).isPresent());
     }
 }
