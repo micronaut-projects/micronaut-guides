@@ -1,16 +1,30 @@
+/*
+ * Copyright 2017-2026 original authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package example.micronaut;
 
 import io.micronaut.transaction.annotation.OracleTransactional;
 import io.micronaut.transaction.annotation.Transactional;
 import jakarta.inject.Singleton;
 
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 
 @Singleton
 public class InventoryService {
 
     static final long DEMO_ITEM_ID = 1L;
-    private static final String DEMO_ITEM_NAME = "Last available item";
 
     private final InventoryItemRepository inventoryItemRepository;
 
@@ -19,57 +33,37 @@ public class InventoryService {
     }
 
     @Transactional
-    public InventoryItem resetDemoItem() {
-        InventoryItem item = new InventoryItem(DEMO_ITEM_ID, DEMO_ITEM_NAME, 1, Status.AVAILABLE);
-        return inventoryItemRepository.findById(DEMO_ITEM_ID).isPresent()
+    public InventoryItem reset() {
+        InventoryItem item = new InventoryItem(DEMO_ITEM_ID, "Last available item", 1, Status.AVAILABLE);
+        return inventoryItemRepository.existsById(DEMO_ITEM_ID)
             ? inventoryItemRepository.update(item)
-            : inventoryItemRepository.insert(item);
+            : inventoryItemRepository.save(item);
     }
 
     @Transactional(readOnly = true)
-    public InventoryItem demoItem() {
-        return inventoryItemRepository.findById(DEMO_ITEM_ID)
-            .orElseThrow(() -> new IllegalStateException("The demo inventory item has not been initialized"));
+    public InventoryItem find() {
+        return inventoryItemRepository.findById(DEMO_ITEM_ID).orElseThrow();
     }
 
-    /**
-     * A background stock reconciliation is deliberately LOW priority. It holds the item lock while
-     * an intentionally slow external count is performed. If a customer checkout needs the row,
-     * Oracle can roll this transaction back.
-     *
-     * A priority rollback is not retried automatically. A caller that wants to retry must invoke
-     * this operation in a new transaction and re-read/revalidate the item first.
-     */
     @OracleTransactional(priority = OracleTransactional.Priority.LOW) // <1>
-    public InventoryItem reconcileStock(long holdSeconds, Runnable lockAcquired) { // <2>
-        InventoryItem item = lockedDemoItem();
-        // SELECT FOR UPDATE owns the row lock while the deliberately slow reconciliation runs.
-        lockAcquired.run();
-        sleep(holdSeconds);
-        // This is the business write and the post-wait JDBC round trip. If Oracle rolled back this
-        // low-priority transaction while it was waiting, ORA-63300/ORA-63302 is reported here.
-        InventoryItem reconciled = new InventoryItem(item.id(), item.name(), 0, Status.RECONCILED);
-        return inventoryItemRepository.update(reconciled); // <3>
+    public InventoryItem reconcile(Duration countDuration) {
+        InventoryItem item = inventoryItemRepository.findByIdForUpdate(DEMO_ITEM_ID).orElseThrow(); // <2>
+        countStock(countDuration); // <3>
+        return inventoryItemRepository.update(item.withStatus(Status.RECONCILED)); // <4>
     }
 
-    @OracleTransactional(priority = OracleTransactional.Priority.HIGH) // <4>
+    @OracleTransactional(priority = OracleTransactional.Priority.HIGH) // <5>
     public InventoryItem checkout() {
-        InventoryItem item = lockedDemoItem();
-        InventoryItem checkedOut = new InventoryItem(item.id(), item.name(), 0, Status.CHECKED_OUT);
-        return inventoryItemRepository.update(checkedOut);
+        InventoryItem item = inventoryItemRepository.findByIdForUpdate(DEMO_ITEM_ID).orElseThrow(); // <6>
+        return inventoryItemRepository.update(new InventoryItem(item.id(), item.name(), 0, Status.CHECKED_OUT));
     }
 
-    private InventoryItem lockedDemoItem() {
-        return inventoryItemRepository.findByIdForUpdate(DEMO_ITEM_ID)
-            .orElseThrow(() -> new IllegalStateException("The demo inventory item has not been initialized"));
-    }
-
-    private static void sleep(long holdSeconds) {
+    private static void countStock(Duration countDuration) {
         try {
-            TimeUnit.SECONDS.sleep(holdSeconds);
+            Thread.sleep(countDuration); // Simulates a slow count in an external system.
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new IllegalStateException("The stock reconciliation was interrupted", e);
+            throw new IllegalStateException("The stock count was interrupted", e);
         }
     }
 }
