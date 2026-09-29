@@ -1,8 +1,8 @@
+from io import BytesIO
+
 import pytest
 import requests
-
-from builders.dsl.spreadsheet.query.poi import PoiSpreadsheetCriteria
-from java.io import ByteArrayInputStream
+from openpyxl import load_workbook
 from pyronaut.test import MicronautTest, micronaut_test_fixture
 
 
@@ -30,18 +30,8 @@ def test_books_can_be_downloaded_as_an_excel_file(client):
     )  # <3>
 
     assert response.status_code == 200
+    assert response.headers["Content-Disposition"] == 'attachment; filename="books.xlsx"'
 
-    input_stream = ByteArrayInputStream(response.content)  # <4>
-    query = PoiSpreadsheetCriteria.FACTORY.forStream(input_stream)
-    result = query.query(
-        lambda workbook: workbook.sheet(
-            "Books",
-            lambda sheet: sheet.row(
-                lambda row: row.cell(
-                    lambda cell: cell.value("Building Microservices")
-                )
-            ),
-        )
-    )
-
-    assert result.getCells().size() == 1
+    workbook = load_workbook(BytesIO(response.content))  # <4>
+    sheet = workbook["Books"]
+    assert sheet["B2"].value == "Building Microservices"
