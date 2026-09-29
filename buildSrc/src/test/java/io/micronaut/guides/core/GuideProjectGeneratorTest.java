@@ -112,6 +112,7 @@ class GuideProjectGeneratorTest {
                     }
                     testResources {
                         sharedServer = true
+                        version = "4.0.0"
                     }
                 }"""));
         String javaVersion = JavaVersion.current().getMajorVersion();

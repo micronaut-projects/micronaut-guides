@@ -122,9 +122,24 @@ task generateGuidesIndex {
     }
 }
 
+task generatePythonGuidesIndex {
+    group 'guides'
+    description 'Generates an index.html with the Python guides'
+    doLast {
+        if (!distDir.exists()) {
+            distDir.mkdirs()
+        }
+        File template = new File(projectDir, "assets/template.html")
+        File indexGridFile = new File(projectDir, "buildSrc/src/main/resources/indexgrid.html")
+        IndexGenerator.generatePythonGuidesIndex(template, guidesDir, distDir, metadataConfigName, indexGridFile.text)
+    }
+}
+
+buildPython.dependsOn 'createDist', 'generatePythonGuidesIndex'
+
 task generateGuidesJsonMetadata {
     group 'guides'
-    description 'Generates a guides.json with the metadata for all the guides'
+    description 'Generates guides.json and python.json with guide metadata'
     doLast {
         if (!distDir.exists()) {
             distDir.mkdirs()
@@ -132,6 +147,9 @@ task generateGuidesJsonMetadata {
         File guidesJson = new File(distDir, 'guides.json')
         guidesJson.createNewFile()
         guidesJson.text = IndexGenerator.generateGuidesJsonIndex(guidesDir, metadataConfigName)
+        File pythonJson = new File(distDir, 'python.json')
+        pythonJson.createNewFile()
+        pythonJson.text = IndexGenerator.generatePythonJsonIndex(guidesDir, metadataConfigName)
     }
 }
 

@@ -89,9 +89,6 @@ cd ..
 cd hello-base-maven-groovy
 
 cd ..
-cd hello-base-maven-kotlin
-
-cd ..
 
 cd test-gradle-java
 cd micronautframeworkjacksondatabind
@@ -128,4 +125,3 @@ if [ ${#FAILED_PROJECTS[@]} -ne 0 ]; then
 else
   exit 0
 fi
-

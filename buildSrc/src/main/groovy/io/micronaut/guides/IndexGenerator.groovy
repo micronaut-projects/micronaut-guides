@@ -11,6 +11,7 @@ import io.micronaut.starter.options.BuildTool
 import io.micronaut.starter.options.Language
 
 import java.time.format.DateTimeFormatter
+import java.util.regex.Matcher
 import java.util.regex.Pattern
 import java.util.stream.Collectors
 import java.util.stream.Stream
@@ -21,7 +22,7 @@ class IndexGenerator {
     private static final String DEFAULT_CARD = "micronauttwittercard.png"
     private static final String DEFAULT_INTRO = "Step-by-step tutorials to learn the Micronaut framework"
     private static final String DEFAULT_TITLE = "Micronaut Guides"
-    private static final String GUIDES_URL = "https://guides.micronaut.io"
+    private static final String GUIDES_URL = "https://micronaut-projects.github.io/micronaut-guides/"
     private static final String LATEST_GUIDES_URL = GUIDES_URL + "/latest/"
     private static final String TWITTER_MICRONAUT = "@micronautfw"
 
@@ -70,7 +71,21 @@ class IndexGenerator {
         save(distDir, rssFeedGenerator.rssFeed(metadatas), rssFeedConfiguration.getFilename())
     }
 
+    static void generatePythonGuidesIndex(File template, File guidesFolder, File distDir, String metadataConfigName, String indexgrid) {
+        //TODO. We should have an application context and get it from it.
+        JsonMapper jsonMapper = JsonMapper.createDefault();
+        JsonSchemaProvider jsonSchemaProvider = new DefaultJsonSchemaProvider()
+        GuideParser guideParser = new DefaultGuideParser(jsonSchemaProvider, jsonMapper);
+        List<Guide> metadatas = guideParser.parseGuidesMetadata(guidesFolder, metadataConfigName)
+                .findAll { it.publish() && it.languages().contains(Language.PYTHON) }
+        generateGuidesIndexForLanguage(template, distDir, metadatas, indexgrid, Language.PYTHON)
+    }
+
     static void generateGuidesIndex(File template, File distDir, List<Guide> metadatas, String indexgrid) {
+        generateGuidesIndexForLanguage(template, distDir, metadatas, indexgrid, null)
+    }
+
+    private static void generateGuidesIndexForLanguage(File template, File distDir, List<Guide> metadatas, String indexgrid, Language languageFilter) {
         String templateText = template.text.replaceFirst(CONTENT_REGEX) { List<String> it ->
             "${it[1]}\n    <div style=\"clear: both;\"></div><div class=\"container\">@content@</div>\n${it[3]}"
         }
@@ -90,7 +105,9 @@ class IndexGenerator {
                     distDir,
                     [new GuidesSection(category: cat, metadatas: tagMetadatas)],
                     tag.title,
-                    null)
+                    null,
+                    [],
+                    languageFilter)
         }
         Ordered[] categories = Category.values()
         OrderUtil.sort(categories)
@@ -106,10 +123,11 @@ class IndexGenerator {
 
             sections << new GuidesSection(category: cat, metadatas: GuideList)
         }
-        save(templateText, 'index.html', distDir, sections, 'Micronaut Guides', indexgrid, tags)
+        String filteredIndexGrid = languageFilter == null ? indexgrid : filterIndexGrid(indexgrid, metadatas)
+        save(templateText, 'index.html', distDir, sections, 'Micronaut Guides', filteredIndexGrid, tags, languageFilter)
 
         for (Guide metadata :  metadatas) {
-            save(templateText, metadata.slug() + '.html', distDir, [new GuidesSection(category: metadata.categories() ? metadata.categories().first() : null, metadatas: [metadata])],  metadata.title(), null)
+            save(templateText, metadata.slug() + '.html', distDir, [new GuidesSection(category: metadata.categories() ? metadata.categories().first() : null, metadatas: [metadata])],  metadata.title(), null, [], languageFilter)
         }
     }
 
@@ -120,7 +138,18 @@ class IndexGenerator {
                              String title,
                              String indexGrid,
                              Collection<Tag> tags = []) {
-        String text = indexText(distDir, templateText, sections, tags, title, indexGrid)
+        save(templateText, filename, distDir, sections, title, indexGrid, tags, null)
+    }
+
+    private static void save(String templateText,
+                             String filename,
+                             File distDir,
+                             List<GuidesSection> sections,
+                             String title,
+                             String indexGrid,
+                             Collection<Tag> tags,
+                             Language languageFilter) {
+        String text = indexText(distDir, templateText, sections, tags, title, indexGrid, languageFilter)
         save(distDir, text, filename)
     }
 
@@ -136,6 +165,16 @@ class IndexGenerator {
                                     Collection<Tag> tags,
                                     String title,
                                     String indexGrid) {
+        indexText(distDir, templateText, sections, tags, title, indexGrid, null)
+    }
+
+    private static String indexText(File distDir,
+                                    String templateText,
+                                    List<GuidesSection> sections,
+                                    Collection<Tag> tags,
+                                    String title,
+                                    String indexGrid,
+                                    Language languageFilter) {
         boolean singleGuide = sections && sections.size() == 1 && sections.get(0).metadatas.size() == 1
         List<Guide> metadatas = []
         for (GuidesSection section : sections) {
@@ -155,7 +194,7 @@ class IndexGenerator {
             index += '  </div>'
             index += '  <div class="grid-item grid-item_white grid-item_two-third grid-item_dynamic-height latest-guides">'
             index += '    <div class="inner" style="padding: 0">'
-            index += guidesTable(latestGuides(metadatas), "Latest Guides", true)
+            index += guidesTable(latestGuides(metadatas), "Latest Guides", true, languageFilter)
             index += '    </div>'
             index += '  </div>'
             index += '</div>'
@@ -167,7 +206,7 @@ class IndexGenerator {
         }
 
         for (GuidesSection section : sections) {
-            index += renderMetadatas(baseURL, section.category, section.metadatas, singleGuide)
+            index += renderMetadatas(baseURL, section.category, section.metadatas, singleGuide, languageFilter)
         }
 
         String text = templateText
@@ -207,6 +246,65 @@ class IndexGenerator {
         tagMap.values()
     }
 
+    private static String filterIndexGrid(String indexgrid, List<Guide> metadatas) {
+        Set<String> categoryIds = metadatas
+                .collectMany { Guide metadata -> metadata.categories() ?: [] }
+                .collect { String category ->
+                    Category.values().find { Category knownCategory -> knownCategory.toString() == category }?.name()?.toLowerCase()
+                }
+                .findAll { String categoryId -> categoryId != null }
+                .toSet()
+
+        if (categoryIds.isEmpty()) {
+            return ''
+        }
+
+        Pattern categoryItemPattern = ~/(?s)<li>\s*<h4 class="title title_small"><a href="#([^"]+)">.*?<\/li>\s*/
+        Matcher categoryItemMatcher = categoryItemPattern.matcher(indexgrid)
+        StringBuffer filtered = new StringBuffer()
+        while (categoryItemMatcher.find()) {
+            String replacement = categoryIds.contains(categoryItemMatcher.group(1)) ? categoryItemMatcher.group() : ''
+            categoryItemMatcher.appendReplacement(filtered, Matcher.quoteReplacement(replacement))
+        }
+        categoryItemMatcher.appendTail(filtered)
+
+        String filteredIndexGrid = filtered.toString()
+        Pattern gridItemPattern = ~/<div\s+class="grid-item\b[^>]*>/
+        Matcher gridItemMatcher = gridItemPattern.matcher(filteredIndexGrid)
+        List<int[]> emptyGridItems = []
+        while (gridItemMatcher.find()) {
+            int start = gridItemMatcher.start()
+            int end = matchingDivEnd(filteredIndexGrid, start)
+            if (!filteredIndexGrid.substring(start, end).contains('<li>')) {
+                emptyGridItems << new int[]{start, end}
+            }
+            gridItemMatcher.region(end, filteredIndexGrid.length())
+        }
+        for (int i = emptyGridItems.size() - 1; i >= 0; i--) {
+            int[] range = emptyGridItems[i]
+            filteredIndexGrid = filteredIndexGrid.substring(0, range[0]) + filteredIndexGrid.substring(range[1])
+        }
+        filteredIndexGrid
+    }
+
+    private static int matchingDivEnd(String html, int start) {
+        Pattern divPattern = ~/(?s)<\/?div(?:\s[^>]*)?>/
+        Matcher divMatcher = divPattern.matcher(html)
+        divMatcher.region(start, html.length())
+        int depth = 0
+        while (divMatcher.find()) {
+            if (divMatcher.group().startsWith('</')) {
+                depth--
+                if (depth == 0) {
+                    return divMatcher.end()
+                }
+            } else {
+                depth++
+            }
+        }
+        html.length()
+    }
+
     private static List<Guide> latestGuides(List<Guide> metadatas) {
         metadatas.stream()
                 .distinct()
@@ -234,6 +332,10 @@ class IndexGenerator {
     }
 
     private static String renderMetadatas(String baseURL, Object cat, List<Guide> metadatas, boolean singleGuide) {
+        renderMetadatas(baseURL, cat, metadatas, singleGuide, null)
+    }
+
+    private static String renderMetadatas(String baseURL, Object cat, List<Guide> metadatas, boolean singleGuide, Language languageFilter) {
         String index = ''
         int count = 0
         List<Guide> filteredMetadatas = Utils.singleGuide() ?
@@ -272,7 +374,7 @@ class IndexGenerator {
             }
         } else {
             index += "<div class='col-sm-8'>"
-            index += guidesTable(filteredMetadatas)
+            index += guidesTable(filteredMetadatas, null, false, languageFilter)
             index += "</div>"
         }
 
@@ -284,6 +386,13 @@ class IndexGenerator {
     private static String guidesTable(List<Guide> metadatas,
                                       String header = null,
                                       boolean displayPublicationDate = false) {
+        guidesTable(metadatas, header, displayPublicationDate, null)
+    }
+
+    private static String guidesTable(List<Guide> metadatas,
+                                      String header,
+                                      boolean displayPublicationDate,
+                                      Language languageFilter) {
         String index = '<div class="guide-list">'
 
         if (header) {
@@ -298,7 +407,7 @@ class IndexGenerator {
                 }
             }
             index += '<div class="guide">'
-            index += "<div class='guide-title'><a href='${metadata.slug()}.html'>${metadata.title()}</a></div>"
+            index += "<div class='guide-title'><a href='${guideMetadataUrl('', metadata, languageFilter)}'>${metadata.title()}</a></div>"
             if (displayPublicationDate) {
                 index += "<div class='guide-date'>${metadata.publicationDate().format(DateTimeFormatter.ofPattern("MMM dd, yyyy"))}</div>"
             }
@@ -321,6 +430,17 @@ class IndexGenerator {
         index
     }
 
+    private static String guideMetadataUrl(String baseURL, Guide metadata, Language languageFilter) {
+        if (languageFilter == null) {
+            return "${baseURL}${metadata.slug()}.html"
+        }
+        GuidesOption guidesOption = GuideProjectGenerator.guidesOptions(metadata)
+                .find { GuidesOption option -> option.language == languageFilter }
+        guidesOption ?
+                "${baseURL}${GuideProjectGenerator.folderName(metadata.slug(), guidesOption)}.html" :
+                "${baseURL}${metadata.slug()}.html"
+    }
+
     private static String guideLink(String baseURL, Guide metadata,
                                     GuidesOption guidesOption, String title = null) {
         String folder = GuideProjectGenerator.folderName(metadata.slug(), guidesOption)
@@ -332,8 +452,10 @@ class IndexGenerator {
         String kotlinImg = '<img src="./images/kotlin.svg" width="60" alt="Kotlin"/>'
         String groovyImg = '<img src="./images/groovy.svg" width="60" alt="Groovy"/>'
         String javaImg = '<img src="./images/java.svg" width="60" alt="Java"/>'
+        String pythonImg = '<img src="./images/python.png" width="60" alt="Python"/>'
         String mavenImg = '<img src="./images/maven.svg" width="60" alt="Maven"/>'
         String gradleImg = '<img src="./images/gradle.svg" width="60" alt="Gradle"/>'
+        String pyronautImg = '<img src="./images/pyronaut.svg" width="100" alt="Pyronaut"/>'
 
         String tableHtml = """\
 <table class='build-language-grid'>
@@ -344,6 +466,7 @@ class IndexGenerator {
         tableHtml += "<th>${javaImg}</th>"
         tableHtml += "<th>${kotlinImg}</th>"
         tableHtml += "<th>${groovyImg}</th>"
+        tableHtml += "<th>${pythonImg}</th>"
         tableHtml += """\
 </tr>
 </thead>
@@ -358,6 +481,7 @@ class IndexGenerator {
             tableHtml += cell(baseURL, metadata, BuildTool.GRADLE, Language.JAVA, guidesOptionList)
             tableHtml += cell(baseURL, metadata, BuildTool.GRADLE, Language.KOTLIN, guidesOptionList)
             tableHtml += cell(baseURL, metadata, BuildTool.GRADLE, Language.GROOVY, guidesOptionList)
+            tableHtml += cell(baseURL, metadata, BuildTool.GRADLE, Language.PYTHON, guidesOptionList)
 
             tableHtml += """\
 </tr>
@@ -371,6 +495,21 @@ class IndexGenerator {
             tableHtml += cell(baseURL, metadata, BuildTool.MAVEN, Language.JAVA, guidesOptionList)
             tableHtml += cell(baseURL, metadata, BuildTool.MAVEN, Language.KOTLIN, guidesOptionList)
             tableHtml += cell(baseURL, metadata, BuildTool.MAVEN, Language.GROOVY, guidesOptionList)
+            tableHtml += cell(baseURL, metadata, BuildTool.MAVEN, Language.PYTHON, guidesOptionList)
+
+            tableHtml += """\
+</tr>
+"""
+        }
+        if (guidesOptionList.find {GuidesOption option -> option.buildTool == BuildTool.PYRONAUT }) {
+            tableHtml += """\
+<tr>
+<td>${pyronautImg}</td>
+"""
+            tableHtml += cell(baseURL, metadata, BuildTool.PYRONAUT, Language.JAVA, guidesOptionList)
+            tableHtml += cell(baseURL, metadata, BuildTool.PYRONAUT, Language.KOTLIN, guidesOptionList)
+            tableHtml += cell(baseURL, metadata, BuildTool.PYRONAUT, Language.GROOVY, guidesOptionList)
+            tableHtml += cell(baseURL, metadata, BuildTool.PYRONAUT, Language.PYTHON, guidesOptionList)
 
             tableHtml += """\
 </tr>
@@ -525,6 +664,14 @@ class IndexGenerator {
     }
 
     static String generateGuidesJsonIndex(File guidesFolder, String metadataConfigName) {
+        generateJsonIndex(guidesFolder, metadataConfigName, null)
+    }
+
+    static String generatePythonJsonIndex(File guidesFolder, String metadataConfigName) {
+        generateJsonIndex(guidesFolder, metadataConfigName, Language.PYTHON)
+    }
+
+    private static String generateJsonIndex(File guidesFolder, String metadataConfigName, Language languageFilter) {
         String baseURL = System.getenv("CI") ? LATEST_GUIDES_URL : ""
 
         //TOO get both from an application context
@@ -532,12 +679,12 @@ class IndexGenerator {
         JsonSchemaProvider jsonSchemaProvider = new DefaultJsonSchemaProvider();
         GuideParser guideParser = new DefaultGuideParser(jsonSchemaProvider, jsonMapper);
         List<Guide> metadatas = guideParser.parseGuidesMetadata(guidesFolder, metadataConfigName)
-                .findAll { it.publish() }
+                .findAll { it.publish() && (languageFilter == null || it.languages().contains(languageFilter)) }
 
         List<Map> result = metadatas
             .collect {guide -> [
-                title: guide.title(),
-                intro: guide.intro(),
+                title: GuideAsciidocGenerator.postProcessText(guide.title(), languageFilter),
+                intro: GuideAsciidocGenerator.postProcessText(guide.intro(), languageFilter),
                 authors: guide.authors(),
                 tags: generateTags(guide),
                 category: guide.categories() ? guide.categories().first().toString() : null, // Deprecated
@@ -545,7 +692,9 @@ class IndexGenerator {
                 publicationDate: guide.publicationDate().toString(),
                 slug: guide.slug(),
                 url: "${baseURL}${guide.slug()}.html",
-                options: GuideProjectGenerator.guidesOptions(guide).collect {option -> [
+                options: GuideProjectGenerator.guidesOptions(guide)
+                        .findAll { option -> languageFilter == null || option.language == languageFilter }
+                        .collect { option -> [
                     buildTool: option.buildTool,
                     language: option.language,
                     url: "${baseURL}${guide.slug()}-${option.buildTool.toString().toLowerCase()}-${option.language.toString().toLowerCase()}.html"
