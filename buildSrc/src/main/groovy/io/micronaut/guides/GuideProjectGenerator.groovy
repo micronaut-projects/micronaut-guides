@@ -21,9 +21,12 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 import java.nio.file.Files
+import java.nio.file.FileVisitResult
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.nio.file.SimpleFileVisitor
 import java.time.LocalDate
+import java.nio.file.attribute.BasicFileAttributes
 import java.util.regex.Pattern
 
 import static groovy.io.FileType.FILES
@@ -223,7 +226,31 @@ class GuideProjectGenerator implements AutoCloseable {
         final String srcFolder = 'src'
         Path srcPath = Paths.get(inputDir.absolutePath, appName, srcFolder)
         if (Files.exists(srcPath)) {
-            Files.walkFileTree(srcPath, new CopyFileVisitor(Paths.get(destinationPath.toString(), srcFolder)))
+            Path resourcesPath = srcPath.resolve('main').resolve('resources')
+            if (language == PYTHON.toString() && Files.exists(resourcesPath)) {
+                Path configPath = Paths.get(destinationPath.toString(), 'config')
+                Files.createDirectories(configPath)
+                Files.walkFileTree(resourcesPath, new CopyFileVisitor(configPath))
+                Path destinationResourcesPath = Paths.get(destinationPath.toString(), srcFolder, 'main', 'resources')
+                Files.walkFileTree(resourcesPath, new SimpleFileVisitor<Path>() {
+                    @Override
+                    FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+                        Files.deleteIfExists(destinationResourcesPath.resolve(resourcesPath.relativize(file)))
+                        FileVisitResult.CONTINUE
+                    }
+                })
+                Files.walkFileTree(srcPath, new CopyFileVisitor(Paths.get(destinationPath.toString(), srcFolder)) {
+                    @Override
+                    FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
+                        if (dir.equals(resourcesPath)) {
+                            return FileVisitResult.SKIP_SUBTREE
+                        }
+                        super.preVisitDirectory(dir, attrs)
+                    }
+                })
+            } else {
+                Files.walkFileTree(srcPath, new CopyFileVisitor(Paths.get(destinationPath.toString(), srcFolder)))
+            }
         }
 
         Path sourcePath = Paths.get(inputDir.absolutePath, appName, language)

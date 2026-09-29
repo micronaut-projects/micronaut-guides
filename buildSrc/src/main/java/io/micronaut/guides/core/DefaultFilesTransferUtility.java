@@ -1,6 +1,7 @@
 package io.micronaut.guides.core;
 
 import io.micronaut.core.annotation.NonNull;
+import io.micronaut.starter.options.Language;
 import jakarta.inject.Singleton;
 import jakarta.validation.constraints.NotNull;
 import org.gradle.api.GradleException;
@@ -9,10 +10,13 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 import java.util.List;
 
@@ -51,7 +55,31 @@ public class DefaultFilesTransferUtility implements FilesTransferUtility {
         final String srcFolder = "src";
         Path srcPath = Paths.get(inputDir.getAbsolutePath(), appName, srcFolder);
         if (Files.exists(srcPath)) {
-            Files.walkFileTree(srcPath, new CopyFileVisitor(Paths.get(destinationPath.toString(), srcFolder)));
+            Path resourcesPath = srcPath.resolve("main").resolve("resources");
+            if (Language.PYTHON.toString().equals(language) && Files.exists(resourcesPath)) {
+                Path configPath = Paths.get(destinationPath.toString(), "config");
+                Files.createDirectories(configPath);
+                Files.walkFileTree(resourcesPath, new CopyFileVisitor(configPath));
+                Path destinationResourcesPath = Paths.get(destinationPath.toString(), srcFolder, "main", "resources");
+                Files.walkFileTree(resourcesPath, new SimpleFileVisitor<>() {
+                    @Override
+                    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                        Files.deleteIfExists(destinationResourcesPath.resolve(resourcesPath.relativize(file)));
+                        return FileVisitResult.CONTINUE;
+                    }
+                });
+                Files.walkFileTree(srcPath, new CopyFileVisitor(Paths.get(destinationPath.toString(), srcFolder)) {
+                    @Override
+                    public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+                        if (dir.equals(resourcesPath)) {
+                            return FileVisitResult.SKIP_SUBTREE;
+                        }
+                        return super.preVisitDirectory(dir, attrs);
+                    }
+                });
+            } else {
+                Files.walkFileTree(srcPath, new CopyFileVisitor(Paths.get(destinationPath.toString(), srcFolder)));
+            }
         }
 
         Path sourcePath = Paths.get(inputDir.getAbsolutePath(), appName, language);

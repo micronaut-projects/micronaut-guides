@@ -71,4 +71,19 @@ public class FilesTransferUtilityTest {
         assertFalse(new File(outputPath + "/creating-your-first-micronaut-app-maven-java/src/main/java/example/micronaut/Application.java").exists());
     }
 
+    @Test
+    void pythonCommonResourcesAreCopiedToConfig() throws Exception {
+        File inputDirectory = new File("src/test/resources/guides/python-resources");
+        Guide guide = guideParser.parseGuideMetadata(inputDirectory, "metadata.json").orElseThrow();
+        File outputDirectory = new File("build/tmp/python-resources");
+        File destination = new File(outputDirectory, "python-resources-pyronaut-python");
+        assertTrue(destination.mkdirs() || destination.exists());
+
+        filesTransferUtility.transferFiles(inputDirectory, outputDirectory, guide);
+
+        assertTrue(new File(destination, "config/views/index.html").exists());
+        assertTrue(new File(destination, "placeholder.py").exists());
+        assertFalse(new File(destination, "src/main/resources/views/index.html").exists());
+    }
+
 }
