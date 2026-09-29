@@ -82,15 +82,21 @@ public class FilesTransferUtilityTest {
         File starterView = new File(destination, "src/main/resources/views/starter.html");
         Files.createDirectories(starterView.toPath().getParent());
         Files.writeString(starterView.toPath(), "starter");
+        File starterStatic = new File(destination, "src/main/resources/static/starter.txt");
+        Files.createDirectories(starterStatic.toPath().getParent());
+        Files.writeString(starterStatic.toPath(), "starter");
 
         filesTransferUtility.transferFiles(inputDirectory, outputDirectory, guide);
 
         assertTrue(new File(destination, "config/views/index.html").exists());
         assertTrue(new File(destination, "config/views/starter.html").exists());
         assertTrue(new File(destination, "config/views/python.html").exists());
+        assertTrue(new File(destination, "config/static/starter.txt").exists());
+        assertTrue(new File(destination, "config/static/python.txt").exists());
         assertTrue(new File(destination, "placeholder.py").exists());
         assertFalse(new File(destination, "src/main/resources/views/index.html").exists());
         assertFalse(new File(destination, "src/main/resources/views/starter.html").exists());
+        assertFalse(new File(destination, "src/main/resources/static/python.txt").exists());
     }
 
 }

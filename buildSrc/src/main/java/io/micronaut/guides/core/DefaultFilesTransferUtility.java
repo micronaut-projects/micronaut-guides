@@ -121,7 +121,7 @@ public class DefaultFilesTransferUtility implements FilesTransferUtility {
                 File destination = destinationPath.toFile();
 
                 if (Language.PYTHON.toString().equals(guidesOption.getLanguage().toString())) {
-                    movePythonViews(destinationPath);
+                    movePythonResources(destinationPath);
                 }
 
                 if (guide.base() != null) {
@@ -168,13 +168,18 @@ public class DefaultFilesTransferUtility implements FilesTransferUtility {
         }
     }
 
-    private static void movePythonViews(Path destinationPath) throws IOException {
-        Path sourcePath = destinationPath.resolve("src").resolve("main").resolve("resources").resolve("views");
+    private static void movePythonResources(Path destinationPath) throws IOException {
+        movePythonResourceFolder(destinationPath, "views");
+        movePythonResourceFolder(destinationPath, "static");
+    }
+
+    private static void movePythonResourceFolder(Path destinationPath, String resourceFolder) throws IOException {
+        Path sourcePath = destinationPath.resolve("src").resolve("main").resolve("resources").resolve(resourceFolder);
         if (!Files.exists(sourcePath)) {
             return;
         }
 
-        Path targetPath = destinationPath.resolve("config").resolve("views");
+        Path targetPath = destinationPath.resolve("config").resolve(resourceFolder);
         Files.createDirectories(targetPath);
         Files.walkFileTree(sourcePath, new SimpleFileVisitor<>() {
             @Override

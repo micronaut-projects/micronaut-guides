@@ -156,7 +156,7 @@ class GuideProjectGenerator implements AutoCloseable {
                         appFeatures, buildTool, app.testFramework() ?: testFramework, lang, javaVersion)
 
                 if (lang == PYTHON) {
-                    movePythonViews(destinationPath)
+                    movePythonResources(destinationPath)
                 }
 
                 if (metadata.base()) {
@@ -203,13 +203,18 @@ class GuideProjectGenerator implements AutoCloseable {
         }
     }
 
-    private static void movePythonViews(Path destinationPath) {
-        Path sourcePath = destinationPath.resolve('src').resolve('main').resolve('resources').resolve('views')
+    private static void movePythonResources(Path destinationPath) {
+        movePythonResourceFolder(destinationPath, 'views')
+        movePythonResourceFolder(destinationPath, 'static')
+    }
+
+    private static void movePythonResourceFolder(Path destinationPath, String resourceFolder) {
+        Path sourcePath = destinationPath.resolve('src').resolve('main').resolve('resources').resolve(resourceFolder)
         if (!Files.exists(sourcePath)) {
             return
         }
 
-        Path targetPath = destinationPath.resolve('config').resolve('views')
+        Path targetPath = destinationPath.resolve('config').resolve(resourceFolder)
         Files.createDirectories(targetPath)
         Files.walkFileTree(sourcePath, new SimpleFileVisitor<Path>() {
             @Override
