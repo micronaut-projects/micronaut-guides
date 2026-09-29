@@ -73,7 +73,7 @@ public class FilesTransferUtilityTest {
     }
 
     @Test
-    void pythonCommonResourcesAreCopiedToConfig() throws Exception {
+    void pythonViewsAreCopiedToConfig() throws Exception {
         File inputDirectory = new File("src/test/resources/file-transfer/python-resources");
         Guide guide = guideParser.parseGuideMetadata(inputDirectory, "metadata.json").orElseThrow();
         File outputDirectory = new File("build/tmp/python-resources");
@@ -87,6 +87,7 @@ public class FilesTransferUtilityTest {
 
         assertTrue(new File(destination, "config/views/index.html").exists());
         assertTrue(new File(destination, "config/views/starter.html").exists());
+        assertTrue(new File(destination, "config/views/python.html").exists());
         assertTrue(new File(destination, "placeholder.py").exists());
         assertFalse(new File(destination, "src/main/resources/views/index.html").exists());
         assertFalse(new File(destination, "src/main/resources/views/starter.html").exists());

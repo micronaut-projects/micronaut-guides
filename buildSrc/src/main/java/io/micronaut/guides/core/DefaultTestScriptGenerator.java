@@ -17,11 +17,13 @@ import java.util.stream.Collectors;
 
 import static io.micronaut.starter.options.BuildTool.GRADLE;
 import static io.micronaut.starter.options.BuildTool.MAVEN;
+import static io.micronaut.starter.options.BuildTool.PYRONAUT;
 
 
 @Singleton
 public class DefaultTestScriptGenerator implements TestScriptGenerator {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultTestScriptGenerator.class);
+    private static final String PYTHON_VERSION = "graalpy3.13-25.4.4";
 
     private final GuidesConfiguration guidesConfiguration;
     private final GuideParser guideParser;
@@ -78,7 +80,18 @@ public class DefaultTestScriptGenerator implements TestScriptGenerator {
             bashScript.append("kill_kotlin_daemon\n");
         }
 
-        if (nativeTest) {
+        if (buildTool == PYRONAUT) {
+            bashScript.append(String.format(
+                    """
+                            eval "$(pyenv init -)" || EXIT_STATUS=$?
+                            pyenv shell %s || EXIT_STATUS=$?
+                            pyronaut install || EXIT_STATUS=$?
+                            pyronaut validate-config || EXIT_STATUS=$?
+                            pyronaut test || EXIT_STATUS=$?
+                            """,
+                    PYTHON_VERSION
+            ));
+        } else if (nativeTest) {
             bashScript.append(String.format(
                     "%s || EXIT_STATUS=$?\n",
                     buildTool == BuildTool.MAVEN ? "./mvnw -Pnative test" : "./gradlew nativeTest"
@@ -215,7 +228,7 @@ public class DefaultTestScriptGenerator implements TestScriptGenerator {
             bashScript.append("\n");
             for (GuidesOption guidesOption : guidesOptionList) {
                 String folder = MacroUtils.getSourceDir(metadata.slug(), guidesOption);
-                BuildTool buildTool = folder.contains(MAVEN.toString()) ? MAVEN : GRADLE;
+                BuildTool buildTool = guidesOption.getBuildTool();
                 if (metadata.apps().stream().anyMatch(app -> app.name().equals(guidesConfiguration.getDefaultAppName()))) {
                     if (GuideUtils.shouldSkip(metadata, buildTool, guidesOption.getLanguage())) {
                         continue;
