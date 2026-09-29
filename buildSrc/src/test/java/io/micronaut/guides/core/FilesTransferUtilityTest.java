@@ -73,7 +73,7 @@ public class FilesTransferUtilityTest {
 
     @Test
     void pythonCommonResourcesAreCopiedToConfig() throws Exception {
-        File inputDirectory = new File("src/test/resources/guides/python-resources");
+        File inputDirectory = new File("src/test/resources/file-transfer/python-resources");
         Guide guide = guideParser.parseGuideMetadata(inputDirectory, "metadata.json").orElseThrow();
         File outputDirectory = new File("build/tmp/python-resources");
         File destination = new File(outputDirectory, "python-resources-pyronaut-python");
