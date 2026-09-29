@@ -11,6 +11,7 @@ import io.micronaut.starter.options.BuildTool
 import io.micronaut.starter.options.Language
 
 import java.time.format.DateTimeFormatter
+import java.util.regex.Matcher
 import java.util.regex.Pattern
 import java.util.stream.Collectors
 import java.util.stream.Stream
@@ -122,7 +123,8 @@ class IndexGenerator {
 
             sections << new GuidesSection(category: cat, metadatas: GuideList)
         }
-        save(templateText, 'index.html', distDir, sections, 'Micronaut Guides', indexgrid, tags, languageFilter)
+        String filteredIndexGrid = languageFilter == null ? indexgrid : filterIndexGrid(indexgrid, metadatas)
+        save(templateText, 'index.html', distDir, sections, 'Micronaut Guides', filteredIndexGrid, tags, languageFilter)
 
         for (Guide metadata :  metadatas) {
             save(templateText, metadata.slug() + '.html', distDir, [new GuidesSection(category: metadata.categories() ? metadata.categories().first() : null, metadatas: [metadata])],  metadata.title(), null, [], languageFilter)
@@ -242,6 +244,65 @@ class IndexGenerator {
             }
         }
         tagMap.values()
+    }
+
+    private static String filterIndexGrid(String indexgrid, List<Guide> metadatas) {
+        Set<String> categoryIds = metadatas
+                .collectMany { Guide metadata -> metadata.categories() ?: [] }
+                .collect { String category ->
+                    Category.values().find { Category knownCategory -> knownCategory.toString() == category }?.name()?.toLowerCase()
+                }
+                .findAll { String categoryId -> categoryId != null }
+                .toSet()
+
+        if (categoryIds.isEmpty()) {
+            return ''
+        }
+
+        Pattern categoryItemPattern = ~/(?s)<li>\s*<h4 class="title title_small"><a href="#([^"]+)">.*?<\/li>\s*/
+        Matcher categoryItemMatcher = categoryItemPattern.matcher(indexgrid)
+        StringBuffer filtered = new StringBuffer()
+        while (categoryItemMatcher.find()) {
+            String replacement = categoryIds.contains(categoryItemMatcher.group(1)) ? categoryItemMatcher.group() : ''
+            categoryItemMatcher.appendReplacement(filtered, Matcher.quoteReplacement(replacement))
+        }
+        categoryItemMatcher.appendTail(filtered)
+
+        String filteredIndexGrid = filtered.toString()
+        Pattern gridItemPattern = ~/<div\s+class="grid-item\b[^>]*>/
+        Matcher gridItemMatcher = gridItemPattern.matcher(filteredIndexGrid)
+        List<int[]> emptyGridItems = []
+        while (gridItemMatcher.find()) {
+            int start = gridItemMatcher.start()
+            int end = matchingDivEnd(filteredIndexGrid, start)
+            if (!filteredIndexGrid.substring(start, end).contains('<li>')) {
+                emptyGridItems << new int[]{start, end}
+            }
+            gridItemMatcher.region(end, filteredIndexGrid.length())
+        }
+        for (int i = emptyGridItems.size() - 1; i >= 0; i--) {
+            int[] range = emptyGridItems[i]
+            filteredIndexGrid = filteredIndexGrid.substring(0, range[0]) + filteredIndexGrid.substring(range[1])
+        }
+        filteredIndexGrid
+    }
+
+    private static int matchingDivEnd(String html, int start) {
+        Pattern divPattern = ~/(?s)<\/?div(?:\s[^>]*)?>/
+        Matcher divMatcher = divPattern.matcher(html)
+        divMatcher.region(start, html.length())
+        int depth = 0
+        while (divMatcher.find()) {
+            if (divMatcher.group().startsWith('</')) {
+                depth--
+                if (depth == 0) {
+                    return divMatcher.end()
+                }
+            } else {
+                depth++
+            }
+        }
+        html.length()
     }
 
     private static List<Guide> latestGuides(List<Guide> metadatas) {
