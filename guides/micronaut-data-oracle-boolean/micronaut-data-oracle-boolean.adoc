@@ -1,0 +1,149 @@
+common:header.adoc[]
+
+In this guide, you will build a small task list with Micronaut Data JDBC and Oracle Database. Each task has a `completed` flag. You will map that flag to a native Oracle `BOOLEAN` column and query it with repository methods that Micronaut Data translates to Oracle boolean SQL such as `IS TRUE` and `IS FALSE`.
+
+Oracle Database 23.1 and later (including Oracle AI Database 26ai) support the SQL `BOOLEAN` data type. Earlier releases such as Oracle Database 19c and 21c do not, so Micronaut Data keeps its legacy mapping by default: `boolean` properties are stored in `NUMBER(1)` columns and compared with `1` and `0`. You opt in to native `BOOLEAN` by telling Micronaut Data which Oracle version your SQL targets.
+
+common:requirements.adoc[]
+
+* https://www.docker.io/gettingstarted/[Docker] installed to run Oracle Database with https://micronaut-projects.github.io/micronaut-test-resources/latest/guide/[Micronaut Test Resources].
+
+common:completesolution.adoc[]
+
+common:create-app-features.adoc[]
+
+common:oracle-driver.adoc[]
+
+common:datasource-configuration-oracle.adoc[]
+
+== Target Oracle Database 23.1
+
+Micronaut Data uses the target Oracle version in two places:
+
+* *Repository SQL* is generated when your code is compiled. The target version for a repository comes from its `@JdbcRepository` annotation, as you will see in the <<Repository>> section.
+* *Schema generation* runs when the application starts. It reads the target version from the datasource configuration:
+
+resource:application.properties[tag=dialect-options]
+
+<1> Generate Oracle 23.1-compatible DDL, so `boolean` properties are created as `BOOLEAN` columns instead of `NUMBER(1)`.
+
+Keep both settings on the same version. The datasource setting does not change SQL that was already generated for repositories at compilation time.
+
+The target version tells Micronaut Data which SQL features it can use. It does not detect the database version. Use numeric `major.minor` notation: a major-only value such as `23` means `23.0` and does not enable features that require `23.1`.
+
+Micronaut Test Resources starts Oracle Database Free, which supports native `BOOLEAN`, for tests and development:
+
+resource:application.properties[tag=testresources]
+
+<1> Use the full Oracle Database Free image and allow the container enough time to start.
+
+== Task
+
+Create an entity for a task:
+
+source:Task[]
+
+<1> A `boolean` property. Micronaut Data maps it to a `BOOLEAN` column because the datasource targets Oracle 23.1.
+
+Schema generation creates the `TASK` table, and a `TASK_SEQ` sequence for the generated IDs:
+
+[source,sql]
+----
+CREATE TABLE "TASK" (
+    "ID" NUMBER(19) NOT NULL PRIMARY KEY,
+    "TITLE" VARCHAR(255) NOT NULL,
+    "COMPLETED" BOOLEAN NOT NULL
+)
+----
+
+Without the datasource target version, the `COMPLETED` column would be created as `NUMBER(1)`.
+
+== Repository
+
+Create a repository for tasks:
+
+source:TaskRepository[]
+
+<1> Micronaut Data generates SQL for Oracle Database 23.1 at compilation time. Without `version`, the repository uses the legacy mapping even when the database supports `BOOLEAN`.
+<2> The `True` suffix generates `WHERE (task_."COMPLETED" IS TRUE)`. With the legacy mapping, the condition is `task_."COMPLETED" = 1`.
+<3> The `False` suffix generates `WHERE (task_."COMPLETED" IS FALSE)`.
+<4> A boolean parameter generates `WHERE (task_."COMPLETED" = ?)`. Micronaut Data binds the value as a JDBC `BOOLEAN`, instead of the `BIT` type it uses for the legacy mapping.
+<5> A partial update that sets the `completed` flag of one task and returns the number of updated rows.
+
+TIP: To target Oracle Database 23.1 for all Oracle repositories instead of each repository separately, set the `micronaut.data.sql.dialect-options.oracle.version` system property for the Java compiler. See https://micronaut-projects.github.io/micronaut-data/latest/guide/#sqlOracleBoolean[Oracle BOOLEAN Support] in the Micronaut Data documentation.
+
+When a repository has a target version, Micronaut Data reads the database version on first use. If the database is older than the target version, it logs a warning, because Oracle Database 19c or 21c rejects the generated `BOOLEAN` SQL.
+
+== Controller
+
+Expose the tasks as HTTP endpoints:
+
+source:TaskController[]
+
+<1> Repository calls block while they wait for the database, so run them on the blocking executor instead of the event loop.
+<2> Bind the `title` property of the JSON request body. New tasks are not completed.
+<3> `updateCompleted` returns `0` when there is no task with the given ID, so respond with `404 Not Found`.
+
+== Test
+
+Add a test for the column type, the repository queries and the HTTP endpoints:
+
+test:OracleBooleanTest[]
+
+<1> Disable the test transaction, so the repository and HTTP requests commit their own transactions.
+<2> Oracle reports the `BOOLEAN` data type for the `COMPLETED` column in the `USER_TAB_COLUMNS` data dictionary view.
+<3> Complete one of the tasks.
+<4> `IS TRUE` and `IS FALSE` conditions find the completed and the open task.
+<5> A boolean parameter is bound as a JDBC `BOOLEAN`.
+<6> Complete a task over HTTP.
+
+common:testApp.adoc[]
+
+When you run the tests, Micronaut Test Resources starts an Oracle Database Free container before the application connects.
+
+== Run the Application
+
+Start the application with `./gradlew run` or `./mvnw mn:run`, and create two tasks:
+
+[source,bash]
+----
+curl -X POST http://localhost:8080/tasks \
+     -H 'Content-Type: application/json' \
+     -d '{"title":"Write the guide"}'
+----
+
+[source,bash]
+----
+curl -X POST http://localhost:8080/tasks \
+     -H 'Content-Type: application/json' \
+     -d '{"title":"Review the guide"}'
+----
+
+Complete the first task:
+
+[source,bash]
+----
+curl -X PUT http://localhost:8080/tasks/1/complete
+----
+
+List the completed and the open tasks:
+
+[source,bash]
+----
+curl http://localhost:8080/tasks/completed
+----
+
+[source,bash]
+----
+curl http://localhost:8080/tasks/open
+----
+
+The first request returns `Write the guide`, and the second returns `Review the guide`.
+
+To see the SQL that Micronaut Data runs, set the `io.micronaut.data.query` logger to `DEBUG` in `logback.xml`.
+
+common:test-resources-benefits.adoc[]
+
+== Next Steps
+
+Read more about https://micronaut-projects.github.io/micronaut-data/latest/guide/#sqlOracleBoolean[Oracle BOOLEAN Support] in Micronaut Data and the Oracle https://docs.oracle.com/en/database/oracle/oracle-database/26/sqlrf/Data-Types.html[SQL data types].
