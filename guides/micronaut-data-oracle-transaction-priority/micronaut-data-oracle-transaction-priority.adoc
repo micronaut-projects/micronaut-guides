@@ -16,8 +16,6 @@ common:oracle-driver.adoc[]
 
 common:datasource-configuration-oracle.adoc[]
 
-resource:application.properties[tag=datasource]
-
 == Configure Oracle Priority Transactions
 
 Transaction priority is an Oracle Database feature. A database administrator decides how long a higher-priority transaction waits for a lower-priority one that holds a row lock, and whether Oracle then rolls back the blocker:
@@ -72,7 +70,7 @@ source:InventoryService[]
 <1> `@OracleTransactional` starts a transaction and sets the Oracle transaction priority for it. Micronaut Data restores the session priority when the transaction completes, so pooled connections do not keep it.
 <2> Lock the item. The lock alone makes the reconciliation a blocker for any other transaction that needs the row.
 <3> Simulate a slow count in an external system while the row is locked.
-<4> If Oracle rolled back the reconciliation while it was counting, this write is the first statement to find out. Micronaut Data rolls back the transaction and throws api:transaction.exceptions.OracleTransactionPriorityException[].
+<4> If Oracle rolled back the reconciliation while it was counting, this write is the first statement to find out. Micronaut Data rolls back the transaction and throws https://micronaut-projects.github.io/micronaut-data/latest/api/io/micronaut/transaction/exceptions/OracleTransactionPriorityException.html[`OracleTransactionPriorityException`].
 <5> Checkout is the critical operation, so it runs with `HIGH` priority. `HIGH` is also the default for `@OracleTransactional`.
 <6> Checkout waits for the row lock. After the configured wait target, Oracle rolls back the reconciliation and checkout acquires the lock.
 
@@ -93,7 +91,7 @@ Without a handler, an `OracleTransactionPriorityException` results in a `500 Int
 
 source:TransactionPriorityExceptionHandler[]
 
-<1> Handle api:transaction.exceptions.OracleTransactionPriorityException[]. Micronaut Data throws it for both Oracle errors that report a priority rollback: `ORA-63300` for the statement that was running when Oracle rolled back the transaction, and `ORA-63302` for a later statement or commit.
+<1> Handle https://micronaut-projects.github.io/micronaut-data/latest/api/io/micronaut/transaction/exceptions/OracleTransactionPriorityException.html[`OracleTransactionPriorityException`]. Micronaut Data throws it for both Oracle errors that report a priority rollback: `ORA-63300` for the statement that was running when Oracle rolled back the transaction, and `ORA-63302` for a later statement or commit.
 <2> Tell the client why the operation failed.
 <3> Respond with `409 Conflict`, so the client can re-read the item and retry if the operation is still needed.
 
