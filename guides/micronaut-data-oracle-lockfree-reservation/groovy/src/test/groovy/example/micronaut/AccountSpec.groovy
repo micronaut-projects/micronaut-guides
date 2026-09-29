@@ -18,6 +18,7 @@ package example.micronaut
 import example.micronaut.domain.Account
 import io.micronaut.data.exceptions.DataIntegrityViolationException
 import io.micronaut.http.HttpRequest
+import io.micronaut.http.HttpResponse
 import io.micronaut.http.HttpStatus
 import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
@@ -73,5 +74,32 @@ class AccountSpec extends Specification {
         then:
         HttpClientResponseException e = thrown()
         e.status == HttpStatus.CONFLICT // <5>
+        e.response.getBody(String).orElse('').contains('The operation violates an account constraint') // <6>
+    }
+
+    void 'account is created and reserved over HTTP'() {
+        when:
+        HttpResponse<Account> created = httpClient.toBlocking().exchange(
+                HttpRequest.POST('/accounts', new Account(null, 'Savings', 100L, 50L)), Account) // <7>
+
+        then:
+        created.status == HttpStatus.CREATED
+
+        when:
+        Account reserved = httpClient.toBlocking().retrieve(
+                HttpRequest.POST("/accounts/${created.body().id}/reserve?balance=25&credit=10", null), Account) // <8>
+
+        then:
+        reserved.balance == 125L
+        reserved.credit == 40L
+    }
+
+    void 'reservation for unknown account responds with not found'() {
+        when:
+        httpClient.toBlocking().exchange(HttpRequest.POST('/accounts/-1/reserve?balance=1&credit=1', null))
+
+        then:
+        HttpClientResponseException e = thrown()
+        e.status == HttpStatus.NOT_FOUND // <9>
     }
 }

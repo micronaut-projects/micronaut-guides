@@ -18,7 +18,9 @@ package example.micronaut;
 import example.micronaut.domain.Account;
 import io.micronaut.data.exceptions.DataIntegrityViolationException;
 import io.micronaut.http.HttpRequest;
+import io.micronaut.http.HttpResponse;
 import io.micronaut.http.HttpStatus;
+import io.micronaut.http.client.BlockingHttpClient;
 import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.http.client.exceptions.HttpClientResponseException;
@@ -28,6 +30,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @MicronautTest(transactional = false) // <1>
 class AccountTest {
@@ -71,5 +74,31 @@ class AccountTest {
                 HttpRequest.POST("/accounts/" + account.id() + "/reserve?balance=0&credit=1000", null)));
 
         assertEquals(HttpStatus.CONFLICT, e.getStatus()); // <5>
+        assertTrue(e.getResponse().getBody(String.class).orElse("")
+            .contains("The operation violates an account constraint")); // <6>
+    }
+
+    @Test
+    void accountIsCreatedAndReservedOverHttp() {
+        BlockingHttpClient client = httpClient.toBlocking();
+
+        HttpResponse<Account> created = client.exchange(
+            HttpRequest.POST("/accounts", new Account(null, "Savings", 100L, 50L)), Account.class); // <7>
+        assertEquals(HttpStatus.CREATED, created.getStatus());
+        Account account = created.body();
+
+        Account reserved = client.retrieve(
+            HttpRequest.POST("/accounts/" + account.id() + "/reserve?balance=25&credit=10", null), Account.class); // <8>
+        assertEquals(125L, reserved.balance());
+        assertEquals(40L, reserved.credit());
+    }
+
+    @Test
+    void reservationForUnknownAccountRespondsWithNotFound() {
+        HttpClientResponseException e = assertThrows(HttpClientResponseException.class, () ->
+            httpClient.toBlocking().exchange(
+                HttpRequest.POST("/accounts/-1/reserve?balance=1&credit=1", null)));
+
+        assertEquals(HttpStatus.NOT_FOUND, e.getStatus()); // <9>
     }
 }

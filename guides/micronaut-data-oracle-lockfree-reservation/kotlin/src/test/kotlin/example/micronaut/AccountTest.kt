@@ -26,6 +26,7 @@ import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import jakarta.inject.Inject
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 @MicronautTest(transactional = false) // <1>
@@ -72,5 +73,32 @@ class AccountTest {
         }
 
         assertEquals(HttpStatus.CONFLICT, e.status) // <5>
+        assertTrue(e.response.getBody(String::class.java).orElse("")
+            .contains("The operation violates an account constraint")) // <6>
+    }
+
+    @Test
+    fun accountIsCreatedAndReservedOverHttp() {
+        val client = httpClient.toBlocking()
+
+        val created = client.exchange(
+            HttpRequest.POST("/accounts", Account(name = "Savings", balance = 100, credit = 50)), Account::class.java) // <7>
+        assertEquals(HttpStatus.CREATED, created.status)
+        val account = created.body()!!
+
+        val reserved = client.retrieve(
+            HttpRequest.POST("/accounts/${account.id}/reserve?balance=25&credit=10", ""), Account::class.java) // <8>
+        assertEquals(125L, reserved.balance)
+        assertEquals(40L, reserved.credit)
+    }
+
+    @Test
+    fun reservationForUnknownAccountRespondsWithNotFound() {
+        val e = assertThrows(HttpClientResponseException::class.java) {
+            httpClient.toBlocking().exchange<Any, Any>(
+                HttpRequest.POST("/accounts/-1/reserve?balance=1&credit=1", ""))
+        }
+
+        assertEquals(HttpStatus.NOT_FOUND, e.status) // <9>
     }
 }
