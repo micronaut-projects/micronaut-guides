@@ -41,11 +41,11 @@ public class JsonFeedGeneratorTest {
                 {
                   "version" : "https://jsonfeed.org/version/1.1",
                   "title" : "Micronaut Guides",
-                  "home_page_url" : "https://guides.micronaut.io/latest/",
-                  "feed_url" : "https://guides.micronaut.io/latest/feed.json",
+                  "home_page_url" : "https://micronaut-projects.github.io/micronaut-guides//latest/",
+                  "feed_url" : "https://micronaut-projects.github.io/micronaut-guides//latest/feed.json",
                   "items" : [ {
                     "id" : "child",
-                    "url" : "https://guides.micronaut.io/latest/child",
+                    "url" : "https://micronaut-projects.github.io/micronaut-guides//latest/child",
                     "title" : "Connect a Micronaut Data JDBC Application to Azure Database for MySQL",
                     "content_text" : "Learn how to connect a Micronaut Data JDBC application to a Microsoft Azure Database for MySQL",
                     "date_published" : "2022-02-17T00:00:00Z",
@@ -56,7 +56,7 @@ public class JsonFeedGeneratorTest {
                     "language" : "LANG_ENGLISH"
                   }, {
                     "id" : "creating-your-first-micronaut-app",
-                    "url" : "https://guides.micronaut.io/latest/creating-your-first-micronaut-app",
+                    "url" : "https://micronaut-projects.github.io/micronaut-guides//latest/creating-your-first-micronaut-app",
                     "title" : "Creating your first Micronaut application",
                     "content_text" : "Learn how to create a Hello World Micronaut application with a controller and a functional test.",
                     "date_published" : "2018-05-23T00:00:00Z",
@@ -69,7 +69,7 @@ public class JsonFeedGeneratorTest {
                     "language" : "LANG_ENGLISH"
                   }, {
                     "id" : "test",
-                    "url" : "https://guides.micronaut.io/latest/test",
+                    "url" : "https://micronaut-projects.github.io/micronaut-guides//latest/test",
                     "title" : "1. Testing Serialization - Spring Boot vs Micronaut Framework - Building a Rest API",
                     "content_text" : "This guide compares how to test serialization and deserialization with Micronaut Framework and Spring Boot.",
                     "date_published" : "2024-04-24T00:00:00Z",

@@ -21,7 +21,7 @@ import org.reactivestreams.Publisher;
 
 import java.util.List;
 
-@Client("https://guides.micronaut.io")
+@Client("https://micronaut-projects.github.io/micronaut-guides/")
 public interface GuidesClient extends GuidesApi {
 
     @Get("/latest/guides.json")

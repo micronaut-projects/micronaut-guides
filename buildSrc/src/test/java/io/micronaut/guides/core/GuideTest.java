@@ -220,7 +220,7 @@ class GuideTest {
         String expected = """
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://guides.micronaut.io/schemas/guide.schema.json",
+  "$id": "https://micronaut-projects.github.io/micronaut-guides//schemas/guide.schema.json",
   "title": "Guide",
   "type": "object",
   "properties": {
@@ -228,7 +228,7 @@ class GuideTest {
       "description": "Applications created for the guide",
       "type": "array",
       "items": {
-        "$ref": "https://guides.micronaut.io/schemas/app.schema.json"
+        "$ref": "https://micronaut-projects.github.io/micronaut-guides//schemas/app.schema.json"
       },
       "minItems": 1
     },

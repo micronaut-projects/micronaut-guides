@@ -92,7 +92,7 @@ class AppTest {
         String expected = """
                 {
                   "$schema": "https://json-schema.org/draft/2020-12/schema",
-                  "$id": "https://guides.micronaut.io/schemas/app.schema.json",
+                  "$id": "https://micronaut-projects.github.io/micronaut-guides//schemas/app.schema.json",
                   "title": "App",
                   "type": "object",
                   "properties": {
