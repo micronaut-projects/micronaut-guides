@@ -12,15 +12,35 @@ common:completesolution.adoc[]
 
 common:create-app-features.adoc[]
 
+:exclude-for-languages:python
 common:oracle-driver.adoc[]
 
 common:datasource-configuration-oracle.adoc[]
+:exclude-for-languages:
+:exclude-for-languages:java,groovy,kotlin
+The `oracle` feature adds the Oracle JDBC driver, `com.oracle.database.jdbc:ojdbc11`, to the runtime dependencies in `pyproject.toml`.
+
+=== Database Configuration
+
+Configure the datasource:
+
+resource:application.toml[tag=datasource]
+
+<1> Use Oracle driver.
+<2> In order for the database to be properly detected by Micronaut Test Resources.
+<3> Configure the Oracle dialect.
+:exclude-for-languages:
 
 == Target Oracle Database 23.1
 
 Micronaut Data uses the target Oracle version in two places, and each has its own setting:
 
+:exclude-for-languages:python
 * *Repository SQL* is generated when your code is compiled. The target version comes from the build or from the repository annotation.
+:exclude-for-languages:
+:exclude-for-languages:java,groovy,kotlin
+* *Repository SQL* is generated when Pyronaut processes your sources. The target version comes from the repository annotation.
+:exclude-for-languages:
 * *Schema generation* runs when the application starts. The target version comes from the datasource configuration.
 
 Configure both. The datasource setting does not change SQL that was already generated for repositories at compilation time, and the compile-time setting does not change the generated DDL.
@@ -29,15 +49,23 @@ The target version tells Micronaut Data which SQL features it can use. It does n
 
 === Repository SQL
 
+:exclude-for-languages:java,groovy,kotlin
+Set the `version` member of `@JdbcRepository` on each repository that targets Oracle Database 23.1, as you will see in the <<Repository>> section.
+
+Pyronaut passes an annotation processor option from the application configuration only when a processor declares that option as supported. Micronaut Data does not declare the `micronaut.data.sql.dialect-options.oracle.version` option, so setting it in `application.toml` does not change the generated repository SQL.
+:exclude-for-languages:
+
+:exclude-for-languages:python
 There are two ways to set the target version for repository SQL:
 
 * *For all Oracle repositories* of the application, set the `micronaut.data.sql.dialect-options.oracle.version` option in the build, as shown below. Use this when the whole application runs against Oracle Database 23.1 or later, so the version is configured in one place.
 * *For a single repository*, set the `version` member of `@JdbcRepository`. A repository `version` takes precedence over the build setting, so you can target an individual repository differently, for example while you migrate a schema.
 
 This guide sets the version on the repository, as you will see in the <<Repository>> section, so the generated project works without changes to the build. To target all Oracle repositories instead, configure the build as follows and remove `version` from the annotation.
+:exclude-for-languages:
 
 :exclude-for-build:maven
-:exclude-for-languages:kotlin,groovy
+:exclude-for-languages:kotlin,groovy,python
 The Java compiler does not accept the option as an `-A` annotation processor argument, because the option name contains hyphens. Pass it as a system property to a forked compiler instead:
 
 [source,groovy]
@@ -49,7 +77,7 @@ tasks.withType(JavaCompile).configureEach {
 }
 ----
 :exclude-for-languages:
-:exclude-for-languages:java,groovy
+:exclude-for-languages:java,groovy,python
 Pass the option as a KSP processor argument:
 
 [source,groovy]
@@ -60,7 +88,7 @@ ksp {
 }
 ----
 :exclude-for-languages:
-:exclude-for-languages:java,kotlin
+:exclude-for-languages:java,kotlin,python
 Pass the option as a system property to a forked Groovy compiler:
 
 [source,groovy]
@@ -75,7 +103,7 @@ tasks.withType(GroovyCompile).configureEach {
 :exclude-for-build:
 
 :exclude-for-build:gradle
-:exclude-for-languages:kotlin,groovy
+:exclude-for-languages:kotlin,groovy,python
 The Java compiler does not accept the option as an `-A` annotation processor argument, because the option name contains hyphens. Pass it as a system property to a forked compiler instead. Add `fork` and the `-J-D` argument to the existing `maven-compiler-plugin` configuration in `pom.xml`:
 
 [source,xml]
@@ -93,7 +121,7 @@ The Java compiler does not accept the option as an `-A` annotation processor arg
 </plugin>
 ----
 :exclude-for-languages:
-:exclude-for-languages:java,kotlin
+:exclude-for-languages:java,kotlin,python
 The Groovy sources are compiled in the Maven JVM, so pass the option as a system property of that JVM, for example in `.mvn/jvm.config`:
 
 [source]
@@ -108,7 +136,12 @@ The Groovy sources are compiled in the Maven JVM, so pass the option as a system
 
 Schema generation reads the target version from the datasource configuration:
 
+:exclude-for-languages:python
 resource:application.properties[tag=dialect-options]
+:exclude-for-languages:
+:exclude-for-languages:java,groovy,kotlin
+resource:application.toml[tag=dialect-options]
+:exclude-for-languages:
 
 <1> Generate Oracle 23.1-compatible DDL, so `boolean` properties are created as `BOOLEAN` columns instead of `NUMBER(1)`.
 
@@ -116,7 +149,12 @@ resource:application.properties[tag=dialect-options]
 
 Micronaut Test Resources starts Oracle Database Free, which supports native `BOOLEAN`, for tests and development:
 
+:exclude-for-languages:python
 resource:application.properties[tag=testresources]
+:exclude-for-languages:
+:exclude-for-languages:java,groovy,kotlin
+resource:application.toml[tag=testresources]
+:exclude-for-languages:
 
 <1> Use the full Oracle Database Free image and allow the container enough time to start.
 
@@ -147,7 +185,7 @@ Create a repository for tasks:
 
 source:TaskRepository[]
 
-<1> Micronaut Data generates SQL for Oracle Database 23.1 at compilation time. Without `version` or the build setting described in <<Repository SQL>>, the repository uses the legacy mapping even when the database supports `BOOLEAN`.
+<1> Micronaut Data generates SQL for Oracle Database 23.1 at compilation time. Without a target version, the repository uses the legacy mapping even when the database supports `BOOLEAN`. See <<Repository SQL>>.
 <2> The `True` suffix generates `WHERE (task_."COMPLETED" IS TRUE)`. With the legacy mapping, the condition is `task_."COMPLETED" = 1`.
 <3> The `False` suffix generates `WHERE (task_."COMPLETED" IS FALSE)`.
 <4> A boolean parameter generates `WHERE (task_."COMPLETED" = ?)`. Micronaut Data binds the value as a JDBC `BOOLEAN`, instead of the `BIT` type it uses for the legacy mapping.
@@ -184,7 +222,12 @@ When you run the tests, Micronaut Test Resources starts an Oracle Database Free 
 
 == Run the Application
 
+:exclude-for-languages:python
 Start the application with `./gradlew run` or `./mvnw mn:run`, and create two tasks:
+:exclude-for-languages:
+:exclude-for-languages:java,groovy,kotlin
+Start the application with `pyronaut run`, and create two tasks:
+:exclude-for-languages:
 
 [source,bash]
 ----
@@ -221,7 +264,7 @@ curl http://localhost:8080/tasks/open
 
 The first request returns `Write the guide`, and the second returns `Review the guide`.
 
-To see the SQL that Micronaut Data runs, set the `io.micronaut.data.query` logger to `DEBUG` in `logback.xml`.
+To see the SQL that Micronaut Data runs, set the `logger.levels.io.micronaut.data.query` configuration property to `DEBUG`.
 
 common:test-resources-benefits.adoc[]
 
