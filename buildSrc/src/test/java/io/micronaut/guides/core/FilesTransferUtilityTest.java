@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.nio.file.Files;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -78,12 +79,17 @@ public class FilesTransferUtilityTest {
         File outputDirectory = new File("build/tmp/python-resources");
         File destination = new File(outputDirectory, "python-resources-pyronaut-python");
         assertTrue(destination.mkdirs() || destination.exists());
+        File starterView = new File(destination, "src/main/resources/views/starter.html");
+        Files.createDirectories(starterView.toPath().getParent());
+        Files.writeString(starterView.toPath(), "starter");
 
         filesTransferUtility.transferFiles(inputDirectory, outputDirectory, guide);
 
         assertTrue(new File(destination, "config/views/index.html").exists());
+        assertTrue(new File(destination, "config/views/starter.html").exists());
         assertTrue(new File(destination, "placeholder.py").exists());
         assertFalse(new File(destination, "src/main/resources/views/index.html").exists());
+        assertFalse(new File(destination, "src/main/resources/views/starter.html").exists());
     }
 
 }

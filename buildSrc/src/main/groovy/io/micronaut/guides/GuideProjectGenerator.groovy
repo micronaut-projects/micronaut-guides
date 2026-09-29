@@ -155,6 +155,10 @@ class GuideProjectGenerator implements AutoCloseable {
                 guidesGenerator.generateAppIntoDirectory(destination, app.applicationType(), packageAndName, app.framework(),
                         appFeatures, buildTool, app.testFramework() ?: testFramework, lang, javaVersion)
 
+                if (lang == PYTHON) {
+                    movePythonViews(destinationPath)
+                }
+
                 if (metadata.base()) {
                     File baseDir = new File(inputDir.parentFile, metadata.base())
                     copyGuideSourceFiles(baseDir, destinationPath, appName, guidesOption.language.toString(), true)
@@ -197,6 +201,35 @@ class GuideProjectGenerator implements AutoCloseable {
                 addLicenses(new File(outputDir.absolutePath, folder))
             }
         }
+    }
+
+    private static void movePythonViews(Path destinationPath) {
+        Path sourcePath = destinationPath.resolve('src').resolve('main').resolve('resources').resolve('views')
+        if (!Files.exists(sourcePath)) {
+            return
+        }
+
+        Path targetPath = destinationPath.resolve('config').resolve('views')
+        Files.createDirectories(targetPath)
+        Files.walkFileTree(sourcePath, new SimpleFileVisitor<Path>() {
+            @Override
+            FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
+                Files.createDirectories(targetPath.resolve(sourcePath.relativize(dir)))
+                FileVisitResult.CONTINUE
+            }
+
+            @Override
+            FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+                Files.move(file, targetPath.resolve(sourcePath.relativize(file)), REPLACE_EXISTING)
+                FileVisitResult.CONTINUE
+            }
+
+            @Override
+            FileVisitResult postVisitDirectory(Path dir, IOException exc) {
+                Files.delete(dir)
+                FileVisitResult.CONTINUE
+            }
+        })
     }
 
     void addLicenses(File folder) {

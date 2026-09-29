@@ -120,6 +120,10 @@ public class DefaultFilesTransferUtility implements FilesTransferUtility {
                 Path destinationPath = Paths.get(outputDirectory.getAbsolutePath(), folder, appName);
                 File destination = destinationPath.toFile();
 
+                if (Language.PYTHON.toString().equals(guidesOption.getLanguage().toString())) {
+                    movePythonViews(destinationPath);
+                }
+
                 if (guide.base() != null) {
                     File baseDir = new File(inputDirectory.getParentFile(), guide.base());
                     copyGuideSourceFiles(baseDir, destinationPath, appName, guidesOption.getLanguage().toString(), true);
@@ -162,6 +166,35 @@ public class DefaultFilesTransferUtility implements FilesTransferUtility {
                 addLicenses(new File(outputDirectory.getAbsolutePath(), folder));
             }
         }
+    }
+
+    private static void movePythonViews(Path destinationPath) throws IOException {
+        Path sourcePath = destinationPath.resolve("src").resolve("main").resolve("resources").resolve("views");
+        if (!Files.exists(sourcePath)) {
+            return;
+        }
+
+        Path targetPath = destinationPath.resolve("config").resolve("views");
+        Files.createDirectories(targetPath);
+        Files.walkFileTree(sourcePath, new SimpleFileVisitor<>() {
+            @Override
+            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+                Files.createDirectories(targetPath.resolve(sourcePath.relativize(dir)));
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                Files.move(file, targetPath.resolve(sourcePath.relativize(file)), StandardCopyOption.REPLACE_EXISTING);
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                Files.delete(dir);
+                return FileVisitResult.CONTINUE;
+            }
+        });
     }
 
     void addLicenses(File folder) {
