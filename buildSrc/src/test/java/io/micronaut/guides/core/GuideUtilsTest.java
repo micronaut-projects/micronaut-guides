@@ -139,6 +139,9 @@ class GuideUtilsTest {
         assertFalse(GuideUtils.shouldSkip(guide, BuildTool.MAVEN, Language.JAVA));
         assertTrue(GuideUtils.shouldSkip(guide, BuildTool.MAVEN, Language.KOTLIN));
         assertFalse(GuideUtils.isSupported(BuildTool.MAVEN, Language.KOTLIN));
+        assertTrue(GuideUtils.isSupported(BuildTool.PYRONAUT, Language.PYTHON));
+        assertFalse(GuideUtils.isSupported(BuildTool.GRADLE, Language.PYTHON));
+        assertFalse(GuideUtils.isSupported(BuildTool.PYRONAUT, Language.JAVA));
     }
 
     @Test

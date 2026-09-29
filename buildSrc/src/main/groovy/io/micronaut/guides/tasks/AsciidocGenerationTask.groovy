@@ -3,6 +3,7 @@ package io.micronaut.guides.tasks
 import groovy.transform.CompileStatic
 import io.micronaut.guides.GuideAsciidocGenerator
 import io.micronaut.guides.core.Guide
+import io.micronaut.starter.options.Language
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
@@ -11,6 +12,7 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.TaskAction
 
@@ -26,6 +28,10 @@ abstract class AsciidocGenerationTask extends DefaultTask {
     @Input
     abstract Property<String> getSlug()
 
+    @Optional
+    @Input
+    abstract Property<String> getLanguage()
+
     @InputDirectory
     @PathSensitive(RELATIVE)
     abstract DirectoryProperty getInputDirectory()
@@ -35,6 +41,7 @@ abstract class AsciidocGenerationTask extends DefaultTask {
 
     @TaskAction
     def perform() {
-        GuideAsciidocGenerator.generate(metadata, inputDirectory.get().asFile, outputDir.get().asFile, project.layout.projectDirectory.asFile)
+        Language languageFilter = language.isPresent() ? Language.valueOf(language.get()) : null
+        GuideAsciidocGenerator.generate(metadata, inputDirectory.get().asFile, outputDir.get().asFile, project.layout.projectDirectory.asFile, languageFilter)
     }
 }
