@@ -39,6 +39,7 @@ class GuideAsciidocGeneratorTest {
                 Python only
                 source:HelloController[]
                 test:HelloControllerTest[]
+                pyronaut @cli-command@ example.micronaut.micronautguide --features=@features@
                 :only-for-languages:
                 
                 After
@@ -99,6 +100,8 @@ class GuideAsciidocGeneratorTest {
         assertFalse(pythonOutput.contains("Micronaut Version:"));
         assertTrue(pythonOutput.contains("mn create example.micronaut.micronautguide"));
         assertFalse(pythonOutput.contains("mn create-app example.micronaut.micronautguide"));
+        assertTrue(pythonOutput.contains("pyronaut create example.micronaut.micronautguide"));
+        assertFalse(pythonOutput.contains("--features="));
         assertTrue(pythonOutput.contains("Pyronaut application guide"));
         assertTrue(pythonOutput.contains("Description for a Pyronaut application."));
         assertTrue(pythonOutput.contains("Pyronaut application"));

@@ -54,9 +54,15 @@ class GuideAsciidocGenerator {
             'Micronaut application': 'Pyronaut application'
     ]
     private static final Pattern PYTHON_METADATA_LINES = ~/(?m)^(Authors:|Micronaut Version:).*\R?/
+    private static final Pattern PYTHON_EMPTY_FEATURES_ARGUMENT = ~/(?m)[ \t]+--features=([ \t]*\\)?(?=\r?\n|$)/
 
     static void generate(Guide metadata, File inputDir,
                          File asciidocDir, File projectDir) {
+        generate(metadata, inputDir, asciidocDir, projectDir, null)
+    }
+
+    static void generate(Guide metadata, File inputDir,
+                         File asciidocDir, File projectDir, Language languageFilter) {
 
         JdkVersion javaVersion = Utils.parseJdkVersion()
         if (metadata.maximumJavaVersion() != null && javaVersion.majorVersion() > metadata.maximumJavaVersion()) {
@@ -73,6 +79,7 @@ class GuideAsciidocGenerator {
         List<String> rawLinesExpanded = expandMacros(allLines, projectDir)
 
         List<GuidesOption> guidesOptionList = GuideProjectGenerator.guidesOptions(metadata)
+                .findAll { GuidesOption option -> languageFilter == null || option.language == languageFilter }
         for (GuidesOption guidesOption : guidesOptionList) {
             String projectName = "${metadata.slug()}-${guidesOption.buildTool}-${guidesOption.language}"
 
@@ -224,6 +231,7 @@ class GuideAsciidocGenerator {
     static String postProcessText(String text, Language language) {
         if (language == PYTHON) {
             text = text.replaceAll(PYTHON_METADATA_LINES, '')
+            text = text.replaceAll(PYTHON_EMPTY_FEATURES_ARGUMENT, '')
             for (Entry<String, String> replacement : PYTHON_TEXT_REPLACEMENTS.entrySet()) {
                 text = text.replace(replacement.key, replacement.value)
             }

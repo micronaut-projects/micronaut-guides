@@ -102,6 +102,10 @@ class GuideProjectGenerator implements AutoCloseable {
     }
 
     void generateOne(Guide metadata, File inputDir, File outputDir) {
+        generateOne(metadata, inputDir, outputDir, null)
+    }
+
+    void generateOne(Guide metadata, File inputDir, File outputDir, Language languageFilter) {
         if (!outputDir.exists()) {
             assert outputDir.mkdir()
         }
@@ -120,6 +124,7 @@ class GuideProjectGenerator implements AutoCloseable {
         }
 
         List<GuidesOption> guidesOptionList = guidesOptions(metadata)
+                .findAll { GuidesOption option -> languageFilter == null || option.language == languageFilter }
         for (GuidesOption guidesOption : guidesOptionList) {
             BuildTool buildTool = guidesOption.buildTool
             TestFramework testFramework = guidesOption.testFramework
