@@ -1,9 +1,9 @@
 import time
-from concurrent.futures import ThreadPoolExecutor
 
 import pytest
 import requests
 from java.sql import SQLException
+from java.util.concurrent import CompletableFuture, TimeUnit
 from micronaut.transaction import TransactionOperations
 from pyronaut.test import MicronautTest, micronaut_test_fixture
 
@@ -38,15 +38,15 @@ def test_reconciliation_commits_without_contention(client):
 
 
 def test_high_priority_checkout_rolls_back_low_priority_reconciliation(client, my_context):
-    with ThreadPoolExecutor(max_workers=1) as executor:
-        reconciliation = executor.submit(client.post, "/inventory/reconcile?countSeconds=8")  # <2>
-        await_item_locked(my_context[TransactionOperations])  # <3>
+    reconciliation = CompletableFuture.supplyAsync(
+        lambda: client.post("/inventory/reconcile?countSeconds=8"))  # <2>
+    await_item_locked(my_context[TransactionOperations])  # <3>
 
-        checked_out = client.post("/inventory/checkout")  # <4>
-        assert checked_out.status_code == 200
-        assert checked_out.json()["status"] == "CHECKED_OUT"
+    checked_out = client.post("/inventory/checkout")  # <4>
+    assert checked_out.status_code == 200
+    assert checked_out.json()["status"] == "CHECKED_OUT"
 
-        rolled_back = reconciliation.result(timeout=15)
+    rolled_back = reconciliation.get(15, TimeUnit.SECONDS)
     assert rolled_back.status_code == 409  # <5>
     assert "Oracle rolled back this operation in favor of a higher-priority transaction" in rolled_back.text  # <6>
 

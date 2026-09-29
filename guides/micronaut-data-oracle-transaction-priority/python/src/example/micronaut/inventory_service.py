@@ -1,5 +1,4 @@
 import time
-from dataclasses import replace
 
 from jakarta.inject import Singleton
 from micronaut.transaction.annotation import OracleTransactional, Transactional
@@ -32,10 +31,11 @@ class InventoryService:
     def reconcile(self, count_seconds: int) -> InventoryItem:
         item = self.inventory_item_repository.findByIdForUpdate(DEMO_ITEM_ID).orElseThrow()  # <2>
         time.sleep(count_seconds)  # <3>
-        return self.inventory_item_repository.update(replace(item, status=Status.RECONCILED))  # <4>
+        return self.inventory_item_repository.update(
+            InventoryItem(item.id, item.name, item.available_quantity, Status.RECONCILED))  # <4>
 
     @OracleTransactional(priority=OracleTransactional.Priority.HIGH)  # <5>
     def checkout(self) -> InventoryItem:
         item = self.inventory_item_repository.findByIdForUpdate(DEMO_ITEM_ID).orElseThrow()  # <6>
         return self.inventory_item_repository.update(
-            replace(item, available_quantity=0, status=Status.CHECKED_OUT))
+            InventoryItem(item.id, item.name, 0, Status.CHECKED_OUT))
