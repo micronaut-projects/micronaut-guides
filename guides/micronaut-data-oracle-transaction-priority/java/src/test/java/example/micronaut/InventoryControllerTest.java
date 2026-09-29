@@ -36,6 +36,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 @MicronautTest(transactional = false) // <1>
@@ -78,10 +79,20 @@ class InventoryControllerTest {
 
         HttpClientResponseException rolledBack = reconciliation.get(15, TimeUnit.SECONDS);
         assertEquals(HttpStatus.CONFLICT, rolledBack.getStatus()); // <5>
+        assertTrue(rolledBack.getResponse().getBody(String.class).orElse("")
+            .contains("Oracle rolled back this operation in favor of a higher-priority transaction")); // <6>
 
         InventoryItem item = client.retrieve(HttpRequest.GET("/inventory"), InventoryItem.class);
-        assertEquals(Status.CHECKED_OUT, item.status()); // <6>
+        assertEquals(Status.CHECKED_OUT, item.status()); // <7>
         assertEquals(0, item.availableQuantity());
+    }
+
+    @Test
+    void reconciliationRejectsInvalidCountDuration() {
+        HttpClientResponseException e = assertThrows(HttpClientResponseException.class, () ->
+            client.exchange(HttpRequest.POST("/inventory/reconcile?countSeconds=0", null)));
+
+        assertEquals(HttpStatus.BAD_REQUEST, e.getStatus()); // <8>
     }
 
     private void awaitItemLocked() throws InterruptedException {
