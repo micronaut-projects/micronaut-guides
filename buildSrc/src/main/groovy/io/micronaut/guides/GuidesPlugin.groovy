@@ -154,9 +154,15 @@ class GuidesPlugin implements Plugin<Project> {
                     for (Language language : languages) {
                         GuidesOption languageOption = options.find { GuidesOption option -> option.language == language }
                         TaskProvider<SampleProjectGenerationTask> languageGenerateTask = registerGenerateTask(project, metadata, projectGenerator, guidesDir, codeDir, taskSlug, language)
+                        languageGenerateTask.configure { it.mustRunAfter(generateTask) }
                         TaskProvider<AsciidocGenerationTask> languageDocTask = registerDocTask(project, metadata, guidesDir, languageGenerateTask, taskSlug, language)
                         TaskProvider<Zip> languageZipTask = registerLanguageZipTask(project, taskSlug, metadata, language, languageOption, languageGenerateTask)
                         if (language == Language.PYTHON) {
+                            for (int i = 0; i < options.size(); i++) {
+                                if (options.get(i).language == Language.PYTHON) {
+                                    zippers.get(i).configure { it.dependsOn(languageGenerateTask) }
+                                }
+                            }
                             TaskProvider<PythonTestScriptTask> pythonScript = registerPythonTestScriptTask(project, taskSlug, metadata, languageGenerateTask)
                             TaskProvider<TestScriptRunnerTask> pythonRunner = registerPythonTestScriptRunnerTask(
                                     project,
@@ -760,6 +766,10 @@ class GuidesPlugin implements Plugin<Project> {
             if (language) {
                 it.language.set(language.name())
             }
+            List<String> projectOutputDirectories = SampleProjectGenerationTask.outputDirectoryNames(metadata, language)
+            it.outputDirectories.from(projectOutputDirectories.collect { String outputDirectoryName ->
+                codeDir.map(outputDirectory -> outputDirectory.dir("${metadata.slug()}/${outputDirectoryName}"))
+            })
             it.guidesGenerator = projectGenerator
             it.metadata = metadata
         }
