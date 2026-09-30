@@ -22,7 +22,7 @@ class IndexGenerator {
     private static final String DEFAULT_CARD = "micronauttwittercard.png"
     private static final String DEFAULT_INTRO = "Step-by-step tutorials to learn the Micronaut framework"
     private static final String DEFAULT_TITLE = "Micronaut Guides"
-    private static final String GUIDES_URL = "https://micronaut-projects.github.io/micronaut-guides/"
+    private static final String GUIDES_URL = "https://micronaut-projects.github.io/micronaut-guides"
     private static final String LATEST_GUIDES_URL = GUIDES_URL + "/latest/"
     private static final String TWITTER_MICRONAUT = "@micronautfw"
 
@@ -672,7 +672,7 @@ class IndexGenerator {
     }
 
     private static String generateJsonIndex(File guidesFolder, String metadataConfigName, Language languageFilter) {
-        String baseURL = System.getenv("CI") ? LATEST_GUIDES_URL : ""
+        String baseURL = languageFilter == Language.PYTHON || System.getenv("CI") ? LATEST_GUIDES_URL : ""
 
         //TOO get both from an application context
         JsonMapper jsonMapper = JsonMapper.createDefault();
@@ -682,26 +682,38 @@ class IndexGenerator {
                 .findAll { it.publish() && (languageFilter == null || it.languages().contains(languageFilter)) }
 
         List<Map> result = metadatas
-            .collect {guide -> [
-                title: GuideAsciidocGenerator.postProcessText(guide.title(), languageFilter),
-                intro: GuideAsciidocGenerator.postProcessText(guide.intro(), languageFilter),
-                authors: guide.authors(),
-                tags: generateTags(guide),
-                category: guide.categories() ? guide.categories().first().toString() : null, // Deprecated
-                categories: guide.categories().collect { it.toString() },
-                publicationDate: guide.publicationDate().toString(),
-                slug: guide.slug(),
-                url: "${baseURL}${guide.slug()}.html",
-                options: GuideProjectGenerator.guidesOptions(guide)
+            .collect { guide ->
+                List<GuidesOption> options = GuideProjectGenerator.guidesOptions(guide)
                         .findAll { option -> languageFilter == null || option.language == languageFilter }
-                        .collect { option -> [
-                    buildTool: option.buildTool,
-                    language: option.language,
-                    url: "${baseURL}${guide.slug()}-${option.buildTool.toString().toLowerCase()}-${option.language.toString().toLowerCase()}.html"
-                ]}
-            ]} as List<Map>
+                String guidePath = languageFilter == Language.PYTHON
+                        ? "${GuideProjectGenerator.folderName(guide.slug(), options.first())}.html"
+                        : "${guide.slug()}.html"
+                Map guideJson = [
+                        title: GuideAsciidocGenerator.postProcessText(guide.title(), languageFilter),
+                        intro: GuideAsciidocGenerator.postProcessText(guide.intro(), languageFilter),
+                        authors: guide.authors(),
+                        tags: generateTags(guide),
+                        category: guide.categories() ? guide.categories().first().toString() : null, // Deprecated
+                        categories: guide.categories().collect { it.toString() },
+                        publicationDate: guide.publicationDate().toString(),
+                        slug: guide.slug(),
+                        url: jsonUrl(baseURL, guidePath)
+                ]
+                if (languageFilter != Language.PYTHON) {
+                    guideJson.put('options', options.collect { option -> [
+                            buildTool: option.buildTool,
+                            language: option.language,
+                            url: jsonUrl(baseURL, "${guide.slug()}-${option.buildTool.toString().toLowerCase()}-${option.language.toString().toLowerCase()}.html")
+                    ]})
+                }
+                guideJson
+            } as List<Map>
 
         return JsonOutput.toJson(result)
+    }
+
+    private static String jsonUrl(String baseURL, String path) {
+        baseURL ? "${baseURL.replaceAll('/+$', '')}/${path.replaceFirst('^/+', '')}" : path
     }
 
     @CompileDynamic

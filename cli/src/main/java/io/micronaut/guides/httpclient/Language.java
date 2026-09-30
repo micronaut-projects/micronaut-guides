@@ -16,5 +16,5 @@
 package io.micronaut.guides.httpclient;
 
 public enum Language {
-    JAVA, GROOVY, KOTLIN
+    JAVA, GROOVY, KOTLIN, PYTHON
 }

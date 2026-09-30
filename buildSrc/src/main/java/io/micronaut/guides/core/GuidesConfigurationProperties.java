@@ -9,7 +9,7 @@ import static io.micronaut.starter.options.JdkVersion.JDK_25;
 @ConfigurationProperties(GuidesConfigurationProperties.PREFIX)
 public class GuidesConfigurationProperties implements GuidesConfiguration {
     public static final String PREFIX = "guides";
-    public static final String GUIDES_URL = "https://micronaut-projects.github.io/micronaut-guides//latest/";
+    public static final String GUIDES_URL = "https://micronaut-projects.github.io/micronaut-guides/latest/";
     private static final String DEFAULT_LICENSEHEADER = "classpath:LICENSEHEADER";
     private static final String DEFAULT_PACKAGE_NAME = "example.micronaut";
     private static final String DEFAULT_APP_NAME = "default";
