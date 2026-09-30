@@ -197,6 +197,7 @@ run_pyronaut_test () {
 
 run_pyronaut_tests () {
   if [ -z "${PYRONAUT_LOCAL_REPOSITORY:-}" ]; then
+    set_pyronaut_local_versions
     set_pyronaut_test_resources
     set_pyronaut_native_toolchain
     set_pyronaut_project_venv

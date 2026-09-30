@@ -159,6 +159,15 @@ public class TestScriptGeneratorTest {
         assertTrue(result.contains("PYRONAUT_PROCESS_EXECUTABLE"));
         assertTrue(result.contains("PYRONAUT_CLI_PYTHONPATH"));
         assertTrue(result.contains("set_pyronaut_local_versions"));
+        int runPyronautTests = result.indexOf("run_pyronaut_tests () {");
+        assertTrue(runPyronautTests >= 0);
+        int directBranch = result.indexOf("if [ -z \"${PYRONAUT_LOCAL_REPOSITORY:-}\" ]; then", runPyronautTests);
+        int tempBranch = result.indexOf("local tmp_dir", directBranch);
+        String directBranchScript = result.substring(directBranch, tempBranch);
+        int localVersionsInDirectBranch = directBranchScript.indexOf("set_pyronaut_local_versions");
+        int testResourcesInDirectBranch = directBranchScript.indexOf("set_pyronaut_test_resources");
+        assertTrue(localVersionsInDirectBranch >= 0
+                && localVersionsInDirectBranch < testResourcesInDirectBranch);
         assertTrue(result.contains("[tool.pyronaut.core]"));
         assertTrue(result.contains("[tool.pyronaut.platform]"));
         assertFalse(result.contains("PYRONAUT_LOCAL_VERSION"));
