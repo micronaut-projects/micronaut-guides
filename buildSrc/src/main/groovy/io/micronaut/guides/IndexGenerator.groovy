@@ -672,7 +672,7 @@ class IndexGenerator {
     }
 
     private static String generateJsonIndex(File guidesFolder, String metadataConfigName, Language languageFilter) {
-        String baseURL = System.getenv("CI") ? LATEST_GUIDES_URL : ""
+        String baseURL = languageFilter == Language.PYTHON || System.getenv("CI") ? LATEST_GUIDES_URL : ""
 
         //TOO get both from an application context
         JsonMapper jsonMapper = JsonMapper.createDefault();

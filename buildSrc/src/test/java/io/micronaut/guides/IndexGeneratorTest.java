@@ -22,7 +22,7 @@ class IndexGeneratorTest {
 
         assertEquals("Creating your first Pyronaut application", guide.getString("title"));
         assertEquals("Learn how to create a Hello World Pyronaut application with a controller and a functional test.", guide.getString("intro"));
-        assertEquals("creating-your-first-micronaut-app-pyronaut-python.html", guide.getString("url"));
+        assertEquals("https://micronaut-projects.github.io/micronaut-guides/latest/creating-your-first-micronaut-app-pyronaut-python.html", guide.getString("url"));
         assertFalse(guide.has("options"));
         assertEquals("Getting Started", guide.getJSONArray("categories").getString(0));
     }
