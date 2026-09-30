@@ -339,7 +339,10 @@ class GuidesPlugin implements Plugin<Project> {
         String languageSuffix = language ? language.toString().capitalize() : ''
         String outputFileName = language ? "output-${language.toString().toLowerCase()}.log" : "output.log"
         project.tasks.register("${taskSlug}RunTestScript${languageSuffix}", TestScriptRunnerTask) { TestScriptRunnerTask it ->
-            it.onlyIf { !Utils.skipBecauseOfJavaVersion(metadata) }
+            it.onlyIf {
+                !Utils.skipBecauseOfJavaVersion(metadata) &&
+                        (language != Language.PYTHON || System.getenv('CI') == null)
+            }
 
             Provider<Directory> codeDirectory = project.layout.buildDirectory.dir("code/${metadata.slug()}")
 
