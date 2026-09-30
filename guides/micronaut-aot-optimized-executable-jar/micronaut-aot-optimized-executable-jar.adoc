@@ -1,0 +1,125 @@
+common:header.adoc[]
+
+common:requirements.adoc[]
+
+== Create an Application
+
+common:cli-or-launch.adoc[]
+
+[source,bash]
+----
+mn @cli-command@ example.micronaut.micronautguide --build=@build@ --lang=@lang@ --features=micronaut-aot
+----
+
+common:build-lang-arguments.adoc[]
+
+common:default-package.adoc[]
+
+== Introduction
+
+Micronaut AOT optimizes a Micronaut application at build time for a target runtime. For a JVM deployment, the build plugins can generate an optimized executable JAR that includes the application, its dependencies, and the AOT-generated classes and resources.
+
+Use an AOT-optimized JAR when you want to keep a JVM deployment model but reduce runtime work such as environment deduction, property-source loading, and other startup-time analysis that can be performed during the build.
+
+IMPORTANT: AOT produces an application optimized for the environment used during the AOT build. Build the optimized JAR with configuration and environment inputs that match the deployment environment.
+
+external:distribution-base/hellocontroller.adoc[]
+
+== Generate an AOT-Optimized Executable JAR
+
+:exclude-for-build:maven
+
+The https://micronaut-projects.github.io/micronaut-gradle-plugin/latest/#_micronaut_aot_plugin[Micronaut Gradle Plugin] adds optimized packaging tasks when the application includes Micronaut AOT support.
+
+Generate an optimized executable JAR:
+
+[source,bash]
+----
+./gradlew optimizedJitJarAll
+----
+
+The generated JAR is written to `build/libs/micronautguide-0.1-all-optimized.jar`.
+
+:exclude-for-build:
+:exclude-for-build:gradle
+
+The https://micronaut-projects.github.io/micronaut-maven-plugin/latest/examples/aot.html[Micronaut Maven Plugin] enables AOT when you pass the `micronaut.aot.enabled` system property.
+
+Generate an optimized executable JAR:
+
+[source,bash]
+----
+./mvnw package -Dmicronaut.aot.enabled=true
+----
+
+The generated JAR is written to `target/micronautguide-0.1.jar`.
+
+:exclude-for-build:
+
+== Run the Optimized Executable JAR
+
+Run the application packaged as an AOT-optimized JAR file:
+
+:exclude-for-build:maven
+
+[source,bash]
+----
+java -jar build/libs/micronautguide-0.1-all-optimized.jar
+----
+
+:exclude-for-build:
+:exclude-for-build:gradle
+
+[source,bash]
+----
+java -jar target/micronautguide-0.1.jar
+----
+
+:exclude-for-build:
+
+You can verify the application responds by sending a request to the controller:
+
+[source,bash]
+----
+curl localhost:8080
+----
+
+[source,json]
+----
+{"message":"Hello World"}
+----
+
+== Time To First Request
+
+=== Script
+
+Use the following script to measure time to first request of a single output JAR.
+
+resource:../../../ttfr.sh[]
+
+=== Measurement
+
+Run the script against the optimized JAR:
+
+[source,bash]
+----
+:exclude-for-build:maven
+./ttfr.sh -j build/libs/micronautguide-0.1-all-optimized.jar
+:exclude-for-build:
+:exclude-for-build:gradle
+./ttfr.sh -j target/micronautguide-0.1.jar
+:exclude-for-build:
+----
+
+Compare the result with a regular executable JAR from guideLink:executable-jar[] to decide whether the build-time optimization is worthwhile for your deployment.
+
+common:next.adoc[]
+
+Learn more about:
+
+* https://micronaut-projects.github.io/micronaut-aot/latest/guide/[Micronaut AOT]
+* https://micronaut-projects.github.io/micronaut-gradle-plugin/latest/#_micronaut_aot_plugin[Micronaut AOT support in the Micronaut Gradle Plugin]
+* https://micronaut-projects.github.io/micronaut-maven-plugin/latest/examples/aot.html[Micronaut AOT support in the Micronaut Maven Plugin]
+* guideLink:executable-jar[]
+
+common:helpWithMicronaut.adoc[]
