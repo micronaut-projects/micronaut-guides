@@ -180,7 +180,10 @@ kill_kotlin_daemon () {
                     continue
                 }
                 String folder = GuideProjectGenerator.folderName(metadata.slug(), guidesOption)
-                BuildTool buildTool = guidesOption.buildTool
+                BuildTool buildTool = guidesOption.getBuildTool()
+                if (buildTool == PYRONAUT && System.getenv('CI') != null) {
+                    continue
+                }
                 if (metadata.apps().any { it.name() == DEFAULT_APP_NAME } ) {
                     if (GuideUtils.shouldSkip(metadata,buildTool, guidesOption.getLanguage())) {
                         continue
