@@ -33,20 +33,21 @@ def test_associations_querying(contact_repository, phone_repository):
     contact = contact_repository.save(ContactEntity(None, first_name, last_name))
     assert contact_repository.count() == contact_count + 1
 
-    preview = contact_repository.findPreviewById(contact.id).orElse(None)
+    preview = contact_repository.findPreviewById(contact.id)
     assert preview is not None
     assert preview.id == contact.id
     assert preview.firstName == first_name
     assert preview.lastName == last_name
+    assert contact_repository.findPreviewById(-1) is None
 
-    contact_with_join = contact_repository.getById(contact.id).orElse(None)
+    contact_with_join = contact_repository.getById(contact.id)
     assert contact_with_join is not None
     assert contact_with_join.id == contact.id
     assert contact_with_join.firstName == first_name
     assert contact_with_join.lastName == last_name
     assert list(contact_with_join.phones) == []
 
-    complete = contact_repository.findCompleteById(contact.id).orElse(None)
+    complete = contact_repository.findCompleteById(contact.id)
     assert complete is not None
     assert complete.id == contact.id
     assert complete.firstName == first_name
@@ -61,7 +62,7 @@ def test_associations_querying(contact_repository, phone_repository):
     uk_phone_entity = phone_repository.save(PhoneEntity(None, uk_phone, contact_reference))
     assert phone_repository.count() == phone_count + 2
 
-    preview = contact_repository.findPreviewById(contact.id).orElse(None)
+    preview = contact_repository.findPreviewById(contact.id)
     assert preview is not None
     assert preview.id == contact.id
     assert preview.firstName == first_name
@@ -71,13 +72,13 @@ def test_associations_querying(contact_repository, phone_repository):
     assert contact_without_join is not None
     assert list(contact_without_join.phones) == []
 
-    contact_with_join = contact_repository.getById(contact.id).orElse(None)
+    contact_with_join = contact_repository.getById(contact.id)
     assert contact_with_join is not None
     phones = list(contact_with_join.phones)
     assert {phone.phone for phone in phones} == {american_phone, uk_phone}
     assert {phone.id for phone in phones} == {us_phone.id, uk_phone_entity.id}
 
-    complete = contact_repository.findCompleteById(contact.id).orElse(None)
+    complete = contact_repository.findCompleteById(contact.id)
     assert complete is not None
     assert set(complete.phones) == {american_phone, uk_phone}
 
