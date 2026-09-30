@@ -2,7 +2,6 @@ from micronaut.http import MediaType
 from micronaut.http.annotation import Controller, Get, Produces
 from micronaut.security.annotation import Secured
 from micronaut.security.rules import SecurityRule
-from org.reactivestreams import Publisher
 
 from .username_fetcher import UsernameFetcher
 
@@ -16,6 +15,6 @@ class UserController:
     @Secured(SecurityRule.IS_AUTHENTICATED)
     @Produces(MediaType.TEXT_PLAIN)
     @Get
-    def index(self) -> Publisher[str]:
-        return self.username_fetcher.findUsername()
+    async def index(self) -> str:
+        return await self.username_fetcher.find_username()
 # end::clazz[]

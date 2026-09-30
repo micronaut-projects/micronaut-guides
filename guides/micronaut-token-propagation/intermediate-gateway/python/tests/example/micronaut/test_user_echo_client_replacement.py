@@ -1,7 +1,5 @@
 from jakarta.inject import Singleton
 from micronaut.context.annotation import Requires
-from org.reactivestreams import Publisher
-from reactor.core.publisher import Mono
 
 from example.micronaut.username_fetcher import UsernameFetcher
 
@@ -11,6 +9,6 @@ from example.micronaut.username_fetcher import UsernameFetcher
 @Singleton
 class UserEchoClientReplacement(UsernameFetcher):
 
-    def findUsername(self, authorization: str) -> Publisher[str]:
-        return Mono.just("sherlock")
+    async def find_username(self, authorization: str) -> str:
+        return "sherlock"
 # end::clazz[]
