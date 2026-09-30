@@ -16,5 +16,5 @@
 package io.micronaut.guides.httpclient;
 
 public enum BuildTool {
-    GRADLE, MAVEN
+    GRADLE, MAVEN, PYRONAUT
 }

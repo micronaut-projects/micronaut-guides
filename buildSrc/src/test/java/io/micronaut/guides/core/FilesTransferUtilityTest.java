@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.nio.file.Files;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -69,6 +70,33 @@ public class FilesTransferUtilityTest {
         assertFalse(new File(outputPath + "/creating-your-first-micronaut-app-gradle-kotlin/src/main/kotlin/example/micronaut/Application.kt").exists());
         assertFalse(new File(outputPath + "/creating-your-first-micronaut-app-maven-groovy/src/main/groovy/example/micronaut/Application.groovy").exists());
         assertFalse(new File(outputPath + "/creating-your-first-micronaut-app-maven-java/src/main/java/example/micronaut/Application.java").exists());
+    }
+
+    @Test
+    void pythonViewsAreCopiedToConfig() throws Exception {
+        File inputDirectory = new File("src/test/resources/file-transfer/python-resources");
+        Guide guide = guideParser.parseGuideMetadata(inputDirectory, "metadata.json").orElseThrow();
+        File outputDirectory = new File("build/tmp/python-resources");
+        File destination = new File(outputDirectory, "python-resources-pyronaut-python");
+        assertTrue(destination.mkdirs() || destination.exists());
+        File starterView = new File(destination, "src/main/resources/views/starter.html");
+        Files.createDirectories(starterView.toPath().getParent());
+        Files.writeString(starterView.toPath(), "starter");
+        File starterStatic = new File(destination, "src/main/resources/static/starter.txt");
+        Files.createDirectories(starterStatic.toPath().getParent());
+        Files.writeString(starterStatic.toPath(), "starter");
+
+        filesTransferUtility.transferFiles(inputDirectory, outputDirectory, guide);
+
+        assertTrue(new File(destination, "config/views/index.html").exists());
+        assertTrue(new File(destination, "config/views/starter.html").exists());
+        assertTrue(new File(destination, "config/views/python.html").exists());
+        assertTrue(new File(destination, "config/static/starter.txt").exists());
+        assertTrue(new File(destination, "config/static/python.txt").exists());
+        assertTrue(new File(destination, "placeholder.py").exists());
+        assertFalse(new File(destination, "src/main/resources/views/index.html").exists());
+        assertFalse(new File(destination, "src/main/resources/views/starter.html").exists());
+        assertFalse(new File(destination, "src/main/resources/static/python.txt").exists());
     }
 
 }

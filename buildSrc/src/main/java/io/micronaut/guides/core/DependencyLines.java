@@ -63,6 +63,10 @@ public class DependencyLines {
     }
 
     public static List<String> asciidoc(List<String> lines, BuildTool buildTool, Language language) {
+        if (buildTool != GRADLE && buildTool != MAVEN) {
+            return List.of();
+        }
+
         List<String> dependencyLines = new ArrayList<>();
 
         // Open Asciidoctor code block

@@ -24,7 +24,7 @@ import io.swagger.v3.oas.annotations.servers.Server;
     info = @Info(
             title = "micronaut-guides",
             version = "1.0"
-    ), servers = @Server(url = "https://guides.micronaut.io")
+    ), servers = @Server(url = "https://micronaut-projects.github.io/micronaut-guides/")
 ) // <1>
 public class Application {
 

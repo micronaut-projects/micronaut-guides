@@ -8,6 +8,7 @@ import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import static io.micronaut.starter.options.BuildTool.GRADLE;
@@ -130,5 +131,21 @@ public class TestScriptGeneratorTest {
         String result = testScriptGenerator.generateNativeTestScript(metadatas);
 
         assertEquals(expected.strip(), result.strip());
+    }
+
+    @Test
+    void testGeneratePython() {
+        File guideFolder = new File("src/test/resources/file-transfer/python-resources");
+        Guide guide = guideParser.parseGuideMetadata(guideFolder, "metadata.json").orElseThrow();
+
+        String result = testScriptGenerator.generateTestScript(new ArrayList<>(List.of(guide)));
+
+        assertTrue(result.contains("cd python-resources-pyronaut-python"));
+        assertTrue(result.contains("pyenv shell graalpy3.13-25.4.4"));
+        assertTrue(result.contains("pyronaut install"));
+        assertTrue(result.contains("pyronaut validate-config"));
+        assertTrue(result.contains("pyronaut test"));
+        assertFalse(result.contains("./gradlew -q check"));
+        assertFalse(result.contains("./mvnw -q test"));
     }
 }
