@@ -40,14 +40,20 @@ source:BookRepositoryImpl[]
 
 callout:singleton[]
 
-=== Spreadsheet Builder
+=== Spreadsheet Library
 
+:exclude-for-languages:python
 Add a dependency to https://spreadsheet.dsl.builders/[Spreadsheet builder]
 ____
 Spreadsheet builder provides convenient way how to read and create MS Excel OfficeOpenXML Documents (XLSX) focus not only on content side but also on easy styling.
 ____
 
 dependency:spreadsheet-builder-poi:2.2.1[groupId=builders.dsl]
+:exclude-for-languages:
+
+:only-for-languages:python
+Add `openpyxl==3.1.5` to `requirements.txt`. Pyronaut installs this Python library with the application.
+:only-for-languages:
 
 === Excel Creation
 
@@ -60,11 +66,17 @@ Create a protocol to describe Excel generation:
 
 source:BookExcelService[]
 
-<1> `SystemFile` is specified as the return type of a route execution to indicate the given file should be downloaded by the client instead of displayed.
+:exclude-for-languages:python
+<1> `SystemFile` specifies that the generated file should be downloaded by the client.
 
 Externalize your styles configuration into a class implementing `builders.dsl.spreadsheet.builder.api.Stylesheet` interface to maximize code reuse.
 
 source:BookExcelStylesheet[]
+:exclude-for-languages:
+
+:only-for-languages:python
+<1> The Python service returns the generated XLSX file as bytes.
+:only-for-languages:
 
 Create a bean which generates the Excel file.
 
@@ -84,7 +96,12 @@ callout:controller[arg0=/]
 <2> Constructor injection
 <3> Use `@View` annotation to specify which template to use to render the response.
 <4> You can specify the HTTP verb that a controller action responds to. To respond to a GET request, use `io.micronaut.http.annotation.Get`
-<5> `SystemFile` is specified as the return type of a route execution to indicate the given file should be downloaded by the client instead of displayed.
+:exclude-for-languages:python
+<5> Returning `SystemFile` tells Micronaut to download the file instead of displaying it.
+:exclude-for-languages:
+:only-for-languages:python
+<5> The response includes a `Content-Disposition` attachment header so the browser downloads the XLSX file.
+:only-for-languages:
 
 The previous controller index method renders a simple view with a link to download the Excel file:
 
@@ -120,4 +137,3 @@ common:runapp.adoc[]
 == Next Steps
 
 Read more about Micronaut https://docs.micronaut.io/latest/guide/#transfers[File Transfers] support.
-

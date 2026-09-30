@@ -1,5 +1,5 @@
 from micronaut.http.annotation import Controller, Get, Produces
-from micronaut.http.server.types.files import SystemFile
+from micronaut.http import HttpResponse
 from micronaut.views import View
 
 from .book_excel_service import BookExcelService
@@ -23,7 +23,11 @@ class HomeController:
 
     @Produces("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
     @Get("/excel")  # <4>
-    def excel(self) -> SystemFile:  # <5>
-        return self.book_excel_service.excel_file_from_books(
+    def excel(self) -> HttpResponse:  # <5>
+        data = self.book_excel_service.excel_file_from_books(
             self.book_repository.find_all()
+        )
+        return HttpResponse.ok(data).header(
+            "Content-Disposition",
+            f'attachment; filename="{BookExcelService.HEADER_EXCEL_FILENAME}"',
         )
