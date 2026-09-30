@@ -1,9 +1,9 @@
 from typing import Annotated
 
-import java
 from jakarta.inject import Inject
 from jakarta.validation import Valid
 from micronaut.data.exceptions import DataAccessException
+from micronaut.data.model import Pageable
 from micronaut.http import HttpHeaders, HttpResponse, HttpStatus
 from micronaut.http.annotation import Body, Delete, Get, Post, Put, Status
 from micronaut.scheduling import TaskExecutors
@@ -13,8 +13,6 @@ from .domain.genre import Genre
 from .genre_repository import GenreRepository
 from .genre_service import GenreService
 from .genre_update_command import GenreUpdateCommand
-
-Pageable = java.type("io.micronaut.data.model.Pageable")
 
 genre_repository: Annotated[GenreRepository, Inject]  # <3>
 genre_service: Annotated[GenreService, Inject]
