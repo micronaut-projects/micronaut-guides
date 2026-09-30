@@ -39,10 +39,10 @@ public class GuideParserTest {
         assertEquals("child",guide.slug());
         assertEquals(List.of(Language.JAVA, Language.GROOVY, Language.KOTLIN),guide.languages());
         assertEquals(List.of(BuildTool.GRADLE, BuildTool.MAVEN),guide.buildTools());
-        assertFalse(guide.python());
+        assertFalse(guide.languages().contains(Language.PYTHON));
         assertTrue(guide.zipIncludes().isEmpty());
         assertTrue(guide.env().isEmpty());
-        assertNull(guideParser.parseGuideMetadata(new File(path, "child"), "metadata.json").orElseThrow().python());
+        assertFalse(guideParser.parseGuideMetadata(new File(path, "child"), "metadata.json").orElseThrow().languages().contains(Language.PYTHON));
         List<String> tags = guide.tags();
         Collections.sort(tags);
         assertEquals(List.of("Azure", "cloud", "data-jdbc", "database", "flyway", "jdbc", "micronaut-data", "mysql"), tags);

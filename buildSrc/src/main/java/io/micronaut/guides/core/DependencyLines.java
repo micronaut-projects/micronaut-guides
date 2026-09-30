@@ -79,6 +79,9 @@ public class DependencyLines {
         if (buildTool == PYRONAUT) {
             return pyronautAsciidoc(lines);
         }
+        if (buildTool != GRADLE && buildTool != MAVEN) {
+            return List.of();
+        }
         List<String> dependencyLines = new ArrayList<>();
 
         // Open Asciidoctor code block

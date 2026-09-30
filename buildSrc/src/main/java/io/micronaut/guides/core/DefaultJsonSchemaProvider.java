@@ -10,12 +10,12 @@ import jakarta.inject.Singleton;
 @Singleton
 public class DefaultJsonSchemaProvider implements JsonSchemaProvider {
     SchemaRegistry schemaRegistry = SchemaRegistry.withDefaultDialect(SpecificationVersion.DRAFT_2020_12, builder ->
-            builder.schemaIdResolvers(schemaIdResolvers -> schemaIdResolvers.mapPrefix("https://guides.micronaut.io/schemas", "classpath:"))
+            builder.schemaIdResolvers(schemaIdResolvers -> schemaIdResolvers.mapPrefix("https://micronaut-projects.github.io/micronaut-guides/schemas", "classpath:"))
     );
 
     @Override
     @NonNull
     public Schema getSchema() {
-        return schemaRegistry.getSchema(SchemaLocation.of("https://guides.micronaut.io/schemas/guide-metadata.schema.json"));
+        return schemaRegistry.getSchema(SchemaLocation.of("https://micronaut-projects.github.io/micronaut-guides/schemas/guide-metadata.schema.json"));
     }
 }

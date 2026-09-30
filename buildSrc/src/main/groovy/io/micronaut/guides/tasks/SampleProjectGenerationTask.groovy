@@ -3,6 +3,7 @@ package io.micronaut.guides.tasks
 import groovy.transform.CompileStatic
 import io.micronaut.guides.GuideProjectGenerator
 import io.micronaut.guides.core.Guide
+import io.micronaut.starter.options.Language
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
@@ -30,6 +31,10 @@ abstract class SampleProjectGenerationTask extends DefaultTask {
     @Input
     abstract Property<String> getSlug()
 
+    @Optional
+    @Input
+    abstract Property<String> getLanguage()
+
     @InputDirectory
     @PathSensitive(RELATIVE)
     abstract DirectoryProperty getInputDirectory()
@@ -45,7 +50,10 @@ abstract class SampleProjectGenerationTask extends DefaultTask {
     @TaskAction
     def perform() {
         File outputDirectory = outputDir.get().asFile
-        project.delete(outputDirectory)
-        guidesGenerator.generateOne(metadata, inputDirectory.get().asFile, outputDirectory)
+        Language languageFilter = language.isPresent() ? Language.valueOf(language.get()) : null
+        if (languageFilter == null) {
+            project.delete(outputDirectory)
+        }
+        guidesGenerator.generateOne(metadata, inputDirectory.get().asFile, outputDirectory, languageFilter)
     }
 }

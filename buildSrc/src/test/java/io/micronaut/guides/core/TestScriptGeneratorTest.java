@@ -145,7 +145,6 @@ public class TestScriptGeneratorTest {
                 null,
                 java.util.Map.of(),
                 List.of(app),
-                true,
                 false
         );
 
@@ -189,5 +188,21 @@ public class TestScriptGeneratorTest {
         String result = testScriptGenerator.generateNativeTestScript(metadatas);
 
         assertEquals(expected.strip(), result.strip());
+    }
+
+    @Test
+    void testGenerateGenericScriptSkipsPython() {
+        File guideFolder = new File("src/test/resources/file-transfer/python-resources");
+        Guide guide = guideParser.parseGuideMetadata(guideFolder, "metadata.json").orElseThrow();
+
+        String result = testScriptGenerator.generateTestScript(new ArrayList<>(List.of(guide)));
+
+        assertFalse(result.contains("python-resources-pyronaut-python"));
+        assertFalse(result.contains("pyenv shell"));
+        assertFalse(result.contains("pyronaut install"));
+        assertFalse(result.contains("pyronaut validate-config"));
+        assertFalse(result.contains("pyronaut test"));
+        assertFalse(result.contains("./gradlew -q check"));
+        assertFalse(result.contains("./mvnw -q test"));
     }
 }

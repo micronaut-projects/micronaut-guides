@@ -11,10 +11,13 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
@@ -59,6 +62,18 @@ public class DefaultFilesTransferUtility implements FilesTransferUtility {
         if (Files.exists(srcPath)) {
             if (language == PYTHON) {
                 copySharedPythonResources(srcPath, sourcePath, destinationPath);
+                Path pythonResources = srcPath.resolve("main").resolve("resources");
+                Path pythonTestResources = srcPath.resolve("test").resolve("resources");
+                Path pythonTestResourcesLegacy = srcPath.resolve("test-resources");
+                Files.walkFileTree(srcPath, new CopyFileVisitor(Paths.get(destinationPath.toString(), srcFolder)) {
+                    @Override
+                    public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+                        if (dir.equals(pythonResources) || dir.equals(pythonTestResources) || dir.equals(pythonTestResourcesLegacy)) {
+                            return FileVisitResult.SKIP_SUBTREE;
+                        }
+                        return super.preVisitDirectory(dir, attrs);
+                    }
+                });
             } else {
                 Files.walkFileTree(srcPath, new CopyFileVisitor(Paths.get(destinationPath.toString(), srcFolder)));
             }
@@ -162,6 +177,10 @@ public class DefaultFilesTransferUtility implements FilesTransferUtility {
                 Path destinationPath = Paths.get(outputDirectory.getAbsolutePath(), folder, appName);
                 File destination = destinationPath.toFile();
 
+                if (Language.PYTHON.toString().equals(guidesOption.getLanguage().toString())) {
+                    movePythonResources(destinationPath);
+                }
+
                 if (guide.base() != null) {
                     File baseDir = new File(inputDirectory.getParentFile(), guide.base());
                     copyGuideSourceFiles(baseDir, destinationPath, appName, guidesOption.getLanguage(), true);
@@ -210,6 +229,40 @@ public class DefaultFilesTransferUtility implements FilesTransferUtility {
                 addLicenses(new File(outputDirectory.getAbsolutePath(), folder));
             }
         }
+    }
+
+    private static void movePythonResources(Path destinationPath) throws IOException {
+        movePythonResourceFolder(destinationPath, "views");
+        movePythonResourceFolder(destinationPath, "static");
+    }
+
+    private static void movePythonResourceFolder(Path destinationPath, String resourceFolder) throws IOException {
+        Path sourcePath = destinationPath.resolve("src").resolve("main").resolve("resources").resolve(resourceFolder);
+        if (!Files.exists(sourcePath)) {
+            return;
+        }
+
+        Path targetPath = destinationPath.resolve("config").resolve(resourceFolder);
+        Files.createDirectories(targetPath);
+        Files.walkFileTree(sourcePath, new SimpleFileVisitor<>() {
+            @Override
+            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+                Files.createDirectories(targetPath.resolve(sourcePath.relativize(dir)));
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                Files.move(file, targetPath.resolve(sourcePath.relativize(file)), StandardCopyOption.REPLACE_EXISTING);
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                Files.delete(dir);
+                return FileVisitResult.CONTINUE;
+            }
+        });
     }
 
     void addLicenses(File folder) {

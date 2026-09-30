@@ -22,7 +22,6 @@ import io.micronaut.starter.options.BuildTool
 
 @CompileStatic
 class TestScriptGenerator {
-
     public static final String GITHUB_WORKFLOW_JAVA_CI = 'Java CI'
     public static final String ENV_GITHUB_WORKFLOW = 'GITHUB_WORKFLOW'
     public static final String EMPTY_SCRIPT = '''\
@@ -99,6 +98,14 @@ exit 0
         generateTestScript(output, script)
     }
 
+    static void generateTestScript(File output,
+                                   List<Guide> metadatas,
+                                   boolean stopIfFailure,
+                                   Language languageFilter) {
+        String script = generateScript(metadatas, stopIfFailure, false, false, languageFilter)
+        generateTestScript(output, script)
+    }
+
     static void generateNativeTestScript(File output,
                                    List<Guide> metadatas,
                                    boolean stopIfFailure) {
@@ -139,7 +146,8 @@ exit 0
     static String generateScript(List<Guide> metadatas,
                                  boolean stopIfFailure,
                                  boolean nativeTest = false,
-                                 boolean pythonTest = false) {
+                                 boolean pythonTest = false,
+                                 Language languageFilter = null) {
         StringBuilder bashScript = new StringBuilder('''\
 #!/usr/bin/env bash
 set -e
@@ -162,6 +170,9 @@ kill_kotlin_daemon () {
         metadatas.sort { it.slug() }
         for (Guide metadata : metadatas) {
             List<GuidesOption> guidesOptionList = GuideProjectGenerator.guidesOptions(metadata)
+            if (languageFilter != null) {
+                guidesOptionList = guidesOptionList.findAll { GuidesOption option -> option.language == languageFilter }
+            }
             bashScript << """\
 """
             for (GuidesOption guidesOption : guidesOptionList) {
@@ -240,13 +251,13 @@ echo "Executing '$folder' $testcopy"
 if (noDaemon) {
     bashScript += "kill_kotlin_daemon\n"
 }
-if (nativeTest) {
-bashScript += """\
-${buildTool == MAVEN ? './mvnw -Pnative test' : './gradlew nativeTest'} || EXIT_STATUS=\$?
-"""
-} else if (buildTool == PYRONAUT) {
+if (buildTool == PYRONAUT) {
 bashScript += """\
 run_pyronaut_tests || EXIT_STATUS=\$?
+"""
+} else if (nativeTest) {
+bashScript += """\
+${buildTool == MAVEN ? './mvnw -Pnative test' : './gradlew nativeTest'} || EXIT_STATUS=\$?
 """
 } else {
 String mavenCommand = validateLicense ? './mvnw -q test spotless:check' : './mvnw -q test'

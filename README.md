@@ -1,6 +1,6 @@
 # Micronaut Guides
 
-This is the main repository for the [Micronaut Guides](https://guides.micronaut.io).
+This is the main repository for the [Micronaut Guides](https://micronaut-projects.github.io/micronaut-guides/).
 
 ## Build the guides
 

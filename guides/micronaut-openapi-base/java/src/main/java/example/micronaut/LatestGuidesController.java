@@ -32,13 +32,13 @@ class LatestGuidesController {
                     List.of("Getting Started"),
                     LocalDate.of(2018, 5, 23),
                     "creating-your-first-micronaut-app",
-                    "https://guides.micronaut.io/latest/creating-your-first-micronaut-app.html",
-                    List.of(new Option(Language.JAVA, BuildTool.GRADLE, "https://guides.micronaut.io/latest/creating-your-first-micronaut-app-gradle-java.html"),
-                            new Option(Language.GROOVY, BuildTool.GRADLE, "https://guides.micronaut.io/latest/creating-your-first-micronaut-app-gradle-groovy.html"),
-                            new Option(Language.KOTLIN, BuildTool.GRADLE, "https://guides.micronaut.io/latest/creating-your-first-micronaut-app-gradle-kotlin.html"),
-                            new Option(Language.JAVA, BuildTool.MAVEN, "https://guides.micronaut.io/latest/creating-your-first-micronaut-app-maven-java.html"),
-                            new Option(Language.GROOVY, BuildTool.MAVEN, "https://guides.micronaut.io/latest/creating-your-first-micronaut-app-maven-groovy.html"),
-                            new Option(Language.KOTLIN, BuildTool.MAVEN, "https://guides.micronaut.io/latest/creating-your-first-micronaut-app-maven-kotlin.html")
+                    "https://micronaut-projects.github.io/micronaut-guides/latest/creating-your-first-micronaut-app.html",
+                    List.of(new Option(Language.JAVA, BuildTool.GRADLE, "https://micronaut-projects.github.io/micronaut-guides/latest/creating-your-first-micronaut-app-gradle-java.html"),
+                            new Option(Language.GROOVY, BuildTool.GRADLE, "https://micronaut-projects.github.io/micronaut-guides/latest/creating-your-first-micronaut-app-gradle-groovy.html"),
+                            new Option(Language.KOTLIN, BuildTool.GRADLE, "https://micronaut-projects.github.io/micronaut-guides/latest/creating-your-first-micronaut-app-gradle-kotlin.html"),
+                            new Option(Language.JAVA, BuildTool.MAVEN, "https://micronaut-projects.github.io/micronaut-guides/latest/creating-your-first-micronaut-app-maven-java.html"),
+                            new Option(Language.GROOVY, BuildTool.MAVEN, "https://micronaut-projects.github.io/micronaut-guides/latest/creating-your-first-micronaut-app-maven-groovy.html"),
+                            new Option(Language.KOTLIN, BuildTool.MAVEN, "https://micronaut-projects.github.io/micronaut-guides/latest/creating-your-first-micronaut-app-maven-kotlin.html")
                             ))
     );
 

@@ -82,13 +82,13 @@ public class DefaultTestScriptGenerator implements TestScriptGenerator {
             bashScript.append("kill_kotlin_daemon\n");
         }
 
-        if (nativeTest) {
+        if (buildTool == PYRONAUT) {
+            bashScript.append("run_pyronaut_tests || EXIT_STATUS=$?\n");
+        } else if (nativeTest) {
             bashScript.append(String.format(
                     "%s || EXIT_STATUS=$?\n",
                     buildTool == BuildTool.MAVEN ? "./mvnw -Pnative test" : "./gradlew nativeTest"
             ));
-        } else if (buildTool == BuildTool.PYRONAUT) {
-            bashScript.append("run_pyronaut_tests || EXIT_STATUS=$?\n");
         } else {
             String mavenCommand = validateLicense ? "./mvnw -q test spotless:check" : "./mvnw -q test";
             bashScript.append(String.format(

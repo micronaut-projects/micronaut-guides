@@ -141,6 +141,9 @@ class GuideUtilsTest {
         assertFalse(GuideUtils.shouldSkip(guide, BuildTool.MAVEN, Language.JAVA));
         assertTrue(GuideUtils.shouldSkip(guide, BuildTool.MAVEN, Language.KOTLIN));
         assertFalse(GuideUtils.isSupported(BuildTool.MAVEN, Language.KOTLIN));
+        assertTrue(GuideUtils.isSupported(BuildTool.PYRONAUT, Language.PYTHON));
+        assertFalse(GuideUtils.isSupported(BuildTool.GRADLE, Language.PYTHON));
+        assertFalse(GuideUtils.isSupported(BuildTool.PYRONAUT, Language.JAVA));
     }
 
     @Test
@@ -169,15 +172,14 @@ class GuideUtilsTest {
         App baseApp = new App("default", null, null, null, List.of(), List.of(), List.of(), List.of(), List.of(), null, null, null, true, List.of("base"));
         Guide base = new Guide("base", "base", List.of("author"), List.of("category"), LocalDate.of(2026, 1, 1), null, null, null,
                 false, false, null, List.of(Language.JAVA, Language.GROOVY, Language.KOTLIN, Language.PYTHON), List.of(),
-                List.of(BuildTool.GRADLE, BuildTool.MAVEN, BuildTool.PYRONAUT), null, List.of(), "base", true, null, Map.of(), List.of(baseApp), true, false);
+                List.of(BuildTool.GRADLE, BuildTool.MAVEN, BuildTool.PYRONAUT), null, List.of(), "base", true, null, Map.of(), List.of(baseApp), false);
         App childApp = new App("default", null, null, null, List.of(), List.of(), List.of(), List.of(), List.of(), null, null, null, true, List.of("child"));
         Guide child = new Guide("child", "child", List.of(), List.of("category"), LocalDate.of(2026, 1, 1), null, null, null,
-                false, false, null, List.of(Language.JAVA, Language.GROOVY, Language.KOTLIN), List.of(),
-                List.of(BuildTool.GRADLE, BuildTool.MAVEN), null, List.of(), "child", true, "base", Map.of(), List.of(childApp), null, false);
+                false, false, null, null, List.of(),
+                null, null, List.of(), "child", true, "base", Map.of(), List.of(childApp), false);
 
         Guide merged = GuideUtils.merge(base, child);
 
-        assertTrue(merged.python());
         assertTrue(merged.languages().contains(Language.PYTHON));
         assertTrue(merged.buildTools().contains(BuildTool.PYRONAUT));
         assertEquals(List.of("child", "base"), merged.apps().get(0).pythonFeatures());
@@ -188,14 +190,13 @@ class GuideUtilsTest {
         App app = new App("default", null, null, null, List.of(), List.of(), List.of(), List.of(), List.of(), null, null, null, true, List.of());
         Guide base = new Guide("base", "base", List.of("author"), List.of("category"), LocalDate.of(2026, 1, 1), null, null, null,
                 false, false, null, List.of(Language.JAVA, Language.GROOVY, Language.KOTLIN, Language.PYTHON), List.of(),
-                List.of(BuildTool.GRADLE, BuildTool.MAVEN, BuildTool.PYRONAUT), null, List.of(), "base", true, null, Map.of(), List.of(app), true, false);
+                List.of(BuildTool.GRADLE, BuildTool.MAVEN, BuildTool.PYRONAUT), null, List.of(), "base", true, null, Map.of(), List.of(app), false);
         Guide child = new Guide("child", "child", List.of(), List.of("category"), LocalDate.of(2026, 1, 1), null, null, null,
                 false, false, null, List.of(Language.JAVA, Language.GROOVY, Language.KOTLIN), List.of(),
-                List.of(BuildTool.GRADLE, BuildTool.MAVEN), null, List.of(), "child", true, "base", Map.of(), List.of(app), false, false);
+                List.of(BuildTool.GRADLE, BuildTool.MAVEN), null, List.of(), "child", true, "base", Map.of(), List.of(app), false);
 
         Guide merged = GuideUtils.merge(base, child);
 
-        assertFalse(merged.python());
         assertFalse(merged.languages().contains(Language.PYTHON));
         assertFalse(merged.buildTools().contains(BuildTool.PYRONAUT));
     }

@@ -19,6 +19,7 @@ import java.util.List;
 import static io.micronaut.starter.api.TestFramework.JUNIT;
 import static io.micronaut.starter.api.TestFramework.PYTEST;
 import static io.micronaut.starter.api.TestFramework.SPOCK;
+import static io.micronaut.starter.options.BuildTool.PYRONAUT;
 import static io.micronaut.starter.options.Language.GROOVY;
 import static io.micronaut.starter.options.Language.PYTHON;
 
@@ -87,6 +88,11 @@ public class GuideGenerationUtils {
         TestFramework testFramework = guideMetadata.testFramework();
         List<GuidesOption> guidesOptionList = new ArrayList<>();
 
+        if (languages.contains(PYTHON) && !buildTools.contains(PYRONAUT)) {
+            buildTools = new ArrayList<>(buildTools);
+            buildTools.add(PYRONAUT);
+        }
+
         for (BuildTool buildTool : buildTools) {
             for (Language language : Language.values()) {
                 if (!GuideUtils.isSupported(buildTool, language)) {
@@ -110,6 +116,9 @@ public class GuideGenerationUtils {
         }
         if (testFramework != null) {
             return testFramework;
+        }
+        if (language == PYTHON) {
+            return PYTEST;
         }
         if (language == GROOVY) {
             return SPOCK;
