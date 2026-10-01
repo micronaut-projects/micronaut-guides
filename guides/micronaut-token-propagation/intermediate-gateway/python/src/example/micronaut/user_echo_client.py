@@ -6,7 +6,6 @@ from micronaut.context.env import Environment
 from micronaut.http import HttpHeaders, MediaType
 from micronaut.http.annotation import Consumes, Get, Header
 from micronaut.http.client.annotation import Client
-from org.reactivestreams import Publisher
 
 from .username_fetcher import UsernameFetcher
 
@@ -19,9 +18,9 @@ class UserEchoClient(UsernameFetcher):
     @Consumes(MediaType.TEXT_PLAIN)
     @Get("/user")  # <3>
     @abstractmethod
-    def findUsername(
+    async def find_username(
         self,
         authorization: Annotated[str, Header(HttpHeaders.AUTHORIZATION)],  # <4>
-    ) -> Publisher[str]:
+    ) -> str:
         ...
 # end::clazz[]

@@ -4,7 +4,6 @@ from micronaut.http import HttpHeaders, MediaType
 from micronaut.http.annotation import Controller, Get, Header, Produces
 from micronaut.security.annotation import Secured
 from micronaut.security.rules import SecurityRule
-from org.reactivestreams import Publisher
 
 from .username_fetcher import UsernameFetcher
 
@@ -18,9 +17,9 @@ class UserController:
     @Secured(SecurityRule.IS_AUTHENTICATED)  # <3>
     @Produces(MediaType.TEXT_PLAIN)  # <4>
     @Get  # <5>
-    def index(
+    async def index(
         self,
         authorization: Annotated[str, Header(HttpHeaders.AUTHORIZATION)],  # <6>
-    ) -> Publisher[str]:
-        return self.username_fetcher.findUsername(authorization)
+    ) -> str:
+        return await self.username_fetcher.find_username(authorization)
 # end::clazz[]
