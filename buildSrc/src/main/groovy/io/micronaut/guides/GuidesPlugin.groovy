@@ -433,6 +433,7 @@ class GuidesPlugin implements Plugin<Project> {
             it.metadata = metadata
             it.guideSlug.set(metadata.slug())
             it.metadataFile.set(project.layout.projectDirectory.dir("guides/${metadata.slug()}").file("metadata.json"))
+            it.pyronautTestFunctionsFile.set(project.layout.projectDirectory.file("buildSrc/src/main/resources/pyronaut-test-functions.sh"))
             it.scriptFile.set(project.layout.buildDirectory.dir("code/${metadata.slug()}").map(d -> d.file("python-test.sh")))
             it.dependsOn(generateTask)
         }
