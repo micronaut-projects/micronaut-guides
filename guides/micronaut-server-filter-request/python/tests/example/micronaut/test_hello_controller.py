@@ -1,3 +1,5 @@
+from time import sleep
+
 import java
 import pytest
 import requests
@@ -5,7 +7,6 @@ from pyronaut.test import MicronautTest, micronaut_test_fixture
 
 ListAppender = java.type("ch.qos.logback.core.read.ListAppender")
 LoggerFactory = java.type("org.slf4j.LoggerFactory")
-Thread = java.type("java.lang.Thread")
 
 
 @pytest.fixture
@@ -52,7 +53,7 @@ def test_hello_filter_logging(client):
             messages = formatted_messages(appender)
             if "foo: bar" in messages and "Authorization: *MASKED*" in messages:
                 break
-            Thread.sleep(50)
+            sleep(0.05)
 
         messages = formatted_messages(appender)
         assert "foo: bar" in messages

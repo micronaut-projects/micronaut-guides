@@ -2,14 +2,11 @@ from typing import Annotated
 
 import pytest
 import requests
-import java
 from micronaut.context.annotation import Requires
 from micronaut.http.annotation import Controller, Get, PathVariable
 from pyronaut.test import MicronautTest, micronaut_test_fixture
 
 from example.micronaut.photo import Photo
-
-EmbeddedServer = java.type("io.micronaut.runtime.server.EmbeddedServer")
 
 
 @Requires(property="spec.name", value="PhotosControllerTest")
@@ -44,14 +41,18 @@ def photos_context(request):
 
 @pytest.fixture
 def my_context(request, photos_context):
-    photos_server = photos_context[EmbeddedServer]
+    photos_client = requests.with_context(photos_context)
+    try:
+        photos_url = photos_client.base_url
+    finally:
+        photos_client.close()
     fixture = micronaut_test_fixture(
         request,
         MicronautTest(
             environments=["test"],
             transactional=False,
             properties={
-                "micronaut.http.services.photos.url": f"http://localhost:{photos_server.getPort()}",
+                "micronaut.http.services.photos.url": photos_url,
             },
         ),
     )  # <1>
@@ -61,7 +62,9 @@ def my_context(request, photos_context):
 
 @pytest.fixture
 def client(my_context):
-    return requests.with_context(my_context)  # <2>
+    session = requests.with_context(my_context)  # <2>
+    yield session
+    session.close()
 
 
 def test_photo(client):

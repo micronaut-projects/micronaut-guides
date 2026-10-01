@@ -11,7 +11,7 @@ class LoggingHeadersFilter(Ordered):
     LOG = LoggerFactory.getLogger("example.micronaut.LoggingHeadersFilter")
 
     @RequestFilter  # <2>
-    def filterRequest(self, request: HttpRequest) -> None:
+    def filter_request(self, request: HttpRequest) -> None:
         HttpHeadersUtil.trace(self.LOG, request.getHeaders())
 
     def getOrder(self) -> int:  # <3>

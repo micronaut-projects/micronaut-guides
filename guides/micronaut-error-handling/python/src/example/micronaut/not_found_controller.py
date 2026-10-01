@@ -1,4 +1,3 @@
-from java.util import Collections
 from micronaut.http import HttpRequest, HttpResponse, HttpStatus, MediaType
 from micronaut.http.annotation import Controller, Error
 from micronaut.http.hateoas import JsonError, Link
@@ -15,7 +14,7 @@ class NotFoundController:
     def not_found(self, request: HttpRequest) -> HttpResponse:
         if accepts(request, MediaType.TEXT_HTML):  # <4>
             return HttpResponse.ok(
-                self.views_renderer.render("notFound", Collections.emptyMap(), request)
+                self.views_renderer.render("notFound", {}, request)
             ).contentType(MediaType.TEXT_HTML)
 
         error = JsonError("Page Not Found").link(Link.SELF, Link.of(request.getUri()))
