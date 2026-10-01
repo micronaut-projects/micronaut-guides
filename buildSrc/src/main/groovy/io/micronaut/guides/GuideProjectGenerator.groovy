@@ -219,11 +219,15 @@ class GuideProjectGenerator implements AutoCloseable {
     }
 
     private static void removePythonPackageMarkerFiles(File destination) {
-        destination.eachFileRecurse(FILES) { File file ->
-            if (file.name == '__init__.py') {
-                file.delete()
+        Files.walkFileTree(destination.toPath(), new SimpleFileVisitor<Path>() {
+            @Override
+            FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+                if (attrs.isRegularFile() && file.fileName.toString() == '__init__.py') {
+                    Files.delete(file)
+                }
+                FileVisitResult.CONTINUE
             }
-        }
+        })
     }
 
     private static String pythonModuleName(String target) {
@@ -277,14 +281,18 @@ class GuideProjectGenerator implements AutoCloseable {
 
     void addLicenses(File folder) {
         String licenseHeader = licenseHeaderText()
-        folder.eachFileRecurse (FILES) { file ->
-            if (
-                    (file.path.endsWith(EXTENSION_JAVA) || file.path.endsWith(EXTENSION_GROOVY) || file.path.endsWith(EXTENSION_KT))
-                    && !file.text.contains("Licensed under")
-            ) {
-                file.text = licenseHeader + file.text
+        Files.walkFileTree(folder.toPath(), new SimpleFileVisitor<Path>() {
+            @Override
+            FileVisitResult visitFile(Path path, BasicFileAttributes attrs) {
+                File file = path.toFile()
+                if (attrs.isRegularFile()
+                        && (file.path.endsWith(EXTENSION_JAVA) || file.path.endsWith(EXTENSION_GROOVY) || file.path.endsWith(EXTENSION_KT))
+                        && !file.text.contains("Licensed under")) {
+                    file.text = licenseHeader + file.text
+                }
+                FileVisitResult.CONTINUE
             }
-        }
+        })
     }
 
     @Memoized
