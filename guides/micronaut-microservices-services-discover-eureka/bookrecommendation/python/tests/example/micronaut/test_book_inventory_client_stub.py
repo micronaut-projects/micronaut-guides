@@ -14,16 +14,8 @@ from example.micronaut.book_inventory_operations import BookInventoryOperations
 @Singleton
 class BookInventoryClientStub(BookInventoryOperations):
 
-    in_flight = 0
-    max_in_flight = 0
-
     async def stock(self, isbn: Annotated[str, NotBlank]) -> bool | None:
-        self.in_flight += 1
-        self.max_in_flight = max(self.max_in_flight, self.in_flight)
-        try:
-            await asyncio.sleep(0)
-        finally:
-            self.in_flight -= 1
+        await asyncio.sleep(0)
 
         if isbn == "1491950358":
             return True  # <2>
