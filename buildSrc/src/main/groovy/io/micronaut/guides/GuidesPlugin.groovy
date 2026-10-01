@@ -339,7 +339,10 @@ class GuidesPlugin implements Plugin<Project> {
         String languageSuffix = language ? language.toString().capitalize() : ''
         String outputFileName = language ? "output-${language.toString().toLowerCase()}.log" : "output.log"
         project.tasks.register("${taskSlug}RunTestScript${languageSuffix}", TestScriptRunnerTask) { TestScriptRunnerTask it ->
-            it.onlyIf { !Utils.skipBecauseOfJavaVersion(metadata) }
+            it.onlyIf {
+                !Utils.skipBecauseOfJavaVersion(metadata) &&
+                        (language != Language.PYTHON || System.getenv('CI') == null)
+            }
 
             Provider<Directory> codeDirectory = project.layout.buildDirectory.dir("code/${metadata.slug()}")
 
@@ -587,6 +590,7 @@ class GuidesPlugin implements Plugin<Project> {
         project.tasks.register("${taskSlug}${TASK_SUFFIX_BUILD}${language}") { Task it ->
             it.group = "guides ${metadata.slug()}"
             it.dependsOn(dependsOnTasks)
+            it.dependsOn(project.tasks.named('createDist'))
             it.finalizedBy(project.tasks.named('asciidoctor'), project.tasks.named('themeGuides'))
         }
     }

@@ -153,7 +153,7 @@ class GuideProjectGenerator implements AutoCloseable {
                 String packageAndName = BASE_PACKAGE + '.' + app.name()
 
                 guidesGenerator.generateAppIntoDirectory(destination, app.applicationType(), packageAndName, app.framework(),
-                        appFeatures, buildTool, app.testFramework() ?: testFramework, lang, javaVersion)
+                        appFeatures, buildTool, lang == PYTHON ? PYTEST : (app.testFramework() ?: testFramework), lang, javaVersion)
 
                 if (lang == PYTHON) {
                     movePythonResources(destinationPath)
@@ -360,11 +360,11 @@ class GuideProjectGenerator implements AutoCloseable {
 
     private static TestFramework testFrameworkOption(@NonNull Language language,
                                                      @Nullable TestFramework testFramework) {
-        if (testFramework != null) {
-            return testFramework
-        }
         if (language == PYTHON) {
             return PYTEST
+        }
+        if (testFramework != null) {
+            return testFramework
         }
         if (language == GROOVY) {
             return SPOCK
