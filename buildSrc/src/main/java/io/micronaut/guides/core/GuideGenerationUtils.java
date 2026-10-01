@@ -100,11 +100,11 @@ public class GuideGenerationUtils {
     @NonNull
     static TestFramework testFrameworkOption(@NonNull Language language,
                                              @Nullable TestFramework testFramework) {
-        if (testFramework != null) {
-            return testFramework;
-        }
         if (language == PYTHON) {
             return PYTEST;
+        }
+        if (testFramework != null) {
+            return testFramework;
         }
         if (language == GROOVY) {
             return SPOCK;
