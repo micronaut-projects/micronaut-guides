@@ -27,6 +27,10 @@ abstract class PythonTestScriptTask extends DefaultTask {
     @PathSensitive(RELATIVE)
     abstract RegularFileProperty getMetadataFile()
 
+    @InputFile
+    @PathSensitive(RELATIVE)
+    abstract RegularFileProperty getPyronautTestFunctionsFile()
+
     @Internal
     Guide metadata
 
