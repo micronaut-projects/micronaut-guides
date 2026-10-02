@@ -1,10 +1,10 @@
+from io import BytesIO
+
 import pytest
 import requests
-from com.lowagie.text.pdf import PdfReader
-from com.lowagie.text.pdf.parser import PdfTextExtractor
-from java.io import ByteArrayInputStream
 from micronaut.http import HttpHeaders, MediaType
 from pyronaut.test import MicronautTest, micronaut_test_fixture
+from pypdf import PdfReader
 
 
 @pytest.fixture
@@ -19,15 +19,15 @@ def my_context(request):
 
 @pytest.fixture
 def client(my_context):
-    return requests.with_context(my_context)  # <2>
+    session = requests.with_context(my_context)  # <2>
+    yield session
+    session.close()
 
 
 def text_at_page(pdf_bytes: bytes, page_number: int) -> str:
-    reader = PdfReader(ByteArrayInputStream(pdf_bytes))
-    try:
-        return PdfTextExtractor(reader).getTextFromPage(page_number)
-    finally:
-        reader.close()
+    with BytesIO(pdf_bytes) as source:
+        reader = PdfReader(source)
+        return reader.pages[page_number - 1].extract_text()
 
 
 def test_download(client):
@@ -38,4 +38,5 @@ def test_download(client):
     assert response.headers[HttpHeaders.CONTENT_DISPOSITION] == (
         "attachment; filename=example.pdf"
     )
+    assert response.content.startswith(b"%PDF-")
     assert text_at_page(response.content, 1) == "Hello World"

@@ -1,4 +1,3 @@
-from java.util import Collections
 from com.nimbusds.jwt import JWTParser, SignedJWT
 from micronaut.security.token.jwt.generator import JwtTokenGenerator
 from micronaut.security.token.jwt.signature.rsa import RSASignatureGenerator
@@ -43,7 +42,7 @@ def test_can_validate_a_json_web_token_signed_with_the_secondary_json_web_key(my
         claims_generator,
     )
 
-    jwt_optional = token_generator.generateToken(Collections.singletonMap("sub", "sergio"))
+    jwt_optional = token_generator.generateToken({"sub": "sergio"})
     assert jwt_optional.isPresent()
 
     jwt_string = jwt_optional.get()

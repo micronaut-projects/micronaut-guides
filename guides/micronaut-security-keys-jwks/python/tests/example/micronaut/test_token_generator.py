@@ -1,4 +1,3 @@
-from java.util import Collections
 from com.nimbusds.jwt import JWTParser, SignedJWT
 from pyronaut.test import MicronautTest, micronaut_test_fixture
 import pytest
@@ -27,7 +26,7 @@ def test_can_generate_signed_json_web_tokens(my_context):
         "io.micronaut.security.token.jwt.validator.JsonWebTokenValidator"
     ]
 
-    jwt_optional = token_generator.generateToken(Collections.singletonMap("sub", "sergio"))
+    jwt_optional = token_generator.generateToken({"sub": "sergio"})
     assert jwt_optional.isPresent()
 
     jwt_string = jwt_optional.get()
