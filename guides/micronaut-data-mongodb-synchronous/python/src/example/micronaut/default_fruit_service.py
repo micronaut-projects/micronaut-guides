@@ -1,5 +1,3 @@
-from typing import List
-
 from jakarta.inject import Singleton
 
 from .fruit import Fruit
@@ -12,7 +10,7 @@ class DefaultFruitService(FruitService):
     def __init__(self, fruit_repository: FruitRepository):
         self.fruit_repository = fruit_repository
 
-    def list(self) -> List[Fruit]:
+    def list_fruits(self) -> list[Fruit]:
         return list(self.fruit_repository.findAll())
 
     def save(self, fruit: Fruit) -> Fruit:
@@ -23,5 +21,5 @@ class DefaultFruitService(FruitService):
     def find(self, id: str) -> Fruit | None:
         return self.fruit_repository.findById(id).orElse(None)
 
-    def find_by_name_in_list(self, names: List[str]) -> List[Fruit]:
+    def find_by_name_in_list(self, names: list[str]) -> list[Fruit]:
         return list(self.fruit_repository.findByNameInList(names))

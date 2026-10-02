@@ -1,5 +1,3 @@
-from typing import List
-
 import pytest
 import requests
 from jakarta.inject import Singleton
@@ -15,7 +13,7 @@ from example.micronaut.fruit_service import FruitService
 @Replaces(DefaultFruitService)
 @Requires(property="spec.name", value="controller-isolation")
 class MockService(FruitService):
-    def list(self) -> List[Fruit]:
+    def list_fruits(self) -> list[Fruit]:
         return [
             Fruit("apple", "red"),
             Fruit("banana", "yellow"),
@@ -27,7 +25,7 @@ class MockService(FruitService):
     def find(self, id: str) -> Fruit | None:
         return None
 
-    def find_by_name_in_list(self, names: List[str]) -> List[Fruit]:
+    def find_by_name_in_list(self, names: list[str]) -> list[Fruit]:
         return []
 
 
