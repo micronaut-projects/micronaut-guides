@@ -8,6 +8,9 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static io.micronaut.starter.options.BuildTool.PYRONAUT;
+import static io.micronaut.starter.options.Language.PYTHON;
+
 public final class GuideUtils {
 
     private static final Logger LOG = LoggerFactory.getLogger(GuideUtils.class);
@@ -31,6 +34,7 @@ public final class GuideUtils {
             addAllSafe(allFeatures, app.javaFeatures());
             addAllSafe(allFeatures, app.kotlinFeatures());
             addAllSafe(allFeatures, app.groovyFeatures());
+            addAllSafe(allFeatures, app.pythonFeatures());
             for (String featureName : allFeatures) {
                 String tagToAdd = featureName;
                 for (String prefix : FEATURES_PREFIXES) {
@@ -56,6 +60,9 @@ public final class GuideUtils {
         if (language == Language.GROOVY) {
             return mergeLists(app.features(), getAppInvisibleFeatures(app), app.groovyFeatures());
         }
+        if (language == Language.PYTHON) {
+            return mergeLists(app.features(), getAppInvisibleFeatures(app), app.pythonFeatures());
+        }
         return mergeLists(app.features(), getAppInvisibleFeatures(app));
     }
 
@@ -79,6 +86,9 @@ public final class GuideUtils {
         if (language == Language.GROOVY) {
             return mergeLists(app.features(), app.groovyFeatures());
         }
+        if (language == Language.PYTHON) {
+            return mergeLists(app.features(), app.pythonFeatures());
+        }
         return app.features();
     }
 
@@ -99,6 +109,9 @@ public final class GuideUtils {
         if (buildTool == BuildTool.MAVEN) {
             return guide.skipMavenTests();
         }
+        if (buildTool == BuildTool.PYRONAUT) {
+            return guide.skipPyronautTests();
+        }
 
         return false;
     }
@@ -108,6 +121,21 @@ public final class GuideUtils {
     }
 
     public static Guide merge(Guide base, Guide guide) {
+        List<Language> languages = new ArrayList<>();
+        if (guide.languages() != null) {
+            languages.addAll(guide.languages());
+        } else if (base.languages() != null) {
+            languages.addAll(base.languages());
+        }
+        List<BuildTool> buildTools = new ArrayList<>();
+        if (guide.buildTools() != null) {
+            buildTools.addAll(guide.buildTools());
+        } else if (base.buildTools() != null) {
+            buildTools.addAll(base.buildTools());
+        }
+        if (languages.contains(PYTHON) && !buildTools.contains(PYRONAUT)) {
+            buildTools.add(PYRONAUT);
+        }
         return new Guide(
                 guide.title() == null ? base.title() : guide.title(),
                 guide.intro() == null ? base.intro() : guide.intro(),
@@ -120,16 +148,17 @@ public final class GuideUtils {
                 base.skipGradleTests() || guide.skipGradleTests(),
                 base.skipMavenTests() || guide.skipMavenTests(),
                 guide.asciidoctor(),
-                guide.languages() == null ? base.languages() : guide.languages(),
+                languages,
                 mergeLists(GuideUtils.getTags(base), GuideUtils.getTags(guide)),
-                guide.buildTools() == null ? base.buildTools() : guide.buildTools(),
+                buildTools,
                 guide.testFramework() == null ? base.testFramework() : guide.testFramework(),
                 guide.zipIncludes(),
                 guide.slug(),
                 guide.publish(),
                 guide.base(),
                 guide.env() == null ? base.env() : guide.env(),
-                mergeApps(base.apps(), guide.apps())
+                mergeApps(base.apps(), guide.apps()),
+                Boolean.TRUE.equals(base.skipPyronautTests()) || Boolean.TRUE.equals(guide.skipPyronautTests())
         );
     }
 
@@ -173,7 +202,8 @@ public final class GuideUtils {
                     guideApp.testFramework(),
                     guideApp.excludeTest(),
                     guideApp.excludeSource(),
-                    baseApp.validateLicense()
+                    baseApp.validateLicense(),
+                    mergeLists(guideApp.pythonFeatures(), baseApp.pythonFeatures())
             );
             merged.add(mergedApp);
         }

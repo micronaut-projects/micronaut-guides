@@ -1,0 +1,27 @@
+# tag::atp[]
+[datasources.default]
+ocid = "<ocid>" # <1>
+walletPassword = "<wallet-password>" # <2>
+username = "micronautdemo"
+password = "<schema-password>" # <3>
+dialect = "ORACLE"
+
+[oci.config]
+profile = "DEFAULT" # <4>
+
+[flyway.datasources.default]
+locations = ["classpath:db/migration/oracle"] # <5>
+# end::atp[]
+
+# tag::kafka[]
+[kafka]
+bootstrap.servers = "cell-1.streaming.us-ashburn-1.oci.oraclecloud.com:9092" # <1>
+security.protocol = "SASL_SSL"
+sasl.mechanism = "PLAIN"
+sasl.jaas.config = "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"<tenancy-name>/<username>/<stream-pool-ocid>\" password=\"<auth-token>\";" # <2>
+retries = 3
+max.request.size = 1_048_576 # <3>
+
+[kafka.producer]
+max.request.size = 1_048_576 # <4>
+# end::kafka[]

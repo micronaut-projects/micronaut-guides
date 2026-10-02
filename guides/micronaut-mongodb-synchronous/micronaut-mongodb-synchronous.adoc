@@ -8,16 +8,33 @@ common:completesolution.adoc[]
 
 common:create-app-features.adoc[]
 
+:exclude-for-languages:python
+
 === POJO
 
 Create a `Fruit` POJO:
+
+:exclude-for-languages:
+
+:only-for-languages:python
+
+=== Data Class
+
+Create a `Fruit` dataclass:
+
+:only-for-languages:
 
 source:Fruit[]
 
 callout:serdeable[]
 callout:constraints[]
+
+:exclude-for-languages:python
+
 <.> Since the POJO does not have an empty constructor, use the annotations `@BsonCreator` and `BsonProperty` to define data conversion between BSON and POJO with the MongoDB Java driver. See https://docs.mongodb.com/drivers/java/sync/current/fundamentals/data-formats/pojo-customization/#pojos-without-no-argument-constructors[POJOs without No-Argument Constructor].
 callout:creator[]
+
+:exclude-for-languages:
 
 === Repository
 
@@ -52,17 +69,23 @@ callout:configuration-properties[]
 Define the values via configuration:
 
 
+:exclude-for-languages:python
 resource:application.properties[tag=db]
+:exclude-for-languages:
+
+:only-for-languages:python
+resource:application.toml[tag=db]
+:only-for-languages:
 
 === MongoDB repository
 
-Implement `FruitRepository` by using a `MongoDbClient`.
+Implement `FruitRepository` by using a `MongoClient`.
 
 source:MongoDbFruitRepository[]
 
 callout:singleton[]
 callout:constructor-di[arg0=MongoDbConfiguration]
-callout:constructor-di[arg0=MongoDbClient]
+callout:constructor-di[arg0=MongoClient]
 
 By using the feature `mongo-sync`, the application includes the following dependency:
 
@@ -71,6 +94,8 @@ dependency:micronaut-mongo-sync[groupId=io.micronaut.mongodb]
 This registers a blocking https://mongodb.github.io/mongo-java-driver/4.0/apidocs/com/mongodb/client/MongoClient.html[MongoClient], which you can inject in other Micronaut beans as illustrated in the above code sample.
 
 === Test
+
+:exclude-for-languages:python
 
 Add a https://docs.micronaut.io/latest/guide/#httpClient[Micronaut declarative HTTP Client] to `src/test` to ease the testing of the application's API.
 
@@ -85,6 +110,16 @@ dependency:testcontainers[groupId=org.testcontainers,scope=test]
 :dependencies:
 
 <<test-resources,Test Resources>> will provide us with a MongoDB instance for local testing and execution.
+
+:exclude-for-languages:
+
+:only-for-languages:python
+
+The Python test uses `requests` with the Micronaut test context to exercise the application's API.
+
+<<test-resources,Test Resources>> will provide us with a MongoDB instance for local testing and execution.
+
+:only-for-languages:
 
 Create a test:
 
@@ -119,13 +154,19 @@ connection: keep-alive
 [{"name":"Pear"}]
 ----
 
+:exclude-for-languages:python
+
 common:graal-with-plugins.adoc[]
 
-:exclude-for-languages:groovy
+:exclude-for-languages:
+
+:exclude-for-languages:groovy,python
 
 Consume the endpoints exposed by the native executable with cURL:
 
 :exclude-for-languages:
+
+:exclude-for-languages:python
 
 [source, bash]
 ----
@@ -149,6 +190,8 @@ connection: keep-alive
 
 [{"name":"Pear"}]
 ----
+
+:exclude-for-languages:
 
 common:next.adoc[]
 

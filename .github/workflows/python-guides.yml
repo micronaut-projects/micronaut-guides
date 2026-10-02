@@ -1,0 +1,49 @@
+name: Validate Python Guides
+on:
+  push:
+    branches:
+      - python
+    paths:
+      - '.github/workflows/python-guides.yml'
+      - 'buildSrc/**'
+      - 'guides/**'
+      - 'settings.gradle'
+      - 'src/docs/common/**'
+  pull_request:
+    branches:
+      - python
+    paths:
+      - '.github/workflows/python-guides.yml'
+      - 'buildSrc/**'
+      - 'guides/**'
+      - 'settings.gradle'
+      - 'src/docs/common/**'
+
+jobs:
+  validate:
+    name: Generate Python Guides
+    runs-on: ubuntu-latest
+    env:
+      LOCAL_GIT_MICRONAUT_STARTER: ${{ github.workspace }}/micronaut-starter
+    steps:
+      - uses: actions/checkout@v6.0.2
+      - uses: actions/checkout@v6.0.2
+        with:
+          repository: n0tl3ss/micronaut-starter
+          # Pin micronaut-starter#3136 until its fix is merged upstream.
+          ref: 763920aaa46c06aeebbaba995a66fc3bef643801
+          path: micronaut-starter
+      - uses: actions/setup-java@v5.2.0
+        with:
+          distribution: adopt
+          java-version: '25'
+      - uses: actions/cache@v5.0.5
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: Validate build infrastructure
+        run: ./gradlew buildSrc:test --stacktrace
+      - name: Generate Python guides
+        run: ./gradlew generateAllPythonGuideTestScripts --stacktrace

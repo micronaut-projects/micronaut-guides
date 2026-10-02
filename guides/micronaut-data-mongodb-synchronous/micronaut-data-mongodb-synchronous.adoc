@@ -34,17 +34,22 @@ dependency:mongodb-driver-sync[groupId=org.mongodb]
 
 :dependencies:
 
-:exclude-for-languages:groovy,kotlin
-
 === MappedEntity
 
-Create a `Fruit` `MappedEntity`
+Create a `Fruit` mapped entity:
 
 source:Fruit[]
 
+:exclude-for-languages:python
 callout:mapped-entity[]
 callout:mapped-entity-id[]
 callout:constraints[]
+:exclude-for-languages:
+:only-for-languages:python
+<1> The `@MappedEntity` annotation maps the class to the collection.
+<2> Use `@NotBlank` to ensure the `name` is not blank.
+<3> `@Id` and `@GeneratedValue` define the generated identifier.
+:only-for-languages:
 
 === Repository
 
@@ -74,6 +79,7 @@ Create `FruitController`:
 
 source:FruitController[]
 
+:exclude-for-languages:python
 callout:controller[arg0=/fruits]
 callout:executes-on[]
 callout:constructor-di[arg0=FruitService]
@@ -84,12 +90,29 @@ callout:valid[]
 callout:get[arg0=find,arg1=/fruits/\{id\}]
 callout:get[arg0=findByNameInList,arg1=/fruits/q]
 <.> Bind a list of Strings to the query parameter `names`
+:exclude-for-languages:
+:only-for-languages:python
+<1> Inject the `FruitService` into an annotated module variable.
+<2> Execute blocking MongoDB operations on the blocking executor.
+<3> Maps a `GET` request to `/fruits`.
+<4> Maps a `POST` request to `/fruits`.
+<5> You can specify the HTTP status code via the `@Status` annotation.
+<6> Add `@Valid` to any method parameter that requires validation.
+<7> Maps a `GET` request to `/fruits/{id}`.
+<8> Maps a `GET` request to `/fruits/q`.
+<9> Bind a list of Strings to the query parameter `names`.
+:only-for-languages:
 
-=== Test Client
+=== Writing Tests
 
+:exclude-for-languages:python
 Add a https://docs.micronaut.io/latest/guide/#httpClient[Micronaut declarative HTTP Client] to `src/test` to ease the testing of the application's API.
 
 test:FruitClient[]
+:exclude-for-languages:
+:only-for-languages:python
+Create pytest tests that use the Pyronaut `requests` integration to call the application's API.
+:only-for-languages:
 
 Then create a test that verifies the validation of the `Fruit` entity when we create a new entity via `POST`:
 
