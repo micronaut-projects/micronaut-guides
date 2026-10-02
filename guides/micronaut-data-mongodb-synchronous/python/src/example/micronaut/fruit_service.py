@@ -1,12 +1,11 @@
 from abc import ABC, abstractmethod
-from typing import List
 
 from .fruit import Fruit
 
 
 class FruitService(ABC):
     @abstractmethod
-    def list(self) -> List[Fruit]:
+    def list_fruits(self) -> list[Fruit]:
         pass
 
     @abstractmethod
@@ -18,5 +17,5 @@ class FruitService(ABC):
         pass
 
     @abstractmethod
-    def find_by_name_in_list(self, names: List[str]) -> List[Fruit]:
+    def find_by_name_in_list(self, names: list[str]) -> list[Fruit]:
         pass

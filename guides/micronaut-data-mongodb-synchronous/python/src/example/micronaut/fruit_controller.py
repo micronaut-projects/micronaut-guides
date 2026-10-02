@@ -17,7 +17,7 @@ fruit_service: Annotated[FruitService, Inject]  # <1>
 @ExecuteOn(TaskExecutors.BLOCKING)  # <2>
 @Get("/fruits")  # <3>
 def list_fruits() -> list[Fruit]:
-    return fruit_service.list()
+    return fruit_service.list_fruits()
 
 
 @ExecuteOn(TaskExecutors.BLOCKING)
