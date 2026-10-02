@@ -1,10 +1,10 @@
-from com.lowagie.text import Document, Paragraph
-from com.lowagie.text.pdf import PdfWriter
-from java.io import ByteArrayOutputStream
+from io import BytesIO
+
 from micronaut.http import HttpHeaders, HttpResponse, MediaType
 from micronaut.http.annotation import Controller, Get
 from micronaut.scheduling import TaskExecutors
 from micronaut.scheduling.annotation import ExecuteOn
+from pdfme import PDF
 
 
 @Controller("/pdf")  # <1>
@@ -23,14 +23,10 @@ class PDFController:
         )
 
     @staticmethod
-    def _pdf_bytes():
-        output = ByteArrayOutputStream()
-        document = Document()
-        try:
-            PdfWriter.getInstance(document, output)
-            document.open()
-            document.newPage()
-            document.add(Paragraph("Hello World"))
-        finally:
-            document.close()
-        return output.toByteArray()
+    def _pdf_bytes() -> bytes:
+        document = PDF()
+        document.add_page()
+        document.text("Hello World")
+        with BytesIO() as output:
+            document.output(output)
+            return output.getvalue()

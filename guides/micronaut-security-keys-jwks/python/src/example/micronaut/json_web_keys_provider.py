@@ -1,4 +1,3 @@
-from java.util import Arrays, List
 from micronaut.runtime.context.scope import Refreshable
 from micronaut.security.token.jwt.endpoints import JwkProvider
 
@@ -14,11 +13,11 @@ class JsonWebKeysProvider(JwkProvider):  # <2>
         primary_rsa_private_key: PrimarySignatureConfiguration,
         secondary_signature_configuration: SecondarySignatureConfiguration,
     ):
-        self.jwks = Arrays.asList(
+        self.jwks = [
             primary_rsa_private_key.getPublicJWK(),
             secondary_signature_configuration.getPublicJWK(),
-        )
+        ]
 
-    def retrieveJsonWebKeys(self) -> List:
+    def retrieveJsonWebKeys(self) -> list:
         return self.jwks
 # end::clazz[]
