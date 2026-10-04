@@ -1,8 +1,8 @@
-import java
 import pytest
 
-from micronaut.inject.qualifiers import Qualifiers
 from pyronaut.test import MicronautTest, micronaut_test_fixture
+
+from example.micronaut.stadium_configuration import StadiumConfiguration
 
 
 @pytest.fixture
@@ -25,17 +25,9 @@ def my_context(request):
 
 
 def test_stadium_configuration(my_context):
-    StadiumConfiguration = java.type("example.micronaut.StadiumConfiguration")
-
     # <2>
-    fenway_configuration = my_context.getBean(
-        StadiumConfiguration,
-        Qualifiers.byName("fenway"),
-    ).asPolyglotValue()
-    wrigley_configuration = my_context.getBean(
-        StadiumConfiguration,
-        Qualifiers.byName("wrigley"),
-    ).asPolyglotValue()
+    fenway_configuration = my_context.get_bean(StadiumConfiguration, name="fenway")
+    wrigley_configuration = my_context.get_bean(StadiumConfiguration, name="wrigley")
 
     assert fenway_configuration.name == "fenway"
     assert fenway_configuration.size == 60000
