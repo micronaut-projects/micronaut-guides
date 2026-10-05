@@ -1,10 +1,9 @@
 from dataclasses import dataclass
+from datetime import datetime
 from typing import Annotated
+from uuid import UUID
 
-from java.time import LocalDateTime
-from java.util import UUID
 from jakarta.validation.constraints import NotNull, Size
-from micronaut.core.annotation import Nullable
 from micronaut.data.annotation import DateCreated, Id, MappedEntity, Relation
 
 from ..dto.game_state_dto import GameStateDTO
@@ -21,7 +20,7 @@ class GameState:
     move: Annotated[str, NotNull, Size(max=10)]
     fen: Annotated[str, NotNull, Size(max=100)]
     pgn: Annotated[str, NotNull]
-    date_created: Annotated[LocalDateTime, Nullable, DateCreated] = None
+    date_created: Annotated[datetime | None, DateCreated] = None
 
     def to_dto(self) -> GameStateDTO:
         return GameStateDTO(

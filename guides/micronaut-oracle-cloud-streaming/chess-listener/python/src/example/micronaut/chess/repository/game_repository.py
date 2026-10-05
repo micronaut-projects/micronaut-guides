@@ -1,4 +1,5 @@
-from java.util import UUID
+from uuid import UUID
+
 from micronaut.context.annotation import Requires
 from micronaut.context.env import Environment
 from micronaut.data.jdbc.annotation import JdbcRepository
@@ -11,4 +12,4 @@ from ..entity.game import Game
 @JdbcRepository(dialect=Dialect.ORACLE)  # <1>
 @Requires(env=[Environment.ORACLE_CLOUD, Environment.TEST])  # <2>
 class GameRepository(CrudRepository[Game, UUID]):
-    pass
+    def getById(self, id: UUID) -> Game | None: ...

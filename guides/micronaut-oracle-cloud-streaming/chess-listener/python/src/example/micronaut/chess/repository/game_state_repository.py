@@ -1,4 +1,5 @@
-from java.util import Optional, UUID
+from uuid import UUID
+
 from micronaut.context.annotation import Requires
 from micronaut.context.env import Environment
 from micronaut.data.annotation import Join
@@ -14,4 +15,4 @@ from ..entity.game_state import GameState
 class GameStateRepository(CrudRepository[GameState, UUID]):
 
     @Join(value="game", type=Join.Type.FETCH)  # <1>
-    def getById(self, id: UUID) -> Optional[GameState]: ...
+    def getById(self, id: UUID) -> GameState | None: ...
