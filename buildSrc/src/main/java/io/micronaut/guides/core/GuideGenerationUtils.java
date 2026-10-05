@@ -117,9 +117,6 @@ public class GuideGenerationUtils {
         if (testFramework != null) {
             return testFramework;
         }
-        if (language == PYTHON) {
-            return PYTEST;
-        }
         if (language == GROOVY) {
             return SPOCK;
         }

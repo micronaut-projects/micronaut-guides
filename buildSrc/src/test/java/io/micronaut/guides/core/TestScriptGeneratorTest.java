@@ -181,6 +181,7 @@ public class TestScriptGeneratorTest {
         assertTrue(result.contains("cd python-guide-pyronaut-python"));
         assertFalse(result.contains("}cd python-guide-pyronaut-python"));
         assertTrue(result.contains("run_pyronaut_tests || EXIT_STATUS=$?"));
+        assertFalse(result.contains("pyenv"));
         assertTrue(result.contains("tar --exclude='./.micronaut'"));
         assertFalse(result.contains("./gradlew -q check"));
     }
@@ -207,7 +208,7 @@ public class TestScriptGeneratorTest {
         String result = testScriptGenerator.generateTestScript(new ArrayList<>(List.of(guide)));
 
         assertFalse(result.contains("python-resources-pyronaut-python"));
-        assertFalse(result.contains("pyenv shell"));
+        assertFalse(result.contains("pyenv"));
         assertFalse(result.contains("pyronaut install"));
         assertFalse(result.contains("pyronaut validate-config"));
         assertFalse(result.contains("pyronaut test"));

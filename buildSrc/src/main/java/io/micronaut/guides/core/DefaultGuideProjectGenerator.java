@@ -112,7 +112,8 @@ public class DefaultGuideProjectGenerator implements GuideProjectGenerator {
                 app.framework(),
                 appFeatures,
                 guidesOption.getBuildTool(),
-                app.testFramework() != null ? app.testFramework() : guidesOption.getTestFramework(),
+                guidesOption.getLanguage() == Language.PYTHON ? TestFramework.PYTEST :
+                        (app.testFramework() != null ? app.testFramework() : guidesOption.getTestFramework()),
                 guidesOption.getLanguage(),
                 javaVersion);
         try {
