@@ -1,41 +1,24 @@
-import java
 import pytest
-import requests
-from com.github.tomakehurst.wiremock import WireMockServer
-from com.github.tomakehurst.wiremock.core import WireMockConfiguration
+from pyronaut import requests
 from pyronaut.test import MicronautTest, micronaut_test_fixture
 
 
 # tag::registerExtension[]
 @pytest.fixture
-def wiremock_server():
-    server = WireMockServer(
-        WireMockConfiguration.options()
-        .dynamicPort()
-        .usingFilesUnderDirectory("tests-config/wiremock")
-    )
-    server.start()
-    try:
-        yield server
-    finally:
-        server.stop()
-# end::registerExtension[]
-
-
-@pytest.fixture
-def app_context(request, wiremock_server):
+def app_context(request):
     fixture = micronaut_test_fixture(
         request,
         MicronautTest(
             environments=["test"],
             transactional=False,
             properties={
-                "micronaut.http.services.photosapi.url": wiremock_server.baseUrl(),
+                "micronaut.http.services.photosapi.url": "${wiremock-mappings.url}",
             },
         ),
     )
     yield fixture
     fixture.stop()
+# end::registerExtension[]
 
 
 @pytest.fixture

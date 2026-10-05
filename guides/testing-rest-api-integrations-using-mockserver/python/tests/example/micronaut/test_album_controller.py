@@ -1,11 +1,8 @@
 import json
 
-import java
 import pytest
-import requests
-from com.github.tomakehurst.wiremock import WireMockServer
-from com.github.tomakehurst.wiremock.client import WireMock
-from com.github.tomakehurst.wiremock.core import WireMockConfiguration
+from micronaut.context.env import Environment
+from pyronaut import requests
 from pyronaut.test import MicronautTest, micronaut_test_fixture
 
 PHOTO_RESPONSE = json.dumps([
@@ -25,24 +22,21 @@ PHOTO_RESPONSE = json.dumps([
 
 
 @pytest.fixture
-def wiremock_server():  # <1>
-    server = WireMockServer(WireMockConfiguration.options().dynamicPort())
-    server.start()
-    try:
-        yield server
-    finally:
-        server.stop()
+def wiremock_server(app_context):  # <1>
+    endpoint = app_context[Environment].getProperties("wiremock-stubs")["url"]
+    requests.delete(f"{endpoint}/__admin/mappings").raise_for_status()
+    return endpoint
 
 
 @pytest.fixture
-def app_context(request, wiremock_server):
+def app_context(request):
     fixture = micronaut_test_fixture(
         request,
         MicronautTest(
             environments=["test"],
             transactional=False,
             properties={
-                "micronaut.http.services.photosapi.url": wiremock_server.baseUrl(),  # <2>
+                "micronaut.http.services.photosapi.url": "${wiremock-stubs.url}",  # <2>
             },
         ),
     )
@@ -56,12 +50,17 @@ def client(app_context):
 
 
 def stub_photos(wiremock_server, album_id: int, status: int = 200, body: str = PHOTO_RESPONSE):
-    response = WireMock.aResponse().withStatus(status)
+    response = {"status": status}
     if body is not None:
-        response = response.withHeader("Content-Type", "application/json").withBody(body)
-    wiremock_server.stubFor(  # <4>
-        WireMock.get(WireMock.urlMatching(f"/albums/{album_id}/photos")).willReturn(response)
+        response.update(headers={"Content-Type": "application/json"}, body=body)
+    result = requests.post(  # <4>
+        f"{wiremock_server}/__admin/mappings",
+        json={
+            "request": {"method": "GET", "url": f"/albums/{album_id}/photos"},
+            "response": response,
+        },
     )
+    assert result.status_code == 201
 
 
 def test_should_get_album_by_id(wiremock_server, client):  # <3>

@@ -1,11 +1,9 @@
 import json
 import time
 
-import java
 import pytest
-import requests
-from org.testcontainers.containers import MockServerContainer
-from org.testcontainers.utility import DockerImageName
+from micronaut.context.env import Environment
+from pyronaut import requests
 from pyronaut.test import MicronautTest, micronaut_test_fixture
 
 PHOTO_RESPONSE = json.dumps([
@@ -32,6 +30,7 @@ def mockserver_put(endpoint: str, path: str, payload: dict | None = None):
                 f"{endpoint}{path}",
                 data=json.dumps(payload) if payload is not None else None,
                 headers={"Content-Type": "application/json"} if payload is not None else None,
+                timeout=2,
             )
             if response.status_code in {200, 201, 202}:
                 return response
@@ -44,32 +43,27 @@ def mockserver_put(endpoint: str, path: str, payload: dict | None = None):
     raise last_error
 
 
-@pytest.fixture(scope="module")
-def mockserver_container():  # <1>
-    container = MockServerContainer(DockerImageName.parse("mockserver/mockserver:5.15.0"))
-    container.start()
-    try:
-        yield container
-    finally:
-        container.stop()
+@pytest.fixture
+def mockserver_container(app_context):  # <1>
+    return app_context[Environment].getProperties("mockserver")["url"]
 
 
 @pytest.fixture
 def mockserver_client(mockserver_container):
-    endpoint = mockserver_container.getEndpoint()
+    endpoint = mockserver_container
     mockserver_put(endpoint, "/mockserver/reset")
     return endpoint
 
 
 @pytest.fixture
-def app_context(request, mockserver_container):  # <2>
+def app_context(request):  # <2>
     fixture = micronaut_test_fixture(
         request,
         MicronautTest(
             environments=["test"],
             transactional=False,
             properties={
-                "micronaut.http.services.photosapi.url": mockserver_container.getEndpoint(),  # <3>
+                "micronaut.http.services.photosapi.url": "${mockserver.url}",  # <3>
             },
         ),
     )
