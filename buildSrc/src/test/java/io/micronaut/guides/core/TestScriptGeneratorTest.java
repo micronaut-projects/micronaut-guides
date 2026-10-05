@@ -141,7 +141,7 @@ public class TestScriptGeneratorTest {
         String result = testScriptGenerator.generateTestScript(new ArrayList<>(List.of(guide)));
 
         assertTrue(result.contains("cd python-resources-pyronaut-python"));
-        assertTrue(result.contains("pyenv shell graalpy3.13-25.4.4"));
+        assertFalse(result.contains("pyenv"));
         assertTrue(result.contains("pyronaut install"));
         assertTrue(result.contains("pyronaut validate-config"));
         assertTrue(result.contains("pyronaut test"));
