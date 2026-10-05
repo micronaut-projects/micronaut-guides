@@ -34,7 +34,7 @@ def test_mail_send_endpoint_sends_an_email(client, my_context):
 
     email = sender.emails[0]
     assert email.getFrom().getEmail() == "john@micronaut.example"
-    assert email.getTo().stream().findFirst().get().getEmail() == "johnsnow@micronaut.example"
+    assert list(email.getTo())[0].getEmail() == "johnsnow@micronaut.example"
     assert email.getSubject() == "Sending email with Twilio Sendgrid is Fun"
     assert email.getBody().get(BodyType.HTML).get() == (
         "and <em>easy</em> to do anywhere with <strong>Micronaut Email</strong>"

@@ -1,12 +1,10 @@
 from time import sleep
 
-import java
 import pytest
 import requests
+from ch.qos.logback.core.read import ListAppender
+from org.slf4j import LoggerFactory
 from pyronaut.test import MicronautTest, micronaut_test_fixture
-
-ListAppender = java.type("ch.qos.logback.core.read.ListAppender")
-LoggerFactory = java.type("org.slf4j.LoggerFactory")
 
 
 @pytest.fixture
@@ -26,8 +24,8 @@ def client(my_context):
 
 def formatted_messages(appender) -> set[str]:
     return {
-        appender.list.get(index).getFormattedMessage()
-        for index in range(appender.list.size())
+        event.getFormattedMessage()
+        for event in appender.list
     }
 
 

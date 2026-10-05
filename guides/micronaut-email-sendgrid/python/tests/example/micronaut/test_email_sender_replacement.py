@@ -17,7 +17,7 @@ class EmailSenderReplacement(AsyncTransactionalEmailSender):
     NAME = "sendgrid"
 
     def __init__(self):
-        self.emails = []
+        self.emails: list[Email] = []
 
     def getName(self) -> str:
         return self.NAME

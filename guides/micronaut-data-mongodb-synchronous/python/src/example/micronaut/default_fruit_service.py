@@ -19,7 +19,7 @@ class DefaultFruitService(FruitService):
         return self.fruit_repository.update(fruit)
 
     def find(self, id: str) -> Fruit | None:
-        return self.fruit_repository.findById(id).orElse(None)
+        return self.fruit_repository.getById(id)
 
     def find_by_name_in_list(self, names: list[str]) -> list[Fruit]:
         return list(self.fruit_repository.findByNameInList(names))
