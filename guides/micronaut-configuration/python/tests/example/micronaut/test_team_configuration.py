@@ -3,6 +3,7 @@ import pytest
 from pyronaut.test import MicronautTest, micronaut_test_fixture
 
 from example.micronaut.team_admin import TeamAdmin
+from example.micronaut.team_configuration import TeamConfiguration
 
 
 @pytest.fixture
@@ -46,7 +47,7 @@ def builder_context(request):
 
 # tag::teamConfigSpecNoBuilder[]
 def test_team_configuration(my_context):
-    team_configuration = my_context["example.micronaut.TeamConfiguration"]
+    team_configuration = my_context[TeamConfiguration]
 
     assert team_configuration.name == "evolution"
     assert team_configuration.color == "green"
@@ -70,7 +71,7 @@ def test_builder_pattern_plain_usage():
 
 # tag::teamConfigSpecBuilder[]
 def test_team_configuration_builder(builder_context):
-    team_configuration = builder_context["example.micronaut.TeamConfiguration"]
+    team_configuration = builder_context[TeamConfiguration]
     team_admin = team_configuration.builder.build()  # <2>
 
     assert team_configuration.name == "evolution"

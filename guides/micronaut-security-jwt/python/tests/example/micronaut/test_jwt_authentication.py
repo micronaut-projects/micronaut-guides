@@ -1,6 +1,6 @@
 import pytest
 import requests
-from com.nimbusds.jwt import JWTParser, SignedJWT
+from micronaut.security.token.jwt.validator import JsonWebTokenParser, JsonWebTokenSignatureValidator
 from pyronaut.test import MicronautTest, micronaut_test_fixture
 
 
@@ -16,8 +16,10 @@ def client(my_context):
     return requests.with_context(my_context)  # <2>
 
 
-def assert_signed_jwt(token: str):
-    assert isinstance(JWTParser.parse(token), SignedJWT)
+def assert_signed_jwt(my_context, token: str):
+    parsed = my_context[JsonWebTokenParser].parse(token)
+    assert parsed.isPresent()
+    assert my_context[JsonWebTokenSignatureValidator].validateSignature(parsed.get())
 
 
 def login(client):
@@ -33,14 +35,14 @@ def test_accessing_a_secured_url_without_authenticating_returns_unauthorized(cli
     assert response.status_code == 401  # <3>
 
 
-def test_upon_successful_authentication_a_json_web_token_is_issued_to_the_user(client):
+def test_upon_successful_authentication_a_json_web_token_is_issued_to_the_user(client, my_context):
     response = login(client)
 
     assert response.status_code == 200
     body = response.json()  # <5>
     assert body["username"] == "sherlock"
     assert body["access_token"] is not None
-    assert_signed_jwt(body["access_token"])
+    assert_signed_jwt(my_context, body["access_token"])
 
     response = client.get(
         "/",

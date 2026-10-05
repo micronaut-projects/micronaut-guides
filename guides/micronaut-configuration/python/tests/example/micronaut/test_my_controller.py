@@ -1,7 +1,6 @@
 import pytest
 import requests
 
-from micronaut.runtime.server import EmbeddedServer
 from pyronaut.test import MicronautTest, micronaut_test_fixture
 
 
@@ -16,13 +15,12 @@ def my_context(request):
 
 
 @pytest.fixture
-def base_url(my_context) -> str:
-    server = my_context[EmbeddedServer]
-    return f"http://localhost:{server.getPort()}"
+def client(my_context):
+    return requests.with_context(my_context)
 
 
-def test_my_team(base_url: str):
-    response = requests.get(f"{base_url}/my/team")
+def test_my_team(client):
+    response = client.get("/my/team")
 
     assert response.status_code == 200
     assert response.json()["name"] == "Steelers"
@@ -30,8 +28,8 @@ def test_my_team(base_url: str):
     assert response.json()["player_names"] == ["Mason Rudolph", "James Connor"]
 
 
-def test_my_stadium(base_url: str):
-    response = requests.get(f"{base_url}/my/stadium")
+def test_my_stadium(client):
+    response = client.get("/my/stadium")
 
     assert response.status_code == 200
     assert response.json()["city"] == "Pittsburgh"

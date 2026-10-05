@@ -1,16 +1,13 @@
 from dataclasses import dataclass
+from datetime import date
 from typing import Annotated
 
-import java
 from jakarta.validation import Valid
 from jakarta.validation.constraints import NotBlank, NotNull, Size
-from java.time import LocalDate
 from micronaut.serde.annotation import Serdeable
+from swagger.v3.oas.annotations.media import Schema
 
 from .option import Option
-
-
-Schema = java.type("io.swagger.v3.oas.annotations.media.Schema")
 
 
 @Serdeable  # <1>
@@ -22,7 +19,7 @@ class Guide:
     tags: list[str] | None
     categories: Annotated[list[str], NotNull, Size(min=1)]
     publicationDate: Annotated[
-        LocalDate,
+        date,
         NotNull,
         Schema(format="yyyy-MM-dd", example="2018-05-23"),
     ]  # <3>

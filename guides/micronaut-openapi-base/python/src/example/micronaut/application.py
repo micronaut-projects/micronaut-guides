@@ -1,9 +1,6 @@
-import java
-
-
-OpenAPIDefinition = java.type("io.swagger.v3.oas.annotations.OpenAPIDefinition")
-Info = java.type("io.swagger.v3.oas.annotations.info.Info")
-Server = java.type("io.swagger.v3.oas.annotations.servers.Server")
+from swagger.v3.oas.annotations import OpenAPIDefinition
+from swagger.v3.oas.annotations.info import Info
+from swagger.v3.oas.annotations.servers import Server
 
 
 @OpenAPIDefinition(
