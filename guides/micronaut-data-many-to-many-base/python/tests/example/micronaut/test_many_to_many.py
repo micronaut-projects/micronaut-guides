@@ -37,18 +37,20 @@ def user_role_repo(my_context):
 
 
 def test_many_to_many_persistence(role_repo, user_repo, user_role_repo):
+    assert role_repo.findByAuthority(ROLE_ADMIN) is None
     role_user = role_repo.save(ROLE_USER)
     role_admin = role_repo.save(ROLE_ADMIN)
+    assert role_repo.findByAuthority(ROLE_ADMIN).id == role_admin.id
 
-    assert user_repo.findByUsername(U_SERGIO).isEmpty()
+    assert user_repo.findByUsername(U_SERGIO) is None
 
     sergio = user_repo.save(U_SERGIO)
-    assert_user(user_repo.findByUsername(U_SERGIO).orElse(None), U_SERGIO, None)
+    assert_user(user_repo.findByUsername(U_SERGIO), U_SERGIO, None)
 
     user_role_repo.save(UserRole(UserRoleId(sergio, role_user)))
     user_role_repo.save(UserRole(UserRoleId(sergio, role_admin)))
     assert_user(
-        user_repo.findByUsername(U_SERGIO).orElse(None),
+        user_repo.findByUsername(U_SERGIO),
         U_SERGIO,
         [ROLE_ADMIN, ROLE_USER],
     )
@@ -56,7 +58,7 @@ def test_many_to_many_persistence(role_repo, user_repo, user_role_repo):
     tim = user_repo.save(U_TIM)
     user_role_repo.save(UserRole(UserRoleId(tim, role_user)))
     assert_user(
-        user_repo.findByUsername(U_TIM).orElse(None),
+        user_repo.findByUsername(U_TIM),
         U_TIM,
         [ROLE_USER],
     )
