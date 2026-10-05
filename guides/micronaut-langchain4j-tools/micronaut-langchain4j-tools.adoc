@@ -1,0 +1,150 @@
+common:header.adoc[]
+
+Language models can only produce text. With https://docs.langchain4j.dev/tutorials/tools[tools] (also known as function calling), a model can ask your application to run code, for example to look up data that the model does not know, and then use the result in its answer.
+
+In this guide, you will expose a method of a Micronaut bean as a LangChain4j tool, give it to a https://docs.langchain4j.dev/tutorials/ai-services[LangChain4j AI service], and test that the AI service runs the tool, without calling a language model in the tests.
+
+common:requirements.adoc[]
+* https://ollama.com[Ollama] installed, with a model that supports tools, to run the application. For example, run `ollama pull llama3.2`.
+
+common:completesolution.adoc[]
+
+common:create-app-features.adoc[]
+
+:exclude-for-languages:python
+
+== Dependencies
+
+The `langchain4j-ollama` feature adds the https://micronaut-projects.github.io/micronaut-langchain4j/latest/guide/[Micronaut LangChain4j] annotation processor, which generates the AI service implementations and makes `@Tool` methods executable at compilation time, and the Ollama integration:
+
+:dependencies:
+dependency:micronaut-langchain4j-processor[groupId=io.micronaut.langchain4j,scope=annotationProcessor]
+dependency:micronaut-langchain4j-ollama[groupId=io.micronaut.langchain4j]
+:dependencies:
+
+:exclude-for-languages:
+
+== Configuration
+
+:exclude-for-languages:python
+Configure Ollama in `application.properties`:
+
+resource:application.properties[tag=ollama]
+:exclude-for-languages:
+:only-for-languages:python
+Configure Ollama in `application.toml`:
+
+resource:application.toml[tag=ollama]
+:only-for-languages:
+
+<1> The URL of your local Ollama server.
+<2> A model that supports tools. Small models such as TinyLlama do not support tools.
+
+== Tools
+
+A tool is a method annotated with LangChain4j's `@Tool` annotation. The library of this guide knows how many copies of each book it can lend:
+
+source:BookTools[]
+
+:exclude-for-languages:python
+callout:singleton[]
+<.> The data is hard-coded for the purpose of this example. A real application would read it from a database or call another service.
+<.> The `@Tool` value describes the tool to the model. The model decides when to call the tool based on this description.
+<.> The `@P` annotation names and describes the parameter. The model sends the arguments of the call as JSON, using these names.
+:exclude-for-languages:
+
+:only-for-languages:python
+<1> The data is hard-coded for the purpose of this example. A real application would read it from a database or call another service.
+<2> Use `jakarta.inject.Singleton` to designate a class as a singleton.
+<3> LangChain4j reads the `@Tool` annotations reflectively from the Java class that Pyronaut generates for the Python class. `@AllowsReflection` keeps the annotations available at runtime.
+<4> The `@Tool` annotation names the tool and describes it to the model. The model decides when to call the tool based on this description.
+<5> The `@P` annotation names and describes the parameter. The model sends the arguments of the call as JSON, using these names.
+:only-for-languages:
+
+== AI Service
+
+Give the tool to an AI service:
+
+source:LibraryAssistant[]
+
+:exclude-for-languages:python
+<.> Annotate the interface with `@AiService` to register a LangChain4j AI service as a bean. The `tools` member lists the beans whose `@Tool` methods the AI service can call.
+<.> `@SystemMessage` sets the instructions sent to the model with every request.
+:exclude-for-languages:
+
+:only-for-languages:python
+<1> Annotate the class with `@AiService` to register a LangChain4j AI service as a bean. The `tools` member lists the beans whose `@Tool` methods the AI service can call.
+<2> LangChain4j reads the annotations of the AI service reflectively. `@AllowsReflection` keeps them available at runtime.
+<3> `@SystemMessage` sets the instructions sent to the model with every request.
+:only-for-languages:
+
+When the model answers with a request to execute a tool, the AI service invokes the method of the bean, sends the result back to the model, and returns the final answer of the model.
+
+== Controller
+
+Expose the AI service over HTTP:
+
+source:LibraryController[]
+
+:exclude-for-languages:python
+callout:controller[arg0=/library]
+callout:constructor-di[arg0=LibraryAssistant]
+callout:post[arg0=chat,arg1=/library]
+<.> The endpoint accepts the message as plain text.
+callout:produces[]
+callout:executes-on[]
+:exclude-for-languages:
+
+:only-for-languages:python
+<1> Inject the AI service.
+<2> It is critical that any blocking I/O operations, such as calls to a language model, are offloaded to a separate thread pool that does not block the event loop.
+<3> Map the `chat` function to an HTTP POST request on `/library`, which accepts and produces plain text.
+:only-for-languages:
+
+== Tests
+
+The answers of a language model are not deterministic, and the small models that you can run in a continuous integration build are not good at calling tools. To test that the AI service calls your tool, replace the chat model with a scripted one:
+
+:exclude-for-languages:python
+test:ScriptedChatModel[]
+:exclude-for-languages:
+
+:only-for-languages:python
+[source,python]
+.tests/example/micronaut/scripted_chat_model.py
+----
+include::{sourceDir}/micronaut-langchain4j-tools/@sourceDir@/tests/example/micronaut/scripted_chat_model.py[]
+----
+:only-for-languages:
+
+<1> Replace the Ollama `ChatModel` bean in the tests.
+<2> When the last message contains the result of the tool, answer with it.
+<3> Otherwise, ask the AI service to execute the `availableCopies` tool for the book `Dune`.
+
+Write a test:
+
+test:LibraryAssistantTest[]
+
+callout:micronaut-test-start-application-false[]
+<.> Inject the AI service and the scripted chat model.
+<.> The AI service executed the tool, and the answer contains the result of the tool.
+<.> The AI service sent the specification of the tool, built from the `@Tool` and `@P` annotations, to the model.
+
+common:testApp.adoc[]
+
+common:runapp.adoc[]
+
+Make sure Ollama is running and ask a question:
+
+[source,bash]
+----
+curl -X POST -H 'Content-Type: text/plain' -d 'How many copies of Dune can I borrow?' localhost:8080/library
+----
+
+The model calls the tool and answers that the library can lend three copies.
+
+== Next Steps
+
+* Read about https://micronaut-projects.github.io/micronaut-langchain4j/latest/guide/#tools[tools] in the Micronaut LangChain4j documentation.
+* Read about https://docs.langchain4j.dev/tutorials/tools[tools] in the LangChain4j documentation.
+* Learn how to call the tools of an MCP server from an AI service in guideLink:micronaut-langchain4j-mcp-client[Call MCP Tools from a Micronaut LangChain4j AI Service].
