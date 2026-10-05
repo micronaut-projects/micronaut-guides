@@ -5,6 +5,7 @@ import io.micronaut.starter.options.Language;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -21,6 +22,16 @@ public final class GuideUtils {
     private static final String FEATURE_SPOTLESS = "spotless";
 
     private GuideUtils() {
+    }
+
+    /**
+     * Identifies root configuration files that Python samples must not inherit from JVM resources.
+     * @param relative The resource's path relative to its configuration directory
+     * @return Whether this is a bootstrap configuration file
+     */
+    public static boolean isBootstrapConfiguration(Path relative) {
+        return relative.getNameCount() == 1
+                && relative.getFileName().toString().matches("bootstrap(?:-[^.]+)?\\.(properties|yml|yaml|json|toml)");
     }
 
     public static List<String> getTags(Guide guide) {

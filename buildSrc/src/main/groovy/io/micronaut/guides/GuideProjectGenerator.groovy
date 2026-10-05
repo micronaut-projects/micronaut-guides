@@ -371,7 +371,7 @@ virtual = false
         try {
             paths.filter(Files::isRegularFile).forEach { Path source ->
                 Path relative = resourcePath.relativize(source)
-                if (!isOverriddenByPythonConfig(relative, pythonSpecificPath)) {
+                if (!GuideUtils.isBootstrapConfiguration(relative) && !isOverriddenByPythonConfig(relative, pythonSpecificPath)) {
                     Path destination = destinationPath.resolve(relative)
                     Files.createDirectories(destination.parent)
                     Files.copy(source, destination, REPLACE_EXISTING)

@@ -106,6 +106,10 @@ public class DefaultFilesTransferUtility implements FilesTransferUtility {
             paths.filter(Files::isRegularFile).forEach(source -> {
                 try {
                     Path relative = resourcePath.relativize(source);
+                    // Python samples use application configuration and native config imports.
+                    if (GuideUtils.isBootstrapConfiguration(relative)) {
+                        return;
+                    }
                     if (isOverriddenByPythonConfig(relative, pythonSpecificPath)) {
                         return;
                     }
