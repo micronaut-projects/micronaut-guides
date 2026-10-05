@@ -81,3 +81,10 @@ def test_photo(client):
         f'<a href="{expected_url}"><img src="{expected_thumbnail_url}" alt="{expected_title}"/></a>'
         in html
     )
+
+
+def test_home_redirects_to_photo(client):
+    response = client.get("/", allow_redirects=False)
+
+    assert response.status_code == 303
+    assert response.headers["Location"] == "/photos/1"

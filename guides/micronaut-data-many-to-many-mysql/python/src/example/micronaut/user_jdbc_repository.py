@@ -1,4 +1,3 @@
-from java.util import Optional
 from micronaut.data.annotation import Query
 from micronaut.data.jdbc.annotation import JdbcRepository
 from micronaut.data.repository import CrudRepository
@@ -23,4 +22,4 @@ class UserJdbcRepository(CrudRepository[UserEntity, int]):  # <2>
         WHERE u.username = :username
         GROUP BY u.id, u.username;
         """)
-    def findByUsername(self, username: str) -> Optional[User]: ...
+    def findByUsername(self, username: str) -> User | None: ...
