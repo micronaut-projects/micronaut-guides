@@ -83,7 +83,7 @@ class GuideCiTasksTest(unittest.TestCase):
     def test_default_python_build_remains_unchanged(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             guides_dir = Path(temp_dir)
-            write_metadata(guides_dir, "python-guide", languages=["JAVA", "PYTHON"])
+            write_metadata(guides_dir, "python-guide", languages=["JAVA", "PYTHON"], apps=[{"name": "default"}])
 
             self.assertEqual(
                 ["pythonGuideBuild"],
@@ -92,13 +92,13 @@ class GuideCiTasksTest(unittest.TestCase):
                 ),
             )
 
-    def test_jvm_only_excludes_python_runner_for_implicit_apps(self) -> None:
+    def test_jvm_only_guide_without_apps_has_no_absent_runner_exclusion(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             guides_dir = Path(temp_dir)
             write_metadata(guides_dir, "python-guide", languages=["JAVA", "PYTHON"])
 
             self.assertEqual(
-                ["pythonGuideBuild -x pythonGuideRunPythonTestScript"],
+                ["pythonGuideBuild"],
                 guide_ci_tasks.tasks_for_changed_files(
                     ["guides/python-guide/metadata.json"], guides_dir, jvm_only=True,
                 ),
@@ -143,6 +143,78 @@ class GuideCiTasksTest(unittest.TestCase):
                 ),
             )
 
+    def test_jvm_only_excludes_python_runner_for_inherited_apps(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            guides_dir = Path(temp_dir)
+            write_metadata(guides_dir, "app-base", publish=False, apps=[{"name": "default"}])
+            write_metadata(guides_dir, "python-guide", base="app-base", languages=["PYTHON"], apps=[])
+
+            self.assertEqual(
+                ["pythonGuideBuild -x pythonGuideRunPythonTestScript"],
+                guide_ci_tasks.tasks_for_changed_files(
+                    ["guides/python-guide/metadata.json"], guides_dir, jvm_only=True,
+                ),
+            )
+
+    def test_jvm_only_resolves_sorted_transitive_app_merges(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            guides_dir = Path(temp_dir)
+            write_metadata(guides_dir, "a-base", publish=False, apps=[{"name": "default"}])
+            write_metadata(guides_dir, "b-base", publish=False, base="a-base", apps=[])
+            write_metadata(guides_dir, "python-guide", base="b-base", languages=["PYTHON"], apps=[])
+
+            self.assertEqual(
+                ["pythonGuideBuild -x pythonGuideRunPythonTestScript"],
+                guide_ci_tasks.tasks_for_changed_files(
+                    ["guides/a-base/common.adoc"], guides_dir, jvm_only=True,
+                ),
+            )
+
+    def test_jvm_only_does_not_inherit_base_python_language(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            guides_dir = Path(temp_dir)
+            write_metadata(
+                guides_dir, "python-base", publish=False, languages=["PYTHON"],
+                apps=[{"name": "default"}],
+            )
+            for languages in (None, ["JAVA", "GROOVY", "KOTLIN"]):
+                with self.subTest(languages=languages):
+                    child = "default-jvm" if languages is None else "explicit-jvm"
+                    write_metadata(guides_dir, child, base="python-base", languages=languages, apps=[])
+                    self.assertEqual(
+                        [f"{guide_ci_tasks.kebab_case_to_gradle_name(child)}Build"],
+                        guide_ci_tasks.tasks_for_changed_files(
+                            [f"guides/{child}/metadata.json"], guides_dir, jvm_only=True,
+                        ),
+                    )
+
+    def test_jvm_only_empty_base_and_child_have_no_python_runner(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            guides_dir = Path(temp_dir)
+            write_metadata(guides_dir, "docs-base", publish=False, languages=["PYTHON"], apps=[])
+            write_metadata(guides_dir, "docs-guide", base="docs-base", languages=["PYTHON"], apps=[])
+
+            self.assertEqual(
+                ["docsGuideBuild"],
+                guide_ci_tasks.tasks_for_changed_files(
+                    ["guides/docs-base/common.adoc"], guides_dir, jvm_only=True,
+                ),
+            )
+
+    def test_jvm_only_preserves_sorted_merge_order_for_later_bases(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            guides_dir = Path(temp_dir)
+            write_metadata(guides_dir, "z-base", publish=False, apps=[{"name": "default"}])
+            write_metadata(guides_dir, "b-base", publish=False, base="z-base", apps=[])
+            write_metadata(guides_dir, "a-guide", base="b-base", languages=["PYTHON"], apps=[])
+
+            self.assertEqual(
+                ["aGuideBuild"],
+                guide_ci_tasks.tasks_for_changed_files(
+                    ["guides/z-base/common.adoc"], guides_dir, jvm_only=True,
+                ),
+            )
+
     def test_jvm_only_preserves_transitive_base_impacts_and_deduplication(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             guides_dir = Path(temp_dir)
@@ -150,6 +222,7 @@ class GuideCiTasksTest(unittest.TestCase):
             write_metadata(guides_dir, "middle-base", publish=False, base="root-base")
             write_metadata(
                 guides_dir, "python-guide", base="middle-base", languages=["JAVA", "PYTHON"],
+                apps=[{"name": "default"}],
             )
 
             self.assertEqual(
@@ -165,7 +238,7 @@ class GuideCiTasksTest(unittest.TestCase):
             repo = Path(temp_dir)
             guides_dir = repo / "guides"
             guides_dir.mkdir()
-            write_metadata(guides_dir, "python-guide", languages=["JAVA", "PYTHON"])
+            write_metadata(guides_dir, "python-guide", languages=["JAVA", "PYTHON"], apps=[{"name": "default"}])
 
             for flags, task in (
                 ([], "pythonGuideBuild"),

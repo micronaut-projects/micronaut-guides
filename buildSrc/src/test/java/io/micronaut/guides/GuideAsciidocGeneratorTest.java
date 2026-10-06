@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -42,20 +43,19 @@ class GuideAsciidocGeneratorTest {
 
         Guide guide = new Guide(
                 "Guide", "Guide.", List.of("Micronaut"), List.of("Core Basics"), LocalDate.of(2026, 9, 22),
-                null, null, null, false, false, "guide.adoc", List.of(Language.JAVA, Language.PYTHON), List.of(),
+                null, null, null, false, false, "guide.adoc", List.of(Language.JAVA, Language.GROOVY, Language.KOTLIN, Language.PYTHON), List.of(),
                 List.of(BuildTool.GRADLE, BuildTool.PYRONAUT), TestFramework.JUNIT, List.of(), "guide", true, null,
                 Map.of(), List.of(new App("default", null, null, null, List.of(), null, null, null, null, null, null, null, true)), false);
 
         GuideAsciidocGenerator.generate(guide, input.toFile(), output.toFile(), project.toFile());
 
-        String java = Files.readString(output.resolve("guide-gradle-java.adoc"));
-        String python = Files.readString(output.resolve("guide-pyronaut-python.adoc"));
-        assertTrue(java.contains("before"));
-        assertFalse(java.contains("python-only"));
-        assertTrue(java.contains("after"));
-        assertTrue(python.contains("before"));
-        assertTrue(python.contains("python-only"));
-        assertTrue(python.contains("after"));
+        for (Language language : guide.languages()) {
+            String buildTool = language == Language.PYTHON ? "pyronaut" : "gradle";
+            String rendered = Files.readString(output.resolve("guide-" + buildTool + "-" + language.name().toLowerCase() + ".adoc"));
+            assertTrue(rendered.contains("before"));
+            assertEquals(language == Language.PYTHON, rendered.contains("python-only"));
+            assertTrue(rendered.contains("after"));
+        }
     }
 
     @Test
