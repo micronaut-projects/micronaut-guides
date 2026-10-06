@@ -38,7 +38,7 @@ import java.util.Map;
  * @param publish            Whether the guide should be published, it defaults to true. You can set it to false for draft or base guides
  * @param base               Defaults to null; if set, indicates directory name of the base guide to copy before copying the current one
  * @param env                The guide's environment variables
- * @param apps               Applications created for the guide
+ * @param apps               Applications created for the guide; an empty list denotes a documentation-only guide with no generated application
  * @param skipPyronautTests  Set it to true to skip running the Pyronaut application tests for the guide
  */
 @JsonSchema
@@ -112,7 +112,7 @@ public record Guide(
         @Nullable
         Map<String, String> env,
 
-        @NotEmpty
+        @NotNull
         @NonNull
         List<App> apps,
 

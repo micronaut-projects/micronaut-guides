@@ -3,6 +3,7 @@ package io.micronaut.guides.tasks;
 import io.micronaut.guides.GuideProjectGenerator;
 import io.micronaut.guides.core.App;
 import io.micronaut.guides.core.Guide;
+import io.micronaut.guides.core.App;
 import io.micronaut.starter.api.TestFramework;
 import io.micronaut.starter.application.ApplicationType;
 import io.micronaut.starter.options.BuildTool;
@@ -34,7 +35,8 @@ class SampleProjectGenerationTaskTest {
         Guide metadata = new Guide(null, null, null, null, null, null, null, null,
                 false, false, null, List.of(Language.JAVA, Language.PYTHON), null,
                 List.of(BuildTool.GRADLE, BuildTool.MAVEN), TestFramework.JUNIT,
-                null, "multi-language", true, null, null, List.of());
+                null, "multi-language", true, null, null,
+                List.of(new App("default", null, null, null, null, null, null, null, null, null, null, null, false)));
 
         assertEquals(List.of("multi-language-pyronaut-python"),
                 SampleProjectGenerationTask.outputDirectoryNames(metadata, Language.PYTHON));
