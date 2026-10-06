@@ -1,26 +1,14 @@
-from collections import deque
 from time import monotonic, sleep
 
 import pytest
-import requests
-from jakarta.inject import Singleton
 from micronaut.configuration.kafka.annotation import KafkaListener, OffsetReset, Topic
+from pyronaut import requests
 from pyronaut.test import MicronautTest, micronaut_test_fixture
 
 from example.micronaut.chess.dto.game_dto import GameDTO
 from example.micronaut.chess.dto.game_state_dto import GameStateDTO
 from example.micronaut.chess.dto.player import Player
-
-
-@Singleton
-class ReceivedEvents:
-    def __init__(self):
-        self.games = deque()
-        self.moves = deque()
-
-    def clear(self):
-        self.games.clear()
-        self.moves.clear()
+from example.micronaut.received_events import ReceivedEvents
 
 
 @KafkaListener(groupId="chess-game-tests-games", offsetReset=OffsetReset.EARLIEST)
@@ -55,17 +43,17 @@ def my_context(request):
 
 @pytest.fixture
 def client(my_context):
-    return requests.with_context(my_context)  # <6>
+    return requests.with_context(my_context)  # <2>
 
 
 @pytest.fixture
 def received_events(my_context):
-    events = my_context["example.micronaut.ReceivedEvents"]  # <5>
+    events = my_context[ReceivedEvents]  # <3>
     yield events
     events.clear()
 
 
-def wait_for(condition, timeout: float = 10.0):  # <7>
+def wait_for(condition, timeout: float = 10.0):  # <4>
     deadline = monotonic() + timeout
     while monotonic() < deadline:
         if condition():
@@ -77,8 +65,8 @@ def wait_for(condition, timeout: float = 10.0):  # <7>
 def start_game(client, black_name: str, white_name: str) -> str:
     response = client.post(
         "/game/start",
-        data={Player.BLACK.value: black_name, Player.WHITE.value: white_name},  # <9>
-    )  # <10>
+        data={Player.BLACK.value: black_name, Player.WHITE.value: white_name},  # <5>
+    )  # <6>
     assert response.status_code == 201
     return response.text
 
@@ -92,7 +80,7 @@ def make_move(client, game_id: str, player: Player, move: str, fen: str, pgn: st
             "fen": fen,
             "pgn": pgn,
         },
-    )  # <11>
+    )  # <7>
     assert response.status_code == 201
 
 
@@ -100,7 +88,7 @@ def end_game(client, game_id: str, winner: Player | None):
     path = f"/game/draw/{game_id}"
     if winner is not None:
         path = f"/game/checkmate/{game_id}/{winner.value}"
-    response = client.post(path)  # <12>
+    response = client.post(path)  # <8>
     assert response.status_code == 204
 
 

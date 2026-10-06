@@ -6,7 +6,12 @@ To complete this guide, you will need the following:
 
 * Some time on your hands
 * A decent text editor or IDE
+:exclude-for-languages:python
 * JDK 25 or greater installed with `JAVA_HOME` configured appropriately
+:exclude-for-languages:
+:only-for-languages:python
+* GraalPy installed and the Pyronaut CLI available locally
+:only-for-languages:
 common:oracle-cloud-account.adoc[]
 common:oracle-cloud-cli.adoc[]
 common:completesolution.adoc[]
@@ -64,6 +69,7 @@ image::oracleautodb/autonomous.database.9.png[]
 
 common:cli-or-launch.adoc[]
 
+:exclude-for-languages:python
 [source,bash]
 ----
 mn @cli-command@ example.micronaut.micronautguide \
@@ -78,6 +84,15 @@ common:default-package.adoc[]
 common:diff-general.adoc[]
 
 https://micronaut-projects.github.io/micronaut-guides/latest/micronaut-intellij-idea-ide-setup.html[Setup IntelliJ IDEA to develop Micronaut Applications].
+:exclude-for-languages:
+
+:only-for-languages:python
+[source,bash]
+----
+pyronaut @cli-command@ example.micronaut.micronautguide \
+    --features=data-jdbc,flyway,http-client,oracle-cloud-atp
+----
+:only-for-languages:
 
 === Entity class
 
@@ -90,6 +105,10 @@ source:domain/Thing[]
 Create a `ThingRepository` interface to read and write `Thing` database data:
 
 source:repository/ThingRepository[]
+
+:only-for-languages:python
+The derived `findByName` query returns a `Thing` or `None` when no matching row exists. `findAll` returns a built-in `list[Thing]`.
+:only-for-languages:
 
 === Data populator class
 
@@ -105,7 +124,12 @@ source:controller/ThingController[]
 
 === Configuration
 
+:exclude-for-languages:python
 Create a new Flyway migration SQL script in `src/main/resources/db/migration/V1__create-schema.sql` and add the following:
+:exclude-for-languages:
+:only-for-languages:python
+Create a new Flyway migration SQL script in `config/db/migration/V1__create-schema.sql` and add the following:
+:only-for-languages:
 
 resource:db/migration/V1__create-schema.sql[]
 
@@ -124,7 +148,7 @@ Replace the generated `application.properties` with this:
 resource:application.properties[]
 :exclude-for-languages:
 :only-for-languages:python
-Replace the generated `application.toml` with this:
+Replace the generated `config/application.toml` with this:
 
 resource:application.toml[]
 :only-for-languages:
@@ -134,6 +158,10 @@ resource:application.toml[]
 <3> Set the value of the `ocid` property with the database OCID unique identifier you saved when creating the database
 <4> Set the `walletPassword` property with a password to encrypt the wallet keys (must be at least 8 characters and include at least 1 letter and either 1 numeric or special character)
 <5> Set the `password` property with the `micronautdemo` schema user password you created
+
+:only-for-languages:python
+For the cloud database, uncomment and set `ocid`, `walletPassword`, `username`, and `password` in `config/application.toml`.
+:only-for-languages:
 
 Oracle Cloud Autonomous Database connection information and credentials are stored in the https://docs.oracle.com/en-us/iaas/Content/Database/Tasks/adbconnecting.htm[Oracle Wallet]. See the https://micronaut-projects.github.io/micronaut-oracle-cloud/latest/guide/[Micronaut Oracle Cloud integration documentation] for more details and options for working with Oracle Cloud in Micronaut applications.
 
@@ -150,27 +178,7 @@ test:ThingRepositoryTest[]
 
 == Testing the Application
 
-To run the tests:
-
-:exclude-for-build:maven
-
-[source, bash]
-----
-./gradlew test
-----
-
-Then open `build/reports/tests/test/index.html` in a browser to see the results.
-
-:exclude-for-build:
-
-:exclude-for-build:gradle
-
-[source, bash]
-----
-./mvnw test
-----
-
-:exclude-for-build:
+common:testApp-noheader.adoc[]
 
 :exclude-for-languages:python
 == Using Oracle Cloud Vault
@@ -281,7 +289,7 @@ datasources.default.password=${ATP_USER_PASSWORD}
 
 == Running the Application
 
-:exclude-for-build:maven
+:exclude-for-build:maven,pyronaut
 
 To run the application use:
 
@@ -301,7 +309,7 @@ which will start the application on port 8080.
 
 :exclude-for-build:
 
-:exclude-for-build:gradle
+:exclude-for-build:gradle,pyronaut
 
 To run the application use
 
@@ -320,6 +328,10 @@ mvnw mn:run
 which will start the application on port 8080.
 
 :exclude-for-build:
+
+:only-for-languages:python
+common:runapp-instructions.adoc[]
+:only-for-languages:
 
 You should see output similar to the following, indicating that the database connectivity and wallet configuration is all handled automatically, and that Flyway is being used.
 :exclude-for-languages:python

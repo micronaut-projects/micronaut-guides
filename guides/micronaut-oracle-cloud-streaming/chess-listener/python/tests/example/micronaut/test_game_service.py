@@ -1,34 +1,15 @@
-from abc import ABC, abstractmethod
 from time import monotonic, sleep
-from typing import Annotated
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 import pytest
-from java.util import UUID
-from micronaut.configuration.kafka.annotation import KafkaClient, KafkaKey, Topic
 from pyronaut.test import MicronautTest, micronaut_test_fixture
 
 from example.micronaut.chess.dto.game_dto import GameDTO
 from example.micronaut.chess.dto.game_state_dto import GameStateDTO
 from example.micronaut.chess.dto.player import Player
-
-
-@KafkaClient
-class GameReporter(ABC):
-
-    @Topic("chessGame")
-    @abstractmethod
-    def game(self, game_id: Annotated[str, KafkaKey], game: GameDTO) -> None:
-        ...
-
-    @Topic("chessGameState")
-    @abstractmethod
-    def game_state(
-        self,
-        game_id: Annotated[str, KafkaKey],
-        game_state: GameStateDTO,
-    ) -> None:
-        ...
+from example.micronaut.chess.repository.game_repository import GameRepository
+from example.micronaut.chess.repository.game_state_repository import GameStateRepository
+from example.micronaut.game_reporter import GameReporter
 
 
 @pytest.fixture
@@ -50,24 +31,24 @@ def my_context(request):
 
 @pytest.fixture
 def game_reporter(my_context):
-    return my_context["example.micronaut.GameReporter"]  # <5>
+    return my_context[GameReporter]  # <2>
 
 
 @pytest.fixture
 def game_repository(my_context):
-    repository = my_context["example.micronaut.chess.repository.GameRepository"]
+    repository = my_context[GameRepository]
     yield repository
     repository.deleteAll()
 
 
 @pytest.fixture
 def game_state_repository(my_context):
-    repository = my_context["example.micronaut.chess.repository.GameStateRepository"]
+    repository = my_context[GameStateRepository]
     yield repository
     repository.deleteAll()
 
 
-def wait_for(condition, timeout: float = 10.0):  # <6>
+def wait_for(condition, timeout: float = 10.0):  # <3>
     deadline = monotonic() + timeout
     while monotonic() < deadline:
         if condition():
@@ -76,10 +57,10 @@ def wait_for(condition, timeout: float = 10.0):  # <6>
     raise AssertionError("Timed out waiting for Kafka message")
 
 
-def find_required(repository, id, method="findById"):
+def find_required(repository, id, method="getById"):
     result = getattr(repository, method)(id)
-    assert result.isPresent()
-    return result.get()
+    assert result is not None
+    return result
 
 
 def make_move(
@@ -95,7 +76,7 @@ def make_move(
         game_id,
         GameStateDTO(str(game_state_id), game_id, player, move, fen, pgn),
     )
-    return UUID.fromString(str(game_state_id))
+    return game_state_id
 
 
 def test_game_ending_in_checkmate(
@@ -110,7 +91,7 @@ def test_game_ending_in_checkmate(
 
     wait_for(lambda: game_repository.count() > 0)
 
-    game = find_required(game_repository, UUID.fromString(game_id_string))
+    game = find_required(game_repository, game_id)
     assert game.black_name == "b_name"
     assert game.white_name == "w_name"
     assert not game.draw
@@ -136,11 +117,11 @@ def test_game_ending_in_checkmate(
     wait_for(
         lambda: find_required(
             game_repository,
-            UUID.fromString(game_id_string),
+            game_id,
         ).winner is not None
     )
 
-    game = find_required(game_repository, UUID.fromString(game_id_string))
+    game = find_required(game_repository, game_id)
     assert not game.draw
     assert game.winner == Player.BLACK
 
@@ -167,10 +148,10 @@ def test_game_ending_in_draw(
     wait_for(
         lambda: find_required(
             game_repository,
-            UUID.fromString(game_id_string),
+            game_id,
         ).draw
     )
 
-    game = find_required(game_repository, UUID.fromString(game_id_string))
+    game = find_required(game_repository, game_id)
     assert game.draw
     assert game.winner is None

@@ -5,6 +5,7 @@ import pytest
 from pyronaut.test import MicronautTest, micronaut_test_fixture
 
 from example.micronaut.domain.thing import Thing
+from example.micronaut.repository.thing_repository import ThingRepository
 
 
 @pytest.fixture
@@ -26,7 +27,7 @@ def my_context(request):
 
 @pytest.fixture
 def thing_repository(my_context):
-    return my_context["example.micronaut.repository.ThingRepository"]
+    return my_context[ThingRepository]
 
 
 @pytest.fixture(autouse=True)
@@ -51,9 +52,9 @@ def test_find_all(thing_repository):
 def test_find_by_name(thing_repository):
     name = str(uuid.uuid4())
 
-    assert thing_repository.findByName(name).isEmpty()
+    assert thing_repository.findByName(name) is None
 
     thing_repository.save(Thing(name))
-    thing = thing_repository.findByName(name).orElse(None)
+    thing = thing_repository.findByName(name)
     assert thing is not None
     assert thing.name == name

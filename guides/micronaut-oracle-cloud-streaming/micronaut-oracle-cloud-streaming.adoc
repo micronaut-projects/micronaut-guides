@@ -10,7 +10,12 @@ To complete this guide, you will need the following:
 
 * Some time on your hands
 * A decent text editor or IDE
+:exclude-for-languages:python
 * JDK 25 or greater installed with `JAVA_HOME` configured appropriately
+:exclude-for-languages:
+:only-for-languages:python
+* GraalPy installed and the Pyronaut CLI available locally
+:only-for-languages:
 common:oracle-cloud-account.adoc[]
 common:oracle-cloud-cli.adoc[]
 * https://www.docker.io/gettingstarted/#h_installation[Docker] and https://docs.docker.com/compose/install/[Docker Compose] installed if you will be running Kafka in Docker and for running tests.
@@ -27,10 +32,13 @@ The microservices are:
 
 * `chess-listener` - Receives the chess event messages and persists them to a database
 
+:exclude-for-languages:python
 https://micronaut-projects.github.io/micronaut-guides/latest/micronaut-intellij-idea-ide-setup.html[Setup IntelliJ IDEA to develop Micronaut Applications].
+:exclude-for-languages:
 
 === chess-game Microservice
 
+:exclude-for-languages:python
 Create the `chess-game` microservice using the https://docs.micronaut.io/latest/guide/#cli[Micronaut Command Line Interface] or with https://launch.micronaut.io[Micronaut Launch].
 
 [source,bash]
@@ -41,15 +49,27 @@ mn @chess-game:cli-command@ --features=kafka,graalvm,reactor,testcontainers exam
 common:build-lang-arguments.adoc[]
 
 If you use Micronaut Launch, select Micronaut Application as application type and add the `kafka`, `graalvm`, `reactor`, and `testcontainers` features.
+:exclude-for-languages:
+
+:only-for-languages:python
+Create the `chess-game` microservice using the Pyronaut CLI or https://pyronaut.io/launch[Pyronaut Launch]:
+
+[source,bash]
+----
+pyronaut @chess-game:cli-command@ example.micronaut.chess-game --features=kafka,reactor,serialization-jackson,test-resources,validation
+----
+:only-for-languages:
 
 The previous command creates a directory named `chess-game` and a Micronaut application inside it with default package `example.micronaut`.
 
+:exclude-for-languages:python
 In addition to the dependencies added by the `testcontainers` feature, we also need a test dependency for https://www.testcontainers.org/modules/kafka/[Kafka in Testcontainers], along with one for the http://www.awaitility.org/[Awaitility] library:
 
 :dependencies:
 dependency:testcontainers-kafka[groupId=org.testcontainers,scope=test]
 dependency:awaitility[groupId=org.awaitility,version=@awaitilityVersion@,scope=test]
 :dependencies:
+:exclude-for-languages:
 
 ==== DTOs
 
@@ -84,7 +104,12 @@ source:chess/GameReporter[app=chess-game]
 
 <1> Annotate the class with `@KafkaClient` to declare it as a Kafka message producer; the Micronaut framework will generate the sending code at compile time
 <2> Annotate the method with `@Topic` and specify the topic name
+:exclude-for-languages:python
 <3> By returning a reactive type, the Micronaut framework will use non-blocking code to send the message
+:exclude-for-languages:
+:only-for-languages:python
+<3> Publish the DTO without a return value.
+:only-for-languages:
 <4> Use the `Game` primary key as the Kafka partition key
 
 ==== GameController
@@ -99,9 +124,19 @@ callout:executes-on[]
 <.> The method accepts encoded form data (the two players' names)
 <.> The response will be plain text and contain the ID of the persisted `Game`
 <.> Send a `"Created"` (201) status to indicate a `Game` was persisted
+:exclude-for-languages:python
 <.> Return a reactive type to configure a reactive response
+:exclude-for-languages:
+:only-for-languages:python
+<.> Return the game ID as a Python string.
+:only-for-languages:
 <.> Assign the game's primary key as a UUID
+:exclude-for-languages:python
 <.> Use the `GameReporter` to send a Kafka message with new game data
+:exclude-for-languages:
+:only-for-languages:python
+<.> Send the new game through `GameReporter` and return its ID.
+:only-for-languages:
 <.> The method accepts HTTP POST requests to indicate a move has occurred
 <.> The method accepts encoded form data (the move information)
 <.> Send a `"Created"` (201) status to indicate a `GameState` was persisted
@@ -115,20 +150,20 @@ callout:executes-on[]
 
 ==== Development environment
 
+:exclude-for-languages:python
 common:default-dev-environment-application.adoc[]
 
-:exclude-for-languages:python
 source:Application[app=chess-game]
-:exclude-for-languages:
 
 Delete the `kafka.bootstrap.servers` config option from `application.properties` and move it to `application-dev.properties`.
 
 common:default-dev-environment-application-dev-yaml.adoc[]
 
-:exclude-for-languages:python
 resource:application-dev.properties[app=chess-game]
 :exclude-for-languages:
 :only-for-languages:python
+Create `config/application-dev.toml`. The Micronaut framework applies this configuration file only for the `dev` environment, activated with `MICRONAUT_ENVIRONMENTS=dev` when running the application.
+
 resource:application-dev.toml[app=chess-game]
 :only-for-languages:
 
@@ -136,17 +171,23 @@ resource:application-dev.toml[app=chess-game]
 
 ==== Static Resources
 
+:exclude-for-languages:python
 Update `application.properties` to add static resource configuration:
 
-
-:exclude-for-languages:python
 resource:application.properties[app=chess-game,tag=static-resources]
 :exclude-for-languages:
 :only-for-languages:python
+Update `config/application.toml` to add static resource configuration:
+
 resource:application.toml[app=chess-game,tag=static-resources]
 :only-for-languages:
 
+:exclude-for-languages:python
 callout:static-resources[]
+:exclude-for-languages:
+:only-for-languages:python
+<1> Configure the framework to look for static resources in `config/public`.
+:only-for-languages:
 
 ==== UI Resources
 
@@ -160,7 +201,12 @@ Create `micronaut-chess.js` used by `index.html` with the JavaScript code:
 
 resource:public/micronaut-chess.js[app=chess-game]
 
+:exclude-for-languages:python
 Copy these chess piece images to `src/main/resources/public/img/chesspieces/wikipedia` (the path must be correct because it is hard-coded in `chessboard.js`):
+:exclude-for-languages:
+:only-for-languages:python
+Copy these chess piece images to `config/public/img/chesspieces/wikipedia` (the path must be correct because it is hard-coded in `chessboard.js`):
+:only-for-languages:
 
 image:oraclecloudstream/bB.png[] image:oraclecloudstream/bK.png[] image:oraclecloudstream/bN.png[] image:oraclecloudstream/bP.png[] image:oraclecloudstream/bQ.png[] image:oraclecloudstream/bR.png[]
 
@@ -170,6 +216,7 @@ Right-click each image and save to your local file system, or extract the comple
 
 === chess-listener Microservice
 
+:exclude-for-languages:python
 Create the `chess-listener` microservice using the https://docs.micronaut.io/latest/guide/#cli[Micronaut Command Line Interface] or with https://launch.micronaut.io[Micronaut Launch].
 
 [source,bash]
@@ -180,24 +227,38 @@ mn @chess-listener:cli-command@ --features=kafka,graalvm,data-jdbc,flyway,reacto
 common:build-lang-arguments.adoc[]
 
 If you use Micronaut Launch, select Micronaut Application as application type and add the `kafka`, `graalvm`, `data-jdbc`, `flyway`, `reactor`, and `testcontainers` features.
+:exclude-for-languages:
+
+:only-for-languages:python
+Create the `chess-listener` microservice using the Pyronaut CLI or https://pyronaut.io/launch[Pyronaut Launch]:
+
+[source,bash]
+----
+pyronaut @chess-listener:cli-command@ example.micronaut.chess-listener --features=kafka,data-jdbc,flyway,oracle-cloud-atp,reactor,serialization-jackson,test-resources,validation
+----
+:only-for-languages:
 
 The previous command creates a directory named `chess-listener` and a Micronaut application inside it with default package `example.micronaut`.
 
+:exclude-for-languages:python
 In addition to the dependencies added by the `testcontainers` feature, we also need a test dependency for Kafka in Testcontainers, along with one for the http://www.awaitility.org/[Awaitility] library:
 
 :dependencies:
 dependency:testcontainers-kafka[groupId=org.testcontainers,scope=test]
 dependency:awaitility[groupId=org.awaitility,version=@awaitilityVersion@,scope=test]
 :dependencies:
+:exclude-for-languages:
 
 ==== Flyway
 
+:exclude-for-languages:python
 Enable Flyway database migrations for all environments by adding this configuration to `application.properties`:
 
-:exclude-for-languages:python
 resource:application.properties[app=chess-listener,tag=flyway]
 :exclude-for-languages:
 :only-for-languages:python
+Enable Flyway database migrations by adding this configuration to `config/application.toml`:
+
 resource:application.toml[app=chess-listener,tag=flyway]
 :only-for-languages:
 
@@ -215,6 +276,10 @@ Create a `GameState` entity to represent persistent game move data:
 
 source:chess/entity/GameState[app=chess-listener]
 
+:only-for-languages:python
+The entities use Python's `uuid.UUID` identifiers and `datetime.datetime` timestamps. Micronaut Data populates the nullable creation and update timestamps when persisting the entities.
+:only-for-languages:
+
 ==== Repositories
 
 Create a `GameRepository` interface to have access to methods for `Game` entity persistence:
@@ -224,6 +289,10 @@ source:chess/repository/GameRepository[app=chess-listener]
 :only-for-languages:python
 <1> Annotate with `@JdbcRepository` to make this a Micronaut Data JDBC repository.
 <2> Restrict the bean to be available in the `oraclecloud` and test environments.
+
+The derived `getById` query returns a `Game` or `None`, keeping a missing record explicit without changing the inherited `CrudRepository.findById` contract.
+
+NOTE: The Python example currently supplies Oracle repositories only. `H2GameRepository` and `H2GameStateRepository` are not supplied, so `chess-listener` requires the `oraclecloud` or test environment and cannot run the H2 development demo.
 :only-for-languages:
 
 :exclude-for-languages:python
@@ -239,7 +308,12 @@ Create a `GameStateRepository` interface to have access to methods for `GameStat
 
 source:chess/repository/GameStateRepository[app=chess-listener]
 
+:exclude-for-languages:python
 <1> Override the `findById` method from `CrudRepository` to add a `@Join` annotation. This will configure the SQL query to load `Game` data when retrieving a `GameState` to resolve the `game` property.
+:exclude-for-languages:
+:only-for-languages:python
+<1> Add `@Join` to the derived `getById` query, which returns a `GameState` or `None`. The SQL query loads the related `Game` to resolve the `game` property.
+:only-for-languages:
 
 :exclude-for-languages:python
 Also create a `H2GameStateRepository` interface that extends `GameStateRepository`:
@@ -269,25 +343,32 @@ source:chess/ChessListener[app=chess-listener]
 
 ==== Development environment
 
+:exclude-for-languages:python
 common:default-dev-environment-application.adoc[]
 
-:exclude-for-languages:python
 source:Application[app=chess-listener]
-:exclude-for-languages:
 
 common:default-dev-environment-application-dev-yaml.adoc[]
 
-:exclude-for-languages:python
 resource:application-dev.properties[app=chess-listener]
 :exclude-for-languages:
 :only-for-languages:python
+The H2 development configuration is retained in `config/application-dev.toml`, but using it requires the missing Python H2 repositories described above. Use `oraclecloud` for the listener or run its tests with Test Resources.
+
 resource:application-dev.toml[app=chess-listener]
 :only-for-languages:
 
 <1> Run this microservice on port 8081; `chess-game` will run on the default port 8080
+:exclude-for-languages:python
 <2> Use an in-memory H2 database. Delete the `datasources` block so it's only in `application-dev.properties`
 <3> Use local Kafka. Delete the `kafka.bootstrap.servers` property so it's only in `application-dev.properties`
 <4> Configure Flyway to look for migration scripts in `src/main/resources/db/migration/h2`
+:exclude-for-languages:
+:only-for-languages:python
+<2> Configure the in-memory H2 database for the development environment.
+<3> Use local Kafka for the development environment.
+<4> Configure Flyway to look for migration scripts in `config/db/migration/h2`.
+:only-for-languages:
 
 ==== H2 Flyway Migration Script
 
@@ -321,7 +402,7 @@ Alternatively you can https://kafka.apache.org/quickstart[install and run a loca
 
 Start the `chess-game` microservice:
 
-:exclude-for-build:maven
+:exclude-for-build:maven,pyronaut
 
 [source,bash]
 .chess-game
@@ -349,7 +430,7 @@ Start the `chess-listener` microservice:
 
 :exclude-for-build:
 
-:exclude-for-build:gradle
+:exclude-for-build:gradle,pyronaut
 
 [source,bash]
 .chess-game
@@ -377,7 +458,34 @@ Start the `chess-listener` microservice:
 
 :exclude-for-build:
 
+:only-for-languages:python
+In the `chess-game` directory, activate the `dev` environment and start the application. On Linux and macOS:
+
+[source,bash]
+.chess-game
+----
+export MICRONAUT_ENVIRONMENTS=dev
+pyronaut dev
+----
+
+On Windows PowerShell:
+
+[source,powershell]
+.chess-game
+----
+$env:MICRONAUT_ENVIRONMENTS = "dev"
+pyronaut dev
+----
+
+NOTE: Only `chess-game` can run this Python local-development demo. The Python listener has no H2 repositories and requires `oraclecloud` or test; the listener tests below verify Kafka delivery and Oracle persistence with Test Resources.
+:only-for-languages:
+
+:exclude-for-languages:python
 Test the app functionality by opening http://localhost:8080/ in a browser. The UI lets you choose one or more chess games that will auto-play with the specified delay between plays. Events (game start and end, player moves) are sent to the server via Ajax and then sent to the `chess-listener` microservice for processing, analysis, etc.
+:exclude-for-languages:
+:only-for-languages:python
+Open http://localhost:8080/ in a browser. The UI lets you choose chess games that auto-play with the specified delay between plays. Game events are sent to the server via Ajax and published to local Kafka; the listener requires the cloud configuration described below.
+:only-for-languages:
 
 You can, for example, start a single game with a moderately large delay between plays:
 
@@ -399,7 +507,12 @@ image::oraclecloudstream/ui4.png[]
 
 === Oracle Autonomous Database (ATP)
 
+:exclude-for-languages:python
 Update the `chess-listener` microservice to support Oracle in addition to the in-memory H2 database.
+:exclude-for-languages:
+:only-for-languages:python
+Configure the `chess-listener` microservice to use Oracle Autonomous Database.
+:only-for-languages:
 
 Use the guideLink:micronaut-oracle-autonomous-db[Oracle Autonomous Database guide] to provision an Oracle database at OCI.
 
@@ -411,12 +524,14 @@ dependency:micronaut-oraclecloud-atp[groupId=io.micronaut.oraclecloud]
 
 ==== Configuration
 
+:exclude-for-languages:python
 Create `src/main/resources/application-oraclecloud.properties`. The Micronaut framework applies this configuration file only for the `oraclecloud` environment.
 
-:exclude-for-languages:python
 resource:application-oraclecloud.properties[app=chess-listener,tag=atp]
 :exclude-for-languages:
 :only-for-languages:python
+Create `config/application-oraclecloud.toml`. The Micronaut framework applies this configuration file only for the `oraclecloud` environment.
+
 resource:application-oraclecloud.toml[app=chess-listener,tag=atp]
 :only-for-languages:
 
@@ -424,13 +539,18 @@ resource:application-oraclecloud.toml[app=chess-listener,tag=atp]
 <2> Set the `walletPassword` property with a password to encrypt the wallet keys (must be at least 8 characters and include at least 1 letter and either 1 numeric or special character)
 <3> Set the `password` property with the `micronautdemo` schema user password you created
 <4> Change the profile name if you're not using the default, and optionally add a value for the path to the config file if necessary as described in the https://micronaut-projects.github.io/micronaut-oracle-cloud/latest/guide/#config-auth[Authentication section] of the Micronaut Oracle Cloud docs
+:exclude-for-languages:python
 <5> Configure Flyway to look for migration scripts in `src/main/resources/db/migration/oracle`
+:exclude-for-languages:
+:only-for-languages:python
+<5> Configure Flyway to look for migration scripts in `config/db/migration/oracle`.
+:only-for-languages:
 
 ==== Repositories
 
+:exclude-for-languages:python
 Create the `OracleGameRepository` interface that extends `GameRepository` and specifies the `ORACLE` dialect in the `oraclecloud` environment:
 
-:exclude-for-languages:python
 source:chess/repository/OracleGameRepository[app=chess-listener]
 
 <1> Annotate with `@JdbcRepository` to make this a Micronaut Data JDBC repository, and specify the `ORACLE` dialect. The Micronaut framework will generate persistence logic at compile time and use Oracle-specific SQL.
@@ -440,6 +560,9 @@ Create the `OracleGameStateRepository` interface that extends `GameStateReposito
 
 source:chess/repository/OracleGameStateRepository[app=chess-listener]
 :exclude-for-languages:
+:only-for-languages:python
+The `GameRepository` and `GameStateRepository` declared above already use the `ORACLE` dialect and are available in the `oraclecloud` environment.
+:only-for-languages:
 
 ==== Flyway
 
@@ -543,12 +666,14 @@ image::oraclecloudstream/policy3.png[]
 
 ==== Application configuration
 
+:exclude-for-languages:python
 Create `src/main/resources/application-oraclecloud.properties` in the `chess-game` microservice. Add the following there, and also add it to the `application-oraclecloud.properties` you already created in the `chess-listener` microservice:
 
-:exclude-for-languages:python
 resource:application-oraclecloud.properties[app=chess-game]
 :exclude-for-languages:
 :only-for-languages:python
+Create `config/application-oraclecloud.toml` in the `chess-game` microservice. Add the following there, and also add it to `config/application-oraclecloud.toml` in the `chess-listener` microservice:
+
 resource:application-oraclecloud.toml[app=chess-game,tag=kafka]
 :only-for-languages:
 
@@ -561,7 +686,7 @@ resource:application-oraclecloud.toml[app=chess-game,tag=kafka]
 
 You can now start both microservices in the `oraclecloud` environment to use Cloud Streaming and the ATP database you created:
 
-:exclude-for-build:maven
+:exclude-for-build:maven,pyronaut
 
 To run each application use:
 
@@ -579,7 +704,7 @@ cmd /C "set MICRONAUT_ENVIRONMENTS=oraclecloud && gradlew run"
 
 :exclude-for-build:
 
-:exclude-for-build:gradle
+:exclude-for-build:gradle,pyronaut
 
 To run each application use:
 
@@ -597,23 +722,49 @@ cmd /C "set MICRONAUT_ENVIRONMENTS=oraclecloud && mvnw mn:run"
 
 :exclude-for-build:
 
+:only-for-languages:python
+Run the following in each application's directory after configuring the cloud resources. On Linux and macOS:
+
+[source,bash]
+----
+export MICRONAUT_ENVIRONMENTS=oraclecloud
+pyronaut dev
+----
+
+On Windows PowerShell:
+
+[source,powershell]
+----
+$env:MICRONAUT_ENVIRONMENTS = "oraclecloud"
+pyronaut dev
+----
+:only-for-languages:
+
 == Writing Tests
 
 We'll run Kafka inside a Docker container using https://www.testcontainers.org/[Testcontainers] for both application tests and also run Oracle database inside a Docker container for testing persistence in the `chess-listener` tests.
 
 === chess-game tests
 
+:only-for-languages:python
+Define the test-only event collector in `tests/example/micronaut/received_events.py`. Importing its canonical module keeps typed bean lookup independent of pytest's test-module import name:
+
+rawTest:received_events[app=chess-game]
+:only-for-languages:
+
 Create a test in the `chess-game` microservice to verify that Kafka message processing works:
 
 test:GameReporterTest[app=chess-game]
 
+:exclude-for-languages:python
 <.> Use the `@Testcontainers` annotation to configure automatic container management (not necessary in Spock tests)
 callout:test-instance-per-class[]
 <.> Implementing `TestPropertyProvider` allows the test class to provide application configuration properties, in this case the dynamically allocated Kafka broker port
 <.> The Testcontainers instance for Kafka
 <.> Dependency injection for the `ChessListener` class declared below, a Kafka listener class that replicates the functionality of the class of the same name in the `chess-listener` microservice
 <.> Dependency injection for an HTTP client that the Micronaut framework will implement at compile time to make calls to `GameController`
-:exclude-for-languages:java,groovy
+:exclude-for-languages:
+:exclude-for-languages:java,groovy,python
 callout:atfield[]
 callout:lateinit[]
 <.> Wait a few seconds for the message to arrive; it should happen very quickly, but the message will be sent on a separate thread
@@ -623,7 +774,7 @@ callout:lateinit[]
 <.> Use the `HttpClient` to send a POST request that indicates a game move has occurred, which will trigger sending a message with Kafka
 <.> Use the `HttpClient` to send a POST request that indicates a game has ended (in either a draw or checkmate), which will trigger sending a message with Kafka
 :exclude-for-languages:
-:exclude-for-languages:kotlin
+:exclude-for-languages:kotlin,python
 <.> Wait a few seconds for the message to arrive; it should happen very quickly, but the message will be sent on a separate thread
 <.> Configure the Kafka broker port (it will be a different unused port each time) so Micronaut Kafka clients and listeners connect to the test broker
 <.> Use a Map to hold form parameter names and values
@@ -632,12 +783,30 @@ callout:lateinit[]
 <.> Use the `HttpClient` to send a POST request that indicates a game has ended (in either a draw or checkmate), which will trigger sending a message with Kafka
 :exclude-for-languages:
 
+:only-for-languages:python
+<1> Start the Micronaut test context; Test Resources supplies the Kafka broker connection.
+<2> Bind the Python HTTP client to that context.
+<3> Look up the imported event collector by type and clear its state after the test.
+<4> Wait for asynchronous Kafka delivery with a bounded polling helper.
+<5> Preserve the form field names expected by the game controller.
+<6> Start a game and verify the creation response.
+<7> Publish a move and verify the creation response.
+<8> Finish the game and verify the no-content response.
+:only-for-languages:
+
 === chess-listener tests
+
+:only-for-languages:python
+Define the test-only Kafka client in `tests/example/micronaut/game_reporter.py`, then import it in the test:
+
+rawTest:game_reporter[app=chess-listener]
+:only-for-languages:
 
 Create a test in the `chess-listener` microservice to verify that Kafka message processing and database persistence works:
 
 test:GameServiceTest[app=chess-listener]
 
+:exclude-for-languages:python
 <.> Use the `@Testcontainers` annotation to configure automatic container management (not necessary in Spock tests)
 callout:test-instance-per-class[]
 <.> Implementing `TestPropertyProvider` allows the test class to provide application configuration properties, in this case the dynamically allocated Kafka broker port
@@ -645,13 +814,21 @@ callout:test-instance-per-class[]
 <.> Dependency injection for the `GameReporter` interface declared below, a Kafka producer interface that replicates the functionality of the class of the same name in the `chess-game` microservice
 <.> Wait a few seconds for the message to arrive; it should happen very quickly, but the message will be sent on a separate thread
 <.> Configure the Kafka broker port (it will be a different unused port each time) so Micronaut Kafka clients and listeners connect to the test broker
-
-Create `application-test.properties` file in `src/test/resources` with this content:
+:exclude-for-languages:
+:only-for-languages:python
+<1> Start a nontransactional test context with OCI authentication disabled; Test Resources supplies local Kafka and Oracle fixtures.
+<2> Look up the imported Kafka producer by type to publish the same DTOs as the game application.
+<3> Wait for message-driven persistence before asserting game and move state.
+:only-for-languages:
 
 :exclude-for-languages:python
+Create `application-test.properties` file in `src/test/resources` with this content:
+
 testResource:application-test.properties[app=chess-listener]
 :exclude-for-languages:
 :only-for-languages:python
+Create `tests-config/application-test.toml` with this content:
+
 testResource:application-test.toml[app=chess-listener]
 :only-for-languages:
 
@@ -667,7 +844,12 @@ Follow the steps in guideLink:micronaut-oracle-cloud[this guide] for each servic
 
 === Instance Principal authentication
 
+:exclude-for-languages:python
 The current configuration in `application-oraclecloud.properties` works when running locally using OCI resources (ATP database and Cloud Streams) but won't work when deploying the application because it doesn't make sense to install the Oracle Cloud CLI in Compute instances. Instead, we'll use https://micronaut-projects.github.io/micronaut-oracle-cloud/latest/guide/#instance-principals[Instance Principal authentication].
+:exclude-for-languages:
+:only-for-languages:python
+The current configuration in `config/application-oraclecloud.toml` authenticates through the local OCI profile. Use https://micronaut-projects.github.io/micronaut-oracle-cloud/latest/guide/#instance-principals[Instance Principal authentication] when deploying the listener to Compute instances.
+:only-for-languages:
 
 To use this, we need to update the config, create a dynamic group, and add policy statements granting permissions.
 
@@ -695,6 +877,7 @@ image::oraclecloudstream/policy4.png[]
 
 ==== Configuration
 
+:exclude-for-languages:python
 Edit `application-oraclecloud.properties` in the `chess-listener` microservice and replace
 
 [source, yaml]
@@ -713,6 +896,17 @@ oci:
     instance-principal:
       enabled: true
 ----
+:exclude-for-languages:
+
+:only-for-languages:python
+In the listener's `config/application-oraclecloud.toml`, replace the `[oci.config]` table containing `profile = "DEFAULT"` with:
+
+[source,toml]
+----
+[oci.config.instance-principal]
+enabled = true
+----
+:only-for-languages:
 
 :exclude-for-languages:python
 common:graal-with-plugins-multi.adoc[]

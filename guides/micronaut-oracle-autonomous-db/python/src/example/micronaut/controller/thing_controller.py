@@ -21,4 +21,4 @@ class ThingController:
 
     @Get("/{name}")
     def by_name(self, name: Annotated[str, NotBlank]) -> Thing | None:
-        return self.thing_repository.findByName(name).orElse(None)
+        return self.thing_repository.findByName(name)
