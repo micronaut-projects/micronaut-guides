@@ -67,7 +67,7 @@ Each app entry usually includes:
 
 Feature names must be valid Micronaut Starter features. If a guide needs a feature not provided by Starter, add a feature class under `buildSrc/src/main/java/io/micronaut/guides/feature` and keep dependency coordinates in `buildSrc/src/main/resources/pom.xml`.
 
-Use optional metadata only when needed: `languages`, `buildTools`, `testFramework`, `minimumJavaVersion`, `maximumJavaVersion`, `cloud`, `publish`, `base`, `zipIncludes`, `skipGradleTests`, `skipMavenTests`, `env`, app-specific `javaFeatures`, `kotlinFeatures`, `groovyFeatures`, `invisibleFeatures`, `excludeTest`, and `excludeSource`.
+Use optional metadata only when needed: `languages`, `buildTools`, `testFramework`, `minimumJavaVersion`, `maximumJavaVersion`, `cloud`, `publish`, `base`, `zipIncludes`, `skipGradleTests`, `skipMavenTests`, `env`, app-specific `javaFeatures`, `kotlinFeatures`, `groovyFeatures`, `jvmFeatures` (shared by Java, Kotlin, and Groovy but not Python), `invisibleFeatures`, `excludeTest`, and `excludeSource`.
 
 Omit `languages` when a guide supports all default languages: Java, Groovy, and Kotlin. Add `languages` only when the guide intentionally narrows support to a subset.
 

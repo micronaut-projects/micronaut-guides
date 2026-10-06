@@ -55,7 +55,7 @@ class AppTest {
         boolean validateLicense = true;
 
         Set<ConstraintViolation<App>> violations = validator.validate(
-                new App(name,packageName,applicationType,framework,emptyList,emptyList,emptyList,emptyList,emptyList, TestFramework.JUNIT,emptyList,emptyList,validateLicense));
+                new App(name,packageName,applicationType,framework,emptyList,emptyList,emptyList,emptyList,emptyList,emptyList, TestFramework.JUNIT,emptyList,emptyList,validateLicense));
         assertTrue(violations.isEmpty());
     }
 
@@ -148,6 +148,13 @@ class AppTest {
                     },
                     "javaFeatures": {
                       "description": "The app's Java features",
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "jvmFeatures": {
+                      "description": "The app's features shared by the JVM languages (Java, Kotlin and Groovy)",
                       "type": "array",
                       "items": {
                         "type": "string"
