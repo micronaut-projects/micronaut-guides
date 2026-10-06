@@ -70,6 +70,7 @@ class IndexGeneratorTest {
         IndexGenerator.generateGuidesIndex(template, distDir, List.of(guide), null);
 
         String html = Files.readString(distDir.toPath().resolve("python-guide.html"));
+        assertTrue(html.contains("images/python.png"));
         assertTrue(html.contains("python-guide-pyronaut-python.html'>Read</a>"));
         assertFalse(html.contains("python-guide.html'>Read</a>"));
         assertFalse(html.contains("python-guide-gradle-python.html"));
@@ -119,7 +120,7 @@ class IndexGeneratorTest {
         IndexGenerator.generateGuidesIndex(template, distDir, List.of(guide), null);
 
         String html = Files.readString(distDir.toPath().resolve("jvm-guide.html"));
-        assertFalse(html.contains("python.svg"));
+        assertFalse(html.contains("images/python.png"));
         assertFalse(html.contains("Pyronaut"));
     }
 

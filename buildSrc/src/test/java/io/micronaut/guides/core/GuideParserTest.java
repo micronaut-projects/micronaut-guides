@@ -1,13 +1,18 @@
 package io.micronaut.guides.core;
 
+import io.micronaut.core.io.ResourceLoader;
 import io.micronaut.starter.application.ApplicationType;
 import io.micronaut.starter.options.BuildTool;
 import io.micronaut.starter.options.Language;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
@@ -19,6 +24,28 @@ public class GuideParserTest {
 
     @Inject
     GuideParser guideParser;
+
+    @Test
+    void schemaAdvertisesSupportedPythonOptionsOnly(ResourceLoader resourceLoader) throws IOException, JSONException {
+        try (var input = resourceLoader.getResourceAsStream("classpath:guide-metadata.schema.json").orElseThrow()) {
+            JSONObject properties = new JSONObject(new String(input.readAllBytes(), StandardCharsets.UTF_8))
+                    .getJSONObject("properties");
+            assertFalse(properties.has("python"));
+            assertTrue(properties.getJSONObject("languages").getJSONObject("items")
+                    .getJSONArray("enum").toString().contains("\"PYTHON\""));
+            assertTrue(properties.getJSONObject("apps").getJSONObject("items")
+                    .getJSONObject("properties").has("pythonFeatures"));
+        }
+    }
+
+    @Test
+    void explicitPythonLanguageAddsPyronautBuildTool() {
+        Guide guide = guideParser.parseGuideMetadata(
+                new File("src/test/resources/guides-python/creating-your-first-micronaut-app"),
+                "metadata.json").orElseThrow();
+        assertEquals(List.of(Language.PYTHON), guide.languages());
+        assertEquals(List.of(BuildTool.GRADLE, BuildTool.MAVEN, BuildTool.PYRONAUT), guide.buildTools());
+    }
 
     @Test
     void testParseGuidesMetadata() {
