@@ -64,6 +64,8 @@ abstract class SampleProjectGenerationTask extends DefaultTask {
         Language languageFilter = language.isPresent() ? Language.valueOf(language.get()) : null
         if (languageFilter == null) {
             project.delete(outputDirectory)
+        } else {
+            project.delete(outputDirectories)
         }
         guidesGenerator.generateOne(metadata, inputDirectory.get().asFile, outputDirectory, languageFilter)
     }
