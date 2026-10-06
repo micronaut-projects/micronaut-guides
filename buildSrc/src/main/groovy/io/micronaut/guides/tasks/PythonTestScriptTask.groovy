@@ -34,6 +34,11 @@ abstract class PythonTestScriptTask extends DefaultTask {
     @Internal
     Guide metadata
 
+    @Input
+    String getMergedMetadata() {
+        metadata.toString()
+    }
+
     @OutputFile
     abstract RegularFileProperty getScriptFile()
 
