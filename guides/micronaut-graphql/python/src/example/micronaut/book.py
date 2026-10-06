@@ -10,5 +10,5 @@ from .author import Author
 class Book:
     id: str
     name: str
-    pageCount: int
+    page_count: int
     author: Author
