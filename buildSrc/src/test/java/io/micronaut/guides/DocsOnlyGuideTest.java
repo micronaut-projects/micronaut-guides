@@ -16,6 +16,7 @@ import org.gradle.testfixtures.ProjectBuilder;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
@@ -49,12 +50,25 @@ class DocsOnlyGuideTest {
                 () -> assertEquals(List.of(), SampleProjectGenerationTask.outputDirectoryNames(guide, null)),
                 () -> assertEquals(List.of(), SampleProjectGenerationTask.outputDirectoryNames(guide, Language.PYTHON))
         );
+        Path outputDirectory = tempDir.resolve("build/code/docs-only");
+        assertFalse(Files.exists(outputDirectory.getParent()));
         try (GuideProjectGenerator generator = new GuideProjectGenerator()) {
-            generator.generateOne(guide, tempDir.toFile(), tempDir.resolve("code").toFile());
+            generator.generateOne(guide, tempDir.toFile(), outputDirectory.toFile());
+            generator.generateOne(guide, tempDir.toFile(), outputDirectory.toFile());
         }
-        try (var paths = Files.list(tempDir.resolve("code"))) {
+        try (var paths = Files.list(outputDirectory)) {
             assertEquals(0, paths.count());
         }
+    }
+
+    @Test
+    void existingFileCannotBeUsedAsProjectOutputDirectory() throws Exception {
+        Path outputFile = tempDir.resolve("output");
+        Files.writeString(outputFile, "not a directory");
+        try (GuideProjectGenerator generator = new GuideProjectGenerator()) {
+            assertThrows(IOException.class, () -> generator.generateOne(guide(List.of()), tempDir.toFile(), outputFile.toFile()));
+        }
+        assertEquals("not a directory", Files.readString(outputFile));
     }
 
     @Test

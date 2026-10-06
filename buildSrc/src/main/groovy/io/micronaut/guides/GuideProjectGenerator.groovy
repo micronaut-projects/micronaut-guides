@@ -111,9 +111,7 @@ class GuideProjectGenerator implements AutoCloseable {
     }
 
     void generateOne(Guide metadata, File inputDir, File outputDir, Language languageFilter) {
-        if (!outputDir.exists()) {
-            assert outputDir.mkdir()
-        }
+        Files.createDirectories(outputDir.toPath())
 
         JdkVersion javaVersion = Utils.parseJdkVersion()
         if (metadata.minimumJavaVersion() != null) {
