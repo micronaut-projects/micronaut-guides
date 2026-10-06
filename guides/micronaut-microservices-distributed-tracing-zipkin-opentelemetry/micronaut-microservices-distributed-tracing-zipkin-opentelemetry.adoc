@@ -30,6 +30,30 @@ image::flow.svg[]
 
 A request to `bookrecommendation` (http://localhost:8080/books) triggers several requests through our microservices mesh.
 
+:only-for-languages:python
+
+=== Async recommendations
+
+The recommendation service uses Micronaut declarative HTTP clients with Python async methods.
+The catalogue operation returns `list[Book]`; the stock operation returns `True`, `False`, or `None` for a missing book.
+`@Recoverable` keeps the fallback behavior when a service is unavailable.
+
+source:BookCatalogueClient[app=bookrecommendation]
+
+<1> `@Client` connects to the catalogue service at its configured URL.
+
+source:BookInventoryClient[app=bookrecommendation]
+
+The route awaits the catalogue and each stock lookup in sequence, then returns a normal Python list.
+Both `False` and `None` exclude a book from the recommendations.
+
+source:BookController[app=bookrecommendation]
+
+The recommendation test uses async fallback beans with all three stock outcomes and retains the expected single in-stock recommendation.
+This endpoint test does not verify exported traces; run the three services and Zipkin below to inspect distributed spans.
+
+:only-for-languages:
+
 https://micronaut-projects.github.io/micronaut-guides/latest/micronaut-intellij-idea-ide-setup.html[Setup IntelliJ IDEA to develop Micronaut Applications].
 
 == Zipkin and the Micronaut Framework
@@ -186,7 +210,17 @@ The previous request generates a trace composed of 5 spans.
 
 image::zipkinui-opentelemetry.png[]
 
+:exclude-for-languages:python
+
 In the previous image, you can see the requests to `bookinventory` are made in parallel.
+
+:exclude-for-languages:
+
+:only-for-languages:python
+
+The Python recommendation route awaits stock requests sequentially, so their spans do not overlap as in this image.
+
+:only-for-languages:
 
 In the previous image, you can see that:
 
@@ -210,7 +244,16 @@ Start the native images for the three microservices and run the same `curl` requ
 As you have seen in this guide, without any annotations, you can get distributed tracing up and running quickly with the Micronaut framework.
 
 The Micronaut framework includes several annotations to give you more flexibility. We introduced the `@ContinueSpan` and `@SpanTag` annotations.
+:exclude-for-languages:python
+
 Also, you have at your disposal the `@NewSpan` annotation, which will create a new span, wrapping the method call or reactive type.
 
-Make sure to read more about https://micronaut-projects.github.io/micronaut-tracing/latest/guide/#zipkin[Tracing with Zipkin] in the Micronaut framework.
+:exclude-for-languages:
 
+:only-for-languages:python
+
+The `@NewSpan` annotation creates a new span. Use Micronaut tracing annotations on the Python methods you want to trace, while retaining async client calls and `await` in your application code.
+
+:only-for-languages:
+
+Make sure to read more about https://micronaut-projects.github.io/micronaut-tracing/latest/guide/#zipkin[Tracing with Zipkin] in the Micronaut framework.
