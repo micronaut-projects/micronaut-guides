@@ -101,6 +101,27 @@ class GuideUtilsTest {
     }
 
     @Test
+    void testJvmFeaturesApplyToJvmLanguagesOnly(){
+        Optional<InputStream> inputStreamOptional = resourceLoader.getResourceAsStream("classpath:metadata-jvm-features.json");
+        assertTrue(inputStreamOptional.isPresent());
+        InputStream inputStream = inputStreamOptional.get();
+        Guide guide = assertDoesNotThrow(() -> jsonMapper.readValue(inputStream, Guide.class));
+        App app = guide.apps().get(0);
+
+        assertEquals(List.of("validation", "spreadsheet-builder", "graalvm"), GuideUtils.getAppVisibleFeatures(app, Language.JAVA));
+        assertEquals(List.of("validation", "spreadsheet-builder", "graalvm"), GuideUtils.getAppVisibleFeatures(app, Language.KOTLIN));
+        assertEquals(List.of("validation", "spreadsheet-builder"), GuideUtils.getAppVisibleFeatures(app, Language.GROOVY));
+        assertEquals(List.of("validation"), GuideUtils.getAppVisibleFeatures(app, Language.PYTHON));
+
+        assertEquals(List.of("validation", "spreadsheet-builder", "graalvm"), GuideUtils.getAppFeatures(app, Language.JAVA));
+        assertEquals(List.of("validation", "spreadsheet-builder", "graalvm"), GuideUtils.getAppFeatures(app, Language.KOTLIN));
+        assertEquals(List.of("validation", "spreadsheet-builder"), GuideUtils.getAppFeatures(app, Language.GROOVY));
+        assertEquals(List.of("validation"), GuideUtils.getAppFeatures(app, Language.PYTHON));
+
+        assertTrue(GuideUtils.getTags(guide).contains("spreadsheet-builder"));
+    }
+
+    @Test
     void testGetAppFeaturesEmpty(){
         Optional<InputStream> inputStreamOptional = resourceLoader.getResourceAsStream("classpath:metadata-features.json");
         assertTrue(inputStreamOptional.isPresent());
@@ -169,11 +190,11 @@ class GuideUtilsTest {
 
     @Test
     void testMergePreservesPythonOptionsFromBase() {
-        App baseApp = new App("default", null, null, null, List.of(), List.of(), List.of(), List.of(), List.of(), null, null, null, true, List.of("base"));
+        App baseApp = new App("default", null, null, null, List.of(), List.of(), List.of(), List.of(), List.of(), List.of("base-jvm"), null, null, null, true, List.of("base"));
         Guide base = new Guide("base", "base", List.of("author"), List.of("category"), LocalDate.of(2026, 1, 1), null, null, null,
                 false, false, null, List.of(Language.JAVA, Language.GROOVY, Language.KOTLIN, Language.PYTHON), List.of(),
                 List.of(BuildTool.GRADLE, BuildTool.MAVEN, BuildTool.PYRONAUT), null, List.of(), "base", true, null, Map.of(), List.of(baseApp), false);
-        App childApp = new App("default", null, null, null, List.of(), List.of(), List.of(), List.of(), List.of(), null, null, null, true, List.of("child"));
+        App childApp = new App("default", null, null, null, List.of(), List.of(), List.of(), List.of(), List.of(), List.of("child-jvm"), null, null, null, true, List.of("child"));
         Guide child = new Guide("child", "child", List.of(), List.of("category"), LocalDate.of(2026, 1, 1), null, null, null,
                 false, false, null, null, List.of(),
                 null, null, List.of(), "child", true, "base", Map.of(), List.of(childApp), false);
@@ -183,11 +204,14 @@ class GuideUtilsTest {
         assertTrue(merged.languages().contains(Language.PYTHON));
         assertTrue(merged.buildTools().contains(BuildTool.PYRONAUT));
         assertEquals(List.of("child", "base"), merged.apps().get(0).pythonFeatures());
+        assertEquals(List.of("child-jvm", "base-jvm"), merged.apps().get(0).jvmFeatures());
+        assertEquals(List.of("child", "base"), GuideUtils.getAppVisibleFeatures(merged.apps().get(0), Language.PYTHON));
+        assertEquals(List.of("child-jvm", "base-jvm"), GuideUtils.getAppVisibleFeatures(merged.apps().get(0), Language.JAVA));
     }
 
     @Test
     void testMergeAllowsChildToDisablePython() {
-        App app = new App("default", null, null, null, List.of(), List.of(), List.of(), List.of(), List.of(), null, null, null, true, List.of());
+        App app = new App("default", null, null, null, List.of(), List.of(), List.of(), List.of(), List.of(), null, null, null, null, true, List.of());
         Guide base = new Guide("base", "base", List.of("author"), List.of("category"), LocalDate.of(2026, 1, 1), null, null, null,
                 false, false, null, List.of(Language.JAVA, Language.GROOVY, Language.KOTLIN, Language.PYTHON), List.of(),
                 List.of(BuildTool.GRADLE, BuildTool.MAVEN, BuildTool.PYRONAUT), null, List.of(), "base", true, null, Map.of(), List.of(app), false);

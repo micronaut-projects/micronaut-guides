@@ -112,6 +112,7 @@ class GuideAsciidocGeneratorTest {
                         List.of(),
                         List.of(),
                         List.of(),
+                        List.of(),
                         null,
                         null,
                         null,

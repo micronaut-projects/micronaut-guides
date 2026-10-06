@@ -45,6 +45,7 @@ class GuideProjectGeneratorTest {
                 List.of(),
                 List.of(),
                 List.of(),
+                List.of(),
                 null,
                 null,
                 null,
@@ -178,6 +179,7 @@ class GuideProjectGeneratorTest {
                 List.of(),
                 List.of(),
                 List.of(),
+                List.of(),
                 null,
                 null,
                 null,
@@ -221,7 +223,7 @@ class GuideProjectGeneratorTest {
         App app = new App(
                 "default", "example.micronaut", ApplicationType.DEFAULT, "Micronaut",
                 List.of("data-jdbc", "flyway", "oracle-cloud-atp"),
-                List.of(), List.of(), List.of(), List.of(), null, null, null, false,
+                List.of(), List.of(), List.of(), List.of(), null, null, null, null, false,
                 List.of("h2-runtime")
         );
         Guide guide = GuideTestUtils.guideWithSlug("oracle-atp-h2-runtime");

@@ -104,6 +104,7 @@ public class DefaultGuideParser implements GuideParser {
                     app.kotlinFeatures() != null ? app.kotlinFeatures() : new ArrayList<>(),
                     app.javaFeatures() != null ? app.javaFeatures() : new ArrayList<>(),
                     app.groovyFeatures() != null ? app.groovyFeatures() : new ArrayList<>(),
+                    app.jvmFeatures() != null ? app.jvmFeatures() : new ArrayList<>(),
                     app.testFramework(),
                     app.excludeTest(),
                     app.excludeSource(),
