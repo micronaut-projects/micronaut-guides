@@ -12,27 +12,59 @@ common:create-app-features.adoc[]
 
 common:oracle-driver.adoc[]
 
+:exclude-for-languages:python
+
 common:datasource-configuration-oracle.adoc[]
 
 resource:application.properties[tag=testresources]
+
+:exclude-for-languages:
+
+:only-for-languages:python
+
+Configure the Oracle datasource in `config/application.toml`:
+
+resource:application.toml[tag=datasource]
+
+The Python sample uses the Oracle Free `slim-faststart` image with a bounded startup timeout:
+
+resource:application.toml[tag=testresources]
+
+:only-for-languages:
 
 The datasource uses the Oracle dialect and schema generation creates the sample tables. Test Resources supplies the JDBC URL, username, and password by starting an Oracle Free container.
 
 == Why use value-based optimistic locking
 
-Without optimistic locking, two transactions can read the same row and later updates can overwrite one another without detecting that the data changed in between. An ETag gives each read a value representing the selected row values. Micronaut Data includes that value in the `UPDATE` and `DELETE` predicates, so a stale entity matches no row and results in an api:data.exceptions.OptimisticLockException[].
+Without optimistic locking, two transactions can read the same row and later updates can overwrite one another without detecting that the data changed in between. An ETag gives each read a value representing the selected row values. Micronaut Data includes that value in the `UPDATE` and `DELETE` predicates, so a stale entity matches no row and results in an `OptimisticLockException`.
 
 This approach is useful when you need to prevent lost updates but cannot add a dedicated version column, or when you want to use Oracle's built-in row ETag instead of maintaining one yourself. Compared with an ordinary update, it detects stale data. The trade-off is that an entity must be read with its current ETag before an update or delete. You can choose whether all eligible properties or only explicitly selected properties contribute to the ETag.
 
 == Entity with an implicit ETag
 
+:exclude-for-languages:python
+
 Annotate a `String` property with `@GeneratedETag`. When the entity is annotated with `@ETaggable`, all eligible persistent scalar properties participate in the ETag calculation:
+
+:exclude-for-languages:
+
+:only-for-languages:python
+
+Use `Annotated[str | None, GeneratedETag]` for the nullable generated value on a Python dataclass.
+When the entity is annotated with `@ETaggable`, all eligible persistent scalar properties participate in the ETag calculation:
+
+:only-for-languages:
 
 source:Book[tag=generated-etag]
 
 <1> `@ETaggable` includes eligible scalar properties such as `id`, `title`, and the embedded `pages` property.
 <2> `@GeneratedETag` marks `etag` as a generated, read-only version property. It is not a physical column.
+:exclude-for-languages:python
 <3> `@ETagValue(exclude = true)` excludes `chapters` even though it is persisted.
+:exclude-for-languages:
+:only-for-languages:python
+<3> `ETagValue(exclude=True)` excludes `chapters` even though it is persisted.
+:only-for-languages:
 
 The `@ETagValue` annotation can also explicitly select ETag inputs when `@ETaggable` is not used:
 
@@ -58,9 +90,25 @@ test:OptimisticLockingTest[]
 
 <1> Reload the entity after saving it to obtain the computed ETag.
 <2> A successful update changes an ETag input, so reload the entity before another optimistic-locking write.
-<3> Reusing the old ETag causes api:data.exceptions.OptimisticLockException[] because the row no longer matches.
+<3> Reusing the old ETag causes `OptimisticLockException` because the row no longer matches.
+
+:exclude-for-languages:python
 
 Changes to fields excluded with `@ETagValue(exclude = true)`, or fields not selected with explicit `@ETagValue`, do not change the ETag. Always reload an entity after changing an ETag input before issuing another update.
+
+:exclude-for-languages:
+
+:only-for-languages:python
+
+Changes to fields annotated with `ETagValue(exclude=True)`, or fields not selected with explicit `ETagValue`, do not change the ETag. Always reload an entity after changing an ETag input before issuing another update.
+
+The Python tests construct a new `Book` or `Article`, retaining the original ID and ETag, and catch the specific
+`OptimisticLockException`; another exception does not satisfy the stale-write assertion.
+They also verify that a stale delete fails while a fresh delete succeeds, and that changing embedded
+`chapters` preserves the ETag while changing embedded `pages` changes it.
+Database cleanup runs before and after each test, before the application context is stopped.
+
+:only-for-languages:
 
 common:testApp.adoc[]
 
