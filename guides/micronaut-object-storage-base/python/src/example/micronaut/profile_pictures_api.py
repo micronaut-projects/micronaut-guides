@@ -19,7 +19,7 @@ class ProfilePicturesApi(Protocol):
         ...
 
     @Get("/{userId}")  # <2>
-    def download(self, userId: str) -> HttpResponse[StreamedFile]:
+    def download(self, userId: str) -> HttpResponse[StreamedFile] | None:
         ...
 
     @Status(HttpStatus.NO_CONTENT)  # <3>

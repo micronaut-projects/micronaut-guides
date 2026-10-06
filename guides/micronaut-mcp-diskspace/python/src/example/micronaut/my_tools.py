@@ -8,7 +8,7 @@ from example.micronaut.disk_utils import free_disk_space
 class MyTools:
     @Tool(
         title="Free Disk Space",
-        description="Return the free disk space in the users computer",
+        description="Return the free disk space in the user's computer",
     )  # <2>
     def freeDiskSpace(self) -> str:
         return free_disk_space()
