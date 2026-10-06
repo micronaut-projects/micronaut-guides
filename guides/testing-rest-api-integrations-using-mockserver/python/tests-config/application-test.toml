@@ -1,0 +1,44 @@
+[wiremock-stubs]
+url = "http://${wiremock-stubs.host}:${wiremock-stubs.port}"
+
+[wiremock-mappings]
+url = "http://${wiremock-mappings.host}:${wiremock-mappings.port}"
+
+[mockserver]
+url = "http://${mockserver.host}:${mockserver.port}"
+
+# tag::wiremock-stubs[]
+[test-resources.containers.wiremock-stubs]
+image-name = "wiremock/wiremock:3.0.4"
+hostnames = ["wiremock-stubs.host"]
+exposed-ports = [{ "wiremock-stubs.port" = 8080 }]
+startup-timeout = "60s"
+
+[test-resources.containers.wiremock-stubs.wait-strategy.http]
+path = "/__admin/mappings"
+port = 8080
+status-code = 200
+# end::wiremock-stubs[]
+
+# tag::wiremock-mappings[]
+[test-resources.containers.wiremock-mappings]
+image-name = "wiremock/wiremock:3.0.4"
+hostnames = ["wiremock-mappings.host"]
+exposed-ports = [{ "wiremock-mappings.port" = 8080 }]
+copy-to-container = [{ "tests-config/wiremock/mappings" = "/home/wiremock/mappings" }]
+startup-timeout = "60s"
+
+[test-resources.containers.wiremock-mappings.wait-strategy.http]
+path = "/__admin/mappings"
+port = 8080
+status-code = 200
+# end::wiremock-mappings[]
+
+# tag::mockserver[]
+[test-resources.containers.mockserver]
+image-name = "mockserver/mockserver:5.15.0"
+hostnames = ["mockserver.host"]
+exposed-ports = [{ "mockserver.port" = 1080 }]
+startup-timeout = "60s"
+wait-strategy = "port"
+# end::mockserver[]

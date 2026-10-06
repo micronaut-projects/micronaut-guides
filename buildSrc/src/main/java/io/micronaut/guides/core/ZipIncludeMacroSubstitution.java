@@ -32,7 +32,8 @@ public class ZipIncludeMacroSubstitution extends SourceBlockMacroSubstitution {
             String condensedTarget,
             Classpath classpath,
             String language,
-            String packageName) {
+            String packageName,
+            GuidesOption option) {
         return condensedTarget;
     }
 }

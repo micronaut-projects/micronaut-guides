@@ -14,7 +14,8 @@ After creating the repository, go to _Account Settings / Personal Access Tokens_
 
 Use the https://docs.docker.com/security/for-developers/access-tokens/#use-an-access-token[access token to sign in using the Docker CLI].
 
-:exclude-for-build:maven
+:exclude-for-languages:python
+:exclude-for-build:maven,pyronaut
 
 == Micronaut Gradle Plugin
 
@@ -49,3 +50,33 @@ You can push to Docker Hub via the `dockerPush` Gradle task.
 common:docker-push-gradle.adoc[]
 
 :exclude-for-build:
+:exclude-for-languages:
+
+:only-for-languages:python
+
+== Pyronaut
+
+Configure the Pyronaut Docker image name in `pyproject.toml`:
+
+[source,toml]
+----
+[tool.pyronaut.build.docker]
+image-name = "dockerHubNamespace/repositoryName"
+----
+
+Log in to Docker Hub:
+
+[source,bash]
+----
+echo "${DOCKER_HUB_ACCESS_TOKEN}" | docker login -u dockerHubNamespace --password-stdin
+----
+
+Build and push the Docker image:
+
+[source,bash]
+----
+pyronaut build --docker
+docker push dockerHubNamespace/repositoryName:1.0.0
+----
+
+:only-for-languages:

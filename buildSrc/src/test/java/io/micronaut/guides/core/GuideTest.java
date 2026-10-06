@@ -69,7 +69,7 @@ class GuideTest {
         assertEquals(LocalDate.of(2022,2, 17), guide.publicationDate());
         List<String> tags = guide.tags();
         Collections.sort(tags);
-        assertEquals(List.of("Azure", "base-java", "base-kotlin", "child-java", "child-kotlin", "cloud", "data-jdbc", "database", "flyway", "jdbc", "micronaut-data", "mysql"), tags);
+        assertEquals(List.of("Azure", "base-java", "base-jvm", "base-kotlin", "child-java", "child-jvm", "child-kotlin", "cloud", "data-jdbc", "database", "flyway", "jdbc", "micronaut-data", "mysql"), tags);
         List<App> apps = guide.apps();
         assertNotNull(apps);
         assertEquals(1, apps.size());
@@ -83,6 +83,7 @@ class GuideTest {
                     app.kotlinFeatures().equals(List.of("child-kotlin", "base-kotlin")) &&
                     app.javaFeatures().equals(List.of("child-java", "base-java")) &&
                     app.groovyFeatures().isEmpty() &&
+                    app.jvmFeatures().equals(List.of("child-jvm", "base-jvm")) &&
                     app.testFramework() ==  null &&
                     app.excludeTest() ==  null &&
                     app.excludeSource() ==  null &&
@@ -98,10 +99,19 @@ class GuideTest {
         List<String> authors = List.of("Sergio del Amo");
         LocalDate publicationDate = LocalDate.of(2024, 4, 24);
         List<App> apps = new ArrayList<>();
-        apps.add(new App("springboot", null, null, null, null, null, null, null, null, null, null, null,false));
+        apps.add(new App("springboot", null, null, null, null, null, null, null, null, null, null, null, null,false));
         Set<ConstraintViolation<Guide>> violations = validator.validate(
                 new Guide(title,intro, authors, categories, publicationDate, null, null, null,false,false,null,null,null,null,null,null,null,true,null,null,apps));
         assertTrue(violations.isEmpty());
+    }
+
+    @Test
+    void appsMustNotBeNull() {
+        Guide guide = new Guide("Documentation guide", "Connect the existing application.",
+                List.of("Micronaut"), List.of("Data JDBC"), LocalDate.of(2026, 10, 6),
+                null, null, null, false, false, null, null, null, null, null, null, null,
+                true, null, null, null);
+        assertTrue(validator.validate(guide).stream().anyMatch(violation -> violation.getPropertyPath().toString().equals("apps")));
     }
 
     @Test
@@ -220,17 +230,16 @@ class GuideTest {
         String expected = """
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://micronaut-projects.github.io/micronaut-guides/schemas/guide.schema.json",
+  "$id": "https://guides.micronaut.io/schemas/guide.schema.json",
   "title": "Guide",
   "type": "object",
   "properties": {
     "apps": {
-      "description": "Applications created for the guide",
+      "description": "Applications created for the guide; an empty list denotes a documentation-only guide with no generated application",
       "type": "array",
       "items": {
-        "$ref": "https://micronaut-projects.github.io/micronaut-guides/schemas/app.schema.json"
-      },
-      "minItems": 1
+        "$ref": "https://guides.micronaut.io/schemas/app.schema.json"
+      }
     },
     "asciidoctor": {
       "description": "The guide asciidoc file. If not specified, the guide slug followed by the .adoc suffix is used",

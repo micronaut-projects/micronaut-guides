@@ -14,13 +14,13 @@ common:docker-testcontainers.adoc[]
 common:completesolution.adoc[]
 
 == What we are going to achieve in this guide
-We are going to create a Micronaut project with *Kafka*, *Micronaut Data JPA* and *MySQL*,
+We are going to create a Micronaut project with *Kafka*, *Micronaut Data* and *MySQL*,
 where we implement a Kafka Listener which receives an event payload and persists the event data in the database.
 Then we will test this Kafka Listener using the Testcontainers Kafka
 and MySQL modules in conjunction with http://www.awaitility.org/[Awaitility].
 
 
-The generated application has http://www.awaitility.org[Awaitility] library as test dependency
+The generated Java application has http://www.awaitility.org[Awaitility] library as test dependency
 which we can use for asserting the expectations of an asynchronous process flow.
 
 common:create-app-features-testcontainers.adoc[]
@@ -37,7 +37,13 @@ dependency:testcontainers-mysql[groupId=org.testcontainers,scope=test]
 
 The generated application contains the following configuration:
 
+:exclude-for-languages:python
 resource:application.properties[app=testcontainers,tag=datasource]
+:exclude-for-languages:
+
+:exclude-for-languages:java
+resource:application.toml[app=testcontainers,tag=datasource]
+:exclude-for-languages:
 
 NOTE: Note the configuration does not contain any database URL, username or password. It does not contain the Kafka bootstrap servers' location either. We will configure them in the test or via Micronaut Test Resources.
 
@@ -47,22 +53,30 @@ We are going to implement a Kafka Listener listening to a topic named `product-p
 and upon receiving a message we are going to extract product code and price from the event payload
 and update the price of that product in the MySQL database.
 
-== Create JPA entity
+== Create the Product entity
 
-First let us start with creating a JPA entity *Product.java*.
+First let us start with creating a `Product` persistence entity.
 
 source:Product[app=testcontainers]
 
-== Create Micronaut Data JPA repository
+== Create Micronaut Data repository
 
-Let us create a Micronaut Data JPA repository interface for the *Product* entity and
+Let us create a Micronaut Data repository for the *Product* entity and
 add methods to find a product for a given code and update the price for the given product code as follows:
 
 source:ProductRepository[app=testcontainers]
 
+:exclude-for-languages:python
 callout:repository[]
 callout:jparepository[]
 callout:at-query[]
+:exclude-for-languages:
+
+:exclude-for-languages:java
+callout:jdbcrepository[]
+callout:crudrepository[]
+<.> Micronaut Data implements the derived `updateByCode` method at compile time.
+:exclude-for-languages:
 
 == Create the event payload java bean
 
@@ -121,15 +135,27 @@ and configure the application to talk to them as follows:
 test:ProductPriceChangedEventHandlerTest[app=testcontainers]
 
 callout:micronaut-test-transactional-false[]
+:exclude-for-languages:python
 <.> Annotate the class with `@Property` to supply the driver class name configuration to the test.
 <.> We have configured the https://java.testcontainers.org/modules/databases/jdbc/[Testcontainers special JDBC URL] to spin up a MySQL container and configure it as a DataSource with Micronaut application context.
 callout:test-containers-disabled-without-docker[]
 callout:test-instance-per-class[]
 callout:test-property-provider[]
 <.> We have used the Testcontainers JUnit 5 Extension annotations *@Testcontainers* and *@Container* to spin up a Kafka container and registered the *bootstrap-servers* location using *TestPropertyProvider* mechanism.
+:exclude-for-languages:
+:exclude-for-languages:java
+<.> Supply the driver class name configuration to the test.
+<.> Configure the https://java.testcontainers.org/modules/databases/jdbc/[Testcontainers special JDBC URL] to spin up a MySQL container and configure it as a DataSource with Micronaut application context.
+<.> Start a Kafka container for the test.
+:exclude-for-languages:
 <.> We have created a Product record in the database before sending the event.
 <.> During the test, we sent a message to the *product-price-changes* topic using *ProductPriceChangesClient* with productCode as key and *ProductPriceChangedEvent* instance as value.
+:exclude-for-languages:python
 <.> As Kafka message processing is an asynchronous process, we are using the *Awaitility* library to check whether the product price is updated in the database to the expected value or not with an interval of 3 seconds waiting up to a maximum of 10 seconds. If the message is consumed and processed within 10 seconds the test will pass, otherwise the test will fail.
+:exclude-for-languages:
+:exclude-for-languages:java
+<.> As Kafka message processing is an asynchronous process, the test polls until the product price is updated in the database. If the message is consumed and processed within 10 seconds the test will pass, otherwise the test will fail.
+:exclude-for-languages:
 
 common:testApp.adoc[]
 
@@ -162,7 +188,12 @@ test:ProductPriceChangedEventHandlerTest[app=testresources]
 callout:micronaut-test-transactional-false[]
 <.> We have created a Product record in the database before sending the event.
 <.> During the test, we sent a message to the *product-price-changes* topic using *ProductPriceChangesClient* with productCode as key and *ProductPriceChangedEvent* instance as value.
+:exclude-for-languages:python
 <.> As Kafka message processing is an asynchronous process, we are using the *Awaitility* library to check whether the product price is updated in the database to the expected value or not with an interval of 3 seconds waiting up to a maximum of 10 seconds. If the message is consumed and processed within 10 seconds the test will pass, otherwise the test will fail.
+:exclude-for-languages:
+:exclude-for-languages:java
+<.> As Kafka message processing is an asynchronous process, the test polls until the product price is updated in the database. If the message is consumed and processed within 10 seconds the test will pass, otherwise the test will fail.
+:exclude-for-languages:
 
 If you run the test, you will see a MySQL container and Kafka container being started by Test Resources through integration with Testcontainers to provide throwaway containers for testing.
 
