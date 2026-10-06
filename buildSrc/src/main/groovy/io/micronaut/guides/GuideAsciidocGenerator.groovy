@@ -653,7 +653,7 @@ class GuideAsciidocGenerator {
     }
 
     private static String pythonModuleName(String target) {
-        if (target.contains('_') || target == target.toLowerCase(Locale.ENGLISH)) {
+        if (target == target.toLowerCase(Locale.ENGLISH)) {
             return target
         }
         target.replaceAll(/([a-z0-9])([A-Z])/, '$1_$2')
