@@ -102,7 +102,7 @@ exit 0
                                    List<Guide> metadatas,
                                    boolean stopIfFailure,
                                    Language languageFilter) {
-        String script = generateScript(metadatas, stopIfFailure, false, languageFilter)
+        String script = generateScript(metadatas, stopIfFailure, false, false, languageFilter)
         generateTestScript(output, script)
     }
 
@@ -111,6 +111,13 @@ exit 0
                                    boolean stopIfFailure) {
         String script = generateScript(metadatas, stopIfFailure, true)
         generateTestScript(output, script, 'native-test.sh')
+    }
+
+    static void generatePythonTestScript(File output,
+                                         List<Guide> metadatas,
+                                         boolean stopIfFailure) {
+        String script = generateScript(metadatas, stopIfFailure, false, true)
+        generateTestScript(output, script, 'python-test.sh')
     }
 
     static void generateTestScript(File output, String script, String scriptFileName = "test.sh") {
@@ -139,6 +146,7 @@ exit 0
     static String generateScript(List<Guide> metadatas,
                                  boolean stopIfFailure,
                                  boolean nativeTest = false,
+                                 boolean pythonTest = false,
                                  Language languageFilter = null) {
         StringBuilder bashScript = new StringBuilder('''\
 #!/usr/bin/env bash
@@ -155,9 +163,15 @@ kill_kotlin_daemon () {
   done
 }
 ''')
+        if (pythonTest) {
+            bashScript << "\n\n" << pyronautFunctions()
+        }
 
         metadatas.sort { it.slug() }
         for (Guide metadata : metadatas) {
+            if (metadata.apps().isEmpty()) {
+                continue
+            }
             List<GuidesOption> guidesOptionList = GuideProjectGenerator.guidesOptions(metadata)
             if (languageFilter != null) {
                 guidesOptionList = guidesOptionList.findAll { GuidesOption option -> option.language == languageFilter }
@@ -165,6 +179,9 @@ kill_kotlin_daemon () {
             bashScript << """\
 """
             for (GuidesOption guidesOption : guidesOptionList) {
+                if (pythonTest != isPyronautPython(guidesOption)) {
+                    continue
+                }
                 String folder = GuideProjectGenerator.folderName(metadata.slug(), guidesOption)
                 BuildTool buildTool = guidesOption.getBuildTool()
                 if (buildTool == PYRONAUT && System.getenv('CI') != null) {
@@ -242,9 +259,7 @@ if (noDaemon) {
 }
 if (buildTool == PYRONAUT) {
 bashScript += """\
-pyronaut install || EXIT_STATUS=\$?
-pyronaut validate-config || EXIT_STATUS=\$?
-pyronaut test || EXIT_STATUS=\$?
+run_pyronaut_tests || EXIT_STATUS=\$?
 """
 } else if (nativeTest) {
 bashScript += """\
@@ -282,5 +297,19 @@ EXIT_STATUS=0
         }
 
         bashScript
+    }
+
+    static String pyronautFunctions() {
+        java.io.InputStream stream = TestScriptGenerator.class.getResourceAsStream('/pyronaut-test-functions.sh')
+        if (stream == null) {
+            throw new IllegalStateException('Missing pyronaut-test-functions.sh resource')
+        }
+        try (stream) {
+            new String(stream.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8).stripTrailing() + '\n'
+        }
+    }
+
+    private static boolean isPyronautPython(GuidesOption guidesOption) {
+        guidesOption.buildTool == PYRONAUT && guidesOption.language == Language.PYTHON
     }
 }

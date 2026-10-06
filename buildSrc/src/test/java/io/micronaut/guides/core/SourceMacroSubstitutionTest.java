@@ -47,6 +47,20 @@ class SourceMacroSubstitutionTest {
     }
 
     @Test
+    void testSubstitutePyronautPythonKeepsSourceCallouts() {
+        String str = "source:HelloController[]\n";
+        String resPython = sourceMacroSubstitution.substitute(str, GuideTestUtils.guideWithSlug("creating-your-first-micronaut-app"), new GuidesOption(BuildTool.PYRONAUT, Language.PYTHON, TestFramework.PYTEST));
+        String expectedPython = """
+                [source,python]
+                .src/example/micronaut/hello_controller.py
+                ----
+                include::{sourceDir}/creating-your-first-micronaut-app/creating-your-first-micronaut-app-pyronaut-python/src/example/micronaut/hello_controller.py[]
+                ----
+                """;
+        assertEquals(expectedPython, resPython);
+    }
+
+    @Test
     void TestSubstituteWithApp(){
         String str = "source:Application[app=springboot]\n";
         String resJava = sourceMacroSubstitution.substitute(str, GuideTestUtils.guideWithSlug("spring-boot-to-micronaut-application-class"), new GuidesOption(BuildTool.GRADLE, Language.JAVA, TestFramework.SPOCK));
