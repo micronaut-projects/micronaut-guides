@@ -1,4 +1,5 @@
 from graphql import GraphQL
+from graphql.schema import PropertyDataFetcher
 from graphql.schema.idl import RuntimeWiring, SchemaGenerator, SchemaParser
 from graphql.schema.idl import TypeRuntimeWiring
 from jakarta.inject import Singleton
@@ -25,15 +26,21 @@ class GraphQLFactory:
             .type(
                 TypeRuntimeWiring.newTypeWiring("Query").dataFetcher(
                     "bookById",
-                    graph_ql_data_fetchers.get_book_by_id_data_fetcher(),
+                    graph_ql_data_fetchers.book_by_id,
                 )
             )  # <6>
             .type(
-                TypeRuntimeWiring.newTypeWiring("Book").dataFetcher(
-                    "author",
-                    graph_ql_data_fetchers.get_author_data_fetcher(),
+                TypeRuntimeWiring.newTypeWiring("Book")
+                .dataFetcher("author", graph_ql_data_fetchers.author)
+                .dataFetcher(
+                    "pageCount", PropertyDataFetcher.fetching("page_count")
                 )
             )  # <7>
+            .type(
+                TypeRuntimeWiring.newTypeWiring("Author")
+                .dataFetcher("firstName", PropertyDataFetcher.fetching("first_name"))
+                .dataFetcher("lastName", PropertyDataFetcher.fetching("last_name"))
+            )  # <8>
             .build()
         )
 
@@ -41,6 +48,6 @@ class GraphQLFactory:
         graph_ql_schema = schema_generator.makeExecutableSchema(
             type_registry,
             runtime_wiring,
-        )  # <8>
+        )  # <9>
 
-        return GraphQL.newGraphQL(graph_ql_schema).build()  # <9>
+        return GraphQL.newGraphQL(graph_ql_schema).build()  # <10>

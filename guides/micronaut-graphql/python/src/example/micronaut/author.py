@@ -7,5 +7,5 @@ from micronaut.core.annotation import Introspected
 @dataclass
 class Author:
     id: str
-    firstName: str
-    lastName: str
+    first_name: str
+    last_name: str

@@ -73,6 +73,12 @@ source:Book[]
 
 source:Author[]
 
+:only-for-languages:python
+
+Use snake_case attributes in the Python dataclasses. The factory maps the GraphQL fields `pageCount`, `firstName`, and `lastName` to `page_count`, `first_name`, and `last_name`, preserving the schema and response field names.
+
+:only-for-languages:
+
 === Data repository
 
 To keep this example simple, instead of retrieving the information from a database we will keep it in memory and just return it from there. In a real-world example you will use any external storage: relational database, SQL database, etc.
@@ -93,12 +99,29 @@ Create class `GraphQLDataFetchers`
 source:GraphQLDataFetchers[]
 
 <1> Constructor injection for the `DbRepository` bean
+:exclude-for-languages:python
+
 <2> Return a GraphQL `dataFetchingEnvironment` with the information about the query
+
+:exclude-for-languages:
+
+:only-for-languages:python
+
+<2> Resolve a book from the query's `DataFetchingEnvironment`, returning `None` when it is not found
+
+:only-for-languages:
+
 <3> Get the `id` parameter from the query
 <4> Access the repository to find the book. Remember that this should be backed by a real datastore
 <5> Get the Book related to a specific author
 <6> Get the Author
 <7> Access the repository to find the Author.
+
+:only-for-languages:python
+
+The singleton exposes typed Python resolver methods. Pass these bound methods directly to the GraphQL runtime wiring; no `DataFetcher` adapter classes are needed.
+
+:only-for-languages:
 
 === Factory
 
@@ -123,9 +146,22 @@ source:GraphQLFactory[]
 <4> Parse the schema
 <5> Create the runtime wiring
 <6> Bind a data fetcher for the `bookById` query
+:exclude-for-languages:python
+
 <7> Bind a data fetcher to retrieve the author related to a book
 <8> Create the executable schema
 <9> Return the GraphQL bean
+
+:exclude-for-languages:
+
+:only-for-languages:python
+
+<7> Bind the author resolver and map `pageCount` to the Python `page_count` attribute with `PropertyDataFetcher.fetching`
+<8> Map the author's `firstName` and `lastName` fields to its snake_case Python attributes
+<9> Create the executable schema
+<10> Return the GraphQL bean
+
+:only-for-languages:
 
 common:runapp.adoc[]
 

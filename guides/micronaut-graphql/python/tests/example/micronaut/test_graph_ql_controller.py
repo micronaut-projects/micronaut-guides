@@ -35,7 +35,9 @@ def make_request(client, book_id: str) -> dict:
 
     response = client.post("/graphql", json={"query": query})
     assert response.status_code == 200
-    return response.json()
+    body = response.json()
+    assert "errors" not in body
+    return body
 
 
 def test_graph_ql_controller(client):
