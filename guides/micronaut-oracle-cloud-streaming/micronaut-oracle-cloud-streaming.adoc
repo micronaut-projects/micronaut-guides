@@ -287,12 +287,8 @@ Create a `GameRepository` interface to have access to methods for `Game` entity 
 source:chess/repository/GameRepository[app=chess-listener]
 
 :only-for-languages:python
-<1> Annotate with `@JdbcRepository` to make this a Micronaut Data JDBC repository.
-<2> Restrict the bean to be available in the `oraclecloud` and test environments.
-
+The abstract repository supplies the shared `CrudRepository` contract. Concrete repositories below select the database dialect and active environment.
 The derived `getById` query returns a `Game` or `None`, keeping a missing record explicit without changing the inherited `CrudRepository.findById` contract.
-
-NOTE: The Python example currently supplies Oracle repositories only. `H2GameRepository` and `H2GameStateRepository` are not supplied, so `chess-listener` requires the `oraclecloud` or test environment and cannot run the H2 development demo.
 :only-for-languages:
 
 :exclude-for-languages:python
@@ -303,6 +299,14 @@ source:chess/repository/H2GameRepository[app=chess-listener]
 <1> Annotate with `@JdbcRepository` to make this a Micronaut Data JDBC repository, and specify the `H2` dialect. The Micronaut framework will generate persistence logic at compile time and use H2-specific SQL.
 <2> Restrict the bean to be available only in the development environment
 :exclude-for-languages:
+:only-for-languages:python
+Create `H2GameRepository` with the `H2` dialect. `@Requires` selects this bean only in the `dev` environment, and `@Primary` lets `GameService` inject the shared repository type.
+
+source:chess/repository/H2GameRepository[app=chess-listener]
+
+<1> Select the `H2` dialect for the generated persistence SQL.
+<2> Restrict the bean to the development environment.
+:only-for-languages:
 
 Create a `GameStateRepository` interface to have access to methods for `GameState` entity persistence:
 
@@ -320,6 +324,11 @@ Also create a `H2GameStateRepository` interface that extends `GameStateRepositor
 
 source:chess/repository/H2GameStateRepository[app=chess-listener]
 :exclude-for-languages:
+:only-for-languages:python
+Create the corresponding H2 state repository. It inherits the nullable query and its join from `GameStateRepository`.
+
+source:chess/repository/H2GameStateRepository[app=chess-listener]
+:only-for-languages:
 
 ==== GameService
 
@@ -353,7 +362,11 @@ common:default-dev-environment-application-dev-yaml.adoc[]
 resource:application-dev.properties[app=chess-listener]
 :exclude-for-languages:
 :only-for-languages:python
-The H2 development configuration is retained in `config/application-dev.toml`, but using it requires the missing Python H2 repositories described above. Use `oraclecloud` for the listener or run its tests with Test Resources.
+The generated application includes the H2 runtime driver. If you created the listener manually, add this runtime dependency:
+
+dependency:h2[groupId=com.h2database,scope=runtimeOnly]
+
+Create `config/application-dev.toml` to use the H2 repositories, local Kafka, and H2 Flyway migrations. OCI authentication is disabled for local development.
 
 resource:application-dev.toml[app=chess-listener]
 :only-for-languages:
@@ -459,10 +472,10 @@ Start the `chess-listener` microservice:
 :exclude-for-build:
 
 :only-for-languages:python
-In the `chess-game` directory, activate the `dev` environment and start the application. On Linux and macOS:
+In each application's directory (`chess-game` and `chess-listener`), activate the `dev` environment and start the application. Keep local Kafka running. On Linux and macOS:
 
 [source,bash]
-.chess-game
+.Each application
 ----
 export MICRONAUT_ENVIRONMENTS=dev
 pyronaut dev
@@ -471,20 +484,20 @@ pyronaut dev
 On Windows PowerShell:
 
 [source,powershell]
-.chess-game
+.Each application
 ----
 $env:MICRONAUT_ENVIRONMENTS = "dev"
 pyronaut dev
 ----
 
-NOTE: Only `chess-game` can run this Python local-development demo. The Python listener has no H2 repositories and requires `oraclecloud` or test; the listener tests below verify Kafka delivery and Oracle persistence with Test Resources.
+The listener selects the H2 repositories in `dev`; the Oracle repositories are excluded even if the test environment is also active. The listener tests below cover both H2 and Oracle persistence with local Kafka.
 :only-for-languages:
 
 :exclude-for-languages:python
 Test the app functionality by opening http://localhost:8080/ in a browser. The UI lets you choose one or more chess games that will auto-play with the specified delay between plays. Events (game start and end, player moves) are sent to the server via Ajax and then sent to the `chess-listener` microservice for processing, analysis, etc.
 :exclude-for-languages:
 :only-for-languages:python
-Open http://localhost:8080/ in a browser. The UI lets you choose chess games that auto-play with the specified delay between plays. Game events are sent to the server via Ajax and published to local Kafka; the listener requires the cloud configuration described below.
+Open http://localhost:8080/ in a browser. The UI lets you choose chess games that auto-play with the specified delay between plays. Game events are sent to the server via Ajax and published to local Kafka; the listener persists them in H2.
 :only-for-languages:
 
 You can, for example, start a single game with a moderately large delay between plays:
@@ -561,7 +574,14 @@ Create the `OracleGameStateRepository` interface that extends `GameStateReposito
 source:chess/repository/OracleGameStateRepository[app=chess-listener]
 :exclude-for-languages:
 :only-for-languages:python
-The `GameRepository` and `GameStateRepository` declared above already use the `ORACLE` dialect and are available in the `oraclecloud` environment.
+Create concrete repositories with the `ORACLE` dialect for the `oraclecloud` and test environments. Exclude `dev` so H2 and Oracle beans cannot both satisfy the shared repository contract.
+
+source:chess/repository/OracleGameRepository[app=chess-listener]
+
+<1> Select the `ORACLE` dialect for the generated persistence SQL.
+<2> Restrict the bean to the `oraclecloud` and test environments, excluding development.
+
+source:chess/repository/OracleGameStateRepository[app=chess-listener]
 :only-for-languages:
 
 ==== Flyway
@@ -819,6 +839,8 @@ callout:test-instance-per-class[]
 <1> Start a nontransactional test context with OCI authentication disabled; Test Resources supplies local Kafka and Oracle fixtures.
 <2> Look up the imported Kafka producer by type to publish the same DTOs as the game application.
 <3> Wait for message-driven persistence before asserting game and move state.
+
+The additional `dev` test verifies H2 repository selection, Kafka-driven persistence, Python UUID and datetime values, joined game state, updates, deletion, and missing-record results. The original Oracle checkmate and draw tests remain separate.
 :only-for-languages:
 
 :exclude-for-languages:python
