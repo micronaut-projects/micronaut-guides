@@ -6,13 +6,17 @@ import io.micronaut.starter.options.BuildTool;
 import io.micronaut.starter.options.Language;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
@@ -45,6 +49,32 @@ public class GuideParserTest {
                 "metadata.json").orElseThrow();
         assertEquals(List.of(Language.PYTHON), guide.languages());
         assertEquals(List.of(BuildTool.GRADLE, BuildTool.MAVEN, BuildTool.PYRONAUT), guide.buildTools());
+    }
+
+    @Test
+    void childLanguageDefaultsAreAppliedBeforeBaseAppsAreMerged(@TempDir Path guides) throws Exception {
+        Path base = Files.createDirectory(guides.resolve("base"));
+        Files.writeString(base.resolve("metadata.json"), """
+                {"publish":false,"languages":["PYTHON"],"apps":[{"name":"default"}]}
+                """);
+        Path child = Files.createDirectory(guides.resolve("child"));
+        JSONObject metadata = new JSONObject(Files.readString(
+                Path.of("src/test/resources/guides-python/creating-your-first-micronaut-app/metadata.json")));
+        metadata.remove("languages");
+        metadata.put("base", "base");
+        metadata.put("apps", new JSONArray());
+        for (boolean python : List.of(false, true)) {
+            if (python) {
+                metadata.put("languages", new JSONArray(List.of("PYTHON")));
+            }
+            Files.writeString(child.resolve("metadata.json"), metadata.toString());
+            Guide parsed = guideParser.parseGuidesMetadata(guides.toFile(), "metadata.json").stream()
+                    .filter(guide -> guide.slug().equals("child")).findFirst().orElseThrow();
+            assertEquals(python ? List.of(Language.PYTHON) : List.of(Language.JAVA, Language.GROOVY, Language.KOTLIN), parsed.languages());
+            assertEquals(python, parsed.buildTools().contains(BuildTool.PYRONAUT));
+            assertEquals(1, parsed.apps().size());
+            assertEquals("default", parsed.apps().get(0).name());
+        }
     }
 
     @Test

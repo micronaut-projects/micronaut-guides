@@ -42,16 +42,21 @@ def guide_slugs_from_paths(paths: Iterable[str]) -> set[str]:
 
 
 def load_guides(guides_dir: Path) -> dict[str, GuideMetadata]:
-    guides = {}
+    metadata_by_slug = {}
     for metadata_path in sorted(guides_dir.glob("*/metadata.json")):
         with metadata_path.open(encoding="utf-8") as metadata_file:
-            metadata = json.load(metadata_file)
-        slug = metadata_path.parent.name
+            metadata_by_slug[metadata_path.parent.name] = json.load(metadata_file)
+    has_apps = {slug: bool(metadata.get("apps")) for slug, metadata in metadata_by_slug.items()}
+    # Match GuideUtils' sorted, in-place merge of base applications.
+    for slug, metadata in metadata_by_slug.items():
+        has_apps[slug] = has_apps[slug] or has_apps.get(metadata.get("base"), False)
+    guides = {}
+    for slug, metadata in metadata_by_slug.items():
         guides[slug] = GuideMetadata(
             slug=slug,
             publish=metadata.get("publish", True) is not False,
             base=metadata.get("base"),
-            python_app="PYTHON" in (metadata.get("languages") or []) and metadata.get("apps") != [],
+            python_app="PYTHON" in (metadata.get("languages") or []) and has_apps[slug],
         )
     return guides
 
