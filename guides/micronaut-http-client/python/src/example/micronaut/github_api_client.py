@@ -1,13 +1,9 @@
 from abc import ABC, abstractmethod
 
-import java
-from micronaut.core.async_.annotation import SingleResult
 from micronaut.http.annotation import Get, Header
 from micronaut.http.client.annotation import Client
 
 from .github_release import GithubRelease
-
-Publisher = java.type("org.reactivestreams.Publisher")
 
 
 @Client(id="github")  # <1>
@@ -16,7 +12,6 @@ Publisher = java.type("org.reactivestreams.Publisher")
 class GithubApiClient(ABC):
 
     @Get("/repos/${github.organization}/${github.repo}/releases")  # <4>
-    @SingleResult  # <5>
     @abstractmethod
-    def fetch_releases(self) -> Publisher[list[GithubRelease]]:  # <6>
+    async def fetch_releases(self) -> list[GithubRelease]:  # <5>
         ...

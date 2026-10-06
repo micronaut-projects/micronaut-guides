@@ -1,16 +1,14 @@
 import json
 import re
 
-import java
 import pytest
 import requests
 from micronaut.context.annotation import Requires
 from micronaut.http.annotation import Controller, Get, Produces
+from micronaut.runtime.server import EmbeddedServer
 from pyronaut.test import MicronautTest, micronaut_test_fixture
 
 MICRONAUT_RELEASE = re.compile(r"Micronaut (Core |Framework )?v?\d+\.\d+\.\d+( (RC|M)\d)?")
-
-EmbeddedServer = java.type("io.micronaut.runtime.server.EmbeddedServer")
 
 
 @Requires(property="spec.name", value="GithubControllerTest")  # <1>
