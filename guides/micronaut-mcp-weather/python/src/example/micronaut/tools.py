@@ -12,7 +12,7 @@ class Tools:
         self.weather_client = weather_client
 
     @Tool(
-        description="Get weather forecast for a specific latitude/longitude coordinates",
+        description="Get weather forecast for specific latitude/longitude coordinates",
     )  # <3>
     def getWeatherForecastByLocation(self, point: Point) -> str:
         return self.weather_client.formatted_forecast(point.latitude, point.longitude)

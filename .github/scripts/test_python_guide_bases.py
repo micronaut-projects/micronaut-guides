@@ -9,6 +9,10 @@ GUIDES = Path(__file__).resolve().parents[2] / "guides"
 
 
 class PythonGuideBasesTest(unittest.TestCase):
+    def test_weather_tool_description_matches_java(self) -> None:
+        source = (GUIDES / "micronaut-mcp-weather/python/src/example/micronaut/tools.py").read_text(encoding="utf-8")
+        self.assertIn('description="Get weather forecast for specific latitude/longitude coordinates"', source)
+
     def test_openapi_toml_example_is_python_only(self) -> None:
         source = (GUIDES / "micronaut-openapi-base/openapi-intro.adoc").read_text(encoding="utf-8")
         self.assertIn(

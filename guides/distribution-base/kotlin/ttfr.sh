@@ -49,7 +49,7 @@ execute() {
 
 mytime() {
   exec 3>&1 4>&2
-  mytime=$(TIMEFORMAT="%3R"; { time $1 1>&3 2>&4; } 2>&1)
+  mytime=$(TIMEFORMAT="%3R"; { time $1 1>&3 2>&4; } 2>&1) || return $?
   exec 3>&- 4>&-
   echo $mytime
 }
@@ -57,17 +57,23 @@ mytime() {
 if [[ "$TYPE" == "java" ]]; then
   java -jar $1 &
   PID=$!
+  trap 'kill -9 "$PID"' EXIT
   TTFR=$(mytime execute)
   kill -9 $PID
+  trap - EXIT
 elif [[ "$TYPE" == "docker" ]]; then
   CONTAINER=$(docker run -d --rm -p $PORT:$PORT --privileged $1)
+  trap 'docker container kill "$CONTAINER" > /dev/null' EXIT
   TTFR=$(mytime execute)
   docker container kill $CONTAINER > /dev/null
+  trap - EXIT
 else
   $1 &
   PID=$!
+  trap 'kill -9 "$PID"' EXIT
   TTFR=$(mytime execute)
   kill -9 $PID
+  trap - EXIT
 fi
 
 if [ "$TTFR" != "" ]; then
