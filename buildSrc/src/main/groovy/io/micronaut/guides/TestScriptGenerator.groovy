@@ -169,6 +169,9 @@ kill_kotlin_daemon () {
 
         metadatas.sort { it.slug() }
         for (Guide metadata : metadatas) {
+            if (metadata.apps().isEmpty()) {
+                continue
+            }
             List<GuidesOption> guidesOptionList = GuideProjectGenerator.guidesOptions(metadata)
             if (languageFilter != null) {
                 guidesOptionList = guidesOptionList.findAll { GuidesOption option -> option.language == languageFilter }

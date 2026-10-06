@@ -232,6 +232,9 @@ public class DefaultTestScriptGenerator implements TestScriptGenerator {
 
         metadatas.sort(Comparator.comparing(Guide::slug));
         for (Guide metadata : metadatas) {
+            if (metadata.apps().isEmpty()) {
+                continue;
+            }
             List<GuidesOption> guidesOptionList = GuideGenerationUtils.guidesOptions(metadata, LOG);
             bashScript.append("\n");
             for (GuidesOption guidesOption : guidesOptionList) {

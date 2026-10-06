@@ -25,6 +25,9 @@ import static org.gradle.api.tasks.PathSensitivity.RELATIVE
 abstract class SampleProjectGenerationTask extends DefaultTask {
 
     static List<String> outputDirectoryNames(Guide metadata, Language language) {
+        if (metadata.apps().isEmpty()) {
+            return []
+        }
         GuideProjectGenerator.guidesOptions(metadata)
                 .findAll { GuidesOption option -> language == null || option.language == language }
                 .collect { GuidesOption option -> GuideProjectGenerator.folderName(metadata.slug(), option) }
