@@ -5,8 +5,6 @@ from micronaut.security.errors import (
     OauthErrorResponseException,
 )
 from micronaut.security.token.refresh import RefreshTokenPersistence
-from org.reactivestreams import Publisher
-from reactor.core.publisher import Flux, FluxSink
 
 from .refresh_token_repository import RefreshTokenRepository
 
@@ -27,30 +25,19 @@ class CustomRefreshTokenPersistence(RefreshTokenPersistence):
             payload = event.getRefreshToken()
             self.refresh_token_repository.save(event.getAuthentication().getName(), payload, False)  # <4>
 
-    def getAuthentication(self, refreshToken: str) -> Publisher:
-        def emit(emitter):
-            token_optional = self.refresh_token_repository.findByRefreshToken(refreshToken)
-            if token_optional.isPresent():
-                token = token_optional.get()
-                if token.revoked:
-                    emitter.error(
-                        OauthErrorResponseException(
-                            IssuingAnAccessTokenErrorCode.INVALID_GRANT,
-                            "refresh token revoked",
-                            None,
-                        )
-                    )  # <5>
-                else:
-                    emitter.next(Authentication.build(token.username))  # <6>
-                    emitter.complete()
-            else:
-                emitter.error(
-                    OauthErrorResponseException(
-                        IssuingAnAccessTokenErrorCode.INVALID_GRANT,
-                        "refresh token not found",
-                        None,
-                    )
-                )  # <7>
-
-        return Flux.create(emit, FluxSink.OverflowStrategy.ERROR)
+    async def getAuthentication(self, refresh_token: str) -> Authentication:
+        token = self.refresh_token_repository.findByRefreshToken(refresh_token)
+        if token is None:
+            raise OauthErrorResponseException(
+                IssuingAnAccessTokenErrorCode.INVALID_GRANT,
+                "refresh token not found",
+                None,
+            )  # <7>
+        if token.revoked:
+            raise OauthErrorResponseException(
+                IssuingAnAccessTokenErrorCode.INVALID_GRANT,
+                "refresh token revoked",
+                None,
+            )  # <5>
+        return Authentication.build(token.username)  # <6>
 # end::clazz[]

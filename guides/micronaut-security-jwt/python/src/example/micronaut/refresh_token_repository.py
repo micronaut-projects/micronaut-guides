@@ -6,7 +6,6 @@ from micronaut.core.annotation import NonNull
 from micronaut.data.jdbc.annotation import JdbcRepository
 from micronaut.data.model.query.builder.sql import Dialect
 from micronaut.data.repository import CrudRepository
-from java.util import Optional
 
 from .refresh_token_entity import RefreshTokenEntity
 
@@ -25,7 +24,7 @@ class RefreshTokenRepository(CrudRepository[RefreshTokenEntity, int]):  # <2>
     def findByRefreshToken(
         self,
         refreshToken: Annotated[str, NonNull, NotBlank],
-    ) -> Optional[RefreshTokenEntity]: ...  # <4>
+    ) -> RefreshTokenEntity | None: ...  # <4>
 
     def updateByUsername(
         self,

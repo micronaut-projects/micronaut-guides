@@ -38,6 +38,23 @@ def test_empty_database_contains_no_fruit(client):
     assert response.json() == []
 
 
+def test_find_non_existing_fruit_returns_404(client):
+    response = client.get("/fruits/000000000000000000000000")
+
+    assert response.status_code == 404
+
+
+def test_find_fruit_by_id(client):
+    response = client.post("/fruits", json={"name": "banana"})
+    assert response.status_code == 201
+    banana = response.json()
+
+    response = client.get(f"/fruits/{banana['id']}")
+
+    assert response.status_code == 200
+    assert response.json() == banana
+
+
 def test_interaction_with_the_controller(client):
     response = client.post("/fruits", json={"name": "banana"})
     assert response.status_code == 201

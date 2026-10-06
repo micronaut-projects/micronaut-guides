@@ -1,4 +1,4 @@
-from java.time import LocalDate
+from datetime import date
 from micronaut.http.annotation import Controller, Get
 
 from .build_tool import BuildTool
@@ -17,7 +17,7 @@ class LatestGuidesController:
             ["Ivan Lopez", "Sergio del Amo"],
             ["junit", "getting_started", "graalvm"],
             ["Getting Started"],
-            LocalDate.of(2018, 5, 23),
+            date(2018, 5, 23),
             "creating-your-first-micronaut-app",
             "https://guides.micronaut.io/latest/creating-your-first-micronaut-app.html",
             [

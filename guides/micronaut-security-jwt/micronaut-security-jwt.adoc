@@ -53,13 +53,22 @@ source:HomeController[]
 <1> Annotate with `io.micronaut.security.Secured` to configure secured access. The `isAuthenticated()` expression will allow access only to authenticated users.
 <2> You can specify the HTTP verb that a controller action responds to. To respond to a GET request, use the `io.micronaut.http.annotation.Get` annotation.
 <3> The root route responds to `/`.
+:only-for-languages:python
+<4> If a user is authenticated, Micronaut binds their `Authentication` to the route argument.
+:only-for-languages:
+:exclude-for-languages:python
 <4> If a user is authenticated, the Micronaut framework will bind the user object to an argument of type `java.security.Principal` (if present).
+:exclude-for-languages:
 
 == Tests
 
 Create a test to verify a user is able to login and access a secured endpoint.
 
 test:JwtAuthenticationTest[]
+
+:only-for-languages:python
+Use Micronaut's `JsonWebTokenParser` and `JsonWebTokenSignatureValidator` beans to assert that the issued access token is a signed JWT with a valid signature, not merely a decodable claims payload.
+:only-for-languages:
 
 callout:micronaut-test[]
 
@@ -203,6 +212,10 @@ https://micronaut-projects.github.io/micronaut-security/latest/api/io/micronaut/
 
 source:CustomRefreshTokenPersistence[]
 
+:only-for-languages:python
+The `getAuthentication` SPI method is asynchronous: return the authentication or raise the OAuth error directly. Micronaut adapts the coroutine to the refresh-token pipeline. The repository returns `None` when no token exists.
+:only-for-languages:
+
 callout:singleton[]
 <.> Constructor injection of `RefreshTokenRepository`.
 <.> When a new refresh token is issued, the application emits an event of type https://micronaut-projects.github.io/micronaut-security/latest/api/io/micronaut/security/token/event/RefreshTokenGeneratedEvent.html[RefreshTokenGeneratedEvent]. We listen for it and save the token in the database.
@@ -285,4 +298,3 @@ Send the same `curl` request as before to test that the native executable applic
 == Next Steps
 
 Learn more about JWT Authentication in the https://micronaut-projects.github.io/micronaut-security/latest/guide/#jwt[official documentation].
-

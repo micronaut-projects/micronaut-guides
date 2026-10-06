@@ -6,4 +6,6 @@ from .domain.genre import Genre
 
 @JdbcRepository(dialect="MYSQL")  # <1>
 class GenreRepository(CrudRepository[Genre, int]):  # <2>
+    def getById(self, id: int) -> Genre | None: ...
+
     def findAll(self, pageable: Pageable) -> list[Genre]: ...

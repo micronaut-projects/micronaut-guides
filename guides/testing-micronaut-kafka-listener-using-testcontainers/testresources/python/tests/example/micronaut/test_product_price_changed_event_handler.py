@@ -33,9 +33,9 @@ def product_repository(my_context) -> ProductRepository:
 def wait_for_price(product_repository: ProductRepository, product_code: str, price: BigDecimal):
     deadline = monotonic() + 10.0
     while monotonic() < deadline:
-        optional_product = product_repository.findByCode(product_code)
-        if optional_product.isPresent() and optional_product.get().price.compareTo(price) == 0:
-            return optional_product.get()
+        product = product_repository.findByCode(product_code)
+        if product is not None and product.price.compareTo(price) == 0:
+            return product
         sleep(0.1)
     raise AssertionError(f"Timed out waiting for product {product_code} price {price}")
 

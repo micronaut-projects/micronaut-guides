@@ -18,6 +18,26 @@ class GuideProjectGeneratorTest {
     Path directory;
 
     @Test
+    void pythonResourceTransferDoesNotInheritJvmBootstrapConfiguration() throws Exception {
+        File input = new File("src/test/resources/file-transfer/python-application-config");
+        Path python = Files.createDirectory(directory.resolve("python"));
+        Path java = Files.createDirectory(directory.resolve("java"));
+        Method transfer = GuideProjectGenerator.class.getDeclaredMethod("copyGuideSourceFiles",
+                File.class, Path.class, String.class, String.class, boolean.class);
+        transfer.setAccessible(true);
+
+        transfer.invoke(null, input, python, "", "python", false);
+        transfer.invoke(null, input, java, "", "java", false);
+
+        assertTrue(Files.exists(python.resolve("config/application.toml")));
+        assertTrue(Files.exists(python.resolve("tests-config/application-test.toml")));
+        assertFalse(Files.exists(python.resolve("config/bootstrap.properties")));
+        assertFalse(Files.exists(python.resolve("tests-config/bootstrap-test.properties")));
+        assertTrue(Files.exists(java.resolve("src/main/resources/bootstrap.properties")));
+        assertTrue(Files.exists(java.resolve("src/test/resources/bootstrap-test.properties")));
+    }
+
+    @Test
     void packageCleanupDoesNotTraverseVirtualEnvironmentSymlinks() throws Exception {
         Path project = Files.createDirectory(directory.resolve("project"));
         Path external = Files.createDirectory(directory.resolve("site-packages"));

@@ -1,8 +1,8 @@
 from dataclasses import dataclass
+from datetime import datetime
 from typing import Annotated
 
 from jakarta.validation.constraints import NotBlank, NotNull
-from java.time import Instant
 from micronaut.core.annotation import NonNull
 from micronaut.data.annotation import DateCreated, GeneratedValue, Id, MappedEntity
 
@@ -15,7 +15,7 @@ class RefreshTokenEntity:
     username: Annotated[str | None, NonNull, NotBlank] = None
     refreshToken: Annotated[str | None, NonNull, NotBlank] = None
     revoked: Annotated[bool | None, NonNull, NotNull] = None
-    dateCreated: Annotated[Instant, DateCreated, NonNull, NotNull] = None  # <4>
+    date_created: Annotated[datetime | None, DateCreated, NonNull, NotNull] = None  # <4>
 # end::clazzwithoutsettersandgetters[]
 # tag::endclass[]
 # end::endclass[]

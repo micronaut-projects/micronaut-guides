@@ -28,7 +28,7 @@ def replacement_sender(my_context):
 
 
 def first_contact(contacts):
-    return contacts.iterator().next()
+    return next(iter(contacts))
 
 
 def assert_contact_email(contact, email):

@@ -24,6 +24,7 @@ def test_guides_endpoint(client):
 
     assert response.status_code == 200
     assert "2018-05-23" in response.text
+    assert response.json()[0]["publicationDate"] == "2018-05-23"
     assert {
         "language": "PYTHON",
         "buildTool": "PYRONAUT",

@@ -207,6 +207,7 @@ dependency:micronaut-views-thymeleaf[groupId=io.micronaut.views]
 
 :dependencies:
 
+:exclude-for-languages:python
 === Create a SessionProvider
 
 Micronaut Email requires a bean of type `SessionProvider` when using JavaMail to create a `Session`. Create the `OciSessionProvider` class:
@@ -216,6 +217,13 @@ source:OciSessionProvider[]
 callout:singleton[]
 callout:property-constructor-parameter[]
 <.> Use the username and password to create the `Session`.
+:exclude-for-languages:
+
+:only-for-languages:python
+=== Use built-in SMTP authentication
+
+Micronaut Email supplies a default `SessionProvider` and creates the SMTP authenticator from `javamail.authentication` configuration. No custom provider or Jakarta Mail authenticator is needed in the Python application. Configure the credentials and transport properties below.
+:only-for-languages:
 
 === EmailController class
 
@@ -264,8 +272,14 @@ Add the following snippet to `application.properties` to supply the SMTP credent
 Add the following snippet to `application.toml` to supply the SMTP credentials.
 :only-for-languages:
 
+:exclude-for-languages:python
 We injected SMTP configuration via constructor parameters annotated with `@Property`. You could have used a POJO annotated with
 https://docs.micronaut.io/latest/api/io/micronaut/context/annotation/ConfigurationProperties.html[@ConfigurationProperties] as well.
+:exclude-for-languages:
+
+:only-for-languages:python
+Micronaut Email binds `javamail.authentication.username` and `javamail.authentication.password` and supplies them to its built-in authenticator. Set `SMTP_USER` and `SMTP_PASSWORD` to the OCI SMTP credentials generated earlier; the sample defaults are not production credentials.
+:only-for-languages:
 
 :exclude-for-languages:python
 resource:application.properties[tag=smtp]
@@ -316,7 +330,23 @@ test:EmailControllerTest[]
 callout:micronaut-test[]
 callout:http-client[]
 
+:only-for-languages:python
+The controller tests replace `EmailSender` and capture emails without contacting OCI. A separate test uses fake credentials to verify configuration binding and selection of Micronaut Email's built-in `SessionProvider`:
+
+test:SessionProviderTest[]
+
+This test does not connect to SMTP or verify an authentication exchange or delivery. To test delivery, configure real OCI SMTP credentials and an approved sender as described above.
+:only-for-languages:
+
+:exclude-for-languages:python
 common:application-test-yaml.adoc[]
+:exclude-for-languages:
+
+:only-for-languages:python
+Create `tests-config/application-test.properties`. Micronaut applies this configuration only for the `test` environment:
+
+testResource:application-test.properties[]
+:only-for-languages:
 
 common:testApp.adoc[]
 
