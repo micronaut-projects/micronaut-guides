@@ -139,6 +139,9 @@ class GuidesPlugin implements Plugin<Project> {
                 .map(m -> m.get(KEY_DOC))
                 .toList() as List<TaskProvider<Task>>
 
+        project.tasks.named("asciidoctor").configure { Task it ->
+            it.mustRunAfter(project.tasks.withType(AsciidocGenerationTask))
+        }
         List<TaskProvider<Task>> pythonBuildTasks = sampleTasks.stream()
                 .map(m -> m.get(KEY_PYTHON_BUILD))
                 .filter(task -> task != null)
