@@ -28,8 +28,8 @@ Configure the datasource:
 
 resource:application.toml[tag=datasource]
 
-<1> Use Oracle driver.
-<2> In order for the database to be properly detected by Micronaut Test Resources.
+<1> Use the Oracle driver.
+<2> Set the database type so that Micronaut Test Resources detects the database and starts an Oracle container.
 <3> Configure the Oracle dialect.
 :exclude-for-languages:
 
@@ -77,8 +77,8 @@ source:AccountRepository[]
 
 <1> Micronaut Data generates SQL for the Oracle dialect at compilation time.
 <2> `Account` has an ordinary updatable property, `name`, so the repository can extend `CrudRepository`.
-<3> A derived reservation method starts with `reserve`, followed by `Increment<Property>` or `Decrement<Property>` operations. The `@Id` parameter identifies the row, and the delta parameter has the name of its reservable property. A deposit increments the balance.
-<4> A withdrawal decrements the balance. To update several reservable properties in one statement, join operations with `And`, for example `reserveIncrementBalanceAndDecrementCredit`.
+<3> A derived reservation method starts with `reserve`, followed by `Increment<Property>` or `Decrement<Property>` operations. The `@Id` parameter identifies the row, and the delta parameter has the name of its reservable property. A deposit increments the balance. The `long` return value is the number of updated rows, not the new balance: Oracle applies the reservation when the transaction commits, so the new value is not available to the statement. Reservation methods can also return `void`.
+<4> A withdrawal decrements the balance. To update several reservable properties in one statement, join operations with `And`, for example, `reserveIncrementBalanceAndDecrementCredit` for an entity with two reservable properties, `balance` and `credit`.
 
 The reservation methods generate updates that change the column by a delta, instead of assigning a new value:
 
@@ -88,7 +88,7 @@ UPDATE "ACCOUNT" SET "BALANCE"=("BALANCE" + ?) WHERE ("ID" = ?)
 UPDATE "ACCOUNT" SET "BALANCE"=("BALANCE" - ?) WHERE ("ID" = ?)
 ----
 
-Oracle does not allow direct assignments to reservable columns, or a mix of reservable and ordinary columns in one update. Micronaut Data therefore leaves `balance` out of the generated `save` and `update` statements; those only change `name`.
+Oracle does not allow direct assignments to reservable columns, or a mix of reservable and ordinary columns in one update. Micronaut Data therefore leaves `balance` out of the generated `save` and `update` statements, which only change `name`.
 
 NOTE: If all updatable properties of an entity are reservable, Micronaut Data cannot generate `save` or `update` operations and reports an error at compilation time. Extend `GenericRepository` instead and declare `insert`, finder, delete, and reservation methods explicitly.
 
@@ -106,7 +106,7 @@ source:AccountController[]
 
 == Handle a Constraint Violation
 
-When a reservation would violate a column constraint, Oracle rejects it, and Micronaut Data throws `DataIntegrityViolationException`. Without a handler, that results in a `500 Internal Server Error` response. Report it as a conflict instead:
+When a reservation would violate a column constraint, Oracle rejects it, and Micronaut Data throws `DataIntegrityViolationException`. Without a handler, this results in a `500 Internal Server Error` response. Report it as a conflict instead:
 
 source:ReservationExceptionHandler[]
 
@@ -138,7 +138,7 @@ When you run the tests, Micronaut Test Resources starts an Oracle Database Free 
 
 == Inspect the Generated Schema
 
-To inspect the generated columns and constraints, connect to the database, for example to the Test Resources container while the application runs. The `RESERVABLE_COLUMN` column of `USER_TAB_COLS` shows which columns are reservable:
+To inspect the generated columns and constraints, connect to the database, for example, to the Test Resources container while the application runs. The `RESERVABLE_COLUMN` column of `USER_TAB_COLS` shows which columns are reservable:
 
 [source,sql]
 ----
