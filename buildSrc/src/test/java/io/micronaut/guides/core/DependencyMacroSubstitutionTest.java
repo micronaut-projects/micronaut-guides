@@ -69,7 +69,7 @@ public class DependencyMacroSubstitutionTest {
     }
 
     @Test
-    void pythonDependencyMacrosAreOmitted() {
+    void pythonDependencyMacrosUsePyprojectToml() {
         String source = """
                 Before
 
@@ -87,9 +87,75 @@ public class DependencyMacroSubstitutionTest {
         assertEquals("""
                 Before
 
-
+                [source, toml]
+                .pyproject.toml
+                ----
+                [tool.pyronaut.dependencies]
+                runtime = [
+                    "io.micronaut.views:micronaut-views-thymeleaf",
+                ]
+                ----
 
                 After
                 """, result);
     }
+
+    @Test
+    void pythonPomMacrosFailInsteadOfRenderingOrdinaryDependencies() {
+        GuidesOption python = new GuidesOption(BuildTool.PYRONAUT, Language.PYTHON, TestFramework.PYTEST);
+        for (String scope : new String[]{"implementation", "annotationProcessor"}) {
+            for (String value : new String[]{"true", "TRUE"}) {
+                String macro = "dependency:micronaut-platform[groupId=io.micronaut.platform,scope="
+                        + scope + ",pom=" + value + "]";
+                for (String source : new String[]{macro, ":dependencies:\n" + macro + "\n:dependencies:\n"}) {
+                    IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
+                            () -> dependencyMacroSubstitution.substitute(source,
+                                    GuideTestUtils.guideWithSlug("python-pom"), python));
+                    assertTrue(error.getMessage().contains("pom=true"));
+                }
+            }
+        }
+    }
+
+    @Test
+    void ordinaryPythonDependenciesAndJvmPlatformsRemainSupported() {
+        String ordinary = "dependency:micronaut-http-client[pom=false]";
+        assertTrue(DependencyLines.asciidoc(ordinary, BuildTool.PYRONAUT, Language.PYTHON)
+                .contains("    \"io.micronaut:micronaut-http-client\","));
+        String platform = "dependency:micronaut-platform[groupId=io.micronaut.platform,pom=true]";
+        assertTrue(DependencyLines.asciidoc(platform, BuildTool.GRADLE, Language.JAVA)
+                .contains("implementation platform(\"io.micronaut.platform:micronaut-platform\")"));
+        assertTrue(DependencyLines.asciidoc(platform, BuildTool.MAVEN, Language.JAVA)
+                .contains("    <type>pom</type>"));
+    }
+    @Test
+    void groupedPythonDependenciesPreserveScopesVersionsAndCallouts() {
+        String source = """
+                :dependencies:
+                dependency:micronaut-http-client[scope=runtimeOnly]
+                dependency:micronaut-serde-processor[groupId=io.micronaut.serde,scope=annotationProcessor,callout=1]
+                dependency:micronaut-test-junit5[groupId=io.micronaut.test,scope=testImplementation,version=1.2.3,callout=2]
+                :dependencies:
+                """;
+        String result = dependencyMacroSubstitution.substitute(
+                source, GuideTestUtils.guideWithSlug("python-dependencies"),
+                new GuidesOption(BuildTool.PYRONAUT, Language.PYTHON, TestFramework.PYTEST));
+        assertEquals("""
+                [source, toml]
+                .pyproject.toml
+                ----
+                [tool.pyronaut.dependencies]
+                runtime = [
+                    "io.micronaut:micronaut-http-client",
+                ]
+                build = [
+                    "io.micronaut.serde:micronaut-serde-processor", # <1>
+                ]
+                test = [
+                    "io.micronaut.test:micronaut-test-junit5:1.2.3", # <2>
+                ]
+                ----
+                """, result);
+    }
+
 }
