@@ -15,6 +15,7 @@
  */
 package example.micronaut;
 
+import io.micronaut.serde.annotation.Serdeable;
 import io.micronaut.core.type.Argument;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpResponse;
@@ -57,6 +58,7 @@ public class FlywayEndpointTest {
         assertEquals(2, flywayReport.getMigrations().size());
     }
 
+    @Serdeable
     static class FlywayReport {
         private List<Migration> migrations;
 
@@ -69,6 +71,7 @@ public class FlywayEndpointTest {
         }
     }
 
+    @Serdeable
     static class Migration {
         private String script;
 

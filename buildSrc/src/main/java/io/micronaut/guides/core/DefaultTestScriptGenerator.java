@@ -23,7 +23,6 @@ import static io.micronaut.starter.options.BuildTool.PYRONAUT;
 @Singleton
 public class DefaultTestScriptGenerator implements TestScriptGenerator {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultTestScriptGenerator.class);
-    private static final String PYTHON_VERSION = "graalpy3.13-25.4.4";
 
     private final GuidesConfiguration guidesConfiguration;
     private final GuideParser guideParser;
@@ -81,16 +80,13 @@ public class DefaultTestScriptGenerator implements TestScriptGenerator {
         }
 
         if (buildTool == PYRONAUT) {
-            bashScript.append(String.format(
+            bashScript.append(
                     """
-                            eval "$(pyenv init -)" || EXIT_STATUS=$?
-                            pyenv shell %s || EXIT_STATUS=$?
                             pyronaut install || EXIT_STATUS=$?
                             pyronaut validate-config || EXIT_STATUS=$?
                             pyronaut test || EXIT_STATUS=$?
-                            """,
-                    PYTHON_VERSION
-            ));
+                            """
+            );
         } else if (nativeTest) {
             bashScript.append(String.format(
                     "%s || EXIT_STATUS=$?\n",
