@@ -32,6 +32,7 @@ public class FeaturesMacroSubstitutionTest {
                 List.of(),
                 List.of(),
                 List.of(),
+                List.of(),
                 null,
                 null,
                 null,
