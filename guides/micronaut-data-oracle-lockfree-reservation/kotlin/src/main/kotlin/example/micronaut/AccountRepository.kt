@@ -24,7 +24,19 @@ import io.micronaut.data.repository.CrudRepository
 @JdbcRepository(dialect = Dialect.ORACLE) // <1>
 interface AccountRepository : CrudRepository<Account, Long> { // <2>
 
+    /**
+     *
+     * @param id Account unique identifier
+     * @param balance balance increment
+     * @return rows updated
+     */
     fun reserveIncrementBalance(@Id id: Long, balance: Long): Long // <3>
 
+    /**
+     *
+     * @param id Account unique identifier
+     * @param balance balance decrement
+     * @return rows updated
+     */
     fun reserveDecrementBalance(@Id id: Long, balance: Long): Long // <4>
 }
