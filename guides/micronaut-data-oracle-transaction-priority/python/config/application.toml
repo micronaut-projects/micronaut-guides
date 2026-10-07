@@ -1,0 +1,22 @@
+[micronaut.application]
+name = "micronautguide"
+
+#tag::datasource[]
+[datasources.default]
+schema-generate = "CREATE_DROP"
+# <1>
+driver-class-name = "oracle.jdbc.OracleDriver"
+# <2>
+db-type = "oracle"
+# <3>
+dialect = "ORACLE"
+#end::datasource[]
+
+#tag::testresources[]
+[test-resources.containers.oracle]
+image-name = "gvenzl/oracle-free"
+image-tag = "latest"
+startup-timeout = "600s"
+# <1>
+copy-to-container = [{ "config/oracle/priority-txns.sql" = "/container-entrypoint-startdb.d/priority-txns.sql" }]
+#end::testresources[]
