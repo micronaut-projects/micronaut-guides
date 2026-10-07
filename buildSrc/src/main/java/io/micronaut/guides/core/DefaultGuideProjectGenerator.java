@@ -38,7 +38,6 @@ import static io.micronaut.http.HttpStatus.BAD_REQUEST;
 import static io.micronaut.starter.options.BuildTool.GRADLE;
 import static io.micronaut.starter.options.BuildTool.PYRONAUT;
 import static io.micronaut.starter.options.JdkVersion.JDK_25;
-import static io.micronaut.starter.options.Language.GROOVY;
 import static io.micronaut.starter.options.Language.PYTHON;
 
 @Singleton
@@ -92,8 +91,7 @@ public class DefaultGuideProjectGenerator implements GuideProjectGenerator {
                          @NonNull JdkVersion javaVersion,
                          @NonNull App app) throws IOException {
         List<String> appFeatures = new ArrayList<>(GuideUtils.getAppFeatures(app, guidesOption.getLanguage()));
-        if (guidesOption.getLanguage() == GROOVY ||
-                !guidesConfiguration.getJdkVersionsSupportedByGraalvm().contains(javaVersion)) {
+        if (!guidesConfiguration.getJdkVersionsSupportedByGraalvm().contains(javaVersion)) {
             appFeatures.remove("graalvm");
         }
 

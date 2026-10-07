@@ -19,13 +19,11 @@ import io.micronaut.guides.tasks.PythonTestScriptTask
 import io.micronaut.json.JsonMapper
 import io.micronaut.starter.options.Language
 import org.apache.tools.ant.filters.ReplaceTokens
-import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.Transformer
 import org.gradle.api.file.Directory
-import org.gradle.api.initialization.IncludedBuild
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.TaskProvider
@@ -60,49 +58,12 @@ class GuidesPlugin implements Plugin<Project> {
     private static final String KEY_PYTHON_BUILD = "python-build"
     private static final String COMMA = ","
     private static final String TASK_SUFFIX_BUILD = "Build"
-    private static final String LOCAL_GIT_PYRONAUT_PROPERTY = "local.git.pyronaut"
-    private static final String LOCAL_GIT_PYRONAUT_ENV = "LOCAL_GIT_PYRONAUT"
-    private static final String LOCAL_PYRONAUT_CORE_VERSION_PROPERTY = "local.pyronaut.core.version"
-    private static final String LOCAL_PYRONAUT_CORE_VERSION_ENV = "LOCAL_PYRONAUT_CORE_VERSION"
-    private static final String LOCAL_PYRONAUT_PLATFORM_VERSION_PROPERTY = "local.pyronaut.platform.version"
-    private static final String LOCAL_PYRONAUT_PLATFORM_VERSION_ENV = "LOCAL_PYRONAUT_PLATFORM_VERSION"
-    private static final String DEFAULT_LOCAL_PYRONAUT_CORE_VERSION = "5.2.3"
-    private static final String DEFAULT_LOCAL_PYRONAUT_PLATFORM_VERSION = "5.1.0"
-    private static final String PYRONAUT_INCLUDED_BUILD_NAME = "pyronaut"
-    private static final String PYRONAUT_FIXTURE_REPOSITORY = "functional-test/build/fixture-repo"
-    private static final String PYRONAUT_INSTALL_EXECUTABLE = "pyronaut-install/build/install/micronaut-pyronaut-install/bin/pyronaut-install"
-    private static final String PYRONAUT_VALIDATE_CONFIG_EXECUTABLE = "pyronaut-validate-config/build/install/micronaut-pyronaut-validate-config/bin/pyronaut-validate-config"
-    private static final String PYRONAUT_PROCESS_EXECUTABLE = "pyronaut-processor/build/install/micronaut-pyronaut-processor/bin/pyronaut-processor"
-    private static final String PYRONAUT_TEST_EXECUTABLE = "pyronaut-test/build/install/micronaut-pyronaut-test/bin/pyronaut-test"
-    private static final String PYRONAUT_TEST_RESOURCES_SERVER_EXECUTABLE = "pyronaut-test-resources-server/build/install/micronaut-pyronaut-test-resources-server/bin/pyronaut-test-resources-server"
-    private static final String PYRONAUT_CLI_PYTHONPATH = "pyronaut/src/main/python"
-    private static final String PYRONAUT_FIXTURE_LAUNCHER_TASK = ":micronaut-functional-test:installFixtureLaunchers"
-    private static final List<String> PYRONAUT_FIXTURE_STAGE_TASKS = List.of(
-            ":micronaut-functional-test:stagePyronautFixtureArtifacts",
-            ":micronaut-functional-test:stageMicronautPlatformFixtureArtifact",
-            ":micronaut-functional-test:stageMicronautCoreFixtureArtifacts",
-            ":micronaut-functional-test:stageMicronautDataFixtureArtifacts",
-            ":micronaut-functional-test:stageSourcegenFixtureArtifacts",
-            ":micronaut-functional-test:stageIncludedCoreExternalFixtureArtifacts",
-            ":micronaut-functional-test:stageMicronautTestFixtureArtifacts"
-    )
 
     @Override
     void apply(Project project) {
         GuideProjectGenerator projectGenerator = new GuideProjectGenerator()
         Directory guidesDir = project.layout.projectDirectory.dir("guides")
         Provider<Directory> codeDir = project.layout.buildDirectory.dir("code")
-        Provider<String> localPyronautPath = localGitPath(project, LOCAL_GIT_PYRONAUT_PROPERTY, LOCAL_GIT_PYRONAUT_ENV)
-        Provider<String> localPyronautCoreVersion = configuredValue(project, LOCAL_PYRONAUT_CORE_VERSION_PROPERTY, LOCAL_PYRONAUT_CORE_VERSION_ENV, DEFAULT_LOCAL_PYRONAUT_CORE_VERSION)
-        Provider<String> localPyronautPlatformVersion = configuredValue(project, LOCAL_PYRONAUT_PLATFORM_VERSION_PROPERTY, LOCAL_PYRONAUT_PLATFORM_VERSION_ENV, DEFAULT_LOCAL_PYRONAUT_PLATFORM_VERSION)
-        Provider<String> localPyronautRepository = localPyronautPath.map(path -> new File(path, PYRONAUT_FIXTURE_REPOSITORY).absolutePath)
-        Provider<String> localPyronautInstallExecutable = localPyronautPath.map(path -> new File(path, PYRONAUT_INSTALL_EXECUTABLE).absolutePath)
-        Provider<String> localPyronautValidateConfigExecutable = localPyronautPath.map(path -> new File(path, PYRONAUT_VALIDATE_CONFIG_EXECUTABLE).absolutePath)
-        Provider<String> localPyronautProcessExecutable = localPyronautPath.map(path -> new File(path, PYRONAUT_PROCESS_EXECUTABLE).absolutePath)
-        Provider<String> localPyronautTestExecutable = localPyronautPath.map(path -> new File(path, PYRONAUT_TEST_EXECUTABLE).absolutePath)
-        Provider<String> localPyronautTestResourcesServerExecutable = localPyronautPath.map(path -> new File(path, PYRONAUT_TEST_RESOURCES_SERVER_EXECUTABLE).absolutePath)
-        Provider<String> localPyronautCliPythonPath = localPyronautPath.map(path -> new File(path, PYRONAUT_CLI_PYTHONPATH).absolutePath)
-        TaskProvider<Task> stageLocalPyronautArtifactsTask = registerStageLocalPyronautArtifactsTask(project, localPyronautRepository)
         Properties testProps = guidesDir.file("tests.properties").asFile.withInputStream { inputStream ->
             new Properties().tap {
                 load(inputStream)
@@ -176,17 +137,7 @@ class GuidesPlugin implements Plugin<Project> {
                                     project,
                                     taskSlug,
                                     metadata,
-                                    pythonScript,
-                                    stageLocalPyronautArtifactsTask,
-                                    localPyronautRepository,
-                                    localPyronautCoreVersion,
-                                    localPyronautPlatformVersion,
-                                    localPyronautInstallExecutable,
-                                    localPyronautValidateConfigExecutable,
-                                    localPyronautProcessExecutable,
-                                    localPyronautTestExecutable,
-                                    localPyronautTestResourcesServerExecutable,
-                                    localPyronautCliPythonPath
+                                    pythonScript
                             )
                             pythonBuildTask = registerGuideBuildForLanguage(project, taskSlug, language.toString().capitalize(), metadata, languageDocTask, languageZipTask, pythonScript, pythonRunner)
                             pythonTestRunnerTask = pythonRunner as TaskProvider<Task>
@@ -319,41 +270,6 @@ class GuidesPlugin implements Plugin<Project> {
         }
     }
 
-    private static Provider<String> localGitPath(Project project,
-                                                 String propertyName,
-                                                 String environmentName) {
-        project.providers.gradleProperty(propertyName)
-                .orElse(project.providers.environmentVariable(environmentName))
-    }
-
-    private static Provider<String> configuredValue(Project project,
-                                                    String propertyName,
-                                                    String environmentName,
-                                                    String defaultValue) {
-        project.providers.gradleProperty(propertyName)
-                .orElse(project.providers.environmentVariable(environmentName))
-                .orElse(defaultValue)
-    }
-
-    private static TaskProvider<Task> registerStageLocalPyronautArtifactsTask(Project project,
-                                                                              Provider<String> localPyronautRepository) {
-        IncludedBuild includedBuild = project.gradle.includedBuilds.find { IncludedBuild build ->
-            build.name == PYRONAUT_INCLUDED_BUILD_NAME
-        }
-        project.tasks.register("stageLocalPyronautArtifacts") { Task it ->
-            it.group = "build setup"
-            it.description = "Stages Pyronaut artifacts from the local included Pyronaut checkout into its fixture repository."
-            it.outputs.dir(localPyronautRepository.map(path -> new File(path)))
-            if (includedBuild != null) {
-                it.dependsOn(PYRONAUT_FIXTURE_STAGE_TASKS.collect { String taskPath -> includedBuild.task(taskPath) })
-                it.dependsOn(includedBuild.task(PYRONAUT_FIXTURE_LAUNCHER_TASK))
-            } else {
-                it.doFirst {
-                    throw new GradleException("Python guide tests require an included '${PYRONAUT_INCLUDED_BUILD_NAME}' build. Configure ${LOCAL_GIT_PYRONAUT_PROPERTY} or ${LOCAL_GIT_PYRONAUT_ENV}.")
-                }
-            }
-        }
-    }
 
     /**
      * https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#onpushpull_requestpull_request_targetpathspaths-ignore
@@ -525,19 +441,9 @@ class GuidesPlugin implements Plugin<Project> {
     private static TaskProvider<TestScriptRunnerTask> registerPythonTestScriptRunnerTask(Project project,
                                                                                         String taskSlug,
                                                                                         Guide metadata,
-                                                                                        TaskProvider<PythonTestScriptTask> pythonTestScriptTask,
-                                                                                        TaskProvider<Task> stageLocalPyronautArtifactsTask,
-                                                                                        Provider<String> localPyronautRepository,
-                                                                                        Provider<String> localPyronautCoreVersion,
-                                                                                        Provider<String> localPyronautPlatformVersion,
-                                                                                        Provider<String> localPyronautInstallExecutable,
-                                                                                        Provider<String> localPyronautValidateConfigExecutable,
-                                                                                        Provider<String> localPyronautProcessExecutable,
-                                                                                        Provider<String> localPyronautTestExecutable,
-                                                                                        Provider<String> localPyronautTestResourcesServerExecutable,
-                                                                                        Provider<String> localPyronautCliPythonPath) {
+                                                                                        TaskProvider<PythonTestScriptTask> pythonTestScriptTask) {
         project.tasks.register("${taskSlug}RunPythonTestScript", TestScriptRunnerTask) { TestScriptRunnerTask it ->
-            it.onlyIf { !Utils.skipBecauseOfJavaVersion(metadata) }
+            it.onlyIf { !Utils.skipBecauseOfJavaVersion(metadata) && !Boolean.TRUE.equals(metadata.skipPyronautTests()) }
 
             Provider<Directory> codeDirectory = project.layout.buildDirectory.dir("code/${metadata.slug()}")
 
@@ -545,20 +451,9 @@ class GuidesPlugin implements Plugin<Project> {
             it.description = "Run the Python tests for the Pyronaut project generated by ${metadata.slug()}"
 
             it.environment.set(metadata.env())
-            it.environment.put("PYRONAUT_LOCAL_REPOSITORY", localPyronautRepository)
-            it.environment.put("PYRONAUT_LOCAL_CORE_VERSION", localPyronautCoreVersion)
-            it.environment.put("PYRONAUT_LOCAL_PLATFORM_VERSION", localPyronautPlatformVersion)
-            it.environment.put("PYRONAUT_INSTALL_EXECUTABLE", localPyronautInstallExecutable)
-            it.environment.put("PYRONAUT_VALIDATE_CONFIG_EXECUTABLE", localPyronautValidateConfigExecutable)
-            it.environment.put("PYRONAUT_PROCESS_EXECUTABLE", localPyronautProcessExecutable)
-            it.environment.put("PYRONAUT_PROCESSOR_EXECUTABLE", localPyronautProcessExecutable)
-            it.environment.put("PYRONAUT_TEST_EXECUTABLE", localPyronautTestExecutable)
-            it.environment.put("PYRONAUT_TEST_RESOURCES_SERVER_EXECUTABLE", localPyronautTestResourcesServerExecutable)
-            it.environment.put("PYRONAUT_CLI_PYTHONPATH", localPyronautCliPythonPath)
             it.testScript.set(pythonTestScriptTask.flatMap { t -> t.scriptFile })
             it.guideSourceDirectory.set(project.layout.projectDirectory.dir("guides/${metadata.slug()}"))
             it.outputFile.set(codeDirectory.map(d -> d.file("python-output.log")))
-            it.dependsOn(stageLocalPyronautArtifactsTask)
         }
     }
 
