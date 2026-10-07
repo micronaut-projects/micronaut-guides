@@ -42,6 +42,8 @@ abstract class TestScriptTask extends DefaultTask {
     @TaskAction
     def perform() {
         Language languageFilter = language.isPresent() ? Language.valueOf(language.get()) : null
-        TestScriptGenerator.generateTestScript(scriptFile.get().asFile.parentFile, [metadata], false, languageFilter)
+        File script = scriptFile.get().asFile
+        String contents = TestScriptGenerator.generateScript([metadata], false, false, false, languageFilter)
+        TestScriptGenerator.generateTestScript(script.parentFile, contents, script.name)
     }
 }

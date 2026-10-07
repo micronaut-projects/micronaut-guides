@@ -158,22 +158,6 @@ if [ $EXIT_STATUS -ne 0 ]; then
 fi
 EXIT_STATUS=0
 
-cd hello-base-gradle-java
-
-cd ..
-cd hello-base-gradle-groovy
-
-cd ..
-cd hello-base-gradle-kotlin
-
-cd ..
-cd hello-base-maven-java
-
-cd ..
-cd hello-base-maven-groovy
-
-cd ..
-
 cd test-gradle-java
 cd springboot
 echo "-------------------------------------------------"
