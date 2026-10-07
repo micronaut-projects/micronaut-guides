@@ -106,7 +106,8 @@ public class DefaultGuideParser implements GuideParser {
                     app.testFramework(),
                     app.excludeTest(),
                     app.excludeSource(),
-                    app.validateLicense()
+                    app.validateLicense(),
+                    app.pythonFeatures() != null ? app.pythonFeatures() : new ArrayList<>()
             ));
         }
 

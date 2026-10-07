@@ -27,6 +27,7 @@ import java.util.List;
  * @param excludeTest       The tests that should not be run
  * @param excludeSource     The source files that should not be included
  * @param validateLicense   To enable Spotless code check
+ * @param pythonFeatures    The app's Python features
  */
 @JsonSchema
 @Serdeable
@@ -76,7 +77,28 @@ public record App(
 
         @JsonProperty(defaultValue = StringUtils.TRUE)
         @Nullable
-        Boolean validateLicense
+        Boolean validateLicense,
+
+        @Nullable
+        List<String> pythonFeatures
 ) {
+    public App(String name,
+               String packageName,
+               ApplicationType applicationType,
+               String framework,
+               List<String> features,
+               List<String> invisibleFeatures,
+               List<String> kotlinFeatures,
+               List<String> javaFeatures,
+               List<String> groovyFeatures,
+               List<String> jvmFeatures,
+               TestFramework testFramework,
+               List<String> excludeTest,
+               List<String> excludeSource,
+               Boolean validateLicense) {
+        this(name, packageName, applicationType, framework, features, invisibleFeatures,
+                kotlinFeatures, javaFeatures, groovyFeatures, jvmFeatures, testFramework,
+                excludeTest, excludeSource, validateLicense, null);
+    }
 }
 
