@@ -18,6 +18,11 @@ To build a single guide, run the dynamic task created by `GuidesPlugin`; convert
 ./gradlew micronautHttpClientBuild
 ```
 
+Python guide test tasks use the installed `pyronaut` CLI on `PATH`; no local SDK
+checkout is required. CI can provision the released tools with
+[setup-pyronaut](https://github.com/micronaut-projects/setup-pyronaut).
+`generateAllPythonGuideTestScripts` generates projects and scripts without running the SDK.
+
 ## Create a new guide
 
 For a high-level overview of the guides infrastructure, take a look at this [blog post](https://micronaut.io/2021/04/12/improving-the-micronaut-guides-infrastructure/).
