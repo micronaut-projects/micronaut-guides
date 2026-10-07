@@ -1,0 +1,153 @@
+common:header.adoc[]
+
+In this guide, you will declare a https://docs.langchain4j.dev/tutorials/ai-services[LangChain4j AI service] as a Micronaut bean, give it a system message and per-conversation chat memory, and expose it over HTTP. The application talks to a language model served by https://ollama.com[Ollama], and the tests run against a real Ollama container started by https://micronaut-projects.github.io/micronaut-test-resources/latest/guide/[Micronaut Test Resources], so you need no API key.
+
+:containerized: Ollama
+common:requirements-testcontainers.adoc[]
+
+common:completesolution.adoc[]
+
+common:create-app-features.adoc[]
+
+== Dependencies
+
+The `langchain4j-ollama` feature adds the https://micronaut-projects.github.io/micronaut-langchain4j/latest/guide/[Micronaut LangChain4j] annotation processor, which generates the AI service implementations at compilation time, and the Ollama integration:
+
+:dependencies:
+dependency:micronaut-langchain4j-processor[groupId=io.micronaut.langchain4j,scope=annotationProcessor]
+dependency:micronaut-langchain4j-ollama[groupId=io.micronaut.langchain4j]
+:dependencies:
+
+== Test Resources
+
+common:test-resources.adoc[]
+
+common:install-test-resources.adoc[]
+
+The Micronaut LangChain4j Ollama test resource starts an Ollama container when the application needs the `langchain4j.ollama.base-url` property and you have not set it:
+
+:exclude-for-build:maven
+
+[source,groovy]
+.build.gradle
+----
+testResourcesService("io.micronaut.langchain4j:micronaut-langchain4j-ollama-testresource")
+----
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+[source,xml]
+.pom.xml
+----
+<plugin>
+  <groupId>io.micronaut.maven</groupId>
+  <artifactId>micronaut-maven-plugin</artifactId>
+  <configuration>
+    <testResourcesDependencies>
+      <dependency>
+        <groupId>io.micronaut.langchain4j</groupId>
+        <artifactId>micronaut-langchain4j-ollama-testresource</artifactId>
+        <version>${micronaut.langchain4j.version}</version>
+      </dependency>
+    </testResourcesDependencies>
+  </configuration>
+</plugin>
+----
+
+:exclude-for-build:
+
+NOTE: The test resource runs the `langchain4j/ollama-<model-name>` container images, which embed a model, so tests do not need to download a model at startup. The images are around 1.5 GB, and the first run takes a while to pull them.
+
+== Configuration
+
+Configure the Ollama model:
+
+resource:application.properties[tag=ollama]
+
+<1> The Ollama model to use. The test resource starts the `langchain4j/ollama-tinyllama` image, which embeds the small https://ollama.com/library/tinyllama[TinyLlama] model.
+<2> Small models running on a CPU can take a while to answer. Increase the timeout of the requests to Ollama.
+
+TIP: To use an Ollama server you run yourself, set `langchain4j.ollama.base-url` (for example to `http://localhost:11434`) and a model you have pulled, such as `llama3.2`. Micronaut Test Resources only starts a container when the property is not set.
+
+== AI Service
+
+An AI service is an interface that describes how your application talks to the language model. Micronaut LangChain4j generates the implementation and registers it as a bean.
+
+source:Assistant[]
+
+<1> Annotate the interface with `@AiService` to register a LangChain4j AI service as a bean. Micronaut LangChain4j wires the configured `ChatModel` bean into it.
+<2> `@SystemMessage` sets the instructions sent to the model with every request.
+<3> `@MemoryId` identifies the conversation. Micronaut LangChain4j registers an in-memory, message-window chat memory provider, so every conversation keeps its own history.
+<4> `@UserMessage` marks the parameter that contains the message of the user.
+
+TIP: The size of the chat memory window is configurable with `langchain4j.chat-memory-store.message-window.max-messages`. Micronaut LangChain4j also provides chat memory stores backed by Redis, Neo4j, Cassandra, and Oracle.
+
+== Controller
+
+Expose the AI service over HTTP:
+
+source:ChatController[]
+
+callout:controller[arg0=/chat]
+callout:constructor-di[arg0=Assistant]
+callout:post[arg0=chat,arg1=/chat/{conversationId}]
+<.> The endpoint accepts the message as plain text.
+callout:produces[]
+callout:executes-on[]
+<.> The `conversationId` path variable selects the chat memory, and the request body contains the message.
+
+== Tests
+
+Calls to a language model are not deterministic, so the test does not assert the exact answer of the model. Instead, it records the requests that the AI service sends to the model and verifies that each conversation keeps its own memory.
+
+Create a bean that records the requests sent to Ollama:
+
+test:ChatRequestRecorder[]
+
+callout:bean-created-event-listener[]
+<.> A LangChain4j `ChatModelListener` is notified of every request sent to the model.
+<.> Use a temperature of zero to make the answers of the model as reproducible as possible.
+<.> Record the messages of each request.
+
+Write a test that holds two conversations through the HTTP API:
+
+test:ChatControllerTest[]
+
+<.> Language models can take a while to answer. Increase the read timeout of the HTTP client used by the test.
+callout:micronaut-test[]
+callout:http-client[]
+<.> Inject the bean that records the requests to the model.
+<.> The model answers.
+<.> The second request of the `sergio` conversation contains the system message, the first message of the user, the answer of the model, and the new question.
+<.> The `tim` conversation does not see the messages of the `sergio` conversation.
+
+common:testApp.adoc[]
+
+common:runapp.adoc[]
+
+When you run the application in development mode, Micronaut Test Resources starts the Ollama container for you.
+
+Start a conversation:
+
+[source,bash]
+----
+curl -X POST -H 'Content-Type: text/plain' -d 'Hi, my name is Sergio. What is the Micronaut framework?' localhost:8080/chat/sergio
+----
+
+Ask a follow-up question in the same conversation:
+
+[source,bash]
+----
+curl -X POST -H 'Content-Type: text/plain' -d 'What is my name?' localhost:8080/chat/sergio
+----
+
+TinyLlama is a very small model, so its answers are not always accurate. Use a larger model, such as `llama3.2`, for better answers.
+
+== Next Steps
+
+* Read the https://micronaut-projects.github.io/micronaut-langchain4j/latest/guide/[Micronaut LangChain4j documentation].
+* Read about https://docs.langchain4j.dev/tutorials/ai-services[AI services] and https://docs.langchain4j.dev/tutorials/chat-memory[chat memory] in the LangChain4j documentation.
+* Learn how to ground the answers of an AI service in your own documents with guideLink:micronaut-langchain4j-rag[Retrieval Augmented Generation with Micronaut LangChain4j].
+* Learn how to let the model call your code with guideLink:micronaut-langchain4j-tools[Function Calling with Micronaut LangChain4j Tools].
