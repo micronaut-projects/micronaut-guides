@@ -188,6 +188,9 @@ public class DependencyLines {
             }
 
             String groupId = attributes.getOrDefault("groupId", "io.micronaut");
+            if ("true".equalsIgnoreCase(attributes.get("pom"))) {
+                throw new IllegalArgumentException("Python dependency macros do not support pom=true; configure dependency management explicitly in pyproject.toml.");
+            }
             String version = attributes.get("version");
             String coordinate = groupId + ':' + artifactId + (version != null ? ':' + version : "");
             String callout = extractCallout(attributes);

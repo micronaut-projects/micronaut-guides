@@ -18,21 +18,10 @@ To build a single guide, run the dynamic task created by `GuidesPlugin`; convert
 ./gradlew micronautHttpClientBuild
 ```
 
-### Use local composite builds
-
-Local Micronaut Core, Pyronaut, and Starter checkouts can be included with
-either the matching Gradle property or environment variable:
-
-| Checkout | Gradle property | Environment variable |
-| --- | --- | --- |
-| Micronaut Core | `local.git.micronaut-core` | `LOCAL_GIT_MICRONAUT_CORE` |
-| Pyronaut | `local.git.pyronaut` | `LOCAL_GIT_PYRONAUT` |
-| Micronaut Starter | `local.git.micronaut-starter` | `LOCAL_GIT_MICRONAUT_STARTER` |
-
-For example: `./gradlew -Plocal.git.pyronaut=/path/to/pyronaut help`.
-Gradle properties take precedence when both forms are set. Pyronaut's GraalPy
-bundle repository is discovered from a local Core or Pyronaut checkout when
-available; set `micronaut.graalpy.bundle.repo` to override it.
+Python guide test tasks use the installed `pyronaut` CLI on `PATH`; no local SDK
+checkout is required. CI can provision the released tools with
+[setup-pyronaut](https://github.com/micronaut-projects/setup-pyronaut).
+`generateAllPythonGuideTestScripts` generates projects and scripts without running the SDK.
 
 ## Create a new guide
 

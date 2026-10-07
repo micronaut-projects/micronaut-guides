@@ -150,39 +150,18 @@ public class TestScriptGeneratorTest {
 
         String result = testScriptGenerator.generatePythonTestScript(new ArrayList<>(List.of(guide)));
 
-        assertTrue(result.contains("PYRONAUT_LOCAL_REPOSITORY"));
-        assertTrue(result.contains("PYRONAUT_LOCAL_CORE_VERSION"));
-        assertTrue(result.contains("PYRONAUT_LOCAL_PLATFORM_VERSION"));
-        assertTrue(result.contains("PYRONAUT_INSTALL_EXECUTABLE"));
-        assertTrue(result.contains("PYRONAUT_REFRESH_DEPENDENCIES"));
-        assertTrue(result.contains("PYRONAUT_DEPENDENCY_CACHE:-.pyronaut-m2"));
-        assertTrue(result.contains("PYRONAUT_PROCESS_EXECUTABLE"));
-        assertTrue(result.contains("PYRONAUT_CLI_PYTHONPATH"));
-        assertTrue(result.contains("set_pyronaut_local_versions"));
-        int runPyronautTests = result.indexOf("run_pyronaut_tests () {");
-        assertTrue(runPyronautTests >= 0);
-        int directBranch = result.indexOf("if [ -z \"${PYRONAUT_LOCAL_REPOSITORY:-}\" ]; then", runPyronautTests);
-        int tempBranch = result.indexOf("local tmp_dir", directBranch);
-        String directBranchScript = result.substring(directBranch, tempBranch);
-        int localVersionsInDirectBranch = directBranchScript.indexOf("set_pyronaut_local_versions");
-        int testResourcesInDirectBranch = directBranchScript.indexOf("set_pyronaut_test_resources");
-        assertTrue(localVersionsInDirectBranch >= 0
-                && localVersionsInDirectBranch < testResourcesInDirectBranch);
-        assertTrue(result.contains("[tool.pyronaut.core]"));
-        assertTrue(result.contains("[tool.pyronaut.platform]"));
-        assertFalse(result.contains("PYRONAUT_LOCAL_VERSION"));
-        assertTrue(result.contains("run_pyronaut_install"));
-        assertTrue(result.contains("run_pyronaut_process"));
-        assertTrue(result.contains("run_pyronaut_cli"));
-        assertTrue(result.contains("test_args+=(--local-repository \"$(pyronaut_dependency_cache)\")"));
-        assertTrue(result.contains("run_pyronaut_cli test \"${test_args[@]}\""));
-        assertFalse(result.contains("\"$PYRONAUT_TEST_EXECUTABLE\""));
-        assertTrue(result.contains("set_pyronaut_local_repositories"));
+        assertTrue(result.contains("set_pyronaut_test_resources &&"));
+        for (String command : List.of("install", "validate-config", "process", "test")) {
+            assertTrue(result.contains("pyronaut " + command));
+        }
+        assertFalse(result.contains("PYRONAUT_LOCAL_REPOSITORY"));
+        assertFalse(result.contains("PYRONAUT_INSTALL_EXECUTABLE"));
+        assertFalse(result.contains("pyronaut_native_toolchain"));
+        assertFalse(result.contains("local tmp_dir"));
         assertTrue(result.contains("cd python-guide-pyronaut-python"));
         assertFalse(result.contains("}cd python-guide-pyronaut-python"));
         assertTrue(result.contains("run_pyronaut_tests || EXIT_STATUS=$?"));
         assertFalse(result.contains("pyenv"));
-        assertTrue(result.contains("tar --exclude='./.micronaut'"));
         assertFalse(result.contains("./gradlew -q check"));
     }
 
