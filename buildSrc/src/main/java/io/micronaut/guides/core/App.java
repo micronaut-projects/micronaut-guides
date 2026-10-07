@@ -22,6 +22,7 @@ import java.util.List;
  * @param kotlinFeatures    The app's Kotlin features
  * @param javaFeatures      The app's Java features
  * @param groovyFeatures    The app's Groovy features
+ * @param jvmFeatures       The app's features shared by the JVM languages (Java, Kotlin and Groovy)
  * @param testFramework     The app's test framework
  * @param excludeTest       The tests that should not be run
  * @param excludeSource     The source files that should not be included
@@ -60,6 +61,9 @@ public record App(
 
         @Nullable
         List<String> groovyFeatures,
+
+        @Nullable
+        List<String> jvmFeatures,
 
         @Nullable
         TestFramework testFramework,

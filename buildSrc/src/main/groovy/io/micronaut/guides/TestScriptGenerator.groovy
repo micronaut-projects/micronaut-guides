@@ -22,8 +22,6 @@ import io.micronaut.starter.options.BuildTool
 
 @CompileStatic
 class TestScriptGenerator {
-    private static final String PYTHON_VERSION = 'graalpy3.13-25.4.4'
-
     public static final String GITHUB_WORKFLOW_JAVA_CI = 'Java CI'
     public static final String ENV_GITHUB_WORKFLOW = 'GITHUB_WORKFLOW'
     public static final String EMPTY_SCRIPT = '''\
@@ -244,8 +242,6 @@ if (noDaemon) {
 }
 if (buildTool == PYRONAUT) {
 bashScript += """\
-eval "\$(pyenv init -)" || EXIT_STATUS=\$?
-pyenv shell ${PYTHON_VERSION} || EXIT_STATUS=\$?
 pyronaut install || EXIT_STATUS=\$?
 pyronaut validate-config || EXIT_STATUS=\$?
 pyronaut test || EXIT_STATUS=\$?
