@@ -18,6 +18,7 @@ class GuideMetadata:
     slug: str
     publish: bool
     base: str | None
+    python_app: bool = False
 
 
 def kebab_case_to_gradle_name(name: str) -> str:
@@ -50,6 +51,7 @@ def load_guides(guides_dir: Path) -> dict[str, GuideMetadata]:
             slug=slug,
             publish=metadata.get("publish", True) is not False,
             base=metadata.get("base"),
+            python_app="PYTHON" in (metadata.get("languages") or []) and metadata.get("apps") != [],
         )
     return guides
 
@@ -75,12 +77,18 @@ def resolve_impacted_guide_slugs(
     )
 
 
-def tasks_for_changed_files(changed_files: Iterable[str], guides_dir: Path) -> list[str]:
+def tasks_for_changed_files(
+    changed_files: Iterable[str], guides_dir: Path, *, jvm_only: bool = False,
+) -> list[str]:
     guides = load_guides(guides_dir)
-    return [
-        f"{kebab_case_to_gradle_name(slug)}Build"
-        for slug in resolve_impacted_guide_slugs(changed_files, guides)
-    ]
+    tasks = []
+    for slug in resolve_impacted_guide_slugs(changed_files, guides):
+        task_slug = kebab_case_to_gradle_name(slug)
+        task = f"{task_slug}Build"
+        if jvm_only and guides[slug].python_app:
+            task += f" -x {task_slug}RunPythonTestScript"
+        tasks.append(task)
+    return tasks
 
 
 def matrix_for_tasks(tasks: Iterable[str]) -> dict[str, list[str]]:
@@ -125,6 +133,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--base", help="Base commit for git diff.")
     parser.add_argument("--head", default="HEAD", help="Head commit for git diff.")
     parser.add_argument(
+        "--jvm-only", action="store_true",
+        help="Exclude only Python runtime test tasks; retain JVM tests and guide generation.",
+    )
+    parser.add_argument(
         "--diff-mode",
         choices=("range", "merge-base"),
         default="range",
@@ -153,7 +165,7 @@ def main() -> int:
         if args.changed_files is not None
         else git_changed_files(repo, args.base, args.head, args.diff_mode)
     )
-    tasks = tasks_for_changed_files(changed_files, guides_dir)
+    tasks = tasks_for_changed_files(changed_files, guides_dir, jvm_only=args.jvm_only)
     matrix = matrix_for_tasks(tasks)
 
     print(f"Changed files: {json.dumps(changed_files)}", file=sys.stderr)
