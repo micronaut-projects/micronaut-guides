@@ -11,4 +11,6 @@ from .domain.account import Account
 @JdbcRepository(dialect=Dialect.ORACLE)  # <1>
 class AccountRepository(CrudRepository[Account, int]):  # <2>
 
-    def reserveIncrementBalanceAndDecrementCredit(self, id: Annotated[int, Id], balance: int, credit: int) -> int: ...  # <3>
+    def reserveIncrementBalance(self, id: Annotated[int, Id], balance: int) -> int: ...  # <3>
+
+    def reserveDecrementBalance(self, id: Annotated[int, Id], balance: int) -> int: ...  # <4>

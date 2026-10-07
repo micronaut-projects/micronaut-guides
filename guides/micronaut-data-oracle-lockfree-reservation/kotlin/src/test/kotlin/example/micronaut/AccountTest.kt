@@ -40,37 +40,35 @@ class AccountTest {
     lateinit var httpClient: HttpClient
 
     @Test
-    fun reservationUpdatesMultipleFields() {
-        val account = repository.save(Account(name = "Checking", balance = 100, credit = 50))
+    fun depositIncrementsBalance() {
+        val account = repository.save(Account(name = "Checking", balance = 100))
 
-        val updated = repository.reserveIncrementBalanceAndDecrementCredit(account.id!!, 25, 25) // <2>
+        val updated = repository.reserveIncrementBalance(account.id!!, 25) // <2>
 
         assertEquals(1L, updated)
         val found = repository.findById(account.id!!).orElseThrow()
         assertEquals(125L, found.balance)
-        assertEquals(25L, found.credit)
     }
 
     @Test
-    fun reservationConstraintFailureIsMapped() {
-        val account = repository.save(Account(name = "Checking", balance = 100, credit = 50))
+    fun withdrawalBeyondBalanceIsRejected() {
+        val account = repository.save(Account(name = "Checking", balance = 100))
 
         assertThrows(DataIntegrityViolationException::class.java) {
-            repository.reserveIncrementBalanceAndDecrementCredit(account.id!!, 1000, 1000) // <3>
+            repository.reserveDecrementBalance(account.id!!, 1000) // <3>
         }
 
         val found = repository.findById(account.id!!).orElseThrow()
         assertEquals(100L, found.balance) // <4>
-        assertEquals(50L, found.credit)
     }
 
     @Test
-    fun reservationConstraintFailureRespondsWithConflict() {
-        val account = repository.save(Account(name = "Checking", balance = 100, credit = 50))
+    fun withdrawalBeyondBalanceRespondsWithConflict() {
+        val account = repository.save(Account(name = "Checking", balance = 100))
 
         val e = assertThrows(HttpClientResponseException::class.java) {
             httpClient.toBlocking().exchange<Any, Any>(
-                HttpRequest.POST("/accounts/${account.id}/reserve?balance=1000&credit=1000", ""))
+                HttpRequest.POST("/accounts/${account.id}/withdraw?amount=1000", ""))
         }
 
         assertEquals(HttpStatus.CONFLICT, e.status) // <5>
@@ -79,25 +77,28 @@ class AccountTest {
     }
 
     @Test
-    fun accountIsCreatedAndReservedOverHttp() {
+    fun accountIsCreatedDepositedAndWithdrawnOverHttp() {
         val client = httpClient.toBlocking()
 
         val created = client.exchange(
-            HttpRequest.POST("/accounts", Account(name = "Savings", balance = 100, credit = 50)), Account::class.java) // <7>
+            HttpRequest.POST("/accounts", Account(name = "Savings", balance = 100)), Account::class.java) // <7>
         assertEquals(HttpStatus.CREATED, created.status)
         val account = created.body()!!
 
-        val reserved = client.retrieve(
-            HttpRequest.POST("/accounts/${account.id}/reserve?balance=25&credit=25", ""), Account::class.java) // <8>
-        assertEquals(125L, reserved.balance)
-        assertEquals(25L, reserved.credit)
+        val deposited = client.retrieve(
+            HttpRequest.POST("/accounts/${account.id}/deposit?amount=25", ""), Account::class.java) // <8>
+        assertEquals(125L, deposited.balance)
+
+        val withdrawn = client.retrieve(
+            HttpRequest.POST("/accounts/${account.id}/withdraw?amount=50", ""), Account::class.java)
+        assertEquals(75L, withdrawn.balance)
     }
 
     @Test
-    fun reservationForUnknownAccountRespondsWithNotFound() {
+    fun depositForUnknownAccountRespondsWithNotFound() {
         val e = assertThrows(HttpClientResponseException::class.java) {
             httpClient.toBlocking().exchange<Any, Any>(
-                HttpRequest.POST("/accounts/-1/reserve?balance=1&credit=1", ""))
+                HttpRequest.POST("/accounts/-1/deposit?amount=1", ""))
         }
 
         assertEquals(HttpStatus.NOT_FOUND, e.status) // <9>

@@ -41,17 +41,12 @@ class Account {
     @PositiveOrZero
     Long balance // <5>
 
-    @Reservable
-    @PositiveOrZero
-    Long credit // <6>
-
     Account() {
     }
 
-    Account(@Nullable Long id, String name, Long balance, Long credit) {
+    Account(@Nullable Long id, String name, Long balance) {
         this.id = id
         this.name = name
         this.balance = balance
-        this.credit = credit
     }
 }

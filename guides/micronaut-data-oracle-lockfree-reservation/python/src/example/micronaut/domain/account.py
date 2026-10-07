@@ -13,4 +13,3 @@ class Account:
     id: Annotated[int | None, Id, GeneratedValue]  # <3>
     name: Annotated[str, NotBlank]  # <4>
     balance: Annotated[int, Reservable, PositiveOrZero]  # <5>
-    credit: Annotated[int, Reservable, PositiveOrZero]  # <6>

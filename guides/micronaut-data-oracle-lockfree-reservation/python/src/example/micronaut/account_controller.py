@@ -24,10 +24,14 @@ class AccountController:
     def find_all(self) -> list[Account]:
         return self.repository.findAll()
 
-    @Post("/{id}/reserve")
-    def reserve(self, id: int,
-                balance: Annotated[int, QueryValue],
-                credit: Annotated[int, QueryValue]) -> HttpResponse[Account]:
-        if self.repository.reserveIncrementBalanceAndDecrementCredit(id, balance, credit) == 0:  # <4>
+    @Post("/{id}/deposit")
+    def deposit(self, id: int, amount: Annotated[int, QueryValue]) -> HttpResponse[Account]:
+        if self.repository.reserveIncrementBalance(id, amount) == 0:  # <4>
             return HttpResponse.notFound()
         return HttpResponse.ok(self.repository.findById(id).orElseThrow())  # <5>
+
+    @Post("/{id}/withdraw")
+    def withdraw(self, id: int, amount: Annotated[int, QueryValue]) -> HttpResponse[Account]:
+        if self.repository.reserveDecrementBalance(id, amount) == 0:
+            return HttpResponse.notFound()
+        return HttpResponse.ok(self.repository.findById(id).orElseThrow())

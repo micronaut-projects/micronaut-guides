@@ -27,49 +27,49 @@ def client(my_context):
     return requests.with_context(my_context)
 
 
-def test_reservation_updates_multiple_fields(repository):
-    account = repository.save(Account(None, "Checking", 100, 50))
+def test_deposit_increments_balance(repository):
+    account = repository.save(Account(None, "Checking", 100))
 
-    updated = repository.reserveIncrementBalanceAndDecrementCredit(account.id, 25, 25)  # <2>
+    updated = repository.reserveIncrementBalance(account.id, 25)  # <2>
 
     assert updated == 1
     found = repository.findById(account.id).orElseThrow()
     assert found.balance == 125
-    assert found.credit == 25
 
 
-def test_reservation_constraint_failure_is_mapped(repository):
-    account = repository.save(Account(None, "Checking", 100, 50))
+def test_withdrawal_beyond_balance_is_rejected(repository):
+    account = repository.save(Account(None, "Checking", 100))
 
     with pytest.raises(BaseException) as error:
-        repository.reserveIncrementBalanceAndDecrementCredit(account.id, 1000, 1000)  # <3>
+        repository.reserveDecrementBalance(account.id, 1000)  # <3>
     assert isinstance(error.value, DataIntegrityViolationException)
 
     found = repository.findById(account.id).orElseThrow()
     assert found.balance == 100  # <4>
-    assert found.credit == 50
 
 
-def test_reservation_constraint_failure_responds_with_conflict(repository, client):
-    account = repository.save(Account(None, "Checking", 100, 50))
+def test_withdrawal_beyond_balance_responds_with_conflict(repository, client):
+    account = repository.save(Account(None, "Checking", 100))
 
-    response = client.post(f"/accounts/{account.id}/reserve?balance=1000&credit=1000")
+    response = client.post(f"/accounts/{account.id}/withdraw?amount=1000")
 
     assert response.status_code == 409  # <5>
     assert "The operation violates an account constraint" in response.text  # <6>
 
 
-def test_account_is_created_and_reserved_over_http(client):
-    created = client.post("/accounts", json={"name": "Savings", "balance": 100, "credit": 50})  # <7>
+def test_account_is_created_deposited_and_withdrawn_over_http(client):
+    created = client.post("/accounts", json={"name": "Savings", "balance": 100})  # <7>
     assert created.status_code == 201
     account = created.json()
 
-    reserved = client.post(f"/accounts/{account['id']}/reserve?balance=25&credit=25").json()  # <8>
-    assert reserved["balance"] == 125
-    assert reserved["credit"] == 25
+    deposited = client.post(f"/accounts/{account['id']}/deposit?amount=25").json()  # <8>
+    assert deposited["balance"] == 125
+
+    withdrawn = client.post(f"/accounts/{account['id']}/withdraw?amount=50").json()
+    assert withdrawn["balance"] == 75
 
 
-def test_reservation_for_unknown_account_responds_with_not_found(client):
-    response = client.post("/accounts/-1/reserve?balance=1&credit=1")
+def test_deposit_for_unknown_account_responds_with_not_found(client):
+    response = client.post("/accounts/-1/deposit?amount=1")
 
     assert response.status_code == 404  # <9>

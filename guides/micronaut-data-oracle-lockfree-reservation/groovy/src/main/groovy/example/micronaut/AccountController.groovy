@@ -50,11 +50,19 @@ class AccountController {
         repository.findAll()
     }
 
-    @Post('/{id}/reserve')
-    Account reserve(Long id, @QueryValue Long balance, @QueryValue Long credit) {
-        if (repository.reserveIncrementBalanceAndDecrementCredit(id, balance, credit) == 0L) { // <4>
+    @Post('/{id}/deposit')
+    Account deposit(Long id, @QueryValue Long amount) {
+        if (repository.reserveIncrementBalance(id, amount) == 0L) { // <4>
             throw new HttpStatusException(HttpStatus.NOT_FOUND, 'Account not found')
         }
         repository.findById(id).orElseThrow() // <5>
+    }
+
+    @Post('/{id}/withdraw')
+    Account withdraw(Long id, @QueryValue Long amount) {
+        if (repository.reserveDecrementBalance(id, amount) == 0L) {
+            throw new HttpStatusException(HttpStatus.NOT_FOUND, 'Account not found')
+        }
+        repository.findById(id).orElseThrow()
     }
 }

@@ -38,11 +38,19 @@ class AccountController(private val repository: AccountRepository) { // <3>
     @Get
     fun findAll(): List<Account> = repository.findAll()
 
-    @Post("/{id}/reserve")
-    fun reserve(id: Long, @QueryValue balance: Long, @QueryValue credit: Long): Account {
-        if (repository.reserveIncrementBalanceAndDecrementCredit(id, balance, credit) == 0L) { // <4>
+    @Post("/{id}/deposit")
+    fun deposit(id: Long, @QueryValue amount: Long): Account {
+        if (repository.reserveIncrementBalance(id, amount) == 0L) { // <4>
             throw HttpStatusException(HttpStatus.NOT_FOUND, "Account not found")
         }
         return repository.findById(id).orElseThrow() // <5>
+    }
+
+    @Post("/{id}/withdraw")
+    fun withdraw(id: Long, @QueryValue amount: Long): Account {
+        if (repository.reserveDecrementBalance(id, amount) == 0L) {
+            throw HttpStatusException(HttpStatus.NOT_FOUND, "Account not found")
+        }
+        return repository.findById(id).orElseThrow()
     }
 }
