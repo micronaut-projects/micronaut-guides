@@ -1,6 +1,5 @@
 package example.micronaut;
 
-import io.micronaut.data.model.vector.FloatVector;
 import io.micronaut.data.model.vector.search.Score;
 import io.micronaut.data.model.vector.search.ScoringFunction;
 import io.micronaut.http.HttpResponse;
