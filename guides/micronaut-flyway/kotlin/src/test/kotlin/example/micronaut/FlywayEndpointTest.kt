@@ -15,6 +15,7 @@
  */
 package example.micronaut
 
+import io.micronaut.serde.annotation.Serdeable
 import io.micronaut.core.type.Argument
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.HttpStatus.OK
@@ -46,10 +47,12 @@ class FlywayEndpointTest(@Client("/") val httpClient: HttpClient) { // <2>
         assertEquals(2, flywayReport.migrations!!.size)
     }
 
+    @Serdeable
     internal class FlywayReport {
         var migrations: List<Migration>? = null
     }
 
+    @Serdeable
     internal class Migration {
         var script: String? = null
             private set
