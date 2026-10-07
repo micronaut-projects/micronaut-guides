@@ -13,17 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package example.micronaut;
+package example.micronaut
 
-import io.micronaut.mcp.annotations.Tool;
-import jakarta.inject.Singleton;
-import java.io.File;
+import io.micronaut.mcp.annotations.Tool
+import jakarta.inject.Singleton
 
 @Singleton // <1>
 class MyTools {
-    @Tool(title = "Free Disk Space",
-          description = "Returns the free disk space in the user's computer")  // <2>
-    String freeDiskSpace() {
-        return DiskUtils.freeDiskSpace();
+
+    @Tool(
+        title = "Free Disk Space",
+        description = "Returns the free disk space in the user's computer"
+    ) // <2>
+    fun freeDiskSpace(): String {
+        return DiskUtils.freeDiskSpace()
     }
 }
