@@ -37,41 +37,39 @@ class AccountSpec extends Specification {
     @Client('/')
     HttpClient httpClient
 
-    void 'reservation updates multiple fields'() {
+    void 'deposit increments balance'() {
         given:
-        Account account = repository.save(new Account(null, 'Checking', 100L, 50L))
+        Account account = repository.save(new Account(null, 'Checking', 100L))
 
         when:
-        long updated = repository.reserveIncrementBalanceAndDecrementCredit(account.id, 25L, 25L) // <2>
+        long updated = repository.reserveIncrementBalance(account.id, 25L) // <2>
 
         then:
         updated == 1L
         Account found = repository.findById(account.id).orElseThrow()
         found.balance == 125L
-        found.credit == 25L
     }
 
-    void 'reservation constraint failure is mapped'() {
+    void 'withdrawal beyond balance is rejected'() {
         given:
-        Account account = repository.save(new Account(null, 'Checking', 100L, 50L))
+        Account account = repository.save(new Account(null, 'Checking', 100L))
 
         when:
-        repository.reserveIncrementBalanceAndDecrementCredit(account.id, 1000L, 1000L) // <3>
+        repository.reserveDecrementBalance(account.id, 1000L) // <3>
 
         then:
         thrown(DataIntegrityViolationException)
         Account found = repository.findById(account.id).orElseThrow()
         found.balance == 100L // <4>
-        found.credit == 50L
     }
 
-    void 'reservation constraint failure responds with conflict'() {
+    void 'withdrawal beyond balance responds with conflict'() {
         given:
-        Account account = repository.save(new Account(null, 'Checking', 100L, 50L))
+        Account account = repository.save(new Account(null, 'Checking', 100L))
 
         when:
         httpClient.toBlocking().exchange(
-                HttpRequest.POST("/accounts/${account.id}/reserve?balance=1000&credit=1000", null))
+                HttpRequest.POST("/accounts/${account.id}/withdraw?amount=1000", null))
 
         then:
         HttpClientResponseException e = thrown()
@@ -79,26 +77,32 @@ class AccountSpec extends Specification {
         e.response.getBody(String).orElse('').contains('The operation violates an account constraint') // <6>
     }
 
-    void 'account is created and reserved over HTTP'() {
+    void 'account is created, deposited and withdrawn over HTTP'() {
         when:
         HttpResponse<Account> created = httpClient.toBlocking().exchange(
-                HttpRequest.POST('/accounts', new Account(null, 'Savings', 100L, 50L)), Account) // <7>
+                HttpRequest.POST('/accounts', new Account(null, 'Savings', 100L)), Account) // <7>
 
         then:
         created.status == HttpStatus.CREATED
 
         when:
-        Account reserved = httpClient.toBlocking().retrieve(
-                HttpRequest.POST("/accounts/${created.body().id}/reserve?balance=25&credit=25", null), Account) // <8>
+        Account deposited = httpClient.toBlocking().retrieve(
+                HttpRequest.POST("/accounts/${created.body().id}/deposit?amount=25", null), Account) // <8>
 
         then:
-        reserved.balance == 125L
-        reserved.credit == 25L
+        deposited.balance == 125L
+
+        when:
+        Account withdrawn = httpClient.toBlocking().retrieve(
+                HttpRequest.POST("/accounts/${created.body().id}/withdraw?amount=50", null), Account)
+
+        then:
+        withdrawn.balance == 75L
     }
 
-    void 'reservation for unknown account responds with not found'() {
+    void 'deposit for unknown account responds with not found'() {
         when:
-        httpClient.toBlocking().exchange(HttpRequest.POST('/accounts/-1/reserve?balance=1&credit=1', null))
+        httpClient.toBlocking().exchange(HttpRequest.POST('/accounts/-1/deposit?amount=1', null))
 
         then:
         HttpClientResponseException e = thrown()

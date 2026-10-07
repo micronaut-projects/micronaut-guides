@@ -29,6 +29,5 @@ import jakarta.validation.constraints.PositiveOrZero;
 public record Account(
     @Id @GeneratedValue @Nullable Long id, // <3>
     @NotBlank String name, // <4>
-    @Reservable @PositiveOrZero Long balance, // <5>
-    @Reservable @PositiveOrZero Long credit) { // <6>
+    @Reservable @PositiveOrZero Long balance) { // <5>
 }

@@ -43,36 +43,34 @@ class AccountTest {
     HttpClient httpClient;
 
     @Test
-    void reservationUpdatesMultipleFields() {
-        Account account = repository.save(new Account(null, "Checking", 100L, 50L));
+    void depositIncrementsBalance() {
+        Account account = repository.save(new Account(null, "Checking", 100L));
 
-        long updated = repository.reserveIncrementBalanceAndDecrementCredit(account.id(), 25L, 25L); // <2>
+        long updated = repository.reserveIncrementBalance(account.id(), 25L); // <2>
 
         assertEquals(1L, updated);
         Account found = repository.findById(account.id()).orElseThrow();
         assertEquals(125L, found.balance());
-        assertEquals(25L, found.credit());
     }
 
     @Test
-    void reservationConstraintFailureIsMapped() {
-        Account account = repository.save(new Account(null, "Checking", 100L, 50L));
+    void withdrawalBeyondBalanceIsRejected() {
+        Account account = repository.save(new Account(null, "Checking", 100L));
 
         assertThrows(DataIntegrityViolationException.class,
-            () -> repository.reserveIncrementBalanceAndDecrementCredit(account.id(), 1000L, 1000L)); // <3>
+            () -> repository.reserveDecrementBalance(account.id(), 1000L)); // <3>
 
         Account found = repository.findById(account.id()).orElseThrow();
         assertEquals(100L, found.balance()); // <4>
-        assertEquals(50L, found.credit());
     }
 
     @Test
-    void reservationConstraintFailureRespondsWithConflict() {
-        Account account = repository.save(new Account(null, "Checking", 100L, 50L));
+    void withdrawalBeyondBalanceRespondsWithConflict() {
+        Account account = repository.save(new Account(null, "Checking", 100L));
 
         HttpClientResponseException e = assertThrows(HttpClientResponseException.class, () ->
             httpClient.toBlocking().exchange(
-                HttpRequest.POST("/accounts/" + account.id() + "/reserve?balance=1000&credit=1000", null)));
+                HttpRequest.POST("/accounts/" + account.id() + "/withdraw?amount=1000", null)));
 
         assertEquals(HttpStatus.CONFLICT, e.getStatus()); // <5>
         assertTrue(e.getResponse().getBody(String.class).orElse("")
@@ -80,25 +78,28 @@ class AccountTest {
     }
 
     @Test
-    void accountIsCreatedAndReservedOverHttp() {
+    void accountIsCreatedDepositedAndWithdrawnOverHttp() {
         BlockingHttpClient client = httpClient.toBlocking();
 
         HttpResponse<Account> created = client.exchange(
-            HttpRequest.POST("/accounts", new Account(null, "Savings", 100L, 50L)), Account.class); // <7>
+            HttpRequest.POST("/accounts", new Account(null, "Savings", 100L)), Account.class); // <7>
         assertEquals(HttpStatus.CREATED, created.getStatus());
         Account account = created.body();
 
-        Account reserved = client.retrieve(
-            HttpRequest.POST("/accounts/" + account.id() + "/reserve?balance=25&credit=25", null), Account.class); // <8>
-        assertEquals(125L, reserved.balance());
-        assertEquals(25L, reserved.credit());
+        Account deposited = client.retrieve(
+            HttpRequest.POST("/accounts/" + account.id() + "/deposit?amount=25", null), Account.class); // <8>
+        assertEquals(125L, deposited.balance());
+
+        Account withdrawn = client.retrieve(
+            HttpRequest.POST("/accounts/" + account.id() + "/withdraw?amount=50", null), Account.class);
+        assertEquals(75L, withdrawn.balance());
     }
 
     @Test
-    void reservationForUnknownAccountRespondsWithNotFound() {
+    void depositForUnknownAccountRespondsWithNotFound() {
         HttpClientResponseException e = assertThrows(HttpClientResponseException.class, () ->
             httpClient.toBlocking().exchange(
-                HttpRequest.POST("/accounts/-1/reserve?balance=1&credit=1", null)));
+                HttpRequest.POST("/accounts/-1/deposit?amount=1", null)));
 
         assertEquals(HttpStatus.NOT_FOUND, e.getStatus()); // <9>
     }

@@ -28,6 +28,5 @@ import jakarta.validation.constraints.PositiveOrZero
 data class Account(
     @field:Id @field:GeneratedValue val id: Long? = null, // <3>
     @field:NotBlank val name: String, // <4>
-    @field:Reservable @field:PositiveOrZero val balance: Long, // <5>
-    @field:Reservable @field:PositiveOrZero val credit: Long // <6>
+    @field:Reservable @field:PositiveOrZero val balance: Long // <5>
 )
