@@ -21,17 +21,23 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 import java.nio.file.Files
+import java.nio.file.FileVisitResult
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.nio.file.SimpleFileVisitor
 import java.time.LocalDate
+import java.nio.file.attribute.BasicFileAttributes
 import java.util.regex.Pattern
 
 import static groovy.io.FileType.FILES
 import static io.micronaut.core.util.StringUtils.EMPTY_STRING
 import static io.micronaut.starter.api.TestFramework.JUNIT
+import static io.micronaut.starter.api.TestFramework.PYTEST
 import static io.micronaut.starter.api.TestFramework.SPOCK
+import static io.micronaut.starter.options.BuildTool.PYRONAUT
 import static io.micronaut.starter.options.JdkVersion.JDK_25
 import static io.micronaut.starter.options.Language.GROOVY
+import static io.micronaut.starter.options.Language.PYTHON
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING
 
 @CompileStatic
@@ -99,6 +105,10 @@ class GuideProjectGenerator implements AutoCloseable {
     }
 
     void generateOne(Guide metadata, File inputDir, File outputDir) {
+        generateOne(metadata, inputDir, outputDir, null)
+    }
+
+    void generateOne(Guide metadata, File inputDir, File outputDir, Language languageFilter) {
         if (!outputDir.exists()) {
             assert outputDir.mkdir()
         }
@@ -117,6 +127,7 @@ class GuideProjectGenerator implements AutoCloseable {
         }
 
         List<GuidesOption> guidesOptionList = guidesOptions(metadata)
+                .findAll { GuidesOption option -> languageFilter == null || option.language == languageFilter }
         for (GuidesOption guidesOption : guidesOptionList) {
             BuildTool buildTool = guidesOption.buildTool
             TestFramework testFramework = guidesOption.testFramework
@@ -142,7 +153,11 @@ class GuideProjectGenerator implements AutoCloseable {
                 String packageAndName = BASE_PACKAGE + '.' + app.name()
 
                 guidesGenerator.generateAppIntoDirectory(destination, app.applicationType(), packageAndName, app.framework(),
-                        appFeatures, buildTool, app.testFramework() ?: testFramework, lang, javaVersion)
+                        appFeatures, buildTool, lang == PYTHON ? PYTEST : (app.testFramework() ?: testFramework), lang, javaVersion)
+
+                if (lang == PYTHON) {
+                    movePythonResources(destinationPath)
+                }
 
                 if (metadata.base()) {
                     File baseDir = new File(inputDir.parentFile, metadata.base())
@@ -188,6 +203,40 @@ class GuideProjectGenerator implements AutoCloseable {
         }
     }
 
+    private static void movePythonResources(Path destinationPath) {
+        movePythonResourceFolder(destinationPath, 'views')
+        movePythonResourceFolder(destinationPath, 'static')
+    }
+
+    private static void movePythonResourceFolder(Path destinationPath, String resourceFolder) {
+        Path sourcePath = destinationPath.resolve('src').resolve('main').resolve('resources').resolve(resourceFolder)
+        if (!Files.exists(sourcePath)) {
+            return
+        }
+
+        Path targetPath = destinationPath.resolve('config').resolve(resourceFolder)
+        Files.createDirectories(targetPath)
+        Files.walkFileTree(sourcePath, new SimpleFileVisitor<Path>() {
+            @Override
+            FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
+                Files.createDirectories(targetPath.resolve(sourcePath.relativize(dir)))
+                FileVisitResult.CONTINUE
+            }
+
+            @Override
+            FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+                Files.move(file, targetPath.resolve(sourcePath.relativize(file)), REPLACE_EXISTING)
+                FileVisitResult.CONTINUE
+            }
+
+            @Override
+            FileVisitResult postVisitDirectory(Path dir, IOException exc) {
+                Files.delete(dir)
+                FileVisitResult.CONTINUE
+            }
+        })
+    }
+
     void addLicenses(File folder) {
         String licenseHeader = licenseHeaderText()
         folder.eachFileRecurse (FILES) { file ->
@@ -215,7 +264,31 @@ class GuideProjectGenerator implements AutoCloseable {
         final String srcFolder = 'src'
         Path srcPath = Paths.get(inputDir.absolutePath, appName, srcFolder)
         if (Files.exists(srcPath)) {
-            Files.walkFileTree(srcPath, new CopyFileVisitor(Paths.get(destinationPath.toString(), srcFolder)))
+            Path resourcesPath = srcPath.resolve('main').resolve('resources')
+            if (language == PYTHON.toString() && Files.exists(resourcesPath)) {
+                Path configPath = Paths.get(destinationPath.toString(), 'config')
+                Files.createDirectories(configPath)
+                Files.walkFileTree(resourcesPath, new CopyFileVisitor(configPath))
+                Path destinationResourcesPath = Paths.get(destinationPath.toString(), srcFolder, 'main', 'resources')
+                Files.walkFileTree(resourcesPath, new SimpleFileVisitor<Path>() {
+                    @Override
+                    FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+                        Files.deleteIfExists(destinationResourcesPath.resolve(resourcesPath.relativize(file)))
+                        FileVisitResult.CONTINUE
+                    }
+                })
+                Files.walkFileTree(srcPath, new CopyFileVisitor(Paths.get(destinationPath.toString(), srcFolder)) {
+                    @Override
+                    FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
+                        if (dir.equals(resourcesPath)) {
+                            return FileVisitResult.SKIP_SUBTREE
+                        }
+                        super.preVisitDirectory(dir, attrs)
+                    }
+                })
+            } else {
+                Files.walkFileTree(srcPath, new CopyFileVisitor(Paths.get(destinationPath.toString(), srcFolder)))
+            }
         }
 
         Path sourcePath = Paths.get(inputDir.absolutePath, appName, language)
@@ -259,6 +332,11 @@ class GuideProjectGenerator implements AutoCloseable {
         TestFramework testFramework = guideMetadata.testFramework()
         List<GuidesOption> guidesOptionList = []
 
+        if (languages.contains(PYTHON) && !buildTools.contains(PYRONAUT)) {
+            buildTools = new ArrayList<>(buildTools)
+            buildTools << PYRONAUT
+        }
+
         for (BuildTool buildTool : buildTools) {
             for (Language language : Language.values()) {
                 if (!GuideUtils.isSupported(buildTool, language)) {
@@ -282,6 +360,9 @@ class GuideProjectGenerator implements AutoCloseable {
 
     private static TestFramework testFrameworkOption(@NonNull Language language,
                                                      @Nullable TestFramework testFramework) {
+        if (language == PYTHON) {
+            return PYTEST
+        }
         if (testFramework != null) {
             return testFramework
         }

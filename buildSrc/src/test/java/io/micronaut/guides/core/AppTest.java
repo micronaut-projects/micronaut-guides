@@ -55,7 +55,7 @@ class AppTest {
         boolean validateLicense = true;
 
         Set<ConstraintViolation<App>> violations = validator.validate(
-                new App(name,packageName,applicationType,framework,emptyList,emptyList,emptyList,emptyList,emptyList, TestFramework.JUNIT,emptyList,emptyList,validateLicense));
+                new App(name,packageName,applicationType,framework,emptyList,emptyList,emptyList,emptyList,emptyList,emptyList, TestFramework.JUNIT,emptyList,emptyList,validateLicense));
         assertTrue(violations.isEmpty());
     }
 
@@ -92,7 +92,7 @@ class AppTest {
         String expected = """
                 {
                   "$schema": "https://json-schema.org/draft/2020-12/schema",
-                  "$id": "https://guides.micronaut.io/schemas/app.schema.json",
+                  "$id": "https://micronaut-projects.github.io/micronaut-guides/schemas/app.schema.json",
                   "title": "App",
                   "type": "object",
                   "properties": {
@@ -153,6 +153,13 @@ class AppTest {
                         "type": "string"
                       }
                     },
+                    "jvmFeatures": {
+                      "description": "The app's features shared by the JVM languages (Java, Kotlin and Groovy)",
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
                     "kotlinFeatures": {
                       "description": "The app's Kotlin features",
                       "type": "array",
@@ -176,7 +183,8 @@ class AppTest {
                         "JUNIT",
                         "SPOCK",
                         "KOTLINTEST",
-                        "KOTEST"
+                        "KOTEST",
+                        "PYTEST"
                       ]
                     },
                     "validateLicense": {

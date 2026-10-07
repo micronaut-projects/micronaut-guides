@@ -42,6 +42,7 @@ class GuideProjectGeneratorTest {
                 List.of(),
                 List.of(),
                 List.of(),
+                List.of(),
                 null,
                 null,
                 null,
@@ -112,6 +113,7 @@ class GuideProjectGeneratorTest {
                     }
                     testResources {
                         sharedServer = true
+                        version = "4.0.0"
                     }
                 }"""));
         String javaVersion = JavaVersion.current().getMajorVersion();
@@ -171,6 +173,7 @@ class GuideProjectGeneratorTest {
                 "Micronaut",
                 List.of("data-jdbc", "flyway", "http-client", "oracle-cloud-atp"),
                 List.of("test-resources-jdbc-oracle-free"),
+                List.of(),
                 List.of(),
                 List.of(),
                 List.of(),

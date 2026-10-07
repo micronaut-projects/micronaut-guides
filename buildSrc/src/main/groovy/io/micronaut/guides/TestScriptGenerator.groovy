@@ -15,13 +15,13 @@ import java.util.stream.Collectors
 import static io.micronaut.guides.GuideProjectGenerator.DEFAULT_APP_NAME
 import static io.micronaut.starter.options.BuildTool.GRADLE
 import static io.micronaut.starter.options.BuildTool.MAVEN
+import static io.micronaut.starter.options.BuildTool.PYRONAUT
 import io.micronaut.starter.api.TestFramework
 import io.micronaut.starter.options.Language
 import io.micronaut.starter.options.BuildTool
 
 @CompileStatic
 class TestScriptGenerator {
-
     public static final String GITHUB_WORKFLOW_JAVA_CI = 'Java CI'
     public static final String ENV_GITHUB_WORKFLOW = 'GITHUB_WORKFLOW'
     public static final String EMPTY_SCRIPT = '''\
@@ -98,6 +98,14 @@ exit 0
         generateTestScript(output, script)
     }
 
+    static void generateTestScript(File output,
+                                   List<Guide> metadatas,
+                                   boolean stopIfFailure,
+                                   Language languageFilter) {
+        String script = generateScript(metadatas, stopIfFailure, false, languageFilter)
+        generateTestScript(output, script)
+    }
+
     static void generateNativeTestScript(File output,
                                    List<Guide> metadatas,
                                    boolean stopIfFailure) {
@@ -130,7 +138,8 @@ exit 0
 
     static String generateScript(List<Guide> metadatas,
                                  boolean stopIfFailure,
-                                 boolean nativeTest = false) {
+                                 boolean nativeTest = false,
+                                 Language languageFilter = null) {
         StringBuilder bashScript = new StringBuilder('''\
 #!/usr/bin/env bash
 set -e
@@ -150,11 +159,17 @@ kill_kotlin_daemon () {
         metadatas.sort { it.slug() }
         for (Guide metadata : metadatas) {
             List<GuidesOption> guidesOptionList = GuideProjectGenerator.guidesOptions(metadata)
+            if (languageFilter != null) {
+                guidesOptionList = guidesOptionList.findAll { GuidesOption option -> option.language == languageFilter }
+            }
             bashScript << """\
 """
             for (GuidesOption guidesOption : guidesOptionList) {
                 String folder = GuideProjectGenerator.folderName(metadata.slug(), guidesOption)
-                BuildTool buildTool = folder.containsIgnoreCase(MAVEN.toString()) ? MAVEN : GRADLE
+                BuildTool buildTool = guidesOption.getBuildTool()
+                if (buildTool == PYRONAUT && System.getenv('CI') != null) {
+                    continue
+                }
                 if (metadata.apps().any { it.name() == DEFAULT_APP_NAME } ) {
                     if (GuideUtils.shouldSkip(metadata,buildTool, guidesOption.getLanguage())) {
                         continue
@@ -225,7 +240,13 @@ echo "Executing '$folder' $testcopy"
 if (noDaemon) {
     bashScript += "kill_kotlin_daemon\n"
 }
-if (nativeTest) {
+if (buildTool == PYRONAUT) {
+bashScript += """\
+pyronaut install || EXIT_STATUS=\$?
+pyronaut validate-config || EXIT_STATUS=\$?
+pyronaut test || EXIT_STATUS=\$?
+"""
+} else if (nativeTest) {
 bashScript += """\
 ${buildTool == MAVEN ? './mvnw -Pnative test' : './gradlew nativeTest'} || EXIT_STATUS=\$?
 """

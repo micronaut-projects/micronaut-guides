@@ -99,6 +99,27 @@ class GuideUtilsTest {
     }
 
     @Test
+    void testJvmFeaturesApplyToJvmLanguagesOnly(){
+        Optional<InputStream> inputStreamOptional = resourceLoader.getResourceAsStream("classpath:metadata-jvm-features.json");
+        assertTrue(inputStreamOptional.isPresent());
+        InputStream inputStream = inputStreamOptional.get();
+        Guide guide = assertDoesNotThrow(() -> jsonMapper.readValue(inputStream, Guide.class));
+        App app = guide.apps().get(0);
+
+        assertEquals(List.of("validation", "spreadsheet-builder", "graalvm"), GuideUtils.getAppVisibleFeatures(app, Language.JAVA));
+        assertEquals(List.of("validation", "spreadsheet-builder", "graalvm"), GuideUtils.getAppVisibleFeatures(app, Language.KOTLIN));
+        assertEquals(List.of("validation", "spreadsheet-builder"), GuideUtils.getAppVisibleFeatures(app, Language.GROOVY));
+        assertEquals(List.of("validation"), GuideUtils.getAppVisibleFeatures(app, Language.PYTHON));
+
+        assertEquals(List.of("validation", "spreadsheet-builder", "graalvm"), GuideUtils.getAppFeatures(app, Language.JAVA));
+        assertEquals(List.of("validation", "spreadsheet-builder", "graalvm"), GuideUtils.getAppFeatures(app, Language.KOTLIN));
+        assertEquals(List.of("validation", "spreadsheet-builder"), GuideUtils.getAppFeatures(app, Language.GROOVY));
+        assertEquals(List.of("validation"), GuideUtils.getAppFeatures(app, Language.PYTHON));
+
+        assertTrue(GuideUtils.getTags(guide).contains("spreadsheet-builder"));
+    }
+
+    @Test
     void testGetAppFeaturesEmpty(){
         Optional<InputStream> inputStreamOptional = resourceLoader.getResourceAsStream("classpath:metadata-features.json");
         assertTrue(inputStreamOptional.isPresent());
@@ -139,6 +160,9 @@ class GuideUtilsTest {
         assertFalse(GuideUtils.shouldSkip(guide, BuildTool.MAVEN, Language.JAVA));
         assertTrue(GuideUtils.shouldSkip(guide, BuildTool.MAVEN, Language.KOTLIN));
         assertFalse(GuideUtils.isSupported(BuildTool.MAVEN, Language.KOTLIN));
+        assertTrue(GuideUtils.isSupported(BuildTool.PYRONAUT, Language.PYTHON));
+        assertFalse(GuideUtils.isSupported(BuildTool.GRADLE, Language.PYTHON));
+        assertFalse(GuideUtils.isSupported(BuildTool.PYRONAUT, Language.JAVA));
     }
 
     @Test

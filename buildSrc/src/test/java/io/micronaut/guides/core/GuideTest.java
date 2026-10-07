@@ -69,7 +69,7 @@ class GuideTest {
         assertEquals(LocalDate.of(2022,2, 17), guide.publicationDate());
         List<String> tags = guide.tags();
         Collections.sort(tags);
-        assertEquals(List.of("Azure", "cloud", "data-jdbc", "database", "flyway", "jdbc", "micronaut-data", "mysql"), tags);
+        assertEquals(List.of("Azure", "base-java", "base-jvm", "base-kotlin", "child-java", "child-jvm", "child-kotlin", "cloud", "data-jdbc", "database", "flyway", "jdbc", "micronaut-data", "mysql"), tags);
         List<App> apps = guide.apps();
         assertNotNull(apps);
         assertEquals(1, apps.size());
@@ -78,11 +78,12 @@ class GuideTest {
                     app.applicationType() == ApplicationType.DEFAULT &&
                     app.packageName().equals("example.micronaut") &&
                     app.framework().equals("Micronaut") &&
-                    app.features() == null &&
-                    app.invisibleFeatures() ==  null &&
-                    app.kotlinFeatures() ==  null &&
-                    app.javaFeatures() ==  null &&
-                    app.groovyFeatures() ==  null &&
+                    app.features().isEmpty() &&
+                    app.invisibleFeatures().isEmpty() &&
+                    app.kotlinFeatures().equals(List.of("child-kotlin", "base-kotlin")) &&
+                    app.javaFeatures().equals(List.of("child-java", "base-java")) &&
+                    app.groovyFeatures().isEmpty() &&
+                    app.jvmFeatures().equals(List.of("child-jvm", "base-jvm")) &&
                     app.testFramework() ==  null &&
                     app.excludeTest() ==  null &&
                     app.excludeSource() ==  null &&
@@ -98,7 +99,7 @@ class GuideTest {
         List<String> authors = List.of("Sergio del Amo");
         LocalDate publicationDate = LocalDate.of(2024, 4, 24);
         List<App> apps = new ArrayList<>();
-        apps.add(new App("springboot", null, null, null, null, null, null, null, null, null, null, null,false));
+        apps.add(new App("springboot", null, null, null, null, null, null, null, null, null, null, null, null,false));
         Set<ConstraintViolation<Guide>> violations = validator.validate(
                 new Guide(title,intro, authors, categories, publicationDate, null, null, null,false,false,null,null,null,null,null,null,null,true,null,null,apps));
         assertTrue(violations.isEmpty());
@@ -220,7 +221,7 @@ class GuideTest {
         String expected = """
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://guides.micronaut.io/schemas/guide.schema.json",
+  "$id": "https://micronaut-projects.github.io/micronaut-guides/schemas/guide.schema.json",
   "title": "Guide",
   "type": "object",
   "properties": {
@@ -228,7 +229,7 @@ class GuideTest {
       "description": "Applications created for the guide",
       "type": "array",
       "items": {
-        "$ref": "https://guides.micronaut.io/schemas/app.schema.json"
+        "$ref": "https://micronaut-projects.github.io/micronaut-guides/schemas/app.schema.json"
       },
       "minItems": 1
     },
@@ -256,7 +257,8 @@ class GuideTest {
         "enum": [
           "GRADLE",
           "GRADLE_KOTLIN",
-          "MAVEN"
+          "MAVEN",
+          "PYRONAUT"
         ]
       }
     },
@@ -298,7 +300,8 @@ class GuideTest {
         "enum": [
           "JAVA",
           "GROOVY",
-          "KOTLIN"
+          "KOTLIN",
+          "PYTHON"
         ]
       }
     },
@@ -345,7 +348,8 @@ class GuideTest {
         "JUNIT",
         "SPOCK",
         "KOTLINTEST",
-        "KOTEST"
+        "KOTEST",
+        "PYTEST"
       ]
     },
     "title": {

@@ -28,6 +28,7 @@ public final class GuideUtils {
         for (App app : guide.apps()) {
             List<String> allFeatures = new ArrayList<>();
             addAllSafe(allFeatures, app.features());
+            addAllSafe(allFeatures, app.jvmFeatures());
             addAllSafe(allFeatures, app.javaFeatures());
             addAllSafe(allFeatures, app.kotlinFeatures());
             addAllSafe(allFeatures, app.groovyFeatures());
@@ -48,13 +49,13 @@ public final class GuideUtils {
 
     public static List<String> getAppFeatures(App app, Language language) {
         if (language == Language.JAVA) {
-            return mergeLists(app.features(), getAppInvisibleFeatures(app), app.javaFeatures());
+            return mergeLists(app.features(), getAppInvisibleFeatures(app), app.jvmFeatures(), app.javaFeatures());
         }
         if (language == Language.KOTLIN) {
-            return mergeLists(app.features(), getAppInvisibleFeatures(app), app.kotlinFeatures());
+            return mergeLists(app.features(), getAppInvisibleFeatures(app), app.jvmFeatures(), app.kotlinFeatures());
         }
         if (language == Language.GROOVY) {
-            return mergeLists(app.features(), getAppInvisibleFeatures(app), app.groovyFeatures());
+            return mergeLists(app.features(), getAppInvisibleFeatures(app), app.jvmFeatures(), app.groovyFeatures());
         }
         return mergeLists(app.features(), getAppInvisibleFeatures(app));
     }
@@ -71,18 +72,21 @@ public final class GuideUtils {
 
     public static List<String> getAppVisibleFeatures(App app, Language language) {
         if (language == Language.JAVA) {
-            return mergeLists(app.features(), app.javaFeatures());
+            return mergeLists(app.features(), app.jvmFeatures(), app.javaFeatures());
         }
         if (language == Language.KOTLIN) {
-            return mergeLists(app.features(), app.kotlinFeatures());
+            return mergeLists(app.features(), app.jvmFeatures(), app.kotlinFeatures());
         }
         if (language == Language.GROOVY) {
-            return mergeLists(app.features(), app.groovyFeatures());
+            return mergeLists(app.features(), app.jvmFeatures(), app.groovyFeatures());
         }
         return app.features();
     }
 
     public static boolean isSupported(BuildTool buildTool, Language language) {
+        if (buildTool == BuildTool.PYRONAUT || language == Language.PYTHON) {
+            return buildTool == BuildTool.PYRONAUT && language == Language.PYTHON;
+        }
         return !(buildTool == BuildTool.MAVEN && language == Language.KOTLIN);
     }
 
@@ -164,9 +168,10 @@ public final class GuideUtils {
                     guideApp.framework(),
                     mergeLists(guideApp.features(), baseApp.features()),
                     mergeLists(guideApp.invisibleFeatures(), baseApp.invisibleFeatures()),
-                    mergeLists(guideApp.javaFeatures(), baseApp.javaFeatures()),
                     mergeLists(guideApp.kotlinFeatures(), baseApp.kotlinFeatures()),
+                    mergeLists(guideApp.javaFeatures(), baseApp.javaFeatures()),
                     mergeLists(guideApp.groovyFeatures(), baseApp.groovyFeatures()),
+                    mergeLists(guideApp.jvmFeatures(), baseApp.jvmFeatures()),
                     guideApp.testFramework(),
                     guideApp.excludeTest(),
                     guideApp.excludeSource(),

@@ -56,6 +56,21 @@ class GuideGenerationUtilsTest {
     }
 
     @Test
+    void testPythonGuideOptionsUsePyronautAndPytest() {
+        Guide guideMetadata = new Guide(null,null, null, null, null, null, null, null,false,false,null, List.of(Language.JAVA, Language.PYTHON),null, List.of(BuildTool.GRADLE, BuildTool.MAVEN), TestFramework.SPOCK,null,null,true,null,null,null);
+
+        List<GuidesOption> result = GuideGenerationUtils.guidesOptions(guideMetadata, LOG);
+
+        assertEquals(3, result.size());
+        GuidesOption pythonOption = result.stream()
+                .filter(option -> option.getLanguage() == Language.PYTHON)
+                .findFirst()
+                .orElseThrow();
+        assertEquals(BuildTool.PYRONAUT, pythonOption.getBuildTool());
+        assertEquals(TestFramework.PYTEST, pythonOption.getTestFramework());
+    }
+
+    @Test
     void testGroovyGuideProjectGeneratorGuidesOptions() {
         Guide guideMetadata = new Guide(null,null, null, null, null, null, null, null,false,false,null, List.of(Language.JAVA, Language.KOTLIN),null, List.of(BuildTool.GRADLE, BuildTool.MAVEN), TestFramework.JUNIT,null,null,true,null,null,null);
 
@@ -67,8 +82,25 @@ class GuideGenerationUtilsTest {
     }
 
     @Test
+    void testGroovyPythonGuideOptionsUsePyronautAndPytest() {
+        Guide guideMetadata = new Guide(null,null, null, null, null, null, null, null,false,false,null, List.of(Language.JAVA, Language.PYTHON),null, List.of(BuildTool.GRADLE, BuildTool.MAVEN), TestFramework.SPOCK,null,null,true,null,null,null);
+
+        List<GuidesOption> result = io.micronaut.guides.GuideProjectGenerator.guidesOptions(guideMetadata);
+
+        assertEquals(3, result.size());
+        GuidesOption pythonOption = result.stream()
+                .filter(option -> option.getLanguage() == Language.PYTHON)
+                .findFirst()
+                .orElseThrow();
+        assertEquals(BuildTool.PYRONAUT, pythonOption.getBuildTool());
+        assertEquals(TestFramework.PYTEST, pythonOption.getTestFramework());
+    }
+
+    @Test
     void testTestFrameworkOption() {
         assertEquals(TestFramework.SPOCK, GuideGenerationUtils.testFrameworkOption(Language.GROOVY, null));
+        assertEquals(TestFramework.PYTEST, GuideGenerationUtils.testFrameworkOption(Language.PYTHON, null));
+        assertEquals(TestFramework.PYTEST, GuideGenerationUtils.testFrameworkOption(Language.PYTHON, TestFramework.SPOCK));
         assertEquals(TestFramework.JUNIT, GuideGenerationUtils.testFrameworkOption(Language.JAVA, null));
         assertEquals(TestFramework.SPOCK, GuideGenerationUtils.testFrameworkOption(Language.JAVA, TestFramework.SPOCK));
     }

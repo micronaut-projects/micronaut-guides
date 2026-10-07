@@ -8,6 +8,7 @@ import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import static io.micronaut.starter.options.BuildTool.GRADLE;
@@ -30,7 +31,7 @@ public class TestScriptGeneratorTest {
 
     @Test
     void supportsNativeTestAllConditions() {
-        App app = new App("springboot", null, null, null, null, null, null, null, null, null, null, null, false);
+        App app = new App("springboot", null, null, null, null, null, null, null, null, null, null, null, null, false);
         GuidesOption guidesOption = new GuidesOption(GRADLE, Language.JAVA, TestFramework.JUNIT);
 
         boolean result = testScriptGenerator.supportsNativeTest(app, guidesOption);
@@ -40,7 +41,7 @@ public class TestScriptGeneratorTest {
 
     @Test
     void supportsNativeTestNotMicronaut() {
-        App app = new App("app", null, null, "Spring", null, null, null, null, null, null, null, null, false);
+        App app = new App("app", null, null, "Spring", null, null, null, null, null, null, null, null, null, false);
         GuidesOption guidesOption = new GuidesOption(GRADLE, Language.JAVA, TestFramework.JUNIT);
 
         boolean result = testScriptGenerator.supportsNativeTest(app, guidesOption);
@@ -50,7 +51,7 @@ public class TestScriptGeneratorTest {
 
     @Test
     void supportsNativeTestNotGradle() {
-        App app = new App("springboot", null, null, "Micronaut", null, null, null, null, null, null, null, null, false);
+        App app = new App("springboot", null, null, "Micronaut", null, null, null, null, null, null, null, null, null, false);
         GuidesOption guidesOption = new GuidesOption(MAVEN, Language.JAVA, TestFramework.JUNIT);
 
         boolean result = testScriptGenerator.supportsNativeTest(app, guidesOption);
@@ -60,7 +61,7 @@ public class TestScriptGeneratorTest {
 
     @Test
     void supportsNativeTestNotLanguage() {
-        App app = new App("springboot", null, null, "Micronaut", null, null, null, null, null, null, null, null, false);
+        App app = new App("springboot", null, null, "Micronaut", null, null, null, null, null, null, null, null, null, false);
         GuidesOption guidesOption = new GuidesOption(GRADLE, Language.GROOVY, TestFramework.JUNIT);
 
         boolean result = testScriptGenerator.supportsNativeTest(app, guidesOption);
@@ -70,7 +71,7 @@ public class TestScriptGeneratorTest {
 
     @Test
     void supportsNativeTestNotJUnit() {
-        App app = new App("springboot", null, null, "Micronaut", null, null, null, null, null, null, null, null, false);
+        App app = new App("springboot", null, null, "Micronaut", null, null, null, null, null, null, null, null, null, false);
         GuidesOption guidesOption = new GuidesOption(GRADLE, Language.JAVA, TestFramework.SPOCK);
 
         boolean result = testScriptGenerator.supportsNativeTest(app, guidesOption);
@@ -80,21 +81,21 @@ public class TestScriptGeneratorTest {
 
     @Test
     void supportsNativeTestNullFramework() {
-        App app = new App("springboot", null, null, null, null, null, null, null, null, null, null, null, false);
+        App app = new App("springboot", null, null, null, null, null, null, null, null, null, null, null, null, false);
 
         assertTrue(testScriptGenerator.isMicronautFramework(app));
     }
 
     @Test
     void supportsNativeTestIsMicronaut() {
-        App app = new App("springboot", null, null, "Micronaut", null, null, null, null, null, null, null, null, false);
+        App app = new App("springboot", null, null, "Micronaut", null, null, null, null, null, null, null, null, null, false);
 
         assertTrue(testScriptGenerator.isMicronautFramework(app));
     }
 
     @Test
     void supportsNativeTestIsNotMicronaut() {
-        App app = new App("app", null, null, "Spring", null, null, null, null, null, null, null, null, false);
+        App app = new App("app", null, null, "Spring", null, null, null, null, null, null, null, null, null, false);
 
         assertFalse(testScriptGenerator.isMicronautFramework(app));
     }
@@ -130,5 +131,21 @@ public class TestScriptGeneratorTest {
         String result = testScriptGenerator.generateNativeTestScript(metadatas);
 
         assertEquals(expected.strip(), result.strip());
+    }
+
+    @Test
+    void testGeneratePython() {
+        File guideFolder = new File("src/test/resources/file-transfer/python-resources");
+        Guide guide = guideParser.parseGuideMetadata(guideFolder, "metadata.json").orElseThrow();
+
+        String result = testScriptGenerator.generateTestScript(new ArrayList<>(List.of(guide)));
+
+        assertTrue(result.contains("cd python-resources-pyronaut-python"));
+        assertFalse(result.contains("pyenv"));
+        assertTrue(result.contains("pyronaut install"));
+        assertTrue(result.contains("pyronaut validate-config"));
+        assertTrue(result.contains("pyronaut test"));
+        assertFalse(result.contains("./gradlew -q check"));
+        assertFalse(result.contains("./mvnw -q test"));
     }
 }

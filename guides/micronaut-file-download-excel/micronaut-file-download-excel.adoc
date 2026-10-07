@@ -4,7 +4,11 @@ common:header-top.adoc[]
 
 In this guide, we will demonstrate Micronaut https://docs.micronaut.io/latest/guide/#transfers[file transfer] capabilities by creating an application that downloads an Excel file containing a list of books.
 
-https://guides.micronaut.io/latest/micronaut-intellij-idea-ide-setup.html[Set up IntelliJ IDEA to develop Micronaut applications].
+:exclude-for-languages:python
+
+https://micronaut-projects.github.io/micronaut-guides/latest/micronaut-intellij-idea-ide-setup.html[Set up IntelliJ IDEA to develop Micronaut applications].
+
+:exclude-for-languages:
 
 common:requirements.adoc[]
 
@@ -16,11 +20,21 @@ common:create-app.adoc[]
 
 === Books
 
+:exclude-for-languages:python
 Create `Book` POJO:
+:exclude-for-languages:
+:only-for-languages:python
+Create a `Book` dataclass:
+:only-for-languages:
 
 source:Book[]
 
+:exclude-for-languages:python
 Create an interface to encapsulate Book retrieval.
+:exclude-for-languages:
+:only-for-languages:python
+Create a protocol to describe Book retrieval.
+:only-for-languages:
 
 source:BookRepository[]
 
@@ -30,26 +44,45 @@ source:BookRepositoryImpl[]
 
 callout:singleton[]
 
-=== Spreadsheet Builder
+=== Spreadsheet Library
 
+:exclude-for-languages:python
 Add a dependency to https://spreadsheet.dsl.builders/[Spreadsheet builder]
 ____
 Spreadsheet builder provides convenient way how to read and create MS Excel OfficeOpenXML Documents (XLSX) focus not only on content side but also on easy styling.
 ____
 
 dependency:spreadsheet-builder-poi:2.2.1[groupId=builders.dsl]
+:exclude-for-languages:
+
+:only-for-languages:python
+
+Add `openpyxl==3.1.5` to `requirements.txt`. Pyronaut installs the https://openpyxl.readthedocs.io/en/stable/[]openpyxl Python library] with the application.
+
+:only-for-languages:
 
 === Excel Creation
 
+:exclude-for-languages:python
 Create an interface to encapsulate Excel generation:
+:exclude-for-languages:
+:only-for-languages:python
+Create a protocol to describe Excel generation:
+:only-for-languages:
 
 source:BookExcelService[]
 
-<1> `SystemFile` is specified as the return type of a route execution to indicate the given file should be downloaded by the client instead of displayed.
+:exclude-for-languages:python
+<1> `SystemFile` specifies that the generated file should be downloaded by the client.
 
 Externalize your styles configuration into a class implementing `builders.dsl.spreadsheet.builder.api.Stylesheet` interface to maximize code reuse.
 
 source:BookExcelStylesheet[]
+:exclude-for-languages:
+
+:only-for-languages:python
+<1> The Python service returns the generated XLSX file as bytes.
+:only-for-languages:
 
 Create a bean which generates the Excel file.
 
@@ -69,7 +102,12 @@ callout:controller[arg0=/]
 <2> Constructor injection
 <3> Use `@View` annotation to specify which template to use to render the response.
 <4> You can specify the HTTP verb that a controller action responds to. To respond to a GET request, use `io.micronaut.http.annotation.Get`
-<5> `SystemFile` is specified as the return type of a route execution to indicate the given file should be downloaded by the client instead of displayed.
+:exclude-for-languages:python
+<5> Returning `SystemFile` tells Micronaut to download the file instead of displaying it.
+:exclude-for-languages:
+:only-for-languages:python
+<5> The response includes a `Content-Disposition` attachment header so the browser downloads the XLSX file.
+:only-for-languages:
 
 The previous controller index method renders a simple view with a link to download the Excel file:
 
@@ -84,10 +122,19 @@ Create a test to verify the Excel file is downloaded and the content matches our
 
 test:DownloadExcelTest[]
 
+:exclude-for-languages:python
 callout:micronaut-test[]
 callout:http-client[]
 callout:http-request[]
 <4> Use `.body()` to retrieve the Excel bytes.
+:exclude-for-languages:
+
+:only-for-languages:python
+<1> Create a Micronaut test fixture for the application under test.
+<2> Use `requests.with_context(my_context)` to call the application under test with a context-bound HTTP client.
+<3> Send the request with an `Accept` header for an Excel file.
+<4> Use `response.content` to retrieve the Excel bytes.
+:only-for-languages:
 
 common:testApp.adoc[]
 
@@ -96,5 +143,3 @@ common:runapp.adoc[]
 == Next Steps
 
 Read more about Micronaut https://docs.micronaut.io/latest/guide/#transfers[File Transfers] support.
-
-common:helpWithMicronaut.adoc[]

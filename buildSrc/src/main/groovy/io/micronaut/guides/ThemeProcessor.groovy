@@ -60,6 +60,7 @@ class ThemeProcessor {
                     text = text.replace("@bodyclass@", 'guide')
                     text = text.replace("@toccontent@", toc)
                     text = text.replace("@content@", content)
+                    text = GuideAsciidocGenerator.postProcessText(text, guidesOption)
 
                     int index = fourthIndex(text)
                     if (index != -1) {
