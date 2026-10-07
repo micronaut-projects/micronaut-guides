@@ -38,8 +38,7 @@ import java.util.Map;
  * @param publish            Whether the guide should be published, it defaults to true. You can set it to false for draft or base guides
  * @param base               Defaults to null; if set, indicates directory name of the base guide to copy before copying the current one
  * @param env                The guide's environment variables
- * @param apps               Applications created for the guide; an empty list denotes a documentation-only guide with no generated application
- * @param skipPyronautTests  Set it to true to skip running the Pyronaut application tests for the guide
+ * @param apps               Applications created for the guide
  */
 @JsonSchema
 @Serdeable
@@ -112,38 +111,8 @@ public record Guide(
         @Nullable
         Map<String, String> env,
 
-        @NotNull
+        @NotEmpty
         @NonNull
-        List<App> apps,
-
-        @JsonProperty(defaultValue = StringUtils.FALSE)
-        @Nullable
-        Boolean skipPyronautTests
+        List<App> apps
 ) {
-    public Guide(
-            @NonNull String title,
-            @NonNull String intro,
-            @NonNull List<String> authors,
-            @NonNull List<String> categories,
-            @NonNull LocalDate publicationDate,
-            @Nullable Integer minimumJavaVersion,
-            @Nullable Integer maximumJavaVersion,
-            @Nullable Cloud cloud,
-            @Nullable Boolean skipGradleTests,
-            @Nullable Boolean skipMavenTests,
-            @Nullable String asciidoctor,
-            @Nullable List<Language> languages,
-            @Nullable List<String> tags,
-            @Nullable List<BuildTool> buildTools,
-            @Nullable TestFramework testFramework,
-            @Nullable List<String> zipIncludes,
-            @Nullable String slug,
-            @Nullable Boolean publish,
-            @Nullable String base,
-            @Nullable Map<String, String> env,
-            @NonNull List<App> apps) {
-        this(title, intro, authors, categories, publicationDate, minimumJavaVersion, maximumJavaVersion, cloud,
-                skipGradleTests, skipMavenTests, asciidoctor, languages, tags, buildTools, testFramework, zipIncludes,
-                slug, publish, base, env, apps, false);
-    }
 }

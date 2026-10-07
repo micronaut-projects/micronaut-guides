@@ -69,7 +69,7 @@ public class DependencyMacroSubstitutionTest {
     }
 
     @Test
-    void pythonDependencyMacrosUsePyprojectToml() {
+    void pythonDependencyMacrosAreOmitted() {
         String source = """
                 Before
 
@@ -87,14 +87,7 @@ public class DependencyMacroSubstitutionTest {
         assertEquals("""
                 Before
 
-                [source, toml]
-                .pyproject.toml
-                ----
-                [tool.pyronaut.dependencies]
-                runtime = [
-                    "io.micronaut.views:micronaut-views-thymeleaf",
-                ]
-                ----
+
 
                 After
                 """, result);

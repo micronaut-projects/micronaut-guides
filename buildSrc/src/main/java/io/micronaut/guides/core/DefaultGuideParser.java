@@ -19,8 +19,6 @@ import java.nio.file.Paths;
 import java.util.*;
 
 import static io.micronaut.guides.core.GuideUtils.mergeMetadataList;
-import static io.micronaut.starter.options.BuildTool.PYRONAUT;
-import static io.micronaut.starter.options.Language.PYTHON;
 
 @Singleton
 public class DefaultGuideParser implements GuideParser {
@@ -108,18 +106,8 @@ public class DefaultGuideParser implements GuideParser {
                     app.testFramework(),
                     app.excludeTest(),
                     app.excludeSource(),
-                    app.validateLicense(),
-                    app.pythonFeatures() != null ? app.pythonFeatures() : new ArrayList<>()
+                    app.validateLicense()
             ));
-        }
-        List<Language> languages = raw.languages() != null
-                ? new ArrayList<>(raw.languages())
-                : new ArrayList<>(List.of(Language.JAVA, Language.GROOVY, Language.KOTLIN));
-        List<BuildTool> buildTools = raw.buildTools() != null
-                ? new ArrayList<>(raw.buildTools())
-                : new ArrayList<>(List.of(BuildTool.GRADLE, BuildTool.MAVEN));
-        if (languages.contains(PYTHON) && !buildTools.contains(PYRONAUT)) {
-            buildTools.add(PYRONAUT);
         }
 
         return Optional.of(new Guide(
@@ -131,20 +119,19 @@ public class DefaultGuideParser implements GuideParser {
                 raw.minimumJavaVersion(),
                 raw.maximumJavaVersion(),
                 raw.cloud(),
-                Boolean.TRUE.equals(raw.skipGradleTests()),
-                Boolean.TRUE.equals(raw.skipMavenTests()),
+                raw.skipGradleTests(),
+                raw.skipMavenTests(),
                 publish ? guidesDir.getName() + ".adoc" : null,
-                languages,
+                raw.languages() != null ? raw.languages() : List.of(Language.JAVA, Language.GROOVY, Language.KOTLIN),
                 raw.tags() != null ? raw.tags() : Collections.emptyList(),
-                buildTools,
+                raw.buildTools() != null ? raw.buildTools() : List.of(BuildTool.GRADLE, BuildTool.MAVEN),
                 raw.testFramework(),
                 raw.zipIncludes() != null ? raw.zipIncludes() : new ArrayList<>(),
                 guidesDir.getName(),
                 publish,
                 raw.base(),
                 raw.env() != null ? raw.env() : new HashMap<>(),
-                apps,
-                Boolean.TRUE.equals(raw.skipPyronautTests())
+                apps
         ));
     }
 }

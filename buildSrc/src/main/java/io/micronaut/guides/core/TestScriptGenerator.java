@@ -22,8 +22,4 @@ public interface TestScriptGenerator {
     @NotNull
     String generateTestScript(@NonNull @NotNull List<Guide> metadatas);
 
-    @NonNull
-    @NotNull
-    String generatePythonTestScript(@NonNull @NotNull List<Guide> metadatas);
-
 }

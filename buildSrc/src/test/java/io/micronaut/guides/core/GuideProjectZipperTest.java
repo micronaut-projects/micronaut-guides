@@ -26,7 +26,7 @@ public class GuideProjectZipperTest {
 
         guideProjectZipper.zipDirectory(projectFolder, zipFile);
 
-        List<String> expected = List.of("creating-your-first-micronaut-app.adoc", "metadata.json");
+        List<String> expected = List.of("metadata.json", "creating-your-first-micronaut-app.adoc");
         List<String> result = new LinkedList<>();
 
         try (ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFile))) {
@@ -38,7 +38,6 @@ public class GuideProjectZipperTest {
             zis.closeEntry();
         }
 
-        result.sort(String::compareTo);
         assertEquals(expected, result);
     }
 }

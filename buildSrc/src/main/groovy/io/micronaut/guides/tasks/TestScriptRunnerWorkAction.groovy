@@ -24,7 +24,7 @@ abstract class TestScriptRunnerWorkAction implements WorkAction<TestScriptRunner
                 OutputStream oldOut = execSpec.standardOutput
                 OutputStream oldErr = execSpec.errorOutput
                 execSpec
-                        .commandLine("./${parameters.testScript.get().asFile.name}".toString())
+                        .commandLine("./test.sh")
                         .setStandardOutput(new TeeOutputStream(oldOut, file))
                         .setErrorOutput(new TeeOutputStream(oldErr, file))
                         .workingDir(workDir)
