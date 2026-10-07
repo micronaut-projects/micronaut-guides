@@ -46,12 +46,12 @@ class AccountTest {
     void reservationUpdatesMultipleFields() {
         Account account = repository.save(new Account(null, "Checking", 100L, 50L));
 
-        long updated = repository.reserveIncrementBalanceAndDecrementCredit(account.id(), 25L, 10L); // <2>
+        long updated = repository.reserveIncrementBalanceAndDecrementCredit(account.id(), 25L, 25L); // <2>
 
         assertEquals(1L, updated);
         Account found = repository.findById(account.id()).orElseThrow();
         assertEquals(125L, found.balance());
-        assertEquals(40L, found.credit());
+        assertEquals(25L, found.credit());
     }
 
     @Test
@@ -59,10 +59,11 @@ class AccountTest {
         Account account = repository.save(new Account(null, "Checking", 100L, 50L));
 
         assertThrows(DataIntegrityViolationException.class,
-            () -> repository.reserveIncrementBalanceAndDecrementCredit(account.id(), 0L, 1000L)); // <3>
+            () -> repository.reserveIncrementBalanceAndDecrementCredit(account.id(), 1000L, 1000L)); // <3>
 
         Account found = repository.findById(account.id()).orElseThrow();
-        assertEquals(50L, found.credit()); // <4>
+        assertEquals(100L, found.balance()); // <4>
+        assertEquals(50L, found.credit());
     }
 
     @Test
@@ -71,7 +72,7 @@ class AccountTest {
 
         HttpClientResponseException e = assertThrows(HttpClientResponseException.class, () ->
             httpClient.toBlocking().exchange(
-                HttpRequest.POST("/accounts/" + account.id() + "/reserve?balance=0&credit=1000", null)));
+                HttpRequest.POST("/accounts/" + account.id() + "/reserve?balance=1000&credit=1000", null)));
 
         assertEquals(HttpStatus.CONFLICT, e.getStatus()); // <5>
         assertTrue(e.getResponse().getBody(String.class).orElse("")
@@ -88,9 +89,9 @@ class AccountTest {
         Account account = created.body();
 
         Account reserved = client.retrieve(
-            HttpRequest.POST("/accounts/" + account.id() + "/reserve?balance=25&credit=10", null), Account.class); // <8>
+            HttpRequest.POST("/accounts/" + account.id() + "/reserve?balance=25&credit=25", null), Account.class); // <8>
         assertEquals(125L, reserved.balance());
-        assertEquals(40L, reserved.credit());
+        assertEquals(25L, reserved.credit());
     }
 
     @Test

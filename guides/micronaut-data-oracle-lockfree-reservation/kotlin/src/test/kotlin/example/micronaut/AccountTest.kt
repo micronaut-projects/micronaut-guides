@@ -43,12 +43,12 @@ class AccountTest {
     fun reservationUpdatesMultipleFields() {
         val account = repository.save(Account(name = "Checking", balance = 100, credit = 50))
 
-        val updated = repository.reserveIncrementBalanceAndDecrementCredit(account.id!!, 25, 10) // <2>
+        val updated = repository.reserveIncrementBalanceAndDecrementCredit(account.id!!, 25, 25) // <2>
 
         assertEquals(1L, updated)
         val found = repository.findById(account.id!!).orElseThrow()
         assertEquals(125L, found.balance)
-        assertEquals(40L, found.credit)
+        assertEquals(25L, found.credit)
     }
 
     @Test
@@ -56,11 +56,12 @@ class AccountTest {
         val account = repository.save(Account(name = "Checking", balance = 100, credit = 50))
 
         assertThrows(DataIntegrityViolationException::class.java) {
-            repository.reserveIncrementBalanceAndDecrementCredit(account.id!!, 0, 1000) // <3>
+            repository.reserveIncrementBalanceAndDecrementCredit(account.id!!, 1000, 1000) // <3>
         }
 
         val found = repository.findById(account.id!!).orElseThrow()
-        assertEquals(50L, found.credit) // <4>
+        assertEquals(100L, found.balance) // <4>
+        assertEquals(50L, found.credit)
     }
 
     @Test
@@ -69,7 +70,7 @@ class AccountTest {
 
         val e = assertThrows(HttpClientResponseException::class.java) {
             httpClient.toBlocking().exchange<Any, Any>(
-                HttpRequest.POST("/accounts/${account.id}/reserve?balance=0&credit=1000", ""))
+                HttpRequest.POST("/accounts/${account.id}/reserve?balance=1000&credit=1000", ""))
         }
 
         assertEquals(HttpStatus.CONFLICT, e.status) // <5>
@@ -87,9 +88,9 @@ class AccountTest {
         val account = created.body()!!
 
         val reserved = client.retrieve(
-            HttpRequest.POST("/accounts/${account.id}/reserve?balance=25&credit=10", ""), Account::class.java) // <8>
+            HttpRequest.POST("/accounts/${account.id}/reserve?balance=25&credit=25", ""), Account::class.java) // <8>
         assertEquals(125L, reserved.balance)
-        assertEquals(40L, reserved.credit)
+        assertEquals(25L, reserved.credit)
     }
 
     @Test

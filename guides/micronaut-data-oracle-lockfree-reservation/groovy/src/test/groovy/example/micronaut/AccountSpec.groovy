@@ -42,13 +42,13 @@ class AccountSpec extends Specification {
         Account account = repository.save(new Account(null, 'Checking', 100L, 50L))
 
         when:
-        long updated = repository.reserveIncrementBalanceAndDecrementCredit(account.id, 25L, 10L) // <2>
+        long updated = repository.reserveIncrementBalanceAndDecrementCredit(account.id, 25L, 25L) // <2>
 
         then:
         updated == 1L
         Account found = repository.findById(account.id).orElseThrow()
         found.balance == 125L
-        found.credit == 40L
+        found.credit == 25L
     }
 
     void 'reservation constraint failure is mapped'() {
@@ -56,11 +56,13 @@ class AccountSpec extends Specification {
         Account account = repository.save(new Account(null, 'Checking', 100L, 50L))
 
         when:
-        repository.reserveIncrementBalanceAndDecrementCredit(account.id, 0L, 1000L) // <3>
+        repository.reserveIncrementBalanceAndDecrementCredit(account.id, 1000L, 1000L) // <3>
 
         then:
         thrown(DataIntegrityViolationException)
-        repository.findById(account.id).orElseThrow().credit == 50L // <4>
+        Account found = repository.findById(account.id).orElseThrow()
+        found.balance == 100L // <4>
+        found.credit == 50L
     }
 
     void 'reservation constraint failure responds with conflict'() {
@@ -69,7 +71,7 @@ class AccountSpec extends Specification {
 
         when:
         httpClient.toBlocking().exchange(
-                HttpRequest.POST("/accounts/${account.id}/reserve?balance=0&credit=1000", null))
+                HttpRequest.POST("/accounts/${account.id}/reserve?balance=1000&credit=1000", null))
 
         then:
         HttpClientResponseException e = thrown()
@@ -87,11 +89,11 @@ class AccountSpec extends Specification {
 
         when:
         Account reserved = httpClient.toBlocking().retrieve(
-                HttpRequest.POST("/accounts/${created.body().id}/reserve?balance=25&credit=10", null), Account) // <8>
+                HttpRequest.POST("/accounts/${created.body().id}/reserve?balance=25&credit=25", null), Account) // <8>
 
         then:
         reserved.balance == 125L
-        reserved.credit == 40L
+        reserved.credit == 25L
     }
 
     void 'reservation for unknown account responds with not found'() {
