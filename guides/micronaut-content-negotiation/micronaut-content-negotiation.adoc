@@ -16,7 +16,11 @@ common:micronaut-views-thymeleaf.adoc[]
 
 == Views
 
-The `views-thymeleaf` feature configures Micronaut Views to render HTML templates. The Python routes below supply the template model as a dictionary.
+The `views-jinjava` feature configures Micronaut Views' https://micronaut-projects.github.io/micronaut-views/latest/guide/#jinjava[Jinjava integration] to render Jinja templates. The Python routes below supply the template model as a dictionary.
+
+Configure the renderer to use HTML files for the Jinja templates:
+
+resource:application.toml[tag=jinja]
 
 :only-for-languages:
 
@@ -40,13 +44,25 @@ callout:http-request-method-parameter[]
 <1> Declare a Micronaut controller for `/`.
 <2> Declare the JSON response type on the route. Micronaut selects the matching route using the request's `Accept` header.
 <3> Return a Python dictionary, which Micronaut serializes as JSON.
-<4> For the HTML route, `@View` renders the dictionary with the `message.html` template. No manual header parsing or response wrapper is needed.
+<4> For the HTML route, `@View` renders the dictionary with the `message.html` Jinja template. No manual header parsing or response wrapper is needed.
 
 :only-for-languages:
+
+:exclude-for-languages:python
 
 For HTML, the previous controller uses a Thymeleaf view:
 
 resource:views/message.html[]
+
+:exclude-for-languages:
+
+:only-for-languages:python
+
+For HTML, the previous controller uses a Jinja template. The `e` filter escapes the message for HTML:
+
+resource:views/message.html[]
+
+:only-for-languages:
 
 == Test
 
