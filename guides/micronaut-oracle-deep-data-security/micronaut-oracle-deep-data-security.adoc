@@ -1,0 +1,659 @@
+common:header.adoc[]
+
+https://docs.oracle.com/en/database/oracle/oracle-database/26/ddscg/[Oracle Deep Data Security] moves data access control from the application into Oracle Database. The database knows who the end user is, because the application propagates the end-user identity obtained from an identity provider, such as Microsoft Entra ID, on every JDBC connection. Oracle *data roles* then decide which rows and columns each user can see, and the application escalates privileges for specific operations by enabling a data role for the duration of a call.
+
+In this guide, you will build the Micronaut version of the https://docs.oracle.com/en/database/oracle/oracle-database/26/ddscg/configure-oracle-deep-data-security-sample-application.html[Oracle Deep Data Security sample application]. Users sign in with Microsoft Entra ID. The application lists the employees of the `HR` schema and a salary summary that only a compensation analyst can compute:
+
+image::micronaut-oracle-deep-data-security.png[]
+
+The application uses:
+
+* https://micronaut-projects.github.io/micronaut-security/latest/guide/#oauth[Micronaut Security OAuth 2.0] to authenticate users with Microsoft Entra ID via OpenID Connect.
+* https://micronaut-projects.github.io/micronaut-security/latest/guide/#ojdbcExtensions[Micronaut Security OJDBC Extensions] to hand the authenticated user to Oracle JDBC as an *End User Security Context*.
+* The Oracle JDBC https://github.com/oracle/ojdbc-extensions/tree/main/ojdbc-provider-azure[Azure provider] to authenticate the connection pool to the database with an Entra ID service principal token.
+* https://micronaut-projects.github.io/micronaut-data/latest/guide/#jdbc[Micronaut Data JDBC] to query the `HR.EMPLOYEES` table, and `@RunAs` to run the salary summary query with the `COMPENSATION_ANALYST` data role.
+
+common:requirements.adoc[]
+
+* https://www.docker.io/gettingstarted/#h_installation[Docker] installed to run Oracle Database, and to run the tests with https://www.testcontainers.org[Testcontainers].
+* A https://learn.microsoft.com/entra/fundamentals/[Microsoft Entra ID] tenant where you can register applications.
+
+common:completesolution.adoc[]
+
+== Microsoft Entra ID
+
+Register the applications in Microsoft Entra ID as described in https://docs.oracle.com/en/database/oracle/oracle-database/26/ddscg/create-application-registrations-microsoft-entra-id-springboot.html[Create Application Registrations in Microsoft Entra ID]. You register one application for the Oracle Database instance and one for the employee records application you are about to build.
+
+Take note of the following values; you will need them later as environment variables:
+
+[cols="1,2"]
+|===
+|Value |Description
+
+|`[TENANT_ID]`
+|The tenant ID of the Entra ID directory where both applications are registered.
+
+|`[DB_APP_ID_URI]`
+|The Application ID URI of the application registered for the Oracle Database instance.
+
+|`[EMP_RECORDS_APP_ID]`
+|The client ID of the application registered for the employee records application.
+
+|`[CLIENT_SECRET]`
+|A client secret of the employee records application.
+|===
+
+== Oracle Database
+
+=== Run Oracle Database via Docker
+
+Run https://github.com/gvenzl/oci-oracle-free[Oracle Database Free] with Docker:
+
+[source,bash]
+----
+docker run -d --name micronaut-deep-data-security \
+  -p 1521:1521 -p 2484:2484 \
+  -e ORACLE_PASSWORD='YourStrongPassword1' \
+  -v oracle-free-data:/opt/oracle/oradata \
+  gvenzl/oracle-free:23.26.2-full
+----
+
+Expose both ports: `1521` for plain TCP connections and `2484` for TLS (TCPS) connections, which Deep Data Security requires. Use the `23.26.2-full` image or a later one; previous versions do not support Deep Data Security.
+
+=== Generate Wallets and Certificates
+
+Generate the server wallet and a self-signed certificate as described in https://docs.oracle.com/en/database/oracle/oracle-database/26/ddscg/generate-wallets-and-certificates-springboot.html[Generate Wallets and Certificates]. Because the database runs in a container, create the wallet in `/opt/oracle/wallets/server` instead of `/u01/app/oracle/wallets/server`.
+
+Connect to the container:
+
+[source,bash]
+----
+docker exec -it micronaut-deep-data-security bash
+----
+
+Create the server wallet and a self-signed certificate. Use `localhost` as the certificate common name, since the application connects to the container through `localhost`, and choose a wallet password, for example `WalletPass123!`:
+
+[source,bash]
+----
+mkdir -p /opt/oracle/wallets/server
+orapki wallet create -wallet /opt/oracle/wallets/server -pwd WalletPass123! -auto_login
+orapki wallet add -wallet /opt/oracle/wallets/server -dn "CN=localhost,O=Oracle,C=US" -keysize 2048 -self_signed -validity 3650 -pwd WalletPass123!
+----
+
+=== Copy the Wallet to the Host
+
+The application validates the database certificate with the auto-login wallet, `cwallet.sso`. Copy the wallets from the container to your computer:
+
+[source,bash]
+----
+docker cp micronaut-deep-data-security:/opt/oracle/wallets ~/oracle-wallets
+----
+
+You will reference `~/oracle-wallets/server/cwallet.sso` with the `ORACLE_WALLET_TRUSTSTORE` environment variable.
+
+=== Configure Database Network Settings
+
+https://docs.oracle.com/en/database/oracle/oracle-database/26/ddscg/configure-database-network-settings.html[Configure the database listener and network layer] to accept TCPS connections on port `2484` and to enable token-based authentication. Both configurations use the server wallet you created.
+
+Connect to the container again and go to the network configuration directory:
+
+[source,bash]
+----
+docker exec -it micronaut-deep-data-security bash
+cd $ORACLE_HOME/network/admin
+----
+
+Edit `listener.ora`. Add the wallet location and the TCPS address. Oracle recommends the fully qualified domain name of the database server as `HOST`; inside the container, use `0.0.0.0`:
+
+[source]
+.listener.ora
+----
+WALLET_LOCATION = (SOURCE = (METHOD = FILE) (METHOD_DATA = (DIRECTORY = /opt/oracle/wallets/server)))
+
+TLS_CLIENT_AUTHENTICATION = FALSE
+
+LISTENER =
+ (DESCRIPTION_LIST =
+  (DESCRIPTION =
+   (ADDRESS = (PROTOCOL = IPC)(KEY = EXTPROC_FOR_FREE))
+   (ADDRESS = (PROTOCOL = TCP)(HOST = 0.0.0.0)(PORT = 1521))
+   (ADDRESS = (PROTOCOL = TCPS)(HOST = 0.0.0.0)(PORT = 2484))
+  )
+ )
+
+DEFAULT_SERVICE_LISTENER = FREE
+----
+
+Edit `sqlnet.ora`. This enables token-based authentication and points the network layer to the server wallet for TLS:
+
+[source]
+.sqlnet.ora
+----
+NAMES.DIRECTORY_PATH = (EZCONNECT, TNSNAMES)
+# See https://github.com/gvenzl/oci-oracle-xe/issues/43
+DISABLE_OOB=ON
+BREAK_POLL_SKIP=1000
+
+# --- Authentication ---
+SQLNET.AUTHENTICATION_SERVICES = (BEQ, TOKENAUTH)
+
+# --- TLS Configuration ---
+TLS_CLIENT_AUTHENTICATION = FALSE
+TLS_SERVER_DN_MATCH = TRUE
+
+# Prevents conflicts between Native Encryption and TLS
+SQLNET.IGNORE_ANO_ENCRYPTION_FOR_TCPS = TRUE
+
+WALLET_LOCATION = (SOURCE = (METHOD = FILE) (METHOD_DATA = (DIRECTORY = /opt/oracle/wallets/server)))
+----
+
+Restart the listener and force the database to register its services with it:
+
+[source,bash]
+----
+lsnrctl stop
+lsnrctl start
+sqlplus / as sysdba
+----
+
+[source,sql]
+----
+ALTER SYSTEM REGISTER;
+----
+
+Check with `lsnrctl status` that the listener accepts TCPS connections on port `2484` and that the `FREEPDB1` service is registered.
+
+=== Configure Data Access Control
+
+Follow https://docs.oracle.com/en/database/oracle/oracle-database/26/ddscg/configure-data-access-control-sb.html[Configure Data Access Control] to configure the database for Entra ID authentication, create the `HR.EMPLOYEES` table, and define the data roles. The sample defines, among others, the `COMPENSATION_ANALYST` data role, which is the only role allowed to read every salary.
+
+common:create-app-features.adoc[]
+
+:exclude-for-languages:python
+=== Micronaut Security OJDBC Extensions
+
+The https://micronaut-projects.github.io/micronaut-security/latest/guide/#ojdbcExtensions[Micronaut Security OJDBC Extensions] module registers an Oracle JDBC `EndUserSecurityContextProvider`. For every connection, it hands the authenticated user and the roles starting with `ORACLE_DATA_ROLE_` to the Oracle JDBC driver:
+
+dependency:micronaut-security-ojdbc-extensions[groupId=io.micronaut.security]
+
+The extensions exchange tokens with Entra ID, so they need a Micronaut HTTP Client implementation:
+
+dependency:micronaut-http-client[groupId=io.micronaut]
+
+=== Azure Token Provider for JDBC
+
+The Oracle JDBC Azure provider authenticates the connection pool to Oracle Database with a Microsoft Entra ID service principal token:
+
+dependency:ojdbc-provider-azure[groupId=com.oracle.database.jdbc,version=1.1.0]
+
+The provider depends on the Azure SDK, which chooses an HTTP client implementation at runtime. Its default Netty-based client conflicts with the Netty version shipped by Micronaut. Use the JDK HTTP client instead, and exclude the Netty one:
+
+dependency:azure-core-http-jdk-httpclient[groupId=com.azure]
+
+:exclude-for-build:maven
+[source,groovy]
+.build.gradle
+----
+implementation("com.oracle.database.jdbc:ojdbc-provider-azure:1.1.0") {
+    exclude(group: "com.azure", module: "azure-core-http-netty")
+}
+----
+:exclude-for-build:
+
+:exclude-for-build:gradle
+[source,xml]
+.pom.xml
+----
+<dependency>
+    <groupId>com.oracle.database.jdbc</groupId>
+    <artifactId>ojdbc-provider-azure</artifactId>
+    <version>1.1.0</version>
+    <exclusions>
+        <exclusion>
+            <groupId>com.azure</groupId>
+            <artifactId>azure-core-http-netty</artifactId>
+        </exclusion>
+    </exclusions>
+</dependency>
+----
+:exclude-for-build:
+
+=== Oracle Wallet
+
+The TCPS connection validates the database certificate with the wallet you copied from the container. Oracle PKI reads `cwallet.sso`:
+
+dependency:oraclepki[groupId=com.oracle.database.security,version=23.26.3.0.0]
+
+common:micronaut-data-jdbc.adoc[]
+
+common:oracle-driver.adoc[]
+
+=== Security Dependencies
+
+Micronaut Security OAuth 2.0 and JWT support authenticate users with Entra ID via OpenID Connect:
+
+:dependencies:
+dependency:micronaut-security-oauth2[groupId=io.micronaut.security]
+dependency:micronaut-security-jwt[groupId=io.micronaut.security]
+:dependencies:
+
+common:micronaut-views-thymeleaf.adoc[]
+
+=== Testcontainers
+
+The tests run against a real Oracle Database Free container started with https://www.testcontainers.org[Testcontainers]:
+
+dependency:testcontainers-oracle-free[groupId=org.testcontainers,scope=testImplementation]
+:exclude-for-languages:
+
+:only-for-languages:python
+=== Dependencies
+
+Dependencies are JVM coordinates declared in `pyproject.toml`, under `[tool.pyronaut.dependencies]`. Run `pyronaut install` after changing them.
+
+The https://micronaut-projects.github.io/micronaut-security/latest/guide/#ojdbcExtensions[Micronaut Security OJDBC Extensions] module registers an Oracle JDBC `EndUserSecurityContextProvider`. For every connection, it hands the authenticated user and the roles starting with `ORACLE_DATA_ROLE_` to the Oracle JDBC driver. The extensions exchange tokens with Entra ID, so they need a Micronaut HTTP Client implementation:
+
+[source,toml]
+.pyproject.toml
+----
+runtime = [
+    "io.micronaut.security:micronaut-security-ojdbc-extensions",
+    "io.micronaut:micronaut-http-client",
+----
+
+The Oracle JDBC Azure provider authenticates the connection pool to Oracle Database with a Microsoft Entra ID service principal token. The provider depends on the Azure SDK, which chooses an HTTP client implementation at runtime. Its default Netty-based client conflicts with the Netty version shipped by Micronaut. Use the JDK HTTP client instead:
+
+[source,toml]
+.pyproject.toml
+----
+    "com.oracle.database.jdbc:ojdbc-provider-azure:1.1.0",
+    "com.azure:azure-core-http-jdk-httpclient",
+----
+
+Exclude the Netty-based client globally:
+
+[source,toml]
+.pyproject.toml
+----
+exclusions = [
+    "com.azure:azure-core-http-netty",
+]
+----
+
+The TCPS connection validates the database certificate with the wallet you copied from the container. Oracle PKI reads `cwallet.sso`:
+
+[source,toml]
+.pyproject.toml
+----
+    "com.oracle.database.security:oraclepki:23.26.3.0.0",
+----
+
+The `data-jdbc` feature adds Micronaut Data JDBC and the Hikari connection pool. The `oracle` feature adds the Oracle JDBC driver. The `security-oauth2` and `security-jwt` features authenticate users with Entra ID via OpenID Connect, and the `views-thymeleaf` feature renders the HTML page:
+
+[source,toml]
+.pyproject.toml
+----
+    "io.micronaut.data:micronaut-data-jdbc",
+    "io.micronaut.sql:micronaut-jdbc-hikari",
+    "com.oracle.database.jdbc:ojdbc11",
+    "io.micronaut.security:micronaut-security-oauth2",
+    "io.micronaut.security:micronaut-security-jwt",
+    "io.micronaut.views:micronaut-views-thymeleaf",
+]
+----
+
+The tests run against a real Oracle Database Free container started with https://www.testcontainers.org[Testcontainers]:
+
+[source,toml]
+.pyproject.toml
+----
+test = [
+    "org.testcontainers:testcontainers-oracle-free",
+]
+----
+:only-for-languages:
+
+=== Configuration
+
+:exclude-for-languages:python
+Configure the datasource. The JDBC URL and the credentials depend on the environment, so they are not here:
+
+resource:application.properties[tag=datasource]
+:exclude-for-languages:
+
+:only-for-languages:python
+Configure the datasource. The JDBC URL and the credentials depend on the environment, so they are not here:
+
+resource:application.toml[tag=datasource]
+:only-for-languages:
+
+<1> In order for the database to be properly detected.
+<2> Configure the Oracle dialect.
+<3> Use the Oracle driver.
+<4> The `HR.EMPLOYEES` table already exists; do not generate the schema.
+
+:exclude-for-languages:python
+The sample application registered in Entra ID uses `\http://localhost:3000` as the redirect URI, so the application listens on port `3000`:
+
+resource:application.properties[tag=port]
+
+<1> Listen on port `3000`.
+
+Allow the logout link of the HTML page to log the user out with a GET request:
+
+resource:application.properties[tag=security]
+:exclude-for-languages:
+
+:only-for-languages:python
+The sample application registered in Entra ID uses `\http://localhost:3000` as the redirect URI, so the application listens on port `3000`:
+
+resource:application.toml[tag=port]
+
+<1> Listen on port `3000`.
+
+Allow the logout link of the HTML page to log the user out with a GET request:
+
+resource:application.toml[tag=security]
+:only-for-languages:
+
+<1> Accept GET requests to the `/logout` endpoint.
+
+:exclude-for-languages:python
+common:dev-env.adoc[]
+
+<1> Register a `ApplicationContextConfigurer` via `@ContextConfigurer`.
+<2> The `dev` environment is active when no other environment is specified, for example when you run the application locally. The tests run under the `test` environment, so they do not load the Entra ID configuration.
+
+== Development Environment Configuration
+
+Create `src/main/resources/application-dev.properties`. The Micronaut framework applies this configuration file only for the `dev` environment. Every secret is a placeholder resolved from the environment.
+:exclude-for-languages:
+
+:only-for-languages:python
+== Development Environment Configuration
+
+Create `config/application-dev.toml`. The Micronaut framework applies this configuration file only for the `dev` environment, which `pyronaut dev` activates. The tests run under the `test` environment, so they do not load the Entra ID configuration. Every secret is a placeholder resolved from the environment.
+:only-for-languages:
+
+=== OAuth 2.0
+
+Configure the OpenID Connect client for Microsoft Entra ID:
+
+:exclude-for-languages:python
+resource:application-dev.properties[tag=oauth2]
+:exclude-for-languages:
+
+:only-for-languages:python
+resource:application-dev.toml[tag=oauth2]
+:only-for-languages:
+
+callout:authentication-idtoken[arg0=Microsoft Entra ID]
+<2> The client ID and client secret of the employee records application. The provider identifier, `entraid`, is the last part of the redirect URI you registered in Entra ID: `/oauth/callback/entraid`.
+<3> The issuer URL. It allows the Micronaut framework to discover the configuration of the Entra ID OpenID Connect server.
+
+=== Oracle JDBC
+
+Configure the connection pool and the Oracle JDBC extensions:
+
+:exclude-for-languages:python
+resource:application-dev.properties[tag=jdbc]
+:exclude-for-languages:
+
+:only-for-languages:python
+resource:application-dev.toml[tag=jdbc]
+:only-for-languages:
+
+<1> Register the `EndUserSecurityContextProvider` from Micronaut Security OJDBC Extensions with Oracle JDBC. Before the application runs a statement, Oracle JDBC asks the provider for the end user of the current request, and the database enforces the data access control rules for that user.
+<2> The provider exchanges the end user's ID token with Entra ID for an access token for the database, with the credentials of the employee records application and the scope of the database application.
+<3> The auto-login wallet, which contains the self-signed certificate of the database.
+<4> The connection pool authenticates to the database as the employee records application service principal, with a token obtained from Entra ID.
+<5> Connect with TCPS on port `2484`. The server certificate must match the distinguished name you used when you created the wallet.
+
+=== Logging
+
+To see the End User Security Context the extensions hand to Oracle JDBC, and the SQL statements Micronaut Data runs, set the following logger levels:
+
+:exclude-for-languages:python
+resource:application-dev.properties[tag=logging]
+:exclude-for-languages:
+
+:only-for-languages:python
+resource:application-dev.toml[tag=logging]
+:only-for-languages:
+
+<1> Log the end user and the data roles the extensions propagate.
+<2> Log every SQL statement.
+
+=== Environment Variables
+
+The previous configuration uses several placeholders. Create a `.env` file with the values you obtained when you registered the applications in Entra ID, and the path to the wallet you copied from the container:
+
+[source,bash]
+..env
+----
+HRAPP_TENANT_ID='[TENANT_ID]'
+DB_APP_ID_URI='[DB_APP_ID_URI]'
+HRAPP_CLIENT_ID='[EMP_RECORDS_APP_ID]'
+HRAPP_CLIENT_SECRET='[CLIENT_SECRET]'
+HRAPP_SCOPE='[DB_APP_ID_URI]/.default'
+ORACLE_WALLET_TRUSTSTORE='/path/to/oracle-wallets/server/cwallet.sso'
+----
+
+Do not commit the `.env` file; it contains a secret.
+
+common:env-vars.adoc[]
+
+== Entity
+
+Create an entity mapped to the `HR.EMPLOYEES` table:
+
+source:EmployeeEntity[]
+
+callout:mapped-entity[]
+callout:mapped-entity-id[]
+
+== Repository
+
+common:jdbc-repository-intro.adoc[]
+
+source:EmployeeRepository[]
+
+callout:jdbcrepository[]
+callout:crudrepository[]
+<3> `@RunAs` adds the `ORACLE_DATA_ROLE_COMPENSATION_ANALYST` role to the authentication of the signed-in user for the duration of the call. Micronaut Security OJDBC Extensions turns every role with the `ORACLE_DATA_ROLE_` prefix into an Oracle data role in the End User Security Context it hands to Oracle JDBC, so the query runs as `COMPENSATION_ANALYST`, whoever is signed in. This is the privilege escalation of the Deep Data Security sample: a user who cannot see every salary can still see the salary summary.
+callout:at-query[]
+
+The query returns a single row. Create a type for it:
+
+source:SalaryAggregates[]
+
+callout:serdeable[]
+
+== Service
+
+Create a service that builds the model of the HTML page. It computes the average salary from the aggregates:
+
+source:SalarySummaryDto[]
+
+source:EmployeeService[]
+
+callout:singleton[]
+callout:constructor-di[arg0=EmployeeRepository]
+<3> The page is open to anonymous users. Query the database only for signed-in users.
+<4> `findAll` runs as the signed-in user. Oracle returns only the rows and columns the user's data roles allow.
+<5> `getSalaryAggregates` runs with the `COMPENSATION_ANALYST` data role enabled.
+
+== Controller
+
+Create a controller that renders the page:
+
+source:HomeController[]
+
+callout:controller[arg0=/]
+callout:constructor-di[arg0=EmployeeService]
+callout:secured-anonymous[]
+callout:produces-html[]
+callout:view[]
+callout:get[arg0=index,arg1=/]
+callout:executes-on[]
+<8> The `Authentication` of the signed-in user, or `null` for anonymous users.
+
+== Thymeleaf Template
+
+:exclude-for-languages:python
+Create a Thymeleaf template in `src/main/resources/views/home.html`:
+:exclude-for-languages:
+
+:only-for-languages:python
+Create a Thymeleaf template in `config/views/home.html`:
+:only-for-languages:
+
+resource:views/home.html[]
+
+The https://micronaut-projects.github.io/micronaut-views/latest/api/io/micronaut/views/model/security/SecurityViewModelProcessor.html[SecurityViewModelProcessor] adds a `security` map with the authenticated user to the model. The template shows the `preferred_username` claim of the Entra ID token for signed-in users, and a link to `/oauth/login/entraid` for anonymous users. See https://micronaut-projects.github.io/micronaut-views/latest/guide/#security-model-enhancement[User in a view].
+
+== Tests
+
+The tests do not need Entra ID. They run against an Oracle Database Free container started with Testcontainers, with a plain username and password. The `test` environment does not load the `dev` configuration, so the OJDBC extensions are not registered, and `@RunAs` only needs an authentication to add the data role to.
+
+=== Oracle Database Container
+
+:exclude-for-languages:python
+Create a helper that starts the container once and exposes the datasource properties:
+
+test:Oracle[]
+
+<1> The `faststart` image already contains a database, so it starts quickly.
+<2> Copy a script that creates the `HR` schema and the `EMPLOYEES` table into the directory the container entrypoint runs at startup.
+<3> Start the container once; it is shared by every test class.
+<4> The datasource properties the application needs to reach the container.
+:exclude-for-languages:
+
+:only-for-languages:python
+Create `tests/conftest.py` with the fixtures shared by the tests. It starts the container once and exposes the datasource properties:
+
+[source,python]
+.tests/conftest.py
+----
+include::{sourceDir}/micronaut-oracle-deep-data-security/@sourceDir@/tests/conftest.py[]
+----
+
+<1> The `faststart` image already contains a database, so it starts quickly.
+<2> Copy a script that creates the `HR` schema and the `EMPLOYEES` table into the directory the container entrypoint runs at startup.
+<3> Start the container once; it is shared by every test module.
+<4> The datasource properties the application needs to reach the container.
+<5> This application context does not start the HTTP server; the tests call the repository and the service directly.
+callout:seed-db-pyronaut[]
+<7> `@RunAs` with roles only cannot build an authentication from nothing, so a test propagates the authentication of a user by hand, with the same propagated context the `@RunAs` interceptor uses.
+:only-for-languages:
+
+The script creates the schema in `FREEPDB1`, the pluggable database the Testcontainers JDBC URL points to:
+
+testResource:oracle-init.sql[]
+
+The tests load the sample employees of the Oracle tutorial before each test:
+
+testResource:employees-test-data.sql[]
+
+=== Repository Test
+
+:exclude-for-languages:java,kotlin,python
+A Spock specification is not a Micronaut bean, so `@RunAs` cannot intercept its feature methods. Create a test bean with `@RunAs` methods instead, and run the repository calls through it:
+
+test:RunAsUser[]
+
+callout:singleton[]
+<2> `@RunAs(name = "sergio")` runs the method as the user `sergio`. The repository's `@RunAs` then has an authentication to add the `ORACLE_DATA_ROLE_COMPENSATION_ANALYST` role to; without one, Micronaut Security refuses the call.
+:exclude-for-languages:
+
+test:EmployeeRepositoryTest[]
+
+:exclude-for-languages:python
+callout:micronaut-test-sql[]
+callout:micronaut-test-start-application-false[]
+:exclude-for-languages:
+:exclude-for-languages:groovy,python
+callout:test-instance-per-class[]
+<4> `@RunAs(name = "sergio")` runs every test method as the user `sergio`. The repository's `@RunAs` then has an authentication to add the `ORACLE_DATA_ROLE_COMPENSATION_ANALYST` role to; without one, Micronaut Security refuses the call.
+callout:test-property-provider[]
+<6> The aggregates of the five sample employees.
+:exclude-for-languages:
+:exclude-for-languages:java,kotlin,python
+callout:test-property-provider[]
+<4> Inject the test bean and run the repository calls as the user `sergio`.
+<5> The aggregates of the five sample employees.
+:exclude-for-languages:
+
+:only-for-languages:python
+<1> Run the block as the user `sergio`. The repository's `@RunAs` then has an authentication to add the `ORACLE_DATA_ROLE_COMPENSATION_ANALYST` role to; without one, Micronaut Security refuses the call.
+<2> The projection comes back as the `SalaryAggregates` dataclass, with `BigDecimal` columns converted to `decimal.Decimal`.
+:only-for-languages:
+
+=== Service Test
+
+test:EmployeeServiceTest[]
+
+=== Controller Test
+
+The controller test starts the HTTP server. The application signs users in with Entra ID in the `dev` environment only, so the test registers an authentication provider that accepts HTTP Basic credentials, which the Micronaut Security basic authentication fetcher hands to it:
+
+test:HomeControllerTest[]
+
+:exclude-for-languages:python
+callout:micronaut-test[]
+:exclude-for-languages:
+:only-for-languages:python
+callout:micronaut-test-pyronaut[]
+:only-for-languages:
+<2> Set the `spec.name` property to enable the test authentication provider, and listen on a random port.
+<3> Anonymous users see a link to sign in with Entra ID.
+<4> Sign in with HTTP Basic credentials.
+<5> The salary summary cards show the average salary.
+<6> The table lists every employee.
+callout:requires-property[]
+callout:http-request-authentication-provider[]
+<9> Entra ID puts the user's email in the `preferred_username` claim, which the page shows in the navigation bar.
+
+common:testApp.adoc[]
+
+When you run the tests, Testcontainers starts an Oracle Database Free container before the application connects.
+
+== Running the Application
+
+Load the environment variables from the `.env` file and run the application:
+
+:exclude-for-build:maven,pyronaut
+[source,bash]
+----
+set -a; source .env; set +a
+./gradlew run
+----
+:exclude-for-build:
+
+:exclude-for-build:gradle,pyronaut
+[source,bash]
+----
+set -a; source .env; set +a
+./mvnw mn:run
+----
+:exclude-for-build:
+
+:exclude-for-build:gradle,maven
+[source,bash]
+----
+set -a; source .env; set +a
+pyronaut dev
+----
+
+`pyronaut dev` activates the `dev` environment. Alternatively, run `MICRONAUT_ENVIRONMENTS=dev pyronaut run`.
+:exclude-for-build:
+
+Open http://localhost:3000 in a browser and click *Enter*. After you sign in with one of the users of the Oracle tutorial, the page shows the salary summary and the employees. The rows and the columns you see depend on the data roles of the signed-in user. For example, a manager sees the salary of their reports, while the salary summary is always complete, because the application computes it as `COMPENSATION_ANALYST`.
+
+In the application logs, the OJDBC extensions show the End User Security Context they hand to Oracle JDBC for every request, including the data role enabled by `@RunAs`.
+
+== Next Steps
+
+* Read the https://docs.oracle.com/en/database/oracle/oracle-database/26/ddscg/[Oracle Deep Data Security Configuration Guide].
+* Read more about https://micronaut-projects.github.io/micronaut-security/latest/guide/#ojdbcExtensions[Micronaut Security OJDBC Extensions] and https://micronaut-projects.github.io/micronaut-security/latest/guide/#runAs[@RunAs].
+* Read more about https://micronaut-projects.github.io/micronaut-security/latest/guide/#oauth[Micronaut Security OAuth 2.0].
