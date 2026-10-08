@@ -26,6 +26,8 @@ common:runapp.adoc[]
 
 == Run the static website
 
+:exclude-for-languages:python
+
 Serve the static website with https://docs.oracle.com/en/java/javase/18/docs/specs/man/jwebserver.html[jwebserver].
 
 ____
@@ -48,6 +50,21 @@ URL http://127.0.0.1:8000/
 
 `jwebserver` serves the UI on port 8000.
 
+:exclude-for-languages:
+
+:only-for-languages:python
+
+From the folder containing `index.html`, serve the static website with Python's standard-library HTTP server:
+
+[source,bash]
+----
+python -m http.server 8000 --bind 127.0.0.1
+----
+
+The UI is served at `http://127.0.0.1:8000/`. Keep the Micronaut application running in a separate terminal.
+
+:only-for-languages:
+
 === CORS Error
 
 Open `http://127.0.0.1:8000/`, and you will see an error such as:
@@ -59,7 +76,17 @@ image::cors.png[]
 Enable https://docs.micronaut.io/latest/guide/#cors[CORS configuration].
 
 
+:exclude-for-languages:python
+
 resource:application.properties[tag=cors]
+
+:exclude-for-languages:
+
+:only-for-languages:python
+
+resource:application.toml[tag=cors]
+
+:only-for-languages:
 
 Restart the Micronaut application.
 
@@ -71,9 +98,32 @@ The previous setup is a "wide open" configuration. It is best to enable CORS acc
 
 You can do that with:
 
+:exclude-for-languages:python
+
 resource:application.properties[tags=cors|corsconfigurations]
 
+:exclude-for-languages:
+
+:only-for-languages:python
+
+resource:application.toml[tags=cors|corsconfigurations]
+
+:only-for-languages:
+
+:exclude-for-languages:python
 You can start the static server on a different port. For example, you could run `jwebserver -p 8001` and verify that it is not allowed. The application's configuration only allows requests with origin `127.0.0.1:8000`.
+:exclude-for-languages:
+
+:only-for-languages:python
+Stop the static server and restart it with `python -m http.server 8001 --bind 127.0.0.1`. Open `http://127.0.0.1:8001/` and verify that the browser rejects the cross-origin request. The application's configuration only allows the origin `http://127.0.0.1:8000`.
+
+=== Tests
+
+The Python tests use `requests.with_context` to target the running application's dynamically assigned URL. They verify allowed and unconfigured origins, plus the preflight response's allowed origin, method, and headers. These HTTP assertions do not replace the browser check above.
+
+test:CorsTest[]
+
+:only-for-languages:
 
 
 common:next.adoc[]
