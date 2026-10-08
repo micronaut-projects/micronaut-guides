@@ -20,23 +20,47 @@ image::keycloak/keycloak-client-step3.png[]
 
 common:create-app-features.adoc[]
 
+:exclude-for-languages:python
 common:dev-env.adoc[]
+:exclude-for-languages:
 
 === Start in Port 8081
 
+:exclude-for-languages:python
 common:default-dev-environment-application-dev-yaml.adoc[]
+:exclude-for-languages:
+
+:only-for-languages:python
+Create `config/application-dev.toml`. Micronaut loads this configuration when the `dev` environment is active; set `MICRONAUT_ENVIRONMENTS=dev` when running the application below.
+:only-for-languages:
 
 Configure the application to start in port 8081:
 
+:exclude-for-languages:python
 resource:application-dev.properties[tag=port]
+:exclude-for-languages:
+
+:only-for-languages:python
+resource:application-dev.toml[tag=port]
+:only-for-languages:
 
 === Views
 
 Although the Micronaut framework is primarily designed around message encoding / decoding, there are occasions where it is convenient to render a view on the server side.
 
+:exclude-for-languages:python
 To use the https://www.thymeleaf.org/[Thymeleaf] Java template engine to render views in a Micronaut application, add the following dependency to your classpath.
 
 dependency:micronaut-views-thymeleaf[groupId=io.micronaut.views]
+:exclude-for-languages:
+
+:only-for-languages:python
+The `views-jinjava` feature uses Micronaut Views' https://micronaut-projects.github.io/micronaut-views/latest/guide/#jinjava[Jinjava integration] to render Jinja templates from Python dictionaries. Add its dependency and configure the `html` extension for this guide's template:
+
+dependency:micronaut-views-jinjava[groupId=io.micronaut.views]
+
+resource:application.toml[tag=jinja]
+:only-for-languages:
 
 === OAuth 2.0
 
@@ -53,7 +77,13 @@ dependency:micronaut-security-jwt[groupId=io.micronaut.security]
 
 Add the following OAuth 2.0 configuration:
 
+:exclude-for-languages:python
 resource:application-dev.properties[tag=oauth2]
+:exclude-for-languages:
+
+:only-for-languages:python
+resource:application-dev.toml[tag=oauth2]
+:only-for-languages:
 
 callout:authentication-idtoken[arg0=Keycloak]
 <2> The provider identifier should match the last part of the URL you entered as a redirect URL: `/oauth/callback/keycloak`.
@@ -61,6 +91,10 @@ callout:authentication-idtoken[arg0=Keycloak]
 <4> Client ID. See previous screenshot.
 <5> `issuer` URL. It allows the Micronaut framework to discover the configuration of the OpenID Connect server.
 <6> Accept GET requests to the `/logout` endpoint.
+
+:only-for-languages:python
+<7> Retain the ID token in the authentication attributes so Micronaut's built-in Keycloak logout endpoint can send the required `id_token_hint`.
+:only-for-languages:
 
 Check Keycloak realm's OpenID configuration by visiting http://localhost:8080/realms/myrealm/.well-known/openid-configuration[http://localhost:8080/realms/myrealm/.well-known/openid-configuration].
 
@@ -86,7 +120,13 @@ image::diagramm.png[]
 
 === Home
 
+:exclude-for-languages:python
 Create a controller to handle the requests to `/`. You will display the email of the authenticated person if any. Annotate the controller endpoint with `@View` since we will use a Thymeleaf template.
+:exclude-for-languages:
+
+:only-for-languages:python
+Create a controller for `/` that returns a Python dictionary. `@View` selects the Jinja template, which displays the authenticated user's preferred username when available.
+:only-for-languages:
 
 source:HomeController[]
 
@@ -95,24 +135,53 @@ callout:secured-anonymous[]
 <3> Use https://micronaut-projects.github.io/micronaut-views/latest/api/io/micronaut/views/View.html[View] annotation to specify which template to use to render the response.
 <4> The @api@/io/micronaut/http/annotation/Get.html[@Get] annotation maps the `index` method to GET `/` requests.
 
+:exclude-for-languages:python
 Create a Thymeleaf template:
+:exclude-for-languages:
+
+:only-for-languages:python
+Create a Jinja template. Use the `e` filter to escape the username for HTML:
+:only-for-languages:
 
 resource:views/home.html[]
 
+:exclude-for-languages:python
 Also, note that we return an empty model in the controller. However, we are accessing `security` in the Thymeleaf template.
+:exclude-for-languages:
+
+:only-for-languages:python
+The controller returns an empty dictionary, but the template can still access `security`:
+:only-for-languages:
 
 - The https://micronaut-projects.github.io/micronaut-views/latest/api/io/micronaut/views/model/security/SecurityViewModelProcessor.html[SecurityViewModelProcessor]
 injects into the model a `security` map with the authenticated user.  See
 https://micronaut-projects.github.io/micronaut-views/latest/guide/#security-model-enhancement[User in a view] documentation.
 
+:exclude-for-languages:python
 === EndSessionEndpointResolver
 
 Create an https://micronaut-projects.github.io/micronaut-security/latest/api/io/micronaut/security/oauth2/endpoint/endsession/request/EndSessionEndpointResolver.html[EndSessionEndpointResolver] replacement to log out from Keycloak.
 
 source:EndSessionEndpointResolverReplacement[]
+:exclude-for-languages:
+
+:only-for-languages:python
+=== Keycloak Logout
+
+The `authorization-server = "KEYCLOAK"` setting selects Micronaut Security's built-in Keycloak end-session endpoint. Together with the retained ID token, it supports provider logout without a custom endpoint resolver.
+
+=== Controller Test
+
+The test verifies the anonymous HTML page and its login link. OAuth discovery is disabled only in `config/application-test.toml`, so this local test does not need a Keycloak server. Check the real login and provider logout manually using the running Keycloak server below.
+
+test:HomeControllerTest[]
+
+common:testApp.adoc[]
+:only-for-languages:
 
 == Running the Application
 
+:exclude-for-languages:python
 :exclude-for-build:maven
 
 To run the application, use the `./gradlew run` command, which starts the application on port 8081.
@@ -125,11 +194,25 @@ To run the application, use the `./mvnw mn:run` command, which starts the applic
 
 :exclude-for-build:
 
+:exclude-for-languages:
+
+:only-for-languages:python
+Start the application on port 8081 with the `dev` environment enabled:
+
+[source,bash]
+----
+export MICRONAUT_ENVIRONMENTS=dev
+pyronaut run
+----
+
+On Windows PowerShell, set `$env:MICRONAUT_ENVIRONMENTS = "dev"` before running `pyronaut run`.
+:only-for-languages:
+
 image::keycloak.gif[]
 
 common:graal-with-plugins.adoc[]
 
-:exclude-for-languages:groovy
+:exclude-for-languages:groovy,python
 
 After you execute the native image, navigate to `localhost:8081` and authenticate with Keycloak.
 
@@ -140,4 +223,3 @@ After you execute the native image, navigate to `localhost:8081` and authenticat
 Read https://micronaut-projects.github.io/micronaut-security/latest/guide/#oauth[Micronaut OAuth 2.0 documentation] to learn more.
 
 Check out the https://www.keycloak.org[Keycloak] website.
-
