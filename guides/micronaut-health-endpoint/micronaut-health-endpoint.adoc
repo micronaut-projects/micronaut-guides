@@ -23,9 +23,12 @@ callout:http-client[]
 
 :only-for-languages:python
 <1> `MicronautTest` starts the application context and embedded server.
-<2> The test sends an HTTP request with a context-bound `requests` client.
+<2> The test sends an HTTP request with a context-bound `requests` session. The fixture closes the session when the test finishes; no server port or base URL needs to be constructed.
+<3> The health endpoint returns HTTP 200 and a JSON object whose `status` is `UP`. `response.json()` makes the body available as a Python dictionary.
 :only-for-languages:
+:exclude-for-languages:python
 <3> The health endpoint returns information about the "health" of the application, which is determined by any number of "health indicators".
+:exclude-for-languages:
 
 ==== Base Path
 
@@ -36,7 +39,12 @@ The leading and trailing `/` are required for `endpoints.all.path`, unless `micr
 
 test:HealthPathTest[]
 
+:exclude-for-languages:python
 <1> Sets the base path for all management endpoints to `/endpoints/`. This is normally specified in the application configuration (e.g. `application.properties`).
+:exclude-for-languages:
+:only-for-languages:python
+<1> Sets the base path for all management endpoints to `/endpoints/`. Outside a test, configure `endpoints.all.path` in `config/application.toml`.
+:only-for-languages:
 <2> The "health" endpoint is now rooted at `/endpoints/health`
 <3> The "health" endpoint is no longer reachable at the default path and results in a "Not Found" status (HTTP 404).
 
@@ -46,7 +54,12 @@ Disk-space threshold is one of the built-in indicators. This test demonstrates a
 
 test:PoorHealthTest[]
 
+:exclude-for-languages:python
 <1> Sets the `endpoints.health.disk-space.threshold` property to an impossibly high value to force a service down status. This is normally specified in the application configuration (e.g. `application.properties`).
+:exclude-for-languages:
+:only-for-languages:python
+<1> Sets the `endpoints.health.disk-space.threshold` property to an impossibly high value to force a service down status. Outside a test, set this property in `config/application.toml`.
+:only-for-languages:
 <2> A failed health check results in a Service Unavailable status (HTTP 503)
 <3> The response body of the error contains the json string `{"status":"DOWN"}`
 
