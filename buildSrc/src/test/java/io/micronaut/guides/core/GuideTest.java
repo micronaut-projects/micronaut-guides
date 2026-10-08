@@ -106,6 +106,15 @@ class GuideTest {
     }
 
     @Test
+    void appsMustNotBeNull() {
+        Guide guide = new Guide("Documentation guide", "Connect the existing application.",
+                List.of("Micronaut"), List.of("Data JDBC"), LocalDate.of(2026, 10, 6),
+                null, null, null, false, false, null, null, null, null, null, null, null,
+                true, null, null, null);
+        assertTrue(validator.validate(guide).stream().anyMatch(violation -> violation.getPropertyPath().toString().equals("apps")));
+    }
+
+    @Test
     void testDeserialization() {
         Optional<InputStream> inputStreamOptional = resourceLoader.getResourceAsStream("classpath:metadata.json");
         assertTrue(inputStreamOptional.isPresent());
@@ -221,17 +230,16 @@ class GuideTest {
         String expected = """
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://micronaut-projects.github.io/micronaut-guides/schemas/guide.schema.json",
+  "$id": "https://guides.micronaut.io/schemas/guide.schema.json",
   "title": "Guide",
   "type": "object",
   "properties": {
     "apps": {
-      "description": "Applications created for the guide",
+      "description": "Applications created for the guide; an empty list denotes a documentation-only guide with no generated application",
       "type": "array",
       "items": {
-        "$ref": "https://micronaut-projects.github.io/micronaut-guides/schemas/app.schema.json"
-      },
-      "minItems": 1
+        "$ref": "https://guides.micronaut.io/schemas/app.schema.json"
+      }
     },
     "asciidoctor": {
       "description": "The guide asciidoc file. If not specified, the guide slug followed by the .adoc suffix is used",
