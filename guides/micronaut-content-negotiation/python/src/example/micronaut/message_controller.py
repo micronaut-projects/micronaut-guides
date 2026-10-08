@@ -9,7 +9,7 @@ class MessageController:
     def json_message(self) -> dict[str, str]:  # <3>
         return {"message": "Hello World"}
 
-    @View("message.html")  # <4>
+    @View("message")  # <4>
     @Get(produces=MediaType.TEXT_HTML)
     def html_message(self) -> dict[str, str]:
         return {"message": "Hello World"}
