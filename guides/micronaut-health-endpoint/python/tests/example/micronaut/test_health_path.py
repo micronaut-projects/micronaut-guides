@@ -20,7 +20,8 @@ def my_context(request):
 
 @pytest.fixture
 def client(my_context):
-    return requests.with_context(my_context)
+    with requests.with_context(my_context) as session:
+        yield session
 
 
 def test_health_endpoint_exposed_at_non_default_endpoints_path(client):

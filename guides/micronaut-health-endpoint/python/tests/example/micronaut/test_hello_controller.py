@@ -20,8 +20,8 @@ def client(my_context):
         yield session
 
 
-def test_health_endpoint_exposed(client):
-    response = client.get("/health")  # <2>
+def test_hello_world_response(client):
+    response = client.get("/hello")  # <2>
 
-    assert response.status_code == 200  # <3>
-    assert response.json()["status"] == "UP"
+    assert response.status_code == 200
+    assert response.text == "Hello World"  # <3>
