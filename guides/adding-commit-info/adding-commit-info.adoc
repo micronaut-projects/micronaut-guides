@@ -47,8 +47,19 @@ dependency:micronaut-management[]
 
 Enable the info endpoint:
 
+:exclude-for-languages:python
 
 resource:application.properties[tag=endpoints]
+
+:exclude-for-languages:
+
+:only-for-languages:python
+
+resource:application.toml[tag=endpoints]
+
+:only-for-languages:
+
+:exclude-for-languages:python
 
 :exclude-for-build:maven
 
@@ -100,9 +111,38 @@ rocker:gitCommitIdPlugin[]
 
 :exclude-for-build:
 
+:exclude-for-languages:
+
+:only-for-languages:python
+
+== Generate Git Properties with Python
+
+The Micronaut https://docs.micronaut.io/latest/api/io/micronaut/management/endpoint/info/source/GitInfoSource.html[GitInfoSource] reads `git.properties` and exposes its values under the `git` key. Use Python's standard library and the Git command-line tool to generate this resource:
+
+source:GenerateGitProperties[]
+
+The helper writes ASCII Java properties, escaping Unicode, control characters, and separators so Micronaut can read the original values. No additional Python package or build hook is required.
+
+Run the helper from the project root before processing, running, or packaging the application, and regenerate the file after each commit:
+
+[source,bash]
+----
+python src/example/micronaut/generate_git_properties.py
+pyronaut process
+----
+
+The generated `config/git.properties` resource is included when you package the application with `pyronaut build`. Generate it before that command too; the Python helper is not run automatically. Add `config/git.properties` to `.gitignore` to avoid treating the generated resource as an uncommitted change.
+
+:only-for-languages:
+
 == Test
 
+:exclude-for-languages:python
 Create a JUnit test to verify that when you make a GET request to `/info` you get a payload such as:
+:exclude-for-languages:
+:only-for-languages:python
+Create a pytest test to verify that when you make a GET request to `/info` you get a payload such as:
+:only-for-languages:
 
 [source, json]
 ----
@@ -127,22 +167,38 @@ Create a JUnit test to verify that when you make a GET request to `/info` you ge
 }
 ----
 
+:exclude-for-languages:python
 Create a JUnit test to verify the behaviour:
+:exclude-for-languages:
+:only-for-languages:python
+Create a pytest test to verify the behaviour:
+:only-for-languages:
 
 test:InfoTest[]
 
+:exclude-for-languages:python
 callout:micronaut-test[]
 callout:http-client[]
 callout:http-request[]
 callout:body-method[]
+:exclude-for-languages:
+
+:only-for-languages:python
+<.> Create a test fixture with `MicronautTest` to start the application context and embedded HTTP server.
+<.> Use a context-managed `requests.with_context` session for HTTP requests.
+<.> Make a GET request to the `/info` endpoint.
+<.> The response exposes Git metadata as native Python dictionaries. The tests use temporary Git repositories and verify clean and dirty working trees, Unicode authors, multiline messages, commit IDs, and timestamps without changing the application's repository.
+:only-for-languages:
 
 common:testApp.adoc[]
 
 common:runapp.adoc[]
 
+:exclude-for-languages:python
+
 common:graal-with-plugins.adoc[]
 
-:exclude-for-languages:groovy
+:exclude-for-languages:groovy,python
 
 Annotate the `Application` class with `@Introspected`. This won't be necessary in a real-world application because there
 will be Micronaut beans defined (something annotated with `@Singleton`, `@Controller`,...), but for this case you need to
