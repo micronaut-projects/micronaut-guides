@@ -16,13 +16,17 @@ common:completesolution.adoc[]
 
 == The Booking Flow
 
-[cols="1,2,3",options="header"]
-|===
-|Entry point or topic |Handler |Action
-|`POST /bookings` |HTTP controller |Reserve a seat, create a pending booking, suspend the Oracle Database transaction, publish a payment request with the GTRID.
-|`payment-requests` |`payment-processing` |Process payment outside Oracle Database; publish its outcome with the same GTRID.
-|`payment-results` |`booking-completion` |Resume the Oracle Database transaction using the GTRID; confirm and commit, or roll back on decline.
-|===
+. *Reserve the seat — `BookingController`*
++
+Receives `POST /bookings`, reserves the seat, and saves a pending booking. It suspends the Oracle Database transaction, then publishes a `PaymentRequested` message containing the booking ID and GTRID to the `payment-requests` Kafka topic.
+
+. *Process payment — `PaymentConsumer`*
++
+Consumes messages from the `payment-requests` Kafka topic and processes payment while the reservation transaction remains suspended. It publishes a `PaymentCompleted` message containing the payment outcome, booking ID, and the same GTRID to the `payment-results` Kafka topic.
+
+. *Complete the booking — `CompletionConsumer`*
++
+Consumes messages from the `payment-results` Kafka topic and resumes the original Oracle Database transaction using the GTRID. If payment is approved, it confirms the booking and commits. If payment is declined, it rolls back the reservation.
 
 The sample runs the controller and both consumers in one application. The consumers have separate consumer groups. They can be deployed in separate applications using the same event contracts. Reservation and completion must connect to the same Oracle Database instance and use the same application database user. No connection is held by the application while payment runs, but the suspended transaction continues to hold its database locks.
 
@@ -105,7 +109,7 @@ source:dto/PaymentRequested[]
 
 source:dto/PaymentCompleted[]
 
-The controller passes only `seatId` to the booking service and uses the payment token from the HTTP request when constructing the payment message. Kafka messages contain only the dedicated `PaymentRequested` and `PaymentCompleted` DTOs. Persistence entities are never sent to Kafka. All events use the database-generated booking ID as their Kafka key. The controller gets this ID from the saved booking before constructing the payment request. The payment request carries the server-selected price because the pending booking is not visible outside its suspended transaction. The `transactionId` string is the opaque encoding returned by Micronaut's propagation API. Forward it unchanged; do not convert the raw Oracle Database GTRID yourself.
+The controller passes only `seatId` to the booking service and uses the payment token from the HTTP request when constructing the payment message. Kafka messages contain only the dedicated `PaymentRequested` and `PaymentCompleted` DTOs. Persistence entities are never sent to Kafka. All events use the database-generated booking ID as their Kafka key. The controller gets this ID from the saved booking before constructing the payment request. The payment request carries the server-selected price because the pending booking is not visible outside its suspended transaction. Pass the encoded transaction ID returned by Micronaut's propagation API unchanged through the Kafka messages. Micronaut uses `OracleSessionlessTransactionIdCodec` to encode and decode the Oracle Database GTRID. Applications can provide a custom codec, provided the producing and consuming applications use compatible encoding and decoding.
 
 Treat the encoded GTRID as sensitive transaction-control data. Restrict access to these topics, use authenticated encrypted connections outside local development, and avoid logging it. Do not send card details in Kafka messages; the sample uses only demonstration tokens.
 
