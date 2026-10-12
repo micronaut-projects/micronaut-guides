@@ -1,6 +1,6 @@
 common:header.adoc[]
 
-In this guide you will build a flight-booking workflow with an HTTP controller and two Kafka consumers. The controller reserves a seat in Oracle, suspends its transaction, and publishes a payment request. The first consumer processes a simulated payment. The second resumes the original Oracle transaction and confirms the booking, or rolls back the reservation if payment is declined.
+In this guide you will build a flight-booking workflow with an HTTP controller and two Kafka consumers. The controller reserves a seat in Oracle Database, suspends its transaction, and publishes a payment request. The first consumer processes a simulated payment. The second resumes the original Oracle Database transaction and confirms the booking, or rolls back the reservation if payment is declined.
 
 The controller and consumers exchange the encoded global transaction identifier (GTRID), rather than a JDBC connection. The payment consumer never resumes the transaction and does not need to read the uncommitted booking.
 
@@ -10,7 +10,7 @@ common:requirements.adoc[]
 * Micronaut Data 5.2.0 or later, with `OracleSessionlessTransactionPropagationOperations` and the `sessionless` attribute of `@OracleTransactional`.
 * Oracle AI Database 26ai (version 23.6 or later) and a recent Oracle JDBC Thin driver exposing `startTransaction`, `suspendTransactionImmediately`, and `resumeTransaction`.
 
-See Oracle's https://docs.oracle.com/en/database/oracle/oracle-database/26/jjdbc/sessionless-transactions.html[sessionless transaction documentation] for database and driver requirements. This guide uses Java to focus on the JDBC transaction boundary and transport propagation API.
+See the https://docs.oracle.com/en/database/oracle/oracle-database/26/jjdbc/sessionless-transactions.html[Oracle Database sessionless transaction documentation] for database and driver requirements. This guide uses Java to focus on the JDBC transaction boundary and transport propagation API.
 
 common:completesolution.adoc[]
 
@@ -19,20 +19,20 @@ common:completesolution.adoc[]
 [cols="1,2,3",options="header"]
 |===
 |Entry point or topic |Handler |Action
-|`POST /bookings` |HTTP controller |Reserve a seat, create a pending booking, suspend Oracle, publish a payment request with the GTRID.
-|`payment-requests` |`payment-processing` |Process payment outside Oracle; publish its outcome with the same GTRID.
-|`payment-results` |`booking-completion` |Resume Oracle using the GTRID; confirm and commit, or roll back on decline.
+|`POST /bookings` |HTTP controller |Reserve a seat, create a pending booking, suspend the Oracle Database transaction, publish a payment request with the GTRID.
+|`payment-requests` |`payment-processing` |Process payment outside Oracle Database; publish its outcome with the same GTRID.
+|`payment-results` |`booking-completion` |Resume the Oracle Database transaction using the GTRID; confirm and commit, or roll back on decline.
 |===
 
-The sample runs the controller and both consumers in one application. The consumers have separate consumer groups. They can be deployed in separate applications using the same event contracts. Reservation and completion must connect to the same Oracle database and use the same application database user. No connection is held by the application while payment runs, but the suspended transaction continues to hold its database locks.
+The sample runs the controller and both consumers in one application. The consumers have separate consumer groups. They can be deployed in separate applications using the same event contracts. Reservation and completion must connect to the same Oracle Database instance and use the same application database user. No connection is held by the application while payment runs, but the suspended transaction continues to hold its database locks.
 
-IMPORTANT: This is an Oracle transaction spanning workflow steps. Kafka publishing, Kafka offset commits, and the external payment are separate operations. The example demonstrates propagation and completion; it does not provide atomic delivery or exactly-once booking across these systems.
+IMPORTANT: This is an Oracle Database transaction spanning workflow steps. Kafka publishing, Kafka offset commits, and the external payment are separate operations. The example demonstrates propagation and completion; it does not provide atomic delivery or exactly-once booking across these systems.
 
 common:create-app-features.adoc[]
 
 common:oracle-driver.adoc[]
 
-== Configure Oracle and Kafka
+== Configure Oracle Database and Kafka
 
 resource:application.properties[tag=datasource]
 
@@ -48,7 +48,7 @@ The consumers start from the earliest available offset for a new group. Automati
 
 resource:application.properties[tag=testresources]
 
-Micronaut Test Resources supplies the datasource URL, username, password and `kafka.bootstrap.servers` when they are absent. The pinned Oracle Free image supports sessionless transactions. For your own services, set `DATASOURCES_DEFAULT_URL`, `DATASOURCES_DEFAULT_USERNAME`, `DATASOURCES_DEFAULT_PASSWORD`, and `KAFKA_BOOTSTRAP_SERVERS`; do not put credentials in source control.
+Micronaut Test Resources supplies the datasource URL, username, password and `kafka.bootstrap.servers` when they are absent. The pinned Oracle Database Free image supports sessionless transactions. For your own services, set `DATASOURCES_DEFAULT_URL`, `DATASOURCES_DEFAULT_USERNAME`, `DATASOURCES_DEFAULT_PASSWORD`, and `KAFKA_BOOTSTRAP_SERVERS`; do not put credentials in source control.
 
 Create the two topics before sending messages when using a broker without topic auto-creation:
 
@@ -91,11 +91,11 @@ source:entity/BookingStatus[]
 
 source:repository/FlightSeatRepository[]
 
-The derived `findByIdForUpdate` method lets Micronaut Data generate a locking read for the Oracle dialect. The service checks the status while holding this lock, changes the mutable entity, and persists it with the standard `update` method. Oracle holds the lock until the original transaction commits or rolls back, including while it is suspended. Another reservation for the same seat can wait on that lock. A normal read still sees the previously committed `AVAILABLE` value; it cannot tell you whether a suspended reservation holds the seat.
+The derived `findByIdForUpdate` method lets Micronaut Data generate a locking read for the Oracle Database dialect. The service checks the status while holding this lock, changes the mutable entity, and persists it with the standard `update` method. Oracle Database holds the lock until the original transaction commits or rolls back, including while it is suspended. Another reservation for the same seat can wait on that lock. A normal read still sees the previously committed `AVAILABLE` value; it cannot tell you whether a suspended reservation holds the seat.
 
 source:repository/BookingRepository[]
 
-The entities are mutable Java classes with getters and setters. They are persistence objects and have no serialization annotations. The booking ID is a `Long` annotated with `@GeneratedValue` using its defaults. For Oracle, Micronaut Data selects sequence generation and derives the sequence name from the table name plus `_seq`, so Liquibase creates `booking_seq` for the `booking` table. A new booking has no assigned ID; the inherited `save` method inserts it and returns the entity with its generated ID. Sequence values can have gaps after rollback. New bookings use the inherited `save` method; changes to seats and bookings use the inherited `update` method. Both repositories let Micronaut Data generate their SQL.
+The entities are mutable Java classes with getters and setters. They are persistence objects and have no serialization annotations. The booking ID is a `Long` annotated with `@GeneratedValue` using its defaults. For Oracle Database, Micronaut Data selects sequence generation and derives the sequence name from the table name plus `_seq`, so Liquibase creates `booking_seq` for the `booking` table. A new booking has no assigned ID; the inherited `save` method inserts it and returns the entity with its generated ID. Sequence values can have gaps after rollback. New bookings use the inherited `save` method; changes to seats and bookings use the inherited `update` method. Both repositories let Micronaut Data generate their SQL.
 
 == Request and Message Contracts
 
@@ -105,7 +105,7 @@ source:dto/PaymentRequested[]
 
 source:dto/PaymentCompleted[]
 
-The controller passes only `seatId` to the booking service and uses the payment token from the HTTP request when constructing the payment message. Kafka messages contain only the dedicated `PaymentRequested` and `PaymentCompleted` DTOs. Persistence entities are never sent to Kafka. All events use the database-generated booking ID as their Kafka key. The controller gets this ID from the saved booking before constructing the payment request. The payment request carries the server-selected price because the pending booking is not visible outside its suspended transaction. The `transactionId` string is the opaque encoding returned by Micronaut's propagation API. Forward it unchanged; do not convert the raw Oracle GTRID yourself.
+The controller passes only `seatId` to the booking service and uses the payment token from the HTTP request when constructing the payment message. Kafka messages contain only the dedicated `PaymentRequested` and `PaymentCompleted` DTOs. Persistence entities are never sent to Kafka. All events use the database-generated booking ID as their Kafka key. The controller gets this ID from the saved booking before constructing the payment request. The payment request carries the server-selected price because the pending booking is not visible outside its suspended transaction. The `transactionId` string is the opaque encoding returned by Micronaut's propagation API. Forward it unchanged; do not convert the raw Oracle Database GTRID yourself.
 
 Treat the encoded GTRID as sensitive transaction-control data. Restrict access to these topics, use authenticated encrypted connections outside local development, and avoid logging it. Do not send card details in Kafka messages; the sample uses only demonstration tokens.
 
@@ -115,9 +115,9 @@ source:service/PaymentDeclinedException[]
 
 source:service/BookingService[]
 
-<1> Start an Oracle sessionless transaction with a five-minute suspension timeout. Oracle cancels a transaction that remains suspended past its timeout.
+<1> Start an Oracle Database sessionless transaction with a five-minute suspension timeout. Oracle Database cancels a transaction that remains suspended past its timeout.
 <2> Lock the seat with the generated `findByIdForUpdate` query before checking availability. Change its status to `HELD` and call `update`; create the pending booking with `save`. A competing reservation waits for the lock and then checks the latest committed status, preventing two bookings of the same seat. Failure throws an exception and rolls back the transaction.
-<3> `save` returns the booking with its Oracle-generated ID. After the intercepted method returns, Micronaut suspends the transaction instead of committing it. The generated ID and price can be published, but the database writes are still uncommitted.
+<3> `save` returns the booking with its database-generated ID. After the intercepted method returns, Micronaut suspends the transaction instead of committing it. The generated ID and price can be published, but the database writes are still uncommitted.
 <4> Resume the transaction whose GTRID is in the active propagation scope.
 <5> This read runs inside the resumed transaction and can see the pending booking written by the controller.
 <6> A runtime exception rolls back the original transaction, undoing both the seat reservation and the pending booking.
@@ -129,7 +129,7 @@ These methods are top-level transaction boundaries on an injected bean. Do not c
 
 source:kafka/BookingClient[]
 
-Returning `RecordMetadata` makes each producer method synchronous: it waits for Kafka acknowledgment before returning. The controller waits for its payment request to be acknowledged before returning `202 Accepted`. The payment consumer waits for its result publication before its input offset is committed. Oracle suspension and Kafka acknowledgment still have a crash window between them.
+Returning `RecordMetadata` makes each producer method synchronous: it waits for Kafka acknowledgment before returning. The controller waits for its payment request to be acknowledged before returning `202 Accepted`. The payment consumer waits for its result publication before its input offset is committed. There is still a crash window between suspending the Oracle Database transaction and receiving Kafka acknowledgment.
 
 == Controller: Reserve and Suspend
 
@@ -141,14 +141,14 @@ The HTTP response DTOs expose booking and seat snapshots without serializing per
 
 source:controller/BookingController[]
 
-<1> Create an empty, lexical Oracle propagation scope for the incoming HTTP booking request.
-<2> Call the injected transactional service. It saves the booking and returns its generated ID and price on the entity. Its interceptor suspends Oracle before returning to the controller.
+<1> Create an empty, lexical Oracle Database propagation scope for the incoming HTTP booking request.
+<2> Call the injected transactional service. It saves the booking and returns its generated ID and price on the entity. Its interceptor suspends the Oracle Database transaction before returning to the controller.
 <3> Obtain the encoded GTRID after suspension, while the propagation scope is still active.
 <4> Publish the payment request after the transaction has suspended. The event carries the GTRID even though the lexical scope has ended.
 
-The controller returns `202 Accepted` with a booking ID after Kafka acknowledges the payment request. Reservation has already run and Oracle is suspended, but payment and booking completion are asynchronous. Blocking Kafka sends and JDBC work run on the blocking executor. The controller is an HTTP entry point; it does not listen to a Kafka topic.
+The controller returns `202 Accepted` with a booking ID after Kafka acknowledges the payment request. Reservation has already run and the Oracle Database transaction is suspended, but payment and booking completion are asynchronous. Blocking Kafka sends and JDBC work run on the blocking executor. The controller is an HTTP entry point; it does not listen to a Kafka topic.
 
-Do not publish the payment request from inside the `SUSPEND` method: a consumer could receive it before Oracle has suspended the transaction. A lexical propagation scope is not transported automatically across Kafka or asynchronous threads.
+Do not publish the payment request from inside the `SUSPEND` method: a consumer could receive it before Oracle Database has suspended the transaction. A lexical propagation scope is not transported automatically across Kafka or asynchronous threads.
 
 == First Consumer: Process Payment
 
@@ -158,7 +158,7 @@ The gateway simulates approval for `demo-approve` and decline for `demo-decline`
 
 source:kafka/PaymentConsumer[]
 
-<1> Process payment without entering an Oracle transaction or querying the pending booking.
+<1> Process payment without entering an Oracle Database transaction or querying the pending booking.
 <2> Publish the result with the exact GTRID received in the payment request.
 
 == Second Consumer: Resume and Complete
@@ -185,15 +185,15 @@ The approval scenario submits a booking for the seeded `MN123-12A` seat, then po
 <3> Poll until the replacement booking is `CONFIRMED` and its seat is `BOOKED`.
 <4> Verify the declined booking lookup returns `404`, showing that its pending insert was rolled back.
 
-An absent booking or an `AVAILABLE` seat alone would be a false positive: those are also visible while a reservation is suspended. Successfully booking the same seat again and confirming that the declined booking remains absent verifies rollback through the public API. The 30-second HTTP read timeout and two-minute test timeout are shorter than the five-minute Oracle suspension timeout, so transaction expiry cannot make this scenario pass.
+An absent booking or an `AVAILABLE` seat alone would be a false positive: those are also visible while a reservation is suspended. Successfully booking the same seat again and confirming that the declined booking remains absent verifies rollback through the public API. The 30-second HTTP read timeout and two-minute test timeout are shorter than the five-minute Oracle Database suspension timeout, so transaction expiry cannot make this scenario pass.
 
-The test has no surrounding transaction and uses a dedicated Micronaut Test Resources scope, with its own Oracle and Kafka containers. Liquibase supplies the two seats, so no test setup or cleanup accesses repositories. Docker is required; the build stops the disposable Test Resources services after the tests.
+The test has no surrounding transaction and uses a dedicated Micronaut Test Resources scope, with its own Oracle Database and Kafka containers. Liquibase supplies the two seats, so no test setup or cleanup accesses repositories. Docker is required; the build stops the disposable Test Resources services after the tests.
 
 common:testApp.adoc[]
 
 == Try a Booking
 
-Start the application with `./gradlew run` or `./mvnw mn:run`. Test Resources starts local Oracle and Kafka if external connection properties are absent.
+Start the application with `./gradlew run` or `./mvnw mn:run`. Test Resources starts local Oracle Database and Kafka if external connection properties are absent.
 
 [source,bash]
 ----
@@ -216,23 +216,23 @@ Try `MN123-12B` with `demo-decline`. After payment processing and rollback, no b
 
 == Failure Handling Before Production
 
-Keep suspension short enough for your payment latency, Kafka backlog and outages. Oracle's timeout releases abandoned reservations, but a successful payment can outlive an expired transaction. Reconcile that payment and issue a refund or compensating action if booking cannot complete.
+Keep suspension short enough for your payment latency, Kafka backlog and outages. Oracle Database's timeout releases abandoned reservations, but a successful payment can outlive an expired transaction. Reconcile that payment and issue a refund or compensating action if booking cannot complete.
 
 [cols="2,3",options="header"]
 |===
 |Failure window |Required recovery design
 |Suspension succeeds but the payment request is not published, or the HTTP response is lost |Persist the booking ID, GTRID and workflow stage in a separate committed store, then retry publication or explicitly resume and roll back. An outbox inserted into the suspended transaction is uncommitted and cannot drive the payment step.
 |Payment succeeds but the payment result is not published |Use the booking ID as the provider's durable idempotency key, and recover the known payment outcome before publishing it again.
-|Oracle commits but the result offset is not committed |Recognize the committed booking before resuming. Coordinate concurrent duplicates with a durable inbox or workflow ledger; the sample's read-before-resume check only covers sequential success duplicates.
+|Oracle Database commits but the result offset is not committed |Recognize the committed booking before resuming. Coordinate concurrent duplicates with a durable inbox or workflow ledger; the sample's read-before-resume check only covers sequential success duplicates.
 |Payment is declined, the transaction expires, or the GTRID cannot be resumed |Persist the terminal outcome separately, reconcile with the payment provider, and route unrecoverable events to an operational recovery queue.
 |===
 
 `SYNC_PER_RECORD` is an offset policy, not a workflow recovery strategy. The sample does not install a custom Kafka error handler. Configure explicit bounded retries, dead-letter publication and monitoring for unexpected consumer failures before deploying it. A retried HTTP request can start another transaction or block on the original suspended reservation. Add a durable HTTP idempotency key and workflow lookup before replaying the reservation step. A completed or expired GTRID cannot simply be resumed again.
 
-Kafka transactions can make Kafka output records and input offsets atomic together, but do not make Oracle commits or payment side effects part of that transaction. For workflows with long payment delays, compare this approach with a saga that commits a durable seat hold and later confirms or compensates it.
+Kafka transactions can make Kafka output records and input offsets atomic together, but do not make Oracle Database commits or payment side effects part of that transaction. For workflows with long payment delays, compare this approach with a saga that commits a durable seat hold and later confirms or compensates it.
 
 == Cleanup and Next Steps
 
 Stop the application and Test Resources services (`./gradlew stopTestResourcesService` for Gradle). The containers are disposable; no cloud resources are provisioned by this guide. Remove demonstration topics only from a broker dedicated to this example.
 
-Read the https://micronaut-projects.github.io/micronaut-data/latest/guide/#sessionlessTransactions[Micronaut Data sessionless transaction documentation], the https://micronaut-projects.github.io/micronaut-kafka/latest/guide/[Micronaut Kafka guide], and Oracle's https://docs.oracle.com/en/database/oracle/oracle-database/26/jjdbc/sessionless-transactions.html[sessionless transaction documentation].
+Read the https://micronaut-projects.github.io/micronaut-data/latest/guide/#sessionlessTransactions[Micronaut Data sessionless transaction documentation], the https://micronaut-projects.github.io/micronaut-kafka/latest/guide/[Micronaut Kafka guide], and the https://docs.oracle.com/en/database/oracle/oracle-database/26/jjdbc/sessionless-transactions.html[Oracle Database sessionless transaction documentation].
