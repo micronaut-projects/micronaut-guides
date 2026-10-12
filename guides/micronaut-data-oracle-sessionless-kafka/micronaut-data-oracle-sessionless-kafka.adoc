@@ -176,16 +176,18 @@ A declined booking leaves no booking row: the original insert was rolled back. A
 
 test:controller/KafkaBookingTest[]
 
-Both scenarios start with an HTTP booking request and run through the real Kafka payment and completion consumers against Oracle. The successful scenario verifies confirmation, the serialized response DTOs, and a duplicate completion sent through Kafka.
+The tests interact only with the booking controller's HTTP endpoints. The application runs its payment and completion consumers internally, so HTTP polling verifies the end-to-end workflow without Kafka clients, direct service calls, or repository access in the test.
 
-<1> Observe the declined payment result using a separate Kafka consumer group, then wait until the `booking-completion` group commits an offset beyond that record. Receiving a result alone proves only that payment ran; its committed completion offset shows that the last listener returned.
-<2> Verify the declined booking is absent in Oracle and its HTTP lookup returns `404`, while the seat reads as `AVAILABLE`.
-<3> Submit an approved booking for the exact same seat. This request must acquire the lock released by the rollback; a still-suspended reservation would block it.
-<4> Wait for the replacement booking to commit as `CONFIRMED` with a `BOOKED` seat, then verify the declined booking remains absent.
+The approval scenario submits a booking for the seeded `MN123-12A` seat, then polls until the booking is `CONFIRMED` with a payment reference and the seat is `BOOKED`.
 
-An absent booking and an available seat alone would be a false positive: the original writes are also invisible while suspended. Combining the declined result, the completion offset, and a successful second reservation verifies that the declined transaction rolled back before its five-minute suspension timeout. Offset advancement alone does not prove success, so the database and HTTP assertions remain necessary.
+<1> Submit a declined booking for the seeded `MN123-12B` seat.
+<2> Submit an approved booking for the exact same seat. This request must acquire the lock held by the first reservation, so it can return only after that lock is released.
+<3> Poll until the replacement booking is `CONFIRMED` and its seat is `BOOKED`.
+<4> Verify the declined booking lookup returns `404`, showing that its pending insert was rolled back.
 
-The test has no surrounding transaction and does not call the booking service or completion listener directly. Repositories prepare and clean up unique test seats and verify committed state. Docker is required; Micronaut Test Resources starts Oracle Free and Kafka.
+An absent booking or an `AVAILABLE` seat alone would be a false positive: those are also visible while a reservation is suspended. Successfully booking the same seat again and confirming that the declined booking remains absent verifies rollback through the public API. The 30-second HTTP read timeout and two-minute test timeout are shorter than the five-minute Oracle suspension timeout, so transaction expiry cannot make this scenario pass.
+
+The test has no surrounding transaction and uses a dedicated Micronaut Test Resources scope, with its own Oracle and Kafka containers. Liquibase supplies the two seats, so no test setup or cleanup accesses repositories. Docker is required; the build stops the disposable Test Resources services after the tests.
 
 common:testApp.adoc[]
 
