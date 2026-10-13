@@ -1,0 +1,135 @@
+common:header.adoc[]
+
+external:micronaut-data-upsert/upsert.adoc[]
+
+In this guide, you will declare an upsert method in a Micronaut Data JDBC repository and use it from an HTTP controller backed by https://www.postgresql.org[PostgreSQL].
+
+:containerized: PostgreSQL
+common:requirements-testcontainers.adoc[]
+
+common:completesolution.adoc[]
+
+common:create-app-features.adoc[]
+
+:exclude-for-languages:python
+common:micronaut-data-jdbc.adoc[]
+
+common:postgres-driver.adoc[]
+:exclude-for-languages:
+
+:only-for-languages:python
+The `data-jdbc` and `postgres` features add Micronaut Data JDBC and the PostgreSQL JDBC driver to the dependencies in `pyproject.toml`.
+:only-for-languages:
+
+common:datasource-header.adoc[]
+
+:exclude-for-languages:python
+resource:application.properties[tag=datasource]
+:exclude-for-languages:
+
+:only-for-languages:python
+resource:application.toml[tag=datasource]
+:only-for-languages:
+
+<.> Use the PostgreSQL driver.
+<.> Set the database type.
+<.> Configure the PostgreSQL dialect.
+
+:exclude-for-languages:python
+common:liquibase.adoc[]
+:exclude-for-languages:
+
+:only-for-languages:python
+=== Database Migration with Liquibase
+
+We need a way to create the database schema. For that, we use
+https://micronaut-projects.github.io/micronaut-liquibase/latest/guide/[Micronaut integration with Liquibase].
+
+The `liquibase` feature adds Micronaut Liquibase to the dependencies in `pyproject.toml`.
+
+Configure the database migrations directory for http://www.liquibase.org[Liquibase] in `config/application.toml`:
+
+resource:application.toml[tag=liquibase]
+
+Create the following files with the database schema creation:
+
+resource:db/liquibase-changelog.xml[]
+:only-for-languages:
+
+resource:db/changelog/01-schema.xml[]
+
+The `id` column is the table's primary key. PostgreSQL requires a primary key or unique constraint that matches the conflict target of an upsert.
+
+external:micronaut-data-upsert/book-entity.adoc[]
+
+=== Repository
+
+Create a repository and declare an upsert method:
+
+source:BookRepository[]
+
+callout:jdbcrepository[]
+callout:crudrepository[]
+<.> Upsert methods are opt-in; they are not inherited from `CrudRepository`. Micronaut Data implements a method named exactly `upsert` (or `upsertAll` for an `Iterable` of entities) as a native upsert.
+
+For the `POSTGRES` dialect, Micronaut Data generates an `INSERT ... ON CONFLICT ... DO UPDATE` statement at compilation time. For the `Book` entity, the generated SQL is similar to:
+
+[source,sql]
+----
+INSERT INTO "book" ("id","title","pages") VALUES (?,?,?)
+ON CONFLICT ("id") DO UPDATE SET "title"=EXCLUDED."title","pages"=EXCLUDED."pages"
+----
+
+If no row with the given `id` exists, PostgreSQL inserts a new row. Otherwise, it updates the `title` and `pages` columns of the existing row with the values proposed for insertion, which PostgreSQL exposes through the special `EXCLUDED` table.
+
+TIP: Use the `@Upsert` annotation to give an upsert method a custom name, or its `conflictsOn` member to use another unique property, such as an ISBN, as the conflict target instead of the identity.
+
+external:micronaut-data-upsert/book-controller.adoc[]
+
+=== Tests
+
+:exclude-for-languages:python
+Create an abstract test class that starts a PostgreSQL container with https://www.testcontainers.org[Testcontainers] and points the default datasource to it:
+
+test:AbstractTest[]
+
+callout:test-property-provider[]
+:exclude-for-languages:
+
+:exclude-for-languages:groovy,kotlin,python
+callout:testcontainers-at-container-static[]
+:exclude-for-languages:
+
+:only-for-languages:groovy,kotlin
+<.> Declare the container once, so every test which extends the abstract class shares it.
+:only-for-languages:
+
+:exclude-for-languages:python
+<.> Start the container if it is not running yet.
+<.> Use the PostgreSQL JDBC driver and the container's JDBC URL and credentials.
+:exclude-for-languages:
+
+:only-for-languages:python
+Create `tests/conftest.py` with a fixture that starts a PostgreSQL container with https://www.testcontainers.org[Testcontainers] and exposes the datasource properties:
+
+[source,python]
+.tests/conftest.py
+----
+include::{sourceDir}/micronaut-data-upsert-postgresql/@sourceDir@/tests/conftest.py[]
+----
+
+<.> Start the container once; it is shared by every test.
+<.> Use the PostgreSQL JDBC driver and the container's JDBC URL and credentials.
+:only-for-languages:
+
+external:micronaut-data-upsert/book-controller-test.adoc[]
+
+common:testApp.adoc[]
+
+:exclude-for-languages:python
+common:nativetest.adoc[]
+:exclude-for-languages:
+
+common:next.adoc[]
+
+external:micronaut-data-upsert/next.adoc[]
