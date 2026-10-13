@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'/>
+    <title>Upsert PostgreSQL</title>
+    <link rel='stylesheet' id='wp-block-library-css' href='https://legacy.micronaut.io/wp-includes/css/dist/block-library/style.min.css' type='text/css' media='all'/>
+    <link rel='stylesheet' id='fonts-fira-sans-css' href='https://fonts.googleapis.com/css2?family=Fira+Sans%3Awght%40300%3B500&#038;display=swap&#038;ver=5.7' type='text/css' media='all'/>
+    <link rel='stylesheet' id='micronaut-style-css' href='https://legacy.micronaut.io/wp-content/themes/micronaut/style.min.css' type='text/css' media='all'/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="icon" href="https://legacy.micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link rel="shortcut icon" href="https://legacy.micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link rel="alternate" type="application/rss+xml" title="Micronaut Guides RSS Feed" href="https://micronaut-projects.github.io/micronaut-guides/latest/rss.xml" />
+    <link rel="alternate" type="application/json" title="Micronaut Guides JSON Feed" href="https://micronaut-projects.github.io/micronaut-guides/latest/feed.json" />
+    <link href="coderay.css" rel="stylesheet" />
+    <link href="rouge-github.css" rel="stylesheet" />
+    <link href="guide.css" rel="stylesheet" />
+    <script src="lunr.js"></script>
+    <script src="guide.js"></script>
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:image" content="https://micronaut-projects.github.io/micronaut-guides/latest/images/cards/micronauttwittercard.png"/>
+    <meta name="twitter:creator" content="@micronautfw"/>
+    <meta name="twitter:site" content="@micronautfw"/>
+    <meta name="twitter:title" content="Upsert PostgreSQL"/>
+    <meta name="twitter:description" content="An upsert is a database operation that will update an existing row if a specified value already exists in a table, and insert a new row if the specified value doesn’t already exist."/>
+</head>
+<body class="page-template page-template-page-sidebar page-template-page-sidebar-php page page-parent guide">
+
+<header id="header">
+
+    <div class="container">
+
+        <nav class="navbar navbar-expand-lg navbar-dark">
+
+            <button class="collapsed" type="button" data-toggle="collapse" data-target="#nav" aria-expanded="false">
+                <span></span>
+            </button>
+
+            <a class="navbar-brand" href="https://micronaut.io">
+                <img src="https://legacy.micronaut.io/wp-content/uploads/2020/11/MIcronautLogo_Horizontal.svg" alt="Micronaut framework"/>
+            </a>
+
+            <div class="collapse navbar-collapse" id="nav">
+
+                <ul class="navbar-nav ml-auto">
+
+                    <li id="menu-item-2865" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2865 nav-item"><a href="https://micronaut.io/download/" class="nav-link">Download</a></li>
+                    <li id="menu-item-2868" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-2868 dropdown nav-item"><a href="https://micronaut.io/learn/" class="nav-link dropdown-toggle" data-toggle="dropdown">Learn</a><ul class="dropdown-menu">
+                        <li id="menu-item-4943" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4943"><a href="https://micronaut.io/learn/" class="dropdown-item">Overview</a></li>
+                        <li id="menu-item-5111" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-5111"><a href="https://docs.micronaut.io/index.html" class="dropdown-item">User Documentation</a></li>
+                        <li id="menu-item-4510" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4510"><a href="https://micronaut.io/guides/" class="dropdown-item">Guides</a></li>
+                        <li id="menu-item-2896" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2896"><a href="https://micronaut.io/category/microcast/" class="dropdown-item">Microcasts</a></li>
+                        <li id="menu-item-2897" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2897"><a href="https://micronaut.io/category/webinar/" class="dropdown-item">Webinars</a></li>
+                        <li id="menu-item-2871" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2871"><a href="https://micronaut.io/professional-training/" class="dropdown-item">Professional Training</a></li>
+                        <li id="menu-item-6526" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-6526"><a href="https://micronaut-projects.github.io/micronaut-guides-mn3/latest/" class="dropdown-item">Guides for Micronaut Framework 3</a></li>
+                    </ul>
+                    </li>
+                    <li id="menu-item-2878" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item"><a href="https://micronaut.io/resources/" class="nav-link dropdown-toggle" data-toggle="dropdown">Resources</a><ul class="dropdown-menu">
+                        <li id="menu-item-4999" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4999"><a href="https://micronaut.io/upcoming-events/" class="dropdown-item">Upcoming Events</a></li>
+                        <li id="menu-item-2879" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2879"><a href="https://micronaut.io/blog/" class="dropdown-item">Blog</a></li>
+                        <li id="menu-item-6478" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-6478"><a href="https://micronaut.io/category/release-announcements/" class="dropdown-item">Releases</a></li>
+                        <li id="menu-item-6715" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-6715"><a href="https://micronaut.io/category/security-announcements/" class="dropdown-item">Security Announcements</a></li>
+                        <li id="menu-item-4499" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-4499"><a href="https://micronautpodcast.com/" class="dropdown-item">Podcast</a></li>
+                        <li id="menu-item-5798" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5798"><a href="https://micronaut.io/support/" class="dropdown-item">Commercial Support</a></li>
+                        <li id="menu-item-4186" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4186"><a href="https://micronaut.io/resources/community-support/" class="dropdown-item">Community Support</a></li>
+                        <li id="menu-item-2882" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2882"><a href="https://micronaut.io/faq/" class="dropdown-item">FAQ</a></li>
+                        <li id="menu-item-2883" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2883"><a href="https://micronaut.io/contact/" class="dropdown-item">Contact</a></li>
+                        <li id="menu-item-6479" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-6479"><a href="https://micronaut.io/micronaut-success-stories/" class="dropdown-item">Micronaut Success Stories</a></li>
+                    </ul>
+                    </li>
+                    <li id="menu-item-2872" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2872 dropdown nav-item"><a href="https://micronaut.io/foundation/" class="nav-link dropdown-toggle" data-toggle="dropdown">Foundation</a><ul class="dropdown-menu">
+                        <li id="menu-item-2877" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2877"><a href="https://micronaut.io/foundation/" class="dropdown-item">Overview</a></li>
+                        <li id="menu-item-2874" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2874"><a href="https://micronaut.io/foundation/corporate-sponsorship/" class="dropdown-item">Corporate Sponsorship</a></li>
+                        <li id="menu-item-2873" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2873"><a href="https://micronaut.io/foundation/community-sponsorship/" class="dropdown-item">Community Sponsorship</a></li>
+                        <li id="menu-item-2876" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2876"><a href="https://micronaut.io/foundation/sponsors/" class="dropdown-item">Sponsors</a></li>
+                        <li id="menu-item-3838" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-3838"><a href="https://micronaut.io/meeting-minutes/" class="dropdown-item">Meeting Minutes</a></li>
+                    </ul>
+                    </li>
+                    <li id="menu-item-2884" class="action menu-item menu-item-type-custom menu-item-object-custom menu-item-2884 nav-item"><a target="_blank" rel="noopener" href="https://micronaut.io/launch/" class="nav-link">Launch</a></li>
+
+                </ul>
+
+            </div>
+
+        </nav>
+
+    </div>
+</header>
+
+<div style="background: #fff;padding-top: 20px;padding-bottom: 20px;">
+    <div class="container" style="clear: both;">
+        <fieldset style="float: right;">
+            <input type="search" id="search-form-query"/>
+            <input type="submit" onclick="search()" value="Search">
+            <input type="submit" onclick="resetSearch()" value="Reset">
+        </fieldset>
+    </div>
+    <div class="container" style="clear: both;margin-top: -20px;">
+        <div class="guide-list" id="searchResults">
+        </div>
+    </div>
+</div>
+<div id="breadcrumbs"><div class="container"><a href="https://micronaut.io/">Home</a> » <a href="./index.html">Guides</a> » <a href="micronaut-data-upsert-postgresql.html">Upsert PostgreSQL</a> » <span class="breadcrumb_last" aria-current="page">maven | java</span></div></div><!-- .breadcrumbs -->
+<main id="main">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+
+                <div class="toc">
+                    <div class="inner">
+                        <h1 class="title title_large first-word-bold first-word-break">Table of Contents</h1>
+                        <div class="underline"></div>
+                        
+<ul class="sectlevel1">
+<li><a href="#getting-started">1. Getting Started</a></li>
+<li><a href="#what-you-will-need">2. What you will need</a></li>
+<li><a href="#solution">3. Solution</a></li>
+<li><a href="#writing-the-application">4. Writing the Application</a>
+<ul class="sectlevel2">
+<li><a href="#micronaut-data-jdbc">4.1. Micronaut Data JDBC</a></li>
+<li><a href="#postgresql-driver">4.2. PostgreSQL Driver</a></li>
+<li><a href="#data-source-configuration">4.3. Data Source configuration</a></li>
+<li><a href="#database-migration-with-liquibase">4.4. Database Migration with Liquibase</a></li>
+<li><a href="#entity">4.5. Entity</a></li>
+<li><a href="#repository">4.6. Repository</a></li>
+<li><a href="#controller">4.7. Controller</a></li>
+<li><a href="#tests">4.8. Tests</a></li>
+</ul>
+</li>
+<li><a href="#testing-the-application">5. Testing the Application</a></li>
+<li><a href="#native-tests">6. Native Tests</a></li>
+<li><a href="#next-steps">7. Next Steps</a></li>
+<li><a href="#license">8. License</a></li>
+</ul>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <h1>Upsert PostgreSQL</h1>
+                <div class="underline"></div>
+<div class="sect1">
+<div class="sectionbody">
+
+<div class="paragraph">
+<p>An upsert is a database operation that will update an existing row if a specified value already exists in a table, and insert a new row if the specified value doesn’t already exist.</p>
+</div>
+<div class="paragraph">
+<p>Authors: Sergio del Amo</p>
+</div>
+<div class="paragraph">
+<p>Micronaut Version: 5.2.0</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="getting-started">1. Getting Started</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this guide, we will create a Micronaut application written in Java.</p>
+</div>
+<div class="paragraph">
+<p>An <a href="https://micronaut-projects.github.io/micronaut-data/latest/guide/#upserts">upsert</a> is a native database operation that inserts a row when no matching row exists, or updates the existing row when a match is found.
+Doing this in a single statement, instead of a "find, then insert or update" sequence, avoids a race condition: two concurrent requests cannot both decide the row is missing and both attempt an insert.</p>
+</div>
+<div class="paragraph">
+<p>In this guide, you will declare an upsert method in a Micronaut Data JDBC repository and use it from an HTTP controller backed by <a href="https://www.postgresql.org">PostgreSQL</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="what-you-will-need">2. What you will need</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To complete this guide, you will need the following:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Some time on your hands</p>
+</li>
+<li>
+<p>A decent text editor or IDE (e.g. <a href="https://micronaut-projects.github.io/micronaut-guides/latest/micronaut-intellij-idea-ide-setup.html">IntelliJ IDEA</a>)</p>
+</li>
+<li>
+<p>JDK 21 or greater installed with <code>JAVA_HOME</code> <a href="https://www.baeldung.com/java-home-on-windows-7-8-10-mac-os-x-linux">configured appropriately</a></p>
+</li>
+<li>
+<p><a href="https://www.docker.io/gettingstarted/#h_installation">Docker</a> installed to run PostgreSQL and to run tests using <a href="https://www.testcontainers.org">Testcontainers</a>.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div></div><div class="row"><div class="col-md-12"><div class="sect1">
+<h2 id="solution">3. Solution</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We recommend that you follow the instructions in the next sections and create the application step by step. However, you can go right to the <strong>completed example</strong>.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="micronaut-data-upsert-postgresql-maven-java.zip">Download</a> and unzip the source</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="writing-the-application">4. Writing the Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Create an application using the <a href="https://docs.micronaut.io/latest/guide/#cli">Micronaut Command Line Interface</a> or with <a href="https://launch.micronaut.io">Micronaut Launch</a>.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">mn create-app example.micronaut.micronautguide <span class="se">\</span>
+    <span class="nt">--features</span><span class="o">=</span>data-jdbc,liquibase,postgres,serialization-jackson,testcontainers <span class="se">\</span>
+    <span class="nt">--build</span><span class="o">=</span>maven <span class="se">\</span>
+    <span class="nt">--lang</span><span class="o">=</span>java <span class="se">\</span>
+    <span class="nt">--test</span><span class="o">=</span>junit</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you don&#8217;t specify the <code>--build</code> argument, Gradle with the <a href="https://docs.gradle.org/current/userguide/kotlin_dsl.html">Kotlin DSL</a> is used as the build tool. <br/> If you don&#8217;t specify the <code>--lang</code> argument, Java is used as the language.<br/> If you don&#8217;t specify the <code>--test</code> argument, JUnit is used for Java and Kotlin, and Spock is used for Groovy.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The previous command creates a Micronaut application with the default package <code>example.micronaut</code> in a directory named <code>micronautguide</code>.</p>
+</div>
+<div class="paragraph">
+<p>If you use Micronaut Launch, select Micronaut Application as application type and add <code>data-jdbc</code>, <code>liquibase</code>, <code>postgres</code>, <code>serialization-jackson</code>, and <code>testcontainers</code> features.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+If you have an existing Micronaut application and want to add the functionality described here, you can view the dependency and configuration changes from the specified features, and apply those changes to your application.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><a href="https://micronaut.io/launch?features=data-jdbc&amp;features=liquibase&amp;features=postgres&amp;features=serialization-jackson&amp;features=testcontainers&amp;lang=JAVA&amp;build=MAVEN&amp;test=JUNIT&amp;name=micronautguide&amp;type=DEFAULT&amp;package=example.micronaut&amp;activity=diff" target="_blank" rel="noopener">Diff</a></p>
+</div>
+<div class="paragraph">
+<p><a href="https://micronaut-projects.github.io/micronaut-guides/latest/micronaut-intellij-idea-ide-setup.html">Setup IntelliJ IDEA to develop Micronaut Applications</a>.</p>
+</div>
+<div class="sect2">
+<h3 id="micronaut-data-jdbc">4.1. Micronaut Data JDBC</h3>
+<div class="paragraph">
+<p>Add <a href="https://micronaut-projects.github.io/micronaut-data/latest/guide/#jdbc">Micronaut Data JDBC</a> dependencies to the project:</p>
+</div>
+<div class="listingblock">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="xml"><span class="c">&lt;!-- Add the following to your annotationProcessorPaths element --&gt;</span>
+<span class="nt">&lt;path&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>io.micronaut.data<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>micronaut-data-processor<span class="nt">&lt;/artifactId&gt;</span>
+<span class="nt">&lt;/path&gt;</span>
+<span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>io.micronaut.data<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>micronaut-data-jdbc<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;scope&gt;</span>compile<span class="nt">&lt;/scope&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span>
+<span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>io.micronaut.sql<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>micronaut-jdbc-hikari<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;scope&gt;</span>compile<span class="nt">&lt;/scope&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="postgresql-driver">4.2. PostgreSQL Driver</h3>
+<div class="paragraph">
+<p>Add also the PostgreSQL Driver</p>
+</div>
+<div class="listingblock">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="xml"><span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>org.postgresql<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>postgresql<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;scope&gt;</span>runtime<span class="nt">&lt;/scope&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="data-source-configuration">4.3. Data Source configuration</h3>
+<div class="paragraph">
+<p>Define the datasource in <code>src/main/resources/application.properties</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/application.properties</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="properties"><i class="conum" data-value="1"></i><b>(1)</b>
+<span class="py">datasources.default.driver-class-name</span><span class="p">=</span><span class="s">org.postgresql.Driver</span>
+<i class="conum" data-value="2"></i><b>(2)</b>
+<span class="py">datasources.default.db-type</span><span class="p">=</span><span class="s">postgres</span>
+<i class="conum" data-value="3"></i><b>(3)</b>
+<span class="py">datasources.default.dialect</span><span class="p">=</span><span class="s">POSTGRES</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Use the PostgreSQL driver.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Set the database type.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Configure the PostgreSQL dialect.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="database-migration-with-liquibase">4.4. Database Migration with Liquibase</h3>
+<div class="paragraph">
+<p>We need a way to create the database schema. For that, we use
+<a href="https://micronaut-projects.github.io/micronaut-liquibase/latest/guide/">Micronaut integration with Liquibase</a>.</p>
+</div>
+<div class="paragraph">
+<p>Add the following snippet to include the necessary dependencies:</p>
+</div>
+<div class="listingblock">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="xml"><span class="nt">&lt;dependency&gt;</span>
+    <span class="nt">&lt;groupId&gt;</span>io.micronaut.liquibase<span class="nt">&lt;/groupId&gt;</span>
+    <span class="nt">&lt;artifactId&gt;</span>micronaut-liquibase<span class="nt">&lt;/artifactId&gt;</span>
+    <span class="nt">&lt;scope&gt;</span>compile<span class="nt">&lt;/scope&gt;</span>
+<span class="nt">&lt;/dependency&gt;</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Configure the database migrations directory for <a href="http://www.liquibase.org">Liquibase</a> in <code>application.properties</code>.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/application.properties</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="properties"><span class="py">liquibase.datasources.default.change-log</span><span class="p">=</span><span class="s">classpath</span><span class="se">\:</span><span class="s">db/liquibase-changelog.xml</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Create the following files with the database schema creation:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/db/liquibase-changelog.xml</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="xml"><span class="cp">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
+<span class="nt">&lt;databaseChangeLog</span>
+  <span class="na">xmlns=</span><span class="s">"http://www.liquibase.org/xml/ns/dbchangelog"</span>
+  <span class="na">xmlns:xsi=</span><span class="s">"http://www.w3.org/2001/XMLSchema-instance"</span>
+  <span class="na">xsi:schemaLocation=</span><span class="s">"http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;include</span> <span class="na">file=</span><span class="s">"changelog/01-schema.xml"</span> <span class="na">relativeToChangelogFile=</span><span class="s">"true"</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/databaseChangeLog&gt;</span></code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">src/main/resources/db/changelog/01-schema.xml</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="xml"><span class="cp">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
+
+<span class="nt">&lt;databaseChangeLog</span>
+  <span class="na">xmlns=</span><span class="s">"http://www.liquibase.org/xml/ns/dbchangelog"</span>
+  <span class="na">xmlns:xsi=</span><span class="s">"http://www.w3.org/2001/XMLSchema-instance"</span>
+  <span class="na">xsi:schemaLocation=</span><span class="s">"http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd"</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;changeSet</span> <span class="na">id=</span><span class="s">"01"</span> <span class="na">author=</span><span class="s">"username"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;createTable</span> <span class="na">tableName=</span><span class="s">"book"</span><span class="nt">&gt;</span>
+      <span class="nt">&lt;column</span> <span class="na">name=</span><span class="s">"id"</span> <span class="na">type=</span><span class="s">"BIGINT"</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;constraints</span> <span class="na">primaryKey=</span><span class="s">"true"</span> <span class="na">nullable=</span><span class="s">"false"</span><span class="nt">/&gt;</span>
+      <span class="nt">&lt;/column&gt;</span>
+      <span class="nt">&lt;column</span> <span class="na">name=</span><span class="s">"title"</span> <span class="na">type=</span><span class="s">"VARCHAR(255)"</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;constraints</span> <span class="na">nullable=</span><span class="s">"false"</span><span class="nt">/&gt;</span>
+      <span class="nt">&lt;/column&gt;</span>
+      <span class="nt">&lt;column</span> <span class="na">name=</span><span class="s">"pages"</span> <span class="na">type=</span><span class="s">"INT"</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;constraints</span> <span class="na">nullable=</span><span class="s">"true"</span><span class="nt">/&gt;</span>
+      <span class="nt">&lt;/column&gt;</span>
+    <span class="nt">&lt;/createTable&gt;</span>
+  <span class="nt">&lt;/changeSet&gt;</span>
+<span class="nt">&lt;/databaseChangeLog&gt;</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>id</code> column is the table&#8217;s primary key. PostgreSQL requires a primary key or unique constraint that matches the conflict target of an upsert.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="entity">4.5. Entity</h3>
+<div class="paragraph">
+<p>Create a <code>Book</code> entity:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/Book.java</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">io.micronaut.data.annotation.Id</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.data.annotation.MappedEntity</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.serde.annotation.Serdeable</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.jspecify.annotations.Nullable</span><span class="o">;</span>
+
+<span class="nd">@Serdeable</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="nd">@MappedEntity</span> <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="kd">public</span> <span class="n">record</span> <span class="nf">Book</span><span class="o">(</span>
+        <span class="nd">@Id</span> <span class="nd">@Nullable</span> <span class="nc">Long</span> <span class="n">id</span><span class="o">,</span>  <i class="conum" data-value="3"></i><b>(3)</b> <i class="conum" data-value="4"></i><b>(4)</b>
+        <span class="nc">String</span> <span class="n">title</span><span class="o">,</span>
+        <span class="nd">@Nullable</span> <span class="nc">Integer</span> <span class="n">pages</span><span class="o">)</span> <span class="o">{</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Declare the <code>@Serdeable</code> annotation at the type level in your source code to allow the type to be serialized or deserialized.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Annotate the class with <code>@MappedEntity</code> to map the class to the table defined in the schema.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Specifies the ID of an entity</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Since <a href="https://docs.oracle.com/en/java/javase/14/language/records.html">Records</a> have immutable constructor arguments, those arguments need to be marked as <code>@Nullable</code>, and you should pass null for those arguments.</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The <code>id</code> is not annotated with <code>@GeneratedValue</code>. By default, Micronaut Data uses the entity identity as the upsert conflict target, so the caller must supply the identity value. Upserts that rely on the default identity conflict target reject entities with generated identities.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="repository">4.6. Repository</h3>
+<div class="paragraph">
+<p>Create a repository and declare an upsert method:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/BookRepository.java</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">io.micronaut.data.jdbc.annotation.JdbcRepository</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.data.model.query.builder.sql.Dialect</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.data.repository.CrudRepository</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.jspecify.annotations.Nullable</span><span class="o">;</span>
+
+<span class="nd">@JdbcRepository</span><span class="o">(</span><span class="n">dialect</span> <span class="o">=</span> <span class="nc">Dialect</span><span class="o">.</span><span class="na">POSTGRES</span><span class="o">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">BookRepository</span> <span class="kd">extends</span> <span class="nc">CrudRepository</span><span class="o">&lt;</span><span class="nc">Book</span><span class="o">,</span> <span class="nc">Long</span><span class="o">&gt;</span> <span class="o">{</span> <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="nd">@Nullable</span>
+    <span class="nc">Book</span> <span class="nf">findByTitle</span><span class="o">(</span><span class="nc">String</span> <span class="n">title</span><span class="o">);</span>
+
+    <span class="kt">void</span> <span class="nf">upsert</span><span class="o">(</span><span class="nc">Book</span> <span class="n">book</span><span class="o">);</span> <i class="conum" data-value="3"></i><b>(3)</b>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>@JdbcRepository</code> with a specific dialect.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>By extending <code>CrudRepository</code> you enable automatic generation of CRUD (Create, Read, Update, Delete) operations.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Upsert methods are opt-in; they are not inherited from <code>CrudRepository</code>. Micronaut Data implements a method named exactly <code>upsert</code> (or <code>upsertAll</code> for an <code>Iterable</code> of entities) as a native upsert.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>For the <code>POSTGRES</code> dialect, Micronaut Data generates an <code>INSERT &#8230;&#8203; ON CONFLICT &#8230;&#8203; DO UPDATE</code> statement at compilation time. For the <code>Book</code> entity, the generated SQL is similar to:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="sql"><span class="k">INSERT</span> <span class="k">INTO</span> <span class="nv">"book"</span> <span class="p">(</span><span class="nv">"id"</span><span class="p">,</span><span class="nv">"title"</span><span class="p">,</span><span class="nv">"pages"</span><span class="p">)</span> <span class="k">VALUES</span> <span class="p">(</span><span class="o">?</span><span class="p">,</span><span class="o">?</span><span class="p">,</span><span class="o">?</span><span class="p">)</span>
+<span class="k">ON</span> <span class="n">CONFLICT</span> <span class="p">(</span><span class="nv">"id"</span><span class="p">)</span> <span class="k">DO</span> <span class="k">UPDATE</span> <span class="k">SET</span> <span class="nv">"title"</span><span class="o">=</span><span class="n">EXCLUDED</span><span class="p">.</span><span class="nv">"title"</span><span class="p">,</span><span class="nv">"pages"</span><span class="o">=</span><span class="n">EXCLUDED</span><span class="p">.</span><span class="nv">"pages"</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If no row with the given <code>id</code> exists, PostgreSQL inserts a new row. Otherwise, it updates the <code>title</code> and <code>pages</code> columns of the existing row with the values proposed for insertion, which PostgreSQL exposes through the special <code>EXCLUDED</code> table.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+Use the <code>@Upsert</code> annotation to give an upsert method a custom name, or its <code>conflictsOn</code> member to use another unique property, such as an ISBN, as the conflict target instead of the identity.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="controller">4.7. Controller</h3>
+<div class="paragraph">
+<p>Create a controller which uses the upsert method both to create and to update a book:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/main/java/example/micronaut/BookController.java</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">io.micronaut.http.HttpStatus</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Body</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Controller</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Post</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Put</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.annotation.Status</span><span class="o">;</span>
+
+<span class="nd">@Controller</span><span class="o">(</span><span class="s">"/books"</span><span class="o">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="kd">class</span> <span class="nc">BookController</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="kd">final</span> <span class="nc">BookRepository</span> <span class="n">bookRepository</span><span class="o">;</span>
+
+    <span class="nc">BookController</span><span class="o">(</span><span class="nc">BookRepository</span> <span class="n">bookRepository</span><span class="o">)</span> <span class="o">{</span> <i class="conum" data-value="2"></i><b>(2)</b>
+        <span class="k">this</span><span class="o">.</span><span class="na">bookRepository</span> <span class="o">=</span> <span class="n">bookRepository</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Post</span> <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="nd">@Status</span><span class="o">(</span><span class="nc">HttpStatus</span><span class="o">.</span><span class="na">CREATED</span><span class="o">)</span> <i class="conum" data-value="4"></i><b>(4)</b>
+    <span class="kt">void</span> <span class="nf">save</span><span class="o">(</span><span class="nd">@Body</span> <span class="nc">Book</span> <span class="n">book</span><span class="o">)</span> <span class="o">{</span> <i class="conum" data-value="5"></i><b>(5)</b>
+        <span class="n">bookRepository</span><span class="o">.</span><span class="na">upsert</span><span class="o">(</span><span class="n">book</span><span class="o">);</span> <i class="conum" data-value="6"></i><b>(6)</b>
+    <span class="o">}</span>
+
+    <span class="nd">@Put</span> <i class="conum" data-value="7"></i><b>(7)</b>
+    <span class="nd">@Status</span><span class="o">(</span><span class="nc">HttpStatus</span><span class="o">.</span><span class="na">OK</span><span class="o">)</span>
+    <span class="kt">void</span> <span class="nf">update</span><span class="o">(</span><span class="nd">@Body</span> <span class="nc">Book</span> <span class="n">book</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">bookRepository</span><span class="o">.</span><span class="na">upsert</span><span class="o">(</span><span class="n">book</span><span class="o">);</span> <i class="conum" data-value="6"></i><b>(6)</b>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The class is defined as a controller with the <a href="https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Controller.html">@Controller</a> annotation mapped to the path <code>/books</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Use constructor injection to inject a bean of type <code>BookRepository</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>The <a href="https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Post.html">@Post</a> annotation maps the <code>save</code> method to an HTTP POST request on <code>/books</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>You can return <code>void</code> in your controller&#8217;s method and specify the HTTP status code via the <code>@Status</code> annotation.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>The <code>@Body</code> annotation indicates that the request body should be parsed by Micronaut Framework and bound to the annotated parameter.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>The same repository method inserts or updates the row, depending on whether a book with the supplied <code>id</code> already exists.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>The <a href="https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Put.html">@Put</a> annotation maps the <code>update</code> method to an HTTP PUT request on <code>/books</code>.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="tests">4.8. Tests</h3>
+<div class="paragraph">
+<p>Create an abstract test class that starts a PostgreSQL container with <a href="https://www.testcontainers.org">Testcontainers</a> and points the default datasource to it:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/java/example/micronaut/AbstractTest.java</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">io.micronaut.core.annotation.NonNull</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.test.support.TestPropertyProvider</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.testcontainers.containers.PostgreSQLContainer</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.testcontainers.junit.jupiter.Container</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">java.util.Map</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">abstract</span> <span class="kd">class</span> <span class="nc">AbstractTest</span> <span class="kd">implements</span> <span class="nc">TestPropertyProvider</span> <span class="o">{</span> <i class="conum" data-value="1"></i><b>(1)</b>
+
+    <span class="nd">@Container</span> <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="kd">static</span> <span class="nc">PostgreSQLContainer</span><span class="o">&lt;?&gt;</span> <span class="n">postgres</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">PostgreSQLContainer</span><span class="o">&lt;&gt;(</span><span class="s">"postgres:15.3-alpine"</span><span class="o">);</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="nd">@NonNull</span> <span class="nc">Map</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">,</span> <span class="nc">String</span><span class="o">&gt;</span> <span class="nf">getProperties</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(!</span><span class="n">postgres</span><span class="o">.</span><span class="na">isRunning</span><span class="o">())</span> <span class="o">{</span>
+            <span class="n">postgres</span><span class="o">.</span><span class="na">start</span><span class="o">();</span> <i class="conum" data-value="3"></i><b>(3)</b>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="nc">Map</span><span class="o">.</span><span class="na">of</span><span class="o">(</span><span class="s">"datasources.default.driver-class-name"</span><span class="o">,</span> <span class="s">"org.postgresql.Driver"</span><span class="o">,</span> <i class="conum" data-value="4"></i><b>(4)</b>
+                <span class="s">"datasources.default.url"</span><span class="o">,</span> <span class="n">postgres</span><span class="o">.</span><span class="na">getJdbcUrl</span><span class="o">(),</span>
+                <span class="s">"datasources.default.username"</span><span class="o">,</span> <span class="n">postgres</span><span class="o">.</span><span class="na">getUsername</span><span class="o">(),</span>
+                <span class="s">"datasources.default.password"</span><span class="o">,</span> <span class="n">postgres</span><span class="o">.</span><span class="na">getPassword</span><span class="o">());</span>
+    <span class="o">}</span>
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>When you need dynamic properties definition, implement the <code>TestPropertyProvider</code> interface. Override the method <code>.getProperties()</code> and return the properties you want to expose to the application.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Shared containers are defined as static fields in a top level test class and have to be annotated with <code>@Container</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Start the container if it is not running yet.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Use the PostgreSQL JDBC driver and the container&#8217;s JDBC URL and credentials.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Create a test which sends a <code>POST</code> request to create a book and then a <code>PUT</code> request with the same <code>id</code> to update it:</p>
+</div>
+<div class="listingblock">
+<div class="title">src/test/java/example/micronaut/BookControllerTest.java</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="java"><span class="kn">package</span> <span class="nn">example.micronaut</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">io.micronaut.http.HttpRequest</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.HttpResponse</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.HttpStatus</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.client.BlockingHttpClient</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.client.HttpClient</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.http.client.annotation.Client</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">io.micronaut.test.extensions.junit5.annotation.MicronautTest</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.junit.jupiter.api.Test</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.junit.jupiter.api.TestInstance</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">java.util.Map</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">static</span> <span class="n">org</span><span class="o">.</span><span class="na">junit</span><span class="o">.</span><span class="na">jupiter</span><span class="o">.</span><span class="na">api</span><span class="o">.</span><span class="na">Assertions</span><span class="o">.*;</span>
+
+<span class="nd">@TestInstance</span><span class="o">(</span><span class="nc">TestInstance</span><span class="o">.</span><span class="na">Lifecycle</span><span class="o">.</span><span class="na">PER_CLASS</span><span class="o">)</span> <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="nd">@MicronautTest</span> <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="kd">class</span> <span class="nc">BookControllerTest</span> <span class="kd">extends</span> <span class="nc">AbstractTest</span> <span class="o">{</span> <i class="conum" data-value="3"></i><b>(3)</b>
+
+    <span class="nd">@Test</span>
+    <span class="kt">void</span> <span class="nf">bookUpsert</span><span class="o">(</span><span class="nc">BookRepository</span> <span class="n">repository</span><span class="o">,</span> <i class="conum" data-value="4"></i><b>(4)</b>
+                    <span class="nd">@Client</span><span class="o">(</span><span class="s">"/"</span><span class="o">)</span> <span class="nc">HttpClient</span> <span class="n">httpClient</span><span class="o">)</span> <span class="o">{</span> <i class="conum" data-value="5"></i><b>(5)</b>
+        <span class="nc">BlockingHttpClient</span> <span class="n">client</span> <span class="o">=</span> <span class="n">httpClient</span><span class="o">.</span><span class="na">toBlocking</span><span class="o">();</span>
+        <span class="nc">String</span> <span class="n">path</span> <span class="o">=</span> <span class="s">"/books"</span><span class="o">;</span>
+        <span class="nc">String</span> <span class="n">title</span> <span class="o">=</span> <span class="s">"Netty in Action"</span><span class="o">;</span>
+        <span class="n">assertNull</span><span class="o">(</span><span class="n">repository</span><span class="o">.</span><span class="na">findByTitle</span><span class="o">(</span><span class="n">title</span><span class="o">));</span> <i class="conum" data-value="6"></i><b>(6)</b>
+        <span class="nc">HttpRequest</span><span class="o">&lt;?&gt;</span> <span class="n">postRequest</span> <span class="o">=</span> <span class="nc">HttpRequest</span><span class="o">.</span><span class="na">POST</span><span class="o">(</span><span class="n">path</span><span class="o">,</span> <span class="nc">Map</span><span class="o">.</span><span class="na">of</span><span class="o">(</span><span class="s">"id"</span><span class="o">,</span> <span class="mi">123L</span><span class="o">,</span> <span class="s">"title"</span><span class="o">,</span> <span class="n">title</span><span class="o">));</span>
+        <span class="nc">HttpResponse</span><span class="o">&lt;?&gt;</span> <span class="n">postResponse</span> <span class="o">=</span> <span class="n">assertDoesNotThrow</span><span class="o">(()</span> <span class="o">-&gt;</span> <span class="n">client</span><span class="o">.</span><span class="na">exchange</span><span class="o">(</span><span class="n">postRequest</span><span class="o">));</span>
+        <span class="n">assertEquals</span><span class="o">(</span><span class="nc">HttpStatus</span><span class="o">.</span><span class="na">CREATED</span><span class="o">,</span> <span class="n">postResponse</span><span class="o">.</span><span class="na">getStatus</span><span class="o">());</span> <i class="conum" data-value="7"></i><b>(7)</b>
+        <span class="n">assertNotNull</span><span class="o">(</span><span class="n">repository</span><span class="o">.</span><span class="na">findByTitle</span><span class="o">(</span><span class="n">title</span><span class="o">));</span>
+        <span class="n">assertNull</span><span class="o">(</span><span class="n">repository</span><span class="o">.</span><span class="na">findByTitle</span><span class="o">(</span><span class="n">title</span><span class="o">).</span><span class="na">pages</span><span class="o">());</span>
+
+        <span class="nc">HttpRequest</span><span class="o">&lt;?&gt;</span> <span class="n">putRequest</span> <span class="o">=</span> <span class="nc">HttpRequest</span><span class="o">.</span><span class="na">PUT</span><span class="o">(</span><span class="n">path</span><span class="o">,</span> <span class="nc">Map</span><span class="o">.</span><span class="na">of</span><span class="o">(</span><span class="s">"id"</span><span class="o">,</span> <span class="mi">123L</span><span class="o">,</span> <span class="s">"title"</span><span class="o">,</span> <span class="n">title</span><span class="o">,</span> <span class="s">"pages"</span><span class="o">,</span> <span class="mi">265</span><span class="o">));</span>
+        <span class="nc">HttpResponse</span><span class="o">&lt;?&gt;</span> <span class="n">putResponse</span> <span class="o">=</span> <span class="n">assertDoesNotThrow</span><span class="o">(()</span> <span class="o">-&gt;</span> <span class="n">client</span><span class="o">.</span><span class="na">exchange</span><span class="o">(</span><span class="n">putRequest</span><span class="o">));</span>
+        <span class="n">assertEquals</span><span class="o">(</span><span class="nc">HttpStatus</span><span class="o">.</span><span class="na">OK</span><span class="o">,</span> <span class="n">putResponse</span><span class="o">.</span><span class="na">getStatus</span><span class="o">());</span> <i class="conum" data-value="8"></i><b>(8)</b>
+        <span class="n">assertNotNull</span><span class="o">(</span><span class="n">repository</span><span class="o">.</span><span class="na">findByTitle</span><span class="o">(</span><span class="n">title</span><span class="o">).</span><span class="na">pages</span><span class="o">());</span> <i class="conum" data-value="9"></i><b>(9)</b>
+    <span class="o">}</span>
+
+<span class="o">}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Classes that implement <code>TestPropertyProvider</code> must use this annotation to create a single class instance for all tests (not necessary in Spock tests).</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Annotate the class with <code>@MicronautTest</code> so the Micronaut framework will initialize the application context and the embedded server. <a href="https://micronaut-projects.github.io/micronaut-test/latest/guide/">More info</a>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Extend <code>AbstractTest</code> to run the test against a database started by Testcontainers.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>By default, with JUnit 5 the test method parameters will be resolved to beans if possible.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Inject the <code>HttpClient</code> bean and point it to the embedded server.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>Initially, the book does not exist.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>The first upsert inserts the book without pages.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="8"></i><b>8</b></td>
+<td>The second upsert, with the same <code>id</code>, updates the existing row instead of failing with a duplicate key error.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="9"></i><b>9</b></td>
+<td>The book now has pages.</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="testing-the-application">5. Testing the Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To run the tests:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">./mvnw <span class="nb">test</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="native-tests">6. Native Tests</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The <a href="https://graalvm.github.io/native-build-tools/latest/maven-plugin.html">Maven plugin for GraalVM Native Image building</a> allows you to <a href="https://graalvm.github.io/native-build-tools/latest/maven-plugin.html#testing-support">run native tests</a>.</p>
+</div>
+<div class="quoteblock">
+<blockquote>
+<div class="paragraph">
+<p>This plugin supports running tests on the JUnit Platform as native images. This means that tests will be compiled and executed as native code.</p>
+</div>
+</blockquote>
+</div>
+<div class="paragraph">
+<p>First, add the following profile to <code>pom.xml</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="xml"> <span class="nt">&lt;profile&gt;</span>
+      <span class="nt">&lt;id&gt;</span>native<span class="nt">&lt;/id&gt;</span>
+      <span class="nt">&lt;build&gt;</span>
+        <span class="nt">&lt;plugins&gt;</span>
+          <span class="nt">&lt;plugin&gt;</span>
+            <span class="nt">&lt;groupId&gt;</span>org.graalvm.buildtools<span class="nt">&lt;/groupId&gt;</span>
+            <span class="nt">&lt;artifactId&gt;</span>native-maven-plugin<span class="nt">&lt;/artifactId&gt;</span>
+            <span class="nt">&lt;extensions&gt;</span>true<span class="nt">&lt;/extensions&gt;</span>
+            <span class="nt">&lt;executions&gt;</span>
+              <span class="nt">&lt;execution&gt;</span>
+                <span class="nt">&lt;id&gt;</span>test-native<span class="nt">&lt;/id&gt;</span>
+                <span class="nt">&lt;goals&gt;</span>
+                  <span class="nt">&lt;goal&gt;</span>test<span class="nt">&lt;/goal&gt;</span>
+                <span class="nt">&lt;/goals&gt;</span>
+                <span class="nt">&lt;phase&gt;</span>test<span class="nt">&lt;/phase&gt;</span>
+              <span class="nt">&lt;/execution&gt;</span>
+            <span class="nt">&lt;/executions&gt;</span>
+          <span class="nt">&lt;/plugin&gt;</span>
+        <span class="nt">&lt;/plugins&gt;</span>
+      <span class="nt">&lt;/build&gt;</span>
+    <span class="nt">&lt;/profile&gt;</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then, to execute the native tests, execute:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">./mvnw <span class="nt">-Pnative</span> <span class="nb">test</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>INFO: A test may be disabled within a GraalVM native image via the <a href="https://junit.org/junit5/docs/current/user-guide/#writing-tests-conditional-execution-native@DisabledInNativeImage">@DisabledInNativeImage</a> annotation.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="next-steps">7. Next Steps</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Explore more features with <a href="https://micronaut.io/guides/">Micronaut Guides</a>.</p>
+</div>
+<div class="paragraph">
+<p>Read more about <a href="https://micronaut-projects.github.io/micronaut-data/latest/guide/#upserts">Upserts</a> in the Micronaut Data documentation, including conflict targets, batch upserts, supported dialects, and lifecycle event behavior.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="license">8. License</h2>
+<div class="sectionbody">
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+All guides are released with an <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache License 2.0</a> for the code and a <a href="https://creativecommons.org/licenses/by/4.0/deed.en">Creative Commons Attribution 4.0</a> license for the writing and media (images).
+</td>
+</tr>
+</table>
+</div>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer id="footer">
+    <div class="container">
+
+        <div class="row">
+            <div class="col-sm-5 footer-left">
+
+                <div id="text-14" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <a href="https://micronaut.io/foundation/"><img class="alignnone size-medium wp-image-3736" src="./images/micronaut_foundation_horizontal_white.svg" alt="Micronaut Foundation"/></a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-7 footer-right">
+
+                <ul class="meta">
+
+                    <li id="menu-item-2895" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2895">
+                        <a href="https://micronaut.io/brand-guidelines/">Brand Guidelines</a>
+                    </li>
+                    <li id="menu-item-2894" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2894">
+                        <a href="https://micronaut.io/community-guidelines/">Community Guidelines</a>
+                    </li>
+                    <li id="menu-item-3377" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-privacy-policy menu-item-3377">
+                        <a href="https://micronaut.io/privacy-policy/">Privacy Policy</a>
+                    </li>
+
+                </ul>
+
+                <div id="nav_menu-2" class="widget widget_nav_menu">
+                    <div class="menu-links-container">
+                        <ul id="menu-links" class="menu">
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="https://micronautpodcast.com"><i class="fa fa-podcast"><span class="sr-only">Podcast</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="https://micronaut.io/feed/rss/"><i class="fa fa-feed"><span class="sr-only">Feed</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="mailto:info@micronaut.io"><i class="fas fa-envelope"><span class="sr-only">Mail</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://twitter.com/micronautfw"><i class="fab fa-twitter"><span class="sr-only">Twitter</span></i></a></li>
+                            <li id="menu-item-6740" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-6740"><a href="https://fosstodon.org/@micronaut"><i class="fab fa-mastodon"><span class="sr-only">Mastodon</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://discord.gg/9xRFsHv98T"><i class="fab fa-discord"><span class="sr-only">Discord</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://github.com/micronaut-projects/"><i class="fab fa-github"><span class="sr-only">GitHub</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.youtube.com/@MicronautFramework"><i class="fab fa-youtube"><span class="sr-only">YouTube</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.linkedin.com/showcase/micronaut"><i class="fab fa-linkedin"><span class="sr-only">LinkedIn</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.twitch.tv/micronautfw"><i class="fab fa-twitch"><span class="sr-only">Twitch</span></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="text-5" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <small>Guides are licensed under <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> for the writing/media and <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0</a> for the code</small>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>
