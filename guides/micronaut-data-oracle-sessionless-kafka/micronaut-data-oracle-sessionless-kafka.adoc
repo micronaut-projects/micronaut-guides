@@ -7,10 +7,10 @@ The controller and consumers exchange the encoded global transaction identifier 
 common:requirements.adoc[]
 
 * Docker, for Oracle Database Free and Kafka through Micronaut Test Resources.
-* Micronaut Data 5.2.0 or later, with `OracleSessionlessTransactionPropagationOperations` and the `sessionless` attribute of `@OracleTransactional`.
+* Micronaut Data 5.2.0 or later
 * Oracle AI Database 26ai (version 23.6 or later) and a recent Oracle JDBC Thin driver exposing `startTransaction`, `suspendTransactionImmediately`, and `resumeTransaction`.
 
-See the https://docs.oracle.com/en/database/oracle/oracle-database/26/jjdbc/sessionless-transactions.html[Oracle Database sessionless transaction documentation] for database and driver requirements. This guide uses Java to focus on the JDBC transaction boundary and transport propagation API.
+See the https://docs.oracle.com/en/database/oracle/oracle-database/26/jjdbc/sessionless-transactions.html[Oracle Database sessionless transaction documentation] for database and driver requirements.
 
 common:completesolution.adoc[]
 
@@ -109,7 +109,9 @@ source:dto/PaymentRequested[]
 
 source:dto/PaymentCompleted[]
 
-The controller passes only `seatId` to the booking service and uses the payment token from the HTTP request when constructing the payment message. Kafka messages contain only the dedicated `PaymentRequested` and `PaymentCompleted` DTOs. Persistence entities are never sent to Kafka. All events use the database-generated booking ID as their Kafka key. The controller gets this ID from the saved booking before constructing the payment request. The payment request carries the server-selected price because the pending booking is not visible outside its suspended transaction. Pass the encoded transaction ID returned by Micronaut's propagation API unchanged through the Kafka messages. Micronaut uses `OracleSessionlessTransactionIdCodec` to encode and decode the Oracle Database GTRID. Applications can provide a custom codec, provided the producing and consuming applications use compatible encoding and decoding.
+The controller passes only `seatId` to the booking service and uses the payment token from the HTTP request when constructing the payment message. Kafka messages contain only the dedicated `PaymentRequested` and `PaymentCompleted` DTOs. Persistence entities are never sent to Kafka. All events use the database-generated booking ID as their Kafka key. The controller gets this ID from the saved booking before constructing the payment request. The payment request carries the server-selected price because the pending booking is not visible outside its suspended transaction.
+
+Micronaut's propagation API returns the Oracle Database GTRID as a string encoded by `OracleSessionlessTransactionIdCodec`. Include this string in the `transactionId` field of the Kafka messages so the final consumer can resume the transaction. You can customize the codec, but the receiving application must be able to decode the transaction IDs sent by the producing application.
 
 Treat the encoded GTRID as sensitive transaction-control data. Restrict access to these topics, use authenticated encrypted connections outside local development, and avoid logging it. Do not send card details in Kafka messages; the sample uses only demonstration tokens.
 
@@ -180,7 +182,7 @@ A declined booking leaves no booking row: the original insert was rolled back. A
 
 test:controller/KafkaBookingTest[]
 
-The tests interact only with the booking controller's HTTP endpoints. The application runs its payment and completion consumers internally, so HTTP polling verifies the end-to-end workflow without Kafka clients, direct service calls, or repository access in the test.
+The test submits booking requests through the HTTP API and polls the booking and seat endpoints to verify the outcome.
 
 The approval scenario submits a booking for the seeded `MN123-12A` seat, then polls until the booking is `CONFIRMED` with a payment reference and the seat is `BOOKED`.
 
@@ -217,23 +219,6 @@ curl http://localhost:8080/bookings/seats/MN123-12A
 Before completion, the booking lookup returns `404`; after completion it returns a booking with `status: CONFIRMED` and the seat is `BOOKED`.
 
 Try `MN123-12B` with `demo-decline`. After payment processing and rollback, no booking is visible and the seat remains `AVAILABLE`. The sample has no separate rejection-status endpoint. Use a different available seat for later successful requests, or recreate the disposable database to reset the demonstration.
-
-== Failure Handling Before Production
-
-Keep suspension short enough for your payment latency, Kafka backlog and outages. Oracle Database's timeout releases abandoned reservations, but a successful payment can outlive an expired transaction. Reconcile that payment and issue a refund or compensating action if booking cannot complete.
-
-[cols="2,3",options="header"]
-|===
-|Failure window |Required recovery design
-|Suspension succeeds but the payment request is not published, or the HTTP response is lost |Persist the booking ID, GTRID and workflow stage in a separate committed store, then retry publication or explicitly resume and roll back. An outbox inserted into the suspended transaction is uncommitted and cannot drive the payment step.
-|Payment succeeds but the payment result is not published |Use the booking ID as the provider's durable idempotency key, and recover the known payment outcome before publishing it again.
-|Oracle Database commits but the result offset is not committed |Recognize the committed booking before resuming. Coordinate concurrent duplicates with a durable inbox or workflow ledger; the sample's read-before-resume check only covers sequential success duplicates.
-|Payment is declined, the transaction expires, or the GTRID cannot be resumed |Persist the terminal outcome separately, reconcile with the payment provider, and route unrecoverable events to an operational recovery queue.
-|===
-
-`SYNC_PER_RECORD` is an offset policy, not a workflow recovery strategy. The sample does not install a custom Kafka error handler. Configure explicit bounded retries, dead-letter publication and monitoring for unexpected consumer failures before deploying it. A retried HTTP request can start another transaction or block on the original suspended reservation. Add a durable HTTP idempotency key and workflow lookup before replaying the reservation step. A completed or expired GTRID cannot simply be resumed again.
-
-Kafka transactions can make Kafka output records and input offsets atomic together, but do not make Oracle Database commits or payment side effects part of that transaction. For workflows with long payment delays, compare this approach with a saga that commits a durable seat hold and later confirms or compensates it.
 
 == Cleanup and Next Steps
 
