@@ -34,11 +34,38 @@ IMPORTANT: This is an Oracle Database transaction spanning workflow steps. Kafka
 
 common:create-app-features.adoc[]
 
+:exclude-for-languages:java,groovy,kotlin
+Create a GraalPy virtual environment and install pytest for the booking tests:
+
+[source,bash]
+----
+graalpy -m venv .venv
+source .venv/bin/activate
+python -m pip install pytest
+----
+
+Use compatible versions of GraalPy, the Pyronaut CLI, and the Micronaut platform.
+:exclude-for-languages:
+
 common:oracle-driver.adoc[]
+
+:exclude-for-languages:java,kotlin,python
+:exclude-for-build:gradle,pyronaut
+The Groovy Maven compiler also needs the Jakarta Persistence API on its compile classpath:
+
+dependency:jakarta.persistence-api[groupId=jakarta.persistence,scope=compileOnly]
+:exclude-for-build:
+:exclude-for-languages:
 
 == Configure Oracle Database and Kafka
 
+:exclude-for-languages:python
 resource:application.properties[tag=datasource]
+:exclude-for-languages:
+
+:exclude-for-languages:java,groovy,kotlin
+resource:application.toml[tag=datasource]
+:exclude-for-languages:
 
 Liquibase creates the tables and two demonstration seats. Schema generation is disabled so that application restarts preserve committed bookings.
 
@@ -46,11 +73,23 @@ resource:db/liquibase-changelog.xml[]
 
 resource:db/booking.sql[]
 
+:exclude-for-languages:python
 resource:application.properties[tag=kafka]
+:exclude-for-languages:
+
+:exclude-for-languages:java,groovy,kotlin
+For Python, the Kafka client and listener annotations configure these options in the source files below.
+:exclude-for-languages:
 
 The consumers start from the earliest available offset for a new group. Automatic offset commits are disabled; each listener uses `SYNC_PER_RECORD`. The producer requests acknowledgments from all in-sync replicas, and enables Kafka producer idempotence. That setting covers producer retries; it does not deduplicate repeated business operations.
 
+:exclude-for-languages:python
 resource:application.properties[tag=testresources]
+:exclude-for-languages:
+
+:exclude-for-languages:java,groovy,kotlin
+resource:application.toml[tag=testresources]
+:exclude-for-languages:
 
 Micronaut Test Resources supplies the datasource URL, username, password and `kafka.bootstrap.servers` when they are absent. The pinned Oracle Database Free image supports sessionless transactions. For your own services, set `DATASOURCES_DEFAULT_URL`, `DATASOURCES_DEFAULT_USERNAME`, `DATASOURCES_DEFAULT_PASSWORD`, and `KAFKA_BOOTSTRAP_SERVERS`; do not put credentials in source control.
 
@@ -68,7 +107,7 @@ One replica is suitable for the local demonstration. Configure replication and m
 
 == Application Packages
 
-The Java source is organized under `example.micronaut`:
+The source code is organized under `example.micronaut`:
 
 * `controller`: HTTP booking endpoints.
 * `dto`: HTTP request and response models and Kafka event payloads.
@@ -77,7 +116,7 @@ The Java source is organized under `example.micronaut`:
 * `service`: transactional booking operations and the demonstration payment gateway.
 * `kafka`: the producer client and the two consumers.
 
-The end-to-end test lives in the controller package.
+The end-to-end tests exercise the booking controller.
 
 == Entities and Repositories
 
@@ -99,7 +138,7 @@ The derived `findByIdForUpdate` method lets Micronaut Data generate a locking re
 
 source:repository/BookingRepository[]
 
-The entities are mutable Java classes with getters and setters. They are persistence objects and have no serialization annotations. The booking ID is a `Long` annotated with `@GeneratedValue` using its defaults. For Oracle Database, Micronaut Data selects sequence generation and derives the sequence name from the table name plus `_seq`, so Liquibase creates `booking_seq` for the `booking` table. A new booking has no assigned ID; the inherited `save` method inserts it and returns the entity with its generated ID. Sequence values can have gaps after rollback. New bookings use the inherited `save` method; changes to seats and bookings use the inherited `update` method. Both repositories let Micronaut Data generate their SQL.
+The persistence entities are mutable and have no serialization annotations. The booking ID uses `@GeneratedValue` with its default settings. For Oracle Database, Micronaut Data selects sequence generation and derives the sequence name from the table name plus `_seq`, so Liquibase creates `booking_seq` for the `booking` table. A new booking has no assigned ID; the inherited `save` method inserts it and returns the entity with its generated ID. Sequence values can have gaps after rollback. New bookings use the inherited `save` method; changes to seats and bookings use the inherited `update` method. Both repositories let Micronaut Data generate their SQL.
 
 == Request and Message Contracts
 
@@ -180,7 +219,17 @@ A declined booking leaves no booking row: the original insert was rolled back. A
 
 == End-to-End Tests
 
+:exclude-for-languages:python
 test:controller/KafkaBookingTest[]
+:exclude-for-languages:
+
+:exclude-for-languages:java,groovy,kotlin
+test:KafkaBookingTest[]
+
+The test configuration selects a dedicated Test Resources scope and sets the HTTP client timeout:
+
+testResource:application-test.toml[]
+:exclude-for-languages:
 
 The test submits booking requests through the HTTP API and polls the booking and seat endpoints to verify the outcome.
 
@@ -191,15 +240,27 @@ The approval scenario submits a booking for the seeded `MN123-12A` seat, then po
 <3> Poll until the replacement booking is `CONFIRMED` and its seat is `BOOKED`.
 <4> Verify the declined booking lookup returns `404`, showing that its pending insert was rolled back.
 
-An absent booking or an `AVAILABLE` seat alone would be a false positive: those are also visible while a reservation is suspended. Successfully booking the same seat again and confirming that the declined booking remains absent verifies rollback through the public API. The 30-second HTTP read timeout and two-minute test timeout are shorter than the five-minute Oracle Database suspension timeout, so transaction expiry cannot make this scenario pass.
+An absent booking or an `AVAILABLE` seat alone would be a false positive: those are also visible while a reservation is suspended. Successfully booking the same seat again and confirming that the declined booking remains absent verifies rollback through the public API. The tests use a 30-second HTTP request timeout and a 60-second polling deadline, both shorter than the five-minute Oracle Database suspension timeout, so transaction expiry cannot make this scenario pass.
 
-The test has no surrounding transaction and uses a dedicated Micronaut Test Resources scope, with its own Oracle Database and Kafka containers. Liquibase supplies the two seats, so no test setup or cleanup accesses repositories. Docker is required; the build stops the disposable Test Resources services after the tests.
+The test has no surrounding transaction and uses a dedicated Micronaut Test Resources scope, with its own Oracle Database and Kafka containers. Liquibase supplies the two demonstration seats. Docker is required; the build stops the disposable Test Resources services after the tests.
 
 common:testApp.adoc[]
 
 == Try a Booking
 
-Start the application with `./gradlew run` or `./mvnw mn:run`. Test Resources starts local Oracle Database and Kafka if external connection properties are absent.
+:exclude-for-build:maven,pyronaut
+Start the application with `./gradlew run`.
+:exclude-for-build:
+
+:exclude-for-build:gradle,pyronaut
+Start the application with `./mvnw mn:run`.
+:exclude-for-build:
+
+:exclude-for-build:gradle,maven
+Start the application with `pyronaut dev`.
+:exclude-for-build:
+
+Test Resources starts local Oracle Database and Kafka if external connection properties are absent.
 
 [source,bash]
 ----
@@ -222,6 +283,20 @@ Try `MN123-12B` with `demo-decline`. After payment processing and rollback, no b
 
 == Cleanup and Next Steps
 
-Stop the application and Test Resources services (`./gradlew stopTestResourcesService` for Gradle). The containers are disposable; no cloud resources are provisioned by this guide. Remove demonstration topics only from a broker dedicated to this example.
+Stop the application and its Test Resources services.
+
+:exclude-for-build:maven,pyronaut
+Use `./gradlew stopTestResourcesService` to stop the Gradle Test Resources service.
+:exclude-for-build:
+
+:exclude-for-build:gradle,pyronaut
+Use `./mvnw mn:stop-testresources-service` to stop the Maven Test Resources service.
+:exclude-for-build:
+
+:exclude-for-build:gradle,maven
+Pyronaut stops the Test Resources server it owns when the development or test command exits.
+:exclude-for-build:
+
+The containers are disposable; no cloud resources are provisioned by this guide. Remove demonstration topics only from a broker dedicated to this example.
 
 Read the https://micronaut-projects.github.io/micronaut-data/latest/guide/#sessionlessTransactions[Micronaut Data sessionless transaction documentation], the https://micronaut-projects.github.io/micronaut-kafka/latest/guide/[Micronaut Kafka guide], and the https://docs.oracle.com/en/database/oracle/oracle-database/26/jjdbc/sessionless-transactions.html[Oracle Database sessionless transaction documentation].
