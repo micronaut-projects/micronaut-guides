@@ -11,11 +11,6 @@ public class AzureSecretsManager extends AbstractFeature implements DistributedC
     }
 
     @Override
-    public boolean supportsPython() {
-        return true;
-    }
-
-    @Override
     public void apply(GeneratorContext generatorContext) {
         addDependencyWithoutLookup(generatorContext, "io.micronaut.azure");
     }
