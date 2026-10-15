@@ -36,7 +36,8 @@ public class FeaturesWordsMacroSubstitutionTest {
                 null,
                 null,
                 null,
-                true
+                true,
+                null
         );
 
         Guide guide = new Guide(
