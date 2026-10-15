@@ -1,0 +1,268 @@
+package io.micronaut.guides.core;
+
+import io.micronaut.starter.options.BuildTool;
+import io.micronaut.starter.options.Language;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
+import java.util.stream.Collectors;
+
+public final class GuideUtils {
+
+    private static final Logger LOG = LoggerFactory.getLogger(GuideUtils.class);
+
+    private static final String MICRONAUT_PREFIX = "micronaut-";
+    private static final String VIEWS_PREFIX = "views-";
+    private static final List<String> FEATURES_PREFIXES = List.of(MICRONAUT_PREFIX, VIEWS_PREFIX);
+    private static final String FEATURE_SPOTLESS = "spotless";
+
+    private GuideUtils() {
+    }
+
+    public static void normalizeMavenSpockTestIncludes(Path projectDirectory) throws IOException {
+        Path pom = projectDirectory.resolve("pom.xml");
+        String original = Files.readString(pom);
+        // Surefire 3.6 also uses include patterns as class-name filters. It
+        // normalizes .java suffixes, while wildcard extensions exclude classes.
+        String normalized = original
+                .replace("<include>**/*Spec.*</include>", "<include>**/*Spec.java</include>")
+                .replace("<include>**/*Test.*</include>", "<include>**/*Test.java</include>");
+        if (!original.equals(normalized)) {
+            Files.writeString(pom, normalized);
+        }
+    }
+
+
+    public static List<String> getTags(Guide guide) {
+        Set<String> tagsList = new HashSet<>();
+        if (guide.tags() != null) {
+            addAllSafe(tagsList, guide.tags());
+        }
+        for (App app : guide.apps()) {
+            List<String> allFeatures = new ArrayList<>();
+            addAllSafe(allFeatures, app.features());
+            addAllSafe(allFeatures, app.jvmFeatures());
+            addAllSafe(allFeatures, app.javaFeatures());
+            addAllSafe(allFeatures, app.kotlinFeatures());
+            addAllSafe(allFeatures, app.groovyFeatures());
+            addAllSafe(allFeatures, app.pythonFeatures());
+            for (String featureName : allFeatures) {
+                String tagToAdd = featureName;
+                for (String prefix : FEATURES_PREFIXES) {
+                    if (tagToAdd.startsWith(prefix)) {
+                        tagToAdd = tagToAdd.substring(prefix.length());
+                    }
+                }
+                tagsList.add(tagToAdd);
+            }
+        }
+        Set<String> categoriesAsTags = guide.categories().stream().map(String::toLowerCase).map(s -> s.replace(" ", "-")).collect(Collectors.toSet());
+        tagsList.addAll(categoriesAsTags);
+        return new ArrayList<>(tagsList);
+    }
+
+    public static List<String> getAppFeatures(App app, Language language) {
+        if (language == Language.JAVA) {
+            return mergeLists(app.features(), getAppInvisibleFeatures(app), app.jvmFeatures(), app.javaFeatures());
+        }
+        if (language == Language.KOTLIN) {
+            return mergeLists(app.features(), getAppInvisibleFeatures(app), app.jvmFeatures(), app.kotlinFeatures());
+        }
+        if (language == Language.GROOVY) {
+            return mergeLists(app.features(), getAppInvisibleFeatures(app), app.jvmFeatures(), app.groovyFeatures());
+        }
+        if (language == Language.PYTHON) {
+            return mergeLists(app.features(), getAppInvisibleFeatures(app), app.pythonFeatures());
+        }
+        return mergeLists(app.features(), getAppInvisibleFeatures(app));
+    }
+
+    public static List<String> getAppInvisibleFeatures(App app) {
+        if (app.validateLicense()) {
+            List<String> result = new ArrayList<>();
+            addAllSafe(result, app.invisibleFeatures());
+            result.add(FEATURE_SPOTLESS);
+            return result;
+        }
+        return app.invisibleFeatures();
+    }
+
+    public static List<String> getAppVisibleFeatures(App app, Language language) {
+        if (language == Language.JAVA) {
+            return mergeLists(app.features(), app.jvmFeatures(), app.javaFeatures());
+        }
+        if (language == Language.KOTLIN) {
+            return mergeLists(app.features(), app.jvmFeatures(), app.kotlinFeatures());
+        }
+        if (language == Language.GROOVY) {
+            return mergeLists(app.features(), app.jvmFeatures(), app.groovyFeatures());
+        }
+        if (language == Language.PYTHON) {
+            return mergeLists(app.features(), app.pythonFeatures());
+        }
+        return app.features();
+    }
+
+    public static boolean isSupported(BuildTool buildTool, Language language) {
+        if (buildTool == BuildTool.PYRONAUT || language == Language.PYTHON) {
+            return buildTool == BuildTool.PYRONAUT && language == Language.PYTHON;
+        }
+        return !(buildTool == BuildTool.MAVEN && language == Language.KOTLIN);
+    }
+
+    public static boolean shouldSkip(Guide guide, BuildTool buildTool, Language language) {
+        if (!isSupported(buildTool, language)) {
+            return true;
+        }
+        if (BuildTool.valuesGradle().contains(buildTool)) {
+            return guide.skipGradleTests();
+        }
+        if (buildTool == BuildTool.MAVEN) {
+            return guide.skipMavenTests();
+        }
+
+        return false;
+    }
+
+    public static Set<String> getFrameworks(Guide guide) {
+        return guide.apps().stream().map(App::framework).collect(Collectors.toSet());
+    }
+
+    public static Guide merge(Guide base, Guide guide) {
+        return new Guide(
+                guide.title() == null ? base.title() : guide.title(),
+                guide.intro() == null ? base.intro() : guide.intro(),
+                mergeLists(base.authors(), guide.authors()),
+                guide.categories() == null ? base.categories() : guide.categories(),
+                guide.publicationDate(),
+                guide.minimumJavaVersion() == null ? base.minimumJavaVersion() : guide.minimumJavaVersion(),
+                guide.maximumJavaVersion() == null ? base.maximumJavaVersion() : guide.maximumJavaVersion(),
+                guide.cloud() == null ? base.cloud() : guide.cloud(),
+                base.skipGradleTests() || guide.skipGradleTests(),
+                base.skipMavenTests() || guide.skipMavenTests(),
+                guide.asciidoctor(),
+                guide.languages() == null ? base.languages() : guide.languages(),
+                mergeLists(GuideUtils.getTags(base), GuideUtils.getTags(guide)),
+                guide.buildTools() == null ? base.buildTools() : guide.buildTools(),
+                guide.testFramework() == null ? base.testFramework() : guide.testFramework(),
+                guide.zipIncludes(),
+                guide.slug(),
+                guide.publish(),
+                guide.base(),
+                guide.env() == null ? base.env() : guide.env(),
+                mergeApps(base.apps(), guide.apps())
+        );
+    }
+
+    private static List<App> mergeApps(List<App> base, List<App> guide) {
+        Map<String, App> baseApps = base.stream()
+                .collect(Collectors.toMap(App::name, app -> app));
+
+        Map<String, App> guideApps = guide.stream()
+                .collect(Collectors.toMap(App::name, app -> app));
+
+        Set<String> baseOnly = new HashSet<>(baseApps.keySet());
+        baseOnly.removeAll(guideApps.keySet());
+
+        Set<String> guideOnly = new HashSet<>(guideApps.keySet());
+        guideOnly.removeAll(baseApps.keySet());
+
+        Set<String> inBoth = new HashSet<>(baseApps.keySet());
+        inBoth.retainAll(guideApps.keySet());
+
+        List<App> merged = new ArrayList<>();
+        merged.addAll(baseOnly.stream()
+                .map(baseApps::get)
+                .toList());
+        merged.addAll(guideOnly.stream()
+                .map(guideApps::get)
+                .toList());
+
+        for (String name : inBoth) {
+            App baseApp = baseApps.get(name);
+            App guideApp = guideApps.get(name);
+            App mergedApp = new App(
+                    guideApp.name(),
+                    guideApp.packageName(),
+                    guideApp.applicationType(),
+                    guideApp.framework(),
+                    mergeLists(guideApp.features(), baseApp.features()),
+                    mergeLists(guideApp.invisibleFeatures(), baseApp.invisibleFeatures()),
+                    mergeLists(guideApp.kotlinFeatures(), baseApp.kotlinFeatures()),
+                    mergeLists(guideApp.javaFeatures(), baseApp.javaFeatures()),
+                    mergeLists(guideApp.groovyFeatures(), baseApp.groovyFeatures()),
+                    mergeLists(guideApp.jvmFeatures(), baseApp.jvmFeatures()),
+                    guideApp.testFramework(),
+                    guideApp.excludeTest(),
+                    guideApp.excludeSource(),
+                    baseApp.validateLicense(),
+                    mergeLists(guideApp.pythonFeatures(), baseApp.pythonFeatures())
+            );
+            merged.add(mergedApp);
+        }
+
+        return merged;
+    }
+
+    /**
+     * Merges multiple collections into one list.
+     *
+     * @param lists An array of Collection objects to be merged.
+     * @return A single List containing all elements from the provided Collections, excluding any null values.
+     */
+    private static List mergeLists(Collection... lists) {
+        List merged = new ArrayList<>();
+        for (Collection list : lists) {
+            if (list != null) {
+                merged.addAll(list);
+            }
+        }
+        return merged;
+    }
+
+    /**
+     * Adds all elements from the source collection to the target collection safely.
+     *
+     * @param target The collection where elements will be added.
+     * @param src    The collection whose elements are to be added to the target.
+     * @throws NullPointerException If the target collection is null.
+     */
+    private static void addAllSafe(Collection target, Collection src) {
+        if (target == null) {
+            throw new NullPointerException("Target list cannot be null");
+        }
+
+        if (src != null) {
+            target.addAll(src);
+        }
+    }
+
+    static void mergeMetadataList(List<Guide> metadatas) {
+        Map<String, Guide> metadatasByDirectory = new TreeMap<>();
+        for (Guide metadata : metadatas) {
+            metadatasByDirectory.put(metadata.slug(), metadata);
+        }
+
+        mergeMetadataMap(metadatasByDirectory);
+
+        metadatas.clear();
+        metadatas.addAll(metadatasByDirectory.values());
+    }
+
+    private static void mergeMetadataMap(Map<String, Guide> metadatasByDirectory) {
+        List<String> dirs = new ArrayList<>(metadatasByDirectory.keySet());
+
+        for (String dir : dirs) {
+            Guide metadata = metadatasByDirectory.get(dir);
+            if (metadata.base() != null) {
+                Guide base = metadatasByDirectory.get(metadata.base());
+                Guide merged = GuideUtils.merge(base, metadata);
+                metadatasByDirectory.put(dir, merged);
+            }
+        }
+    }
+}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2024 original authors
+ * Copyright 2017-2026 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ class PetResourceTest {
         assertEquals(HttpStatus.OK, response.status)
         val petNames = response.body()
         assertNotNull(petNames)
-        assertEquals(3, petNames.size)
+        assertEquals(3, petNames!!.size)
         repository.deleteAll()
     }
     

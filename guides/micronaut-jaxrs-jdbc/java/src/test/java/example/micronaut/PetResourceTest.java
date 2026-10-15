@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2024 original authors
+ * Copyright 2017-2026 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -93,7 +93,7 @@ public class PetResourceTest {
         Executable e = () -> httpClient.toBlocking()
                 .exchange(HttpRequest.GET(uri), Pet.class);
         HttpClientResponseException thrown = assertThrows(HttpClientResponseException.class, e);
-        assertEquals(HttpStatus.NOT_FOUND , thrown.getResponse().status()); // <2>
+        assertEquals(HttpStatus.NOT_FOUND , thrown.getResponse().status()); // <3>
 
         repository.deleteById(id);
     }

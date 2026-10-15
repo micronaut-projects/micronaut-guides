@@ -1,8 +1,8 @@
 package io.micronaut.guides.tasks
 
 import groovy.transform.CompileStatic
-import io.micronaut.guides.GuideMetadata
 import io.micronaut.guides.IndexGenerator
+import io.micronaut.guides.core.Guide
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
@@ -20,7 +20,7 @@ import static org.gradle.api.tasks.PathSensitivity.RELATIVE
 abstract class GuidesIndexGradleTask extends DefaultTask {
 
     @Internal
-    GuideMetadata metadata
+    Guide metadata
 
     @InputFile
     @PathSensitive(RELATIVE)
@@ -31,6 +31,9 @@ abstract class GuidesIndexGradleTask extends DefaultTask {
 
     @TaskAction
     def perform() {
-        IndexGenerator.generateGuidesIndex(template.get().asFile, outputDir.get().asFile, Collections.singletonList(metadata))
+        try(InputStream stream = this.getClass().getClassLoader().getResourceAsStream("indexgrid.html")) {
+            String indexgrid = new String(stream.readAllBytes());
+            IndexGenerator.generateGuidesIndex(template.get().asFile, outputDir.get().asFile, Collections.singletonList(metadata), indexgrid)
+        }
     }
 }

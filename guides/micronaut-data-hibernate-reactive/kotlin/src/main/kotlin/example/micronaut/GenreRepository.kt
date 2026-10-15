@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2024 original authors
+ * Copyright 2017-2026 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import jakarta.validation.constraints.NotBlank
 @Repository // <1>
 abstract class GenreRepository: ReactorPageableRepository<Genre, Long> { // <2>
 
-    open fun save(@NotBlank name: String): Mono<Genre?> {
+    open fun save(@NotBlank name: String): Mono<Genre> {
         return save(Genre(id = null, name = name))
     }
 

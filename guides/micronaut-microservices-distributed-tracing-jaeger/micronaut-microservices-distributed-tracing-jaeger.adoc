@@ -2,7 +2,7 @@ common:header-top.adoc[]
 
 == Getting Started
 
-In this guide, we will integrate https://www.jaegertracing.io[Jaeger] in a Micronaut application composed of three microservices.
+In this guide, we will integrate https://www.jaegertracing.io[Jaeger] with a Micronaut application composed of three microservices.
 
 ____
 As on-the-ground microservice practitioners are quickly realizing, the majority of operational problems that arise when moving to a distributed architecture are ultimately grounded in two areas: networking and observability. It is a much larger problem to network and debug a set of intertwined distributed services versus a single monolithic application.
@@ -20,9 +20,9 @@ To learn more about this sample application, read the guideLink:micronaut-micros
 
 * `bookcatalogue` - This returns a list of books. It uses a domain consisting of a book name and an ISBN.
 
-* `bookinventory` - This exposes an endpoint to check whether a book has sufficient stock to fulfil an order. It uses a domain consisting of a stock level and an ISBN.
+* `bookinventory` - This exposes an endpoint to check whether a book has sufficient stock to fulfill an order. It uses a domain consisting of a stock level and an ISBN.
 
-* `bookrecommendation` - This consumes previous services and exposes an endpoint, which recommends book names that are in stock.
+* `bookrecommendation` - This consumes previous services and exposes an endpoint that recommends book names that are in stock.
 
 The `bookcatalogue` service consumes endpoints exposed by the other services. The following image illustrates the application flow:
 
@@ -30,7 +30,7 @@ image::flow.svg[]
 
 A request to `bookrecommendation` (http://localhost:8080/books) triggers several requests through our microservices mesh.
 
-https://guides.micronaut.io/latest/micronaut-intellij-idea-ide-setup.html[Setup IntelliJ IDEA to develop Micronaut Applications].
+https://micronaut-projects.github.io/micronaut-guides/latest/micronaut-intellij-idea-ide-setup.html[Setup IntelliJ IDEA to develop Micronaut Applications].
 
 == Jaeger and the Micronaut Framework
 
@@ -63,11 +63,10 @@ To send tracing spans to Jaeger, the minimal configuration requires you to add t
 
 dependency:jaeger-thrift[groupId=io.jaegertracing,scope=runtimeOnly]
 
-Append to `bookcatalogue` service `application.yml` the following snippet:
+Append the following snippet to the `bookcatalogue` service `application.properties`:
 
-common:yaml-dependency.adoc[]
 
-resource:application.yml[app=bookcatalogue,tag=jaeger]
+resource:application.properties[app=bookcatalogue,tag=jaeger]
 
 <1> Trace 100% of requests.
 
@@ -75,7 +74,7 @@ In production, you will probably want to trace a smaller percentage of the reque
 
 Disable distributed tracing in tests:
 
-testResource:application-test.yml[app=bookcatalogue,tag=jaeger]
+testResource:application-test.properties[app=bookcatalogue,tag=jaeger]
 
 === Book inventory
 
@@ -87,9 +86,9 @@ To send tracing spans to Jaeger, the minimal configuration requires you to add t
 
 dependency:jaeger-thrift[groupId=io.jaegertracing,scope=runtimeOnly]
 
-Append to `bookinventory` service `application.yml` the following snippet:
+Append the following snippet to the `bookinventory` service `application.properties`:
 
-resource:application.yml[app=bookinventory,tag=jaeger]
+resource:application.properties[app=bookinventory,tag=jaeger]
 
 <1> Trace 100% of requests.
 
@@ -97,14 +96,14 @@ In production, you will probably want to trace a smaller percentage of the reque
 
 Disable distributed tracing in tests:
 
-testResource:application-test.yml[app=bookinventory,tag=jaeger]
+testResource:application-test.properties[app=bookinventory,tag=jaeger]
 
 Annotate the method with `@ContinueSpan` and the parameter with `@SpanTag`:
 
 source:BooksController[app=bookinventory]
 
-callout:continue-span[1]
-callout:span-tag[2]
+callout:continue-span[]
+callout:span-tag[]
 
 === Book recommendation
 
@@ -116,9 +115,9 @@ To send tracing spans to Jaeger, the minimal configuration requires you to add t
 
 dependency:jaeger-thrift[groupId=io.jaegertracing,scope=runtimeOnly]
 
-Append to `bookrecommendation` service `application.yml` the following snippet:
+Append the following snippet to the `bookrecommendation` service `application.properties`:
 
-resource:application.yml[app=bookrecommendation,tag=jaeger]
+resource:application.properties[app=bookrecommendation,tag=jaeger]
 
 <1> Trace 100% of requests.
 
@@ -126,7 +125,7 @@ In production, you will probably want to trace a smaller percentage of the reque
 
 Disable distributed tracing in tests:
 
-testResource:application-test.yml[app=bookrecommendation,tag=jaeger]
+testResource:application-test.properties[app=bookrecommendation,tag=jaeger]
 
 == Running the Application
 
@@ -204,7 +203,7 @@ curl http://localhost:8080/books
 
 You can then navigate to http://localhost:16686 to access the Jaeger UI.
 
-The previous request generates a traces composed by 9 spans.
+The previous request generates traces composed of 9 spans.
 
 image::jaegerui.png[]
 
@@ -215,7 +214,7 @@ In the previous image, you can see that:
 
 The `stock.isbn` tags that we configured with `@SpanTag` are present.
 
-Moreover, you can see the requests to `bookinventory` are done in parallel.
+Moreover, you can see the requests to `bookinventory` are made in parallel.
 
 == Next Steps
 
@@ -225,4 +224,3 @@ The Micronaut framework includes several annotations to give you more flexibilit
 
 Make sure to read more about https://micronaut-projects.github.io/micronaut-tracing/latest/guide/#jaeger[Tracing with Jaeger] in the Micronaut framework.
 
-common:helpWithMicronaut.adoc[]

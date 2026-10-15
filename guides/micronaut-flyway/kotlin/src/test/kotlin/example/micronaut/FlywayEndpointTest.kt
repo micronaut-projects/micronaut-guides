@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2024 original authors
+ * Copyright 2017-2026 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package example.micronaut
 
+import io.micronaut.serde.annotation.Serdeable
 import io.micronaut.core.type.Argument
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.HttpStatus.OK
@@ -46,10 +47,12 @@ class FlywayEndpointTest(@Client("/") val httpClient: HttpClient) { // <2>
         assertEquals(2, flywayReport.migrations!!.size)
     }
 
+    @Serdeable
     internal class FlywayReport {
         var migrations: List<Migration>? = null
     }
 
+    @Serdeable
     internal class Migration {
         var script: String? = null
             private set

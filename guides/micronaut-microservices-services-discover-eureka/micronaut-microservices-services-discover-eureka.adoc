@@ -12,29 +12,29 @@ common:completesolution.adoc[]
 
 Let's describe the microservices:
 
-* `bookcatalogue` - It returns a list of books. It uses a domain consisting of a book name and ISBN.
+* `bookcatalogue` - It returns a list of books. It uses a domain consisting of a book name and an ISBN.
 
-* `bookinventory` - It exposes an endpoint to check whether a book has sufficient stock to fulfil an order.  It uses a domain consisting of a stock level and ISBN.
+* `bookinventory` - It exposes an endpoint to check whether a book has sufficient stock to fulfill an order. It uses a domain consisting of a stock level and an ISBN.
 
-* `bookrecommendation` - It consumes previous services and exposes an endpoint which recommends book names which are in stock.
+* `bookrecommendation` - It consumes previous services and exposes an endpoint that recommends book names that are in stock.
 
-Initially we will hard-code the addresses where the different services are in the `bookcatalogue` service.
+Initially, we will hard-code the service addresses in the `bookcatalogue` service.
 
 image::hardcoded.svg[]
 
 As shown in the previous image, the `bookcatalogue` hardcodes references to its collaborators.
 
-In the second part of this guide we will use a discovery service.
+In the second part of this guide, we will use a discovery service.
 
 The services register when they start up:
 
 image::discovery-service-registration.svg[]
 
-When a service wants to do a request to other service, it uses the discovery service to retrieve the address.
+When a service wants to make a request to another service, it uses the discovery service to retrieve the address.
 
 image::discovery-service-flow.svg[]
 
-https://guides.micronaut.io/latest/micronaut-intellij-idea-ide-setup.html[Setup IntelliJ IDEA to develop Micronaut Applications].
+https://micronaut-projects.github.io/micronaut-guides/latest/micronaut-intellij-idea-ide-setup.html[Setup IntelliJ IDEA to develop Micronaut Applications].
 
 === Catalogue Microservice
 
@@ -51,16 +51,18 @@ If you use Micronaut Launch, select Micronaut Application as application type an
 
 The previous command creates a directory named `bookcatalogue` and a Micronaut application inside it with default package `example.micronaut`.
 
+common:diff.adoc[]
+
 diffLink:[app=bookcatalogue]
 
 Create a `BooksController` class to handle incoming HTTP requests into the `bookcatalogue` microservice:
 
 source:BooksController[app=bookcatalogue]
 
-callout:controller[number=1,arg0=/books]
+callout:controller[arg0=/books]
 <2> The `@Get` annotation maps the index method to `/books` requests that use an HTTP GET.
 
-The previous controller responds a `List<Book>`. Create the `Book` POJO:
+The previous controller responds with a `List<Book>`. Create the `Book` POJO:
 
 source:Book[app=bookcatalogue]
 
@@ -68,18 +70,17 @@ Write a test:
 
 test:BooksControllerTest[app=bookcatalogue]
 
-callout:micronaut-test[1]
-callout:http-client[2]
-callout:http-request[3]
-<4> Parse easily JSON into Java objects.
+callout:micronaut-test[]
+callout:http-client[]
+callout:http-request[]
+<4> Easily parse JSON into Java objects.
 
-Edit `application.yml`
+Edit `application.properties`
 
-common:yaml-dependency.adoc[]
 
-resource:application.yml[app=bookcatalogue,tag=mn]
+resource:application.properties[app=bookcatalogue,tag=mn]
 
-<1> Configure the application name. The name will be use by the discovery service.
+<1> Configure the application name. The name will be used by the discovery service.
 
 common:default-dev-environment-application.adoc[]
 
@@ -87,13 +88,13 @@ source:Application[app=bookcatalogue]
 
 common:default-dev-environment-application-dev-yaml.adoc[]
 
-resource:application-dev.yml[app=bookcatalogue]
+resource:application-dev.properties[app=bookcatalogue]
 
-<1> Configure the application to listen on port 8081
+<1> Configure the application to listen on port 8081.
 
-Create a file named `application-test.yml` which is used in the test environment:
+Create a file named `application-test.properties` which is used in the test environment:
 
-testResource:application-test.yml[app=bookcatalogue]
+testResource:application-test.properties[app=bookcatalogue]
 
 Run the unit test:
 
@@ -132,13 +133,15 @@ If you use Micronaut Launch, select Micronaut Application as application type an
 
 The previous command creates a directory named `bookinventory` and a Micronaut application inside it with default package `example.micronaut`.
 
+common:diff.adoc[]
+
 diffLink:[app=bookinventory]
 
 Create a Controller:
 
 source:BooksController[app=bookinventory]
 
-callout:controller[number=1,arg0=/books]
+callout:controller[arg0=/books]
 <2> By default a controller response uses `application/json` as `Content-Type`. We are returning a String, not a JSON object. Because of that, we set it to `text/plain`.
 <3> The `@Get` annotation maps the index method to `/books/stock/{isbn}` requests that use an HTTP GET.
 
@@ -150,9 +153,9 @@ Write a test:
 
 test:BooksControllerTest[app=bookinventory]
 
-Edit `application.yml`
+Edit `application.properties`
 
-resource:application.yml[app=bookinventory,tag=mn]
+resource:application.properties[app=bookinventory,tag=mn]
 
 <1> Configure the application name. The name will be used later in the guide.
 
@@ -162,13 +165,13 @@ source:Application[app=bookinventory]
 
 common:default-dev-environment-application-dev-yaml.adoc[]
 
-resource:application-dev.yml[app=bookinventory]
+resource:application-dev.properties[app=bookinventory]
 
-<1> Configure the application to listen on port 8082
+<1> Configure the application to listen on port 8082.
 
-Create a file named `application-test.yml` which is used in the test environment:
+Create a file named `application-test.properties` which is used in the test environment:
 
-testResource:application-test.yml[app=bookinventory]
+testResource:application-test.properties[app=bookinventory]
 
 Run the unit test:
 
@@ -207,15 +210,17 @@ If you use Micronaut Launch, select Micronaut Application as application type an
 
 The previous command creates a directory named `bookrecommendation` and a Micronaut application inside it with default package `example.micronaut`.
 
+common:diff.adoc[]
+
 diffLink:[app=bookrecommendation]
 
 Create an interface to map operations with `bookcatalogue`, and a Micronaut Declarative HTTP Client to consume it.
 
 source:BookCatalogueOperations[app=bookrecommendation]
 
-source:BookCatalogueClient[app=bookrecommendation,tags=package|imports|harcoded|clazz]
+source:BookCatalogueClient[app=bookrecommendation,tags=package|imports|hardcoded|clazz]
 
-callout:client[1]
+callout:client[]
 
 The client returns a POJO. Create it in the `bookrecommendation`:
 
@@ -225,15 +230,15 @@ Create an interface to map operations with `bookinventory`, and a Micronaut Decl
 
 source:BookInventoryOperations[app=bookrecommendation]
 
-source:BookInventoryClient[app=bookrecommendation,tags=package|imports|harcoded|clazz]
+source:BookInventoryClient[app=bookrecommendation,tags=package|imports|hardcoded|clazz]
 
-callout:client[1]
+callout:client[]
 
 Create a Controller which injects both clients.
 
 source:BookController[app=bookrecommendation]
 
-callout:controller[number=1,arg0=/books]
+callout:controller[arg0=/books]
 <2> Constructor injection
 <3> The `@Get` annotation maps the index method to `/books` requests that use an HTTP GET.
 
@@ -243,16 +248,16 @@ source:BookRecommendation[app=bookrecommendation]
 
 `BookCatalogueClient` and `BookInventoryClient` will fail to consume the `bookcatalogue` and `bookinventory` during the tests phase.
 
-Using the https://docs.micronaut.io/latest/guide/#clientFallback[@Fallback] annotation you can declare a fallback implementation of a client that will be picked up and used once all possible retries have been exhausted
+Using the https://docs.micronaut.io/latest/guide/#clientFallback[@Fallback] annotation, you can declare a fallback implementation of a client that will be picked up and used once all possible retries have been exhausted.
 
 Create `@Fallback` alternatives in the `test` classpath.
 
 test:BookInventoryClientStub[app=bookrecommendation]
 
-<1> Make this fallback class to be effective only when the Micronaut environment __TEST__ is active
-<2> Here we arbitrarily decided that if everything else fails, that book's `stock` would be true
-<3> Similarly, we decided that other book's `stock` method would be false
-<4> Finally, any other book will have their `stock` method return an empty value
+<1> Make this fallback class effective only when the Micronaut environment __TEST__ is active.
+<2> Here we arbitrarily decide that if everything else fails, that book's `stock` would be true.
+<3> Similarly, we decide that the other book's `stock` method would be false.
+<4> Finally, any other book will have its `stock` method return an empty value.
 
 test:BookCatalogueClientStub[app=bookrecommendation]
 
@@ -260,9 +265,9 @@ Write a test:
 
 test:BookControllerTest[app=bookrecommendation]
 
-Edit `application.yml`
+Edit `application.properties`
 
-resource:application.yml[app=bookrecommendation,tag=mn]
+resource:application.properties[app=bookrecommendation,tag=mn]
 
 <1> Configure the application name. The name will be used later in the guide.
 
@@ -272,13 +277,13 @@ source:Application[app=bookrecommendation]
 
 common:default-dev-environment-application-dev-yaml.adoc[]
 
-resource:application-dev.yml[app=bookrecommendation]
+resource:application-dev.properties[app=bookrecommendation]
 
 <1> Configure the application to listen on port 8080
 
-Create a file named `application-test.yml` which is used in the test environment:
+Create a file named `application-test.properties` which is used in the test environment:
 
-testResource:application-test.yml[app=bookrecommendation]
+testResource:application-test.properties[app=bookrecommendation]
 
 Run the unit test:
 
@@ -415,25 +420,25 @@ To bring up Eureka server using Spring-Cloud-Netflix:
 
 === Book Catalogue
 
-Append to `bookcatalogue` service `application.yml` the following snippet:
+Append to `bookcatalogue` service `application.properties` the following snippet:
 
-resource:application.yml[app=bookcatalogue,tag=eureka]
+resource:application.properties[app=bookcatalogue,tag=eureka]
 
-Previous configuration registers a Micronaut application with Eureka with minimal configuration. Discover a more complete list of configuration options at https://micronaut-projects.github.io/micronaut-discovery-client/latest/api/io/micronaut/discovery/eureka/EurekaConfiguration.html[EurekaConfiguration].
+The previous configuration registers a Micronaut application with Eureka with minimal configuration. Discover a more complete list of configuration options at https://micronaut-projects.github.io/micronaut-discovery-client/latest/api/io/micronaut/discovery/eureka/EurekaConfiguration.html[EurekaConfiguration].
 
 === Book Inventory
 
-Append to `bookinventory`.`application.yml` the following snippet:
+Append the following snippet to the `bookinventory` service `application.properties`:
 
-resource:application.yml[app=bookinventory,tag=eureka]
+resource:application.properties[app=bookinventory,tag=eureka]
 
 === Book Recommendation
 
-Append to `bookrecommendation`.`application.yml` the following snippet:
+Append the following snippet to the `bookrecommendation` service `application.properties`:
 
-resource:application.yml[app=bookrecommendation,tag=eureka]
+resource:application.properties[app=bookrecommendation,tag=eureka]
 
-Modify `BookInventoryClient` and `BookCatalogueClient` to use the service id instead of a hardcoded URL.
+Modify `BookInventoryClient` and `BookCatalogueClient` to use the service id instead of a hard-coded URL.
 
 source:BookCatalogueClient[app=bookrecommendation,tags=package|imports|eureka|clazz]
 
@@ -564,8 +569,7 @@ Start the native executables for the three microservices and run the same `curl`
 
 :exclude-for-languages:
 
-== Next steps
+== Next Steps
 
 Read more about https://docs.micronaut.io/latest/guide/#serviceDiscoveryEureka[Eureka Support] in the Micronaut framework.
 
-common:helpWithMicronaut.adoc[]

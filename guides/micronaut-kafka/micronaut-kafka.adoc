@@ -8,7 +8,7 @@ To complete this guide, you will need the following:
 
 * Some time on your hands
 * A decent text editor or IDE
-* JDK 1.8 or greater installed with `JAVA_HOME` configured appropriately
+* JDK 25 or greater installed with `JAVA_HOME` configured appropriately
 * https://www.docker.io/gettingstarted/#h_installation[Docker] and https://docs.docker.com/compose/install/[Docker Compose] installed if you will be running Kafka in Docker, and for running tests.
 
 common:completesolution.adoc[]
@@ -21,7 +21,7 @@ Let's describe the microservices you will build through the guide.
 
 * `analytics` - It connects to Kafka to update the analytics for every book (a counter). It also exposes an endpoint to get the analytics.
 
-https://guides.micronaut.io/latest/micronaut-intellij-idea-ide-setup.html[Setup IntelliJ IDEA to develop Micronaut Applications].
+https://micronaut-projects.github.io/micronaut-guides/latest/micronaut-intellij-idea-ide-setup.html[Setup IntelliJ IDEA to develop Micronaut Applications].
 
 === Books Microservice
 
@@ -56,10 +56,10 @@ Create a `BookController` class to handle incoming HTTP requests to the `books` 
 
 source:BookController[app=books]
 
-<1> The @api@/io/micronaut/http/annotation/Controller.html[@Controller] annotation defines the class as a controller mapped to the root URI `/books`
-callout:constructor-di[number=2,arg0=BookService]
-callout:get[number=3,arg0=listAll,arg1=/books]
-callout:get[number=4,arg0=findBook,arg1=/books/{isbn}]
+<.> The @api@/io/micronaut/http/annotation/Controller.html[@Controller] annotation defines the class as a controller mapped to the root URI `/books`
+callout:constructor-di[arg0=BookService]
+callout:get[arg0=listAll,arg1=/books]
+callout:get[arg0=findBook,arg1=/books/{isbn}]
 
 === Analytics Microservice
 
@@ -135,7 +135,7 @@ source:Application[app=analytics]
 
 common:default-dev-environment-application-dev-yaml.adoc[]
 
-resource:application-dev.yml[app=analytics]
+resource:application-dev.properties[app=analytics]
 
 <1> Start the `analytics` microservice on port 8081
 
@@ -270,28 +270,28 @@ source:AnalyticsClient[app=books]
 
 ==== Create Tests
 
-We could use mocks to test the message sending logic between `BookController`, `AnalyticsFilter`, and `AnalyticsClient`, but it's more realistic to use a running Kafka broker this is why <<test-resources,Test Resources>> are used to run Kafka inside a Docker container.
+We could use mocks to test the message sending logic between `BookController`, `AnalyticsFilter`, and `AnalyticsClient`, but it's more realistic to use a running Kafka broker. This is why <<test-resources,Test Resources>> are used to run Kafka inside a Docker container.
 
 Write a test for `BookController` to verify the interaction with `AnalyticsService`:
 
 test:BookControllerTest[app=books]
 
-callout:test-instance-per-class[1]
-<2> Dependency injection for the `AnalyticsListener` class declared below, a Kafka listener class that replicates the functionality of the class of the same name in the `analytics` microservice
-<3> Dependency injection for an HTTP client that the Micronaut framework will implement at compile to make calls to `BookController`
+callout:test-instance-per-class[]
+<.> Dependency injection for the `AnalyticsListener` class declared below, a Kafka listener class that replicates the functionality of the class of the same name in the `analytics` microservice
+<.> Dependency injection for an HTTP client that the Micronaut framework will implement at compile time to make calls to `BookController`
 :exclude-for-languages:java,groovy
-callout:atfield[4]
-callout:lateinit[5]
-<6> Use the `HttpClient` to retrieve a `Book`, which will trigger sending a message with Kafka
-<7> Wait a few seconds for the message to arrive; it should happen very quickly, but the message will be sent on a separate thread
-<8> Verify that the message was received and has the correct data
-<9> Wait a few seconds to make sure no message is sent
+callout:atfield[]
+callout:lateinit[]
+<.> Use the `HttpClient` to retrieve a `Book`, which will trigger sending a message with Kafka
+<.> Wait a few seconds for the message to arrive; it should happen very quickly, but the message will be sent on a separate thread
+<.> Verify that the message was received and has the correct data
+<.> Wait a few seconds to make sure no message is sent
 :exclude-for-languages:
 :exclude-for-languages:kotlin
-<4> Use the `HttpClient` to retrieve a `Book`, which will trigger sending a message with Kafka
-<5> Wait a few seconds for the message to arrive; it should happen very quickly, but the message will be sent on a separate thread
-<6> Verify that the message was received and has the correct data
-<7> Wait a few seconds to make sure no message is sent
+<.> Use the `HttpClient` to retrieve a `Book`, which will trigger sending a message with Kafka
+<.> Wait a few seconds for the message to arrive; it should happen very quickly, but the message will be sent on a separate thread
+<.> Verify that the message was received and has the correct data
+<.> Wait a few seconds to make sure no message is sent
 :exclude-for-languages:
 
 ==== Send Analytics information automatically
@@ -426,7 +426,7 @@ Start the native executables for the two microservices and run the same `curl` r
 
 :exclude-for-languages:
 
-== Next steps
+== Next Steps
 
 Read more about https://micronaut-projects.github.io/micronaut-kafka/latest/guide/[Kafka support] in Micronaut framework.
 

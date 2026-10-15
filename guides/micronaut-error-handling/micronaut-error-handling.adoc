@@ -28,11 +28,11 @@ Create a `NotFoundController`:
 
 source:NotFoundController[]
 
-callout:controller[number=1,arg0=/notfound]
-<2> Inject an available https://micronaut-projects.github.io/micronaut-views/latest/api/[ViewRenderer] bean to render an HTML view.
-<3> The Error declares which `HttpStatus` error code to handle (in this case 404). We declare the method as a global error handler due to `global = true`.
-<4> If the request `Accept` HTTP Header contains `text/html`, we respond an HTML View.
-<5> By default, we respond JSON.
+callout:controller[arg0=/notfound]
+<.> Inject an available https://micronaut-projects.github.io/micronaut-views/latest/api/[ViewRenderer] bean to render an HTML view.
+<.> The Error declares which `HttpStatus` error code to handle (in this case 404). We declare the method as a global error handler due to `global = true`.
+<.> If the request `Accept` HTTP header contains `text/html`, we respond with an HTML view.
+<.> By default, we respond JSON.
 
 === Local @Error
 
@@ -50,26 +50,26 @@ Create a controller to map the form submission:
 
 source:BookController[tags=package|imports|clazz|create|save|createModelWithBlankValues|endOfFile]
 
-callout:controller[number=1,arg0=/books]
-<2> Use `@View` annotation to indicate the view name which should be used to render a view for the route.
-<3> You can specify the HTTP verb that a controller action responds to. To respond to a GET request, use the `io.micronaut.http.annotation.Get` annotation.
-<4> `@Consumes` annotation takes a `String[]` of supported media types for an incoming request.
-<5> The `@Post` annotation maps the index method to all requests that use an HTTP POST
-<6> Add `@Valid` to any method parameter which requires validation. We use a POJO to encapsulate the form submission.
+callout:controller[arg0=/books]
+<.> Use `@View` annotation to indicate the view name which should be used to render a view for the route.
+<.> You can specify the HTTP verb that a controller action responds to. To respond to a GET request, use the `io.micronaut.http.annotation.Get` annotation.
+<.> `@Consumes` annotation takes a `String[]` of supported media types for an incoming request.
+<.> The `@Post` annotation maps the index method to all requests that use an HTTP POST
+<.> Add `@Valid` to any method parameter which requires validation. We use a POJO to encapsulate the form submission.
 
 Create the POJO encapsulating the submission:
 
 source:CommandBookSave[]
 
-callout:serdeable[1]
-<2> `title` is required and must be not blank.
-<3> `pages` must be greater than 0.
+callout:serdeable[]
+<.> `title` is required and must not be blank.
+<.> `pages` must be greater than 0.
 
 When the form submission fails, we want to display the errors in the UI as the next image illustrates:
 
 image::createbookserrors.png[]
 
-An easy way to achieve it is to capture the `javax.validation.ConstraintViolationException` exception in a local `@Error` handler. Modify `BookController.java`:
+An easy way to achieve it is to capture the `jakarta.validation.ConstraintViolationException` exception in a local `@Error` handler. Modify `BookController.java`:
 
 [source,@lang@]
 .src/main/@lang@/example/micronaut/BookController.@languageextension@
@@ -89,9 +89,9 @@ include::{sourceDir}/micronaut-error-handling/@sourceDir@/src/main/@lang@/exampl
 }
 ----
 
-<1> Constructor injection
-callout:on-error[2]
-callout:on-error-request[3]
+<.> Constructor injection
+callout:on-error[]
+callout:on-error-request[]
 
 Create a `jakarta.inject.Singleton` to encapsulate the generation of a list of messages from a `Set` of `ConstraintViolation`:
 
@@ -99,7 +99,7 @@ source:MessageSource[]
 
 == ExceptionHandler
 
-Another mechanism to handle global exception is to use a `ExceptionHandler`.
+Another mechanism to handle a global exception is to use an `ExceptionHandler`.
 
 Modify the controller and add a method to throw an exception:
 
@@ -114,18 +114,18 @@ include::{sourceDir}/micronaut-error-handling/@sourceDir@/src/main/@lang@/exampl
 }
 ----
 
-callout:controller[number=1,arg0=/books]
+callout:controller[arg0=/books]
 
 source:OutOfStockException[]
 
-Implement a ExceptionHandler; a generic hook for handling exceptions that occurs during the execution of an HTTP request.
+Implement an `ExceptionHandler`, a generic hook for handling exceptions that occur during the execution of an HTTP request.
 
 source:OutOfStockExceptionHandler[]
 
-callout:singleton[1]
-<2> This bean loads if `OutOfStockException`, `ExceptionHandler` are available.
-<3> Specify the `Throwable` to handle.
-<4> Return 200 OK with a body of 0; no stock.
+callout:singleton[]
+<.> This bean loads if `OutOfStockException`, `ExceptionHandler` are available.
+<.> Specify the `Throwable` to handle.
+<.> Return 200 OK with a body of 0; no stock.
 
 common:graal-with-plugins.adoc[]
 
@@ -137,7 +137,7 @@ After you run the native executable, execute a curl request:
 curl -H 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8' localhost:8080/foo
 ----
 
-You should get successful response.
+You should get a successful response.
 
 [source, bash]
 ----
@@ -156,4 +156,3 @@ You should get successful response.
 
 common:next.adoc[]
 
-common:helpWithMicronaut.adoc[]

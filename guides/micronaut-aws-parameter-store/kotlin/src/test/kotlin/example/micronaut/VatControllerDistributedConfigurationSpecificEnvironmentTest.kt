@@ -1,0 +1,91 @@
+/*
+ * Copyright 2017-2026 original authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package example.micronaut
+
+import io.floci.testcontainers.FlociContainer
+import io.micronaut.context.annotation.Property
+import io.micronaut.context.env.Environment
+import io.micronaut.core.util.StringUtils
+import io.micronaut.http.client.HttpClient
+import io.micronaut.http.client.annotation.Client
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest
+import io.micronaut.test.support.TestPropertyProvider
+import jakarta.inject.Inject
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.testcontainers.utility.DockerImageName
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider
+import software.amazon.awssdk.regions.Region
+import software.amazon.awssdk.services.ssm.SsmClient
+import software.amazon.awssdk.services.ssm.model.ParameterType
+import software.amazon.awssdk.services.ssm.model.PutParameterRequest
+import java.net.URI
+
+@MicronautTest(environments = [Environment.AMAZON_EC2, "ch"])
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Property(name = "aws.distributed-configuration.search-active-environments", value = StringUtils.TRUE)
+class VatControllerDistributedConfigurationSpecificEnvironmentTest : TestPropertyProvider {
+
+    @Inject
+    @field:Client("/")
+    lateinit var httpClient: HttpClient
+
+    override fun getProperties(): MutableMap<String, String> {
+        if (!floci.isRunning) {
+            floci.start()
+        }
+        SsmClient.builder()
+            .endpointOverride(URI.create(floci.endpoint))
+            .credentialsProvider(
+                StaticCredentialsProvider.create(
+                    AwsBasicCredentials.create(floci.accessKey, floci.secretKey)
+                )
+            )
+            .region(Region.of(floci.region))
+            .build()
+            .use { ssmClient ->
+                ssmClient.putParameter(putParameterRequest("/config/micronautguide/vat/country", "Spain"))
+                ssmClient.putParameter(putParameterRequest("/config/micronautguide/vat/rate", "21"))
+                ssmClient.putParameter(putParameterRequest("/config/micronautguide_ch/vat/country", "Switzerland"))
+                ssmClient.putParameter(putParameterRequest("/config/micronautguide_ch/vat/rate", "7.7"))
+            }
+        return mapOf(
+            "aws.access-key-id" to floci.accessKey,
+            "aws.secret-key" to floci.secretKey,
+            "aws.region" to floci.region,
+            "aws.services.ssm.endpoint-override" to floci.endpoint
+        ).toMutableMap()
+    }
+
+    private fun putParameterRequest(name: String, value: String): PutParameterRequest {
+        return PutParameterRequest.builder()
+            .name(name)
+            .type(ParameterType.STRING)
+            .value(value)
+            .build()
+    }
+
+    @Test
+    fun vatExposesTheValueAddedTaxRate() {
+        assertEquals("{\"rate\":7.7}", httpClient.toBlocking().retrieve("/vat"))
+    }
+
+    companion object {
+        private val floci: FlociContainer = FlociContainer(DockerImageName.parse("floci/floci:1.5.18"))
+    }
+}

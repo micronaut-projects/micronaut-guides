@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2024 original authors
+ * Copyright 2017-2026 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@ import jakarta.validation.constraints.NotBlank
 interface GenreRepository {
     fun findById(id: Long): Publisher<Genre?>
     fun save(name: String): Publisher<Genre>
-    fun saveWithException(@NotBlank name: String): Publisher<Genre?>
+    fun saveWithException(@NotBlank name: String): Publisher<Genre>
     fun deleteById(id: Long)
-    fun findAll(args: SortingAndOrderArguments): Publisher<Genre?>
-    fun update(id: Long, @NotBlank name: String?): Publisher<Int?>
+    fun findAll(args: SortingAndOrderArguments): Publisher<Genre>
+    fun update(id: Long, @NotBlank name: String): Publisher<Int>
 }

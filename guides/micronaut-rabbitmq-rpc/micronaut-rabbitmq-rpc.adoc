@@ -25,7 +25,7 @@ Let's describe the microservices you will build through the guide.
 
 * `bookrecommendation` - This consumes previous services and exposes an endpoint that recommends book names that are in stock.
 
-https://guides.micronaut.io/latest/micronaut-intellij-idea-ide-setup.html[Setup IntelliJ IDEA to develop Micronaut Applications].
+https://micronaut-projects.github.io/micronaut-guides/latest/micronaut-intellij-idea-ide-setup.html[Setup IntelliJ IDEA to develop Micronaut Applications].
 
 common:test-resources-rabbitmq.adoc[]
 
@@ -43,6 +43,8 @@ common:build-lang-arguments.adoc[]
 If you use Micronaut Launch, select Micronaut Application as application type and add the `rabbitmq` and `graalvm` features.
 
 The previous command creates a directory named `bookcatalogue` and a Micronaut application inside it with default package `example.micronaut`.
+
+common:diff.adoc[]
 
 diffLink:[app=bookcatalogue]
 
@@ -94,13 +96,15 @@ If you use Micronaut Launch, select Micronaut Application as application type an
 
 The previous command creates a directory named `bookinventory` and a Micronaut application inside it with default package `example.micronaut`.
 
+common:diff.adoc[]
+
 diffLink:[app=bookinventory]
 
 The previous command creates a directory named `bookinventory` and a Micronaut application inside it with default package `example.micronaut`.
 
 ==== Create RabbitMQ exchange, queue and binding
 
-Copy the `ChannelPoolListener` class you created in the `bookcatalogue` microservice to `bookinventory/src/main/@lang@/example/micronaut/bookcatalogue`.
+Copy the `ChannelPoolListener` class you created in the `bookcatalogue` microservice to `bookinventory/src/main/@lang@/example/micronaut/bookinventory`.
 
 ==== Create consumer
 
@@ -130,11 +134,13 @@ If you use Micronaut Launch, select Micronaut Application as application type an
 
 The previous command creates a directory named `bookrecommendation` and a Micronaut application inside it with default package `example.micronaut`.
 
+common:diff.adoc[]
+
 diffLink:[app=bookrecommendation]
 
 ==== Create RabbitMQ exchange, queue and binding
 
-Copy the `ChannelPoolListener` class you created in the `bookcatalogue` microservice to `bookrecommendation/src/main/java/example/micronaut/bookcatalogue`.
+Copy the `ChannelPoolListener` class you created in the `bookcatalogue` microservice to `bookrecommendation/src/main/@lang@/example/micronaut/bookrecommendation`.
 
 ==== Create clients
 
@@ -169,9 +175,9 @@ Create a Controller that injects both clients.
 
 source:BookController[app=bookrecommendation]
 
-callout:controller[number=1,arg0=/books]
-<2> Clients are injected via constructor injection
-callout:get[number=3,arg0=index,arg1=/books]
+callout:controller[arg0=/books]
+<.> Clients are injected via constructor injection
+callout:get[arg0=index,arg1=/books]
 
 The previous controller returns a `Publisher<BookRecommendation>`. Create the `BookRecommendation` POJO:
 
@@ -179,7 +185,7 @@ source:BookRecommendation[app=bookrecommendation]
 
 == RabbitMQ and the Micronaut Framework
 
-As <<Test Resources,mentioned above>> a shared dockerized instance of RabbitMQ will be started automatically when you run the application, however if you want to start your own instance of RabbitMQ, you have a few options:
+As <<test-resources,mentioned above>>, a shared dockerized instance of RabbitMQ will be started automatically when you run the application. If you want to start your own instance of RabbitMQ, you have a few options:
 
 === Install RabbitMQ via Docker
 
@@ -201,9 +207,8 @@ Alternatively you can https://www.rabbitmq.com/download.html[install and run a l
 
 Configure `bookinventory` to run on port 8082:
 
-common:yaml-dependency.adoc[]
 
-resource:application.yml[app=bookinventory,tag=port]
+resource:application.properties[app=bookinventory,tag=port]
 
 Run `bookinventory` microservice:
 
@@ -239,7 +244,7 @@ Run `bookinventory` microservice:
 
 Configure `bookcatalogue` to run on port 8081:
 
-resource:application.yml[app=bookcatalogue,tag=port]
+resource:application.properties[app=bookcatalogue,tag=port]
 
 Run `bookcatalogue` microservice:
 
@@ -275,7 +280,7 @@ Run `bookcatalogue` microservice:
 
 Configure `bookrecommendation` to run on port 8080:
 
-resource:application.yml[app=bookrecommendation,tag=port]
+resource:application.properties[app=bookrecommendation,tag=port]
 
 NOTE: 8080 is the default port if you don't specify `micronaut.server.port` property
 
@@ -327,7 +332,7 @@ common:graal-with-plugins.adoc[]
 
 :exclude-for-languages:groovy
 
-Start the native executables for the two microservices and run the same `curl` request as before to check that everything works with GraalVM.
+Start the native executables for the three microservices and run the same `curl` request as before to check that everything works with GraalVM.
 
 :exclude-for-languages:
 

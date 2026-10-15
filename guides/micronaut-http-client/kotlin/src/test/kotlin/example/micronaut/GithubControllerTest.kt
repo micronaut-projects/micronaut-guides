@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2024 original authors
+ * Copyright 2017-2026 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,7 +62,7 @@ class GithubControllerTest {
         assertEquals(HttpStatus.OK, rsp.status)   // <6>
         val releases = rsp.body()
         assertNotNull(releases)
-        assertReleases(releases.toList()) // <7>
+        assertReleases(releases!!.toList()) // <7>
     }
 
     fun assertReleases(releases: List<GithubRelease>) {
@@ -78,7 +78,7 @@ class GithubControllerTest {
         @Produces("application/vnd.github.v3+json")
         @Get("/repos/micronaut-projects/micronaut-core/releases")
         fun coreReleases() : String {
-            return resourceLoader.getResource("releases.json").orElseThrow().readText() // <3>
+            return resourceLoader.getResource("single-release.json").orElseThrow().readText() // <3>
         }
     }
 

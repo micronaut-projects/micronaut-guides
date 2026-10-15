@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2024 original authors
+ * Copyright 2017-2026 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ package example.micronaut;
 
 import io.micronaut.core.annotation.ReflectionConfig;
 
-@ReflectionConfig(
+@ReflectionConfig( // <1>
         type = StringReverser.class,
         methods = {
                 @ReflectionConfig.ReflectiveMethodConfig(name = "reverse", parameterTypes = {String.class})

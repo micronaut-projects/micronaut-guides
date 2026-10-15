@@ -1,5 +1,13 @@
 package io.micronaut.guides
 
+import io.micronaut.guides.core.DefaultGuideParser
+import io.micronaut.guides.core.DefaultJsonSchemaProvider
+import io.micronaut.guides.core.Guide
+import io.micronaut.guides.core.GuideParser
+import io.micronaut.guides.core.GuidesOption
+import io.micronaut.guides.core.JsonSchemaProvider
+import io.micronaut.json.JsonMapper
+
 import java.util.regex.Pattern
 
 class ThemeProcessor {
@@ -14,8 +22,12 @@ class ThemeProcessor {
 
         String templateText = template.text
 
-        List<GuideMetadata> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
-        for (GuideMetadata metadata : metadatas) {
+        //TODO. We should have an application context and get it from it.
+        JsonMapper jsonMapper = JsonMapper.createDefault();
+        JsonSchemaProvider jsonSchemaProvider = new DefaultJsonSchemaProvider();
+        GuideParser guideParser = new DefaultGuideParser(jsonSchemaProvider, jsonMapper);
+        List<Guide> metadatas = guideParser.parseGuidesMetadata(guidesFolder, metadataConfigName)
+        for (Guide metadata : metadatas) {
             if (!Utils.process(metadata, false)) {
                 continue
             }
@@ -48,6 +60,7 @@ class ThemeProcessor {
                     text = text.replace("@bodyclass@", 'guide')
                     text = text.replace("@toccontent@", toc)
                     text = text.replace("@content@", content)
+                    text = GuideAsciidocGenerator.postProcessText(text, guidesOption)
 
                     int index = fourthIndex(text)
                     if (index != -1) {

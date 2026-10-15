@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2024 original authors
+ * Copyright 2017-2026 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@ import io.micronaut.starter.feature.Feature;
 import io.micronaut.starter.feature.FeatureContext;
 import io.micronaut.starter.feature.build.gradle.JavaGradlePlugin;
 import io.micronaut.starter.feature.lang.LanguageFeature;
-import io.micronaut.starter.feature.springboot.template.springBootJavaApplication;
-import io.micronaut.starter.feature.springboot.template.springBootJavaApplicationTest;
+import io.micronaut.starter.rocker.feature.springboot.template.springBootJavaApplication;
+import io.micronaut.starter.rocker.feature.springboot.template.springBootJavaApplicationTest;
 import io.micronaut.starter.options.Language;
 import io.micronaut.starter.options.Options;
 import io.micronaut.starter.options.TestFramework;

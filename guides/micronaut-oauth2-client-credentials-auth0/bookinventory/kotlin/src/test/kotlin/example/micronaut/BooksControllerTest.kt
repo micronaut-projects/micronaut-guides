@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2024 original authors
+ * Copyright 2017-2026 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ class BooksControllerTest {
         val rsp = httpClient.toBlocking().exchange(
                 HttpRequest.GET<Any>("/books/stock/1491950358"), Boolean::class.java)
         assertEquals(OK, rsp.status())
-        assertTrue(rsp.body())
+        assertTrue(rsp.body() == true)
     }
 
     @Test

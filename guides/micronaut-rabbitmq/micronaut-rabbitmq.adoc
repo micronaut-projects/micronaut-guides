@@ -22,7 +22,7 @@ RabbitMQ every time a book is accessed.
 * `analytics` - It connects to RabbitMQ to update the analytics for every book (a counter). It also exposes an endpoint
 to get the analytics.
 
-https://guides.micronaut.io/latest/micronaut-intellij-idea-ide-setup.html[Setup IntelliJ IDEA to develop Micronaut Applications].
+https://micronaut-projects.github.io/micronaut-guides/latest/micronaut-intellij-idea-ide-setup.html[Setup IntelliJ IDEA to develop Micronaut Applications].
 
 === Books microservice
 
@@ -43,10 +43,10 @@ Create a `BookController` class to handle incoming HTTP requests into the `books
 
 source:BookController[app=books]
 
-callout:controller[number=1,arg0=/books]
-<2> Inject `BookService` using constructor injection.
-callout:get[number=3,arg0=listAll,arg1=/books]
-callout:get[number=4,arg0=findBook,arg1=/books/{isbn}]
+callout:controller[arg0=/books]
+<.> Inject `BookService` using constructor injection.
+callout:get[arg0=listAll,arg1=/books]
+callout:get[arg0=findBook,arg1=/books/{isbn}]
 
 The previous controller responds a `List<Book>`. Create the `Book` POJO:
 
@@ -67,7 +67,7 @@ mn @analytics:cli-command@ --features=rabbitmq,graalvm example.micronaut.analyti
 
 common:build-lang-arguments.adoc[]
 
-If you use Micronaut Launch, select Micronaut Application as application type and add the `kafka` and `graalvm` features.
+If you use Micronaut Launch, select Micronaut Application as application type and add the `rabbitmq` and `graalvm` features.
 
 To keep this guide simple there is no database persistence, and the books analytics is kept in memory in `AnalyticsService`:
 
@@ -132,7 +132,7 @@ source:Application[app=analytics]
 
 common:default-dev-environment-application-dev-yaml.adoc[]
 
-resource:application-dev.yml[app=analytics]
+resource:application-dev.properties[app=analytics]
 
 <1> Start the `analytics` microservice on port 8081.
 
@@ -234,15 +234,15 @@ Please note that getting the analytics returns an empty list because the applica
 
 === Books microservice
 
-Via <<Test Resources>> the Micronaut application will connect to a RabbitMQ instance running inside Docker so it is not necessary to add anything to `application.yml`.
+Via <<test-resources,Test Resources>>, the Micronaut application will connect to a RabbitMQ instance running inside Docker so it is not necessary to add anything to `application.properties`.
 In case you want to change the configuration, add the following:
 
-resource:application-prod.yml[app=books,tag=rabbitmq]
+resource:application-prod.properties[app=books,tag=rabbitmq]
 
 ==== Create RabbitMQ exchange, queue and binding
 
-Before being able to send and receive messages using RabbitMQ it is necessary to define the exchange, queue and binding.
-One option is create them directly in the RabbitMQ Admin UI available on port 15672.
+Before being able to send and receive messages using RabbitMQ, it is necessary to define the exchange, queue, and binding.
+One option is to create them directly in the RabbitMQ Admin UI available on port 15672.
 
 NOTE: Use `guest` for both username and password.
 
@@ -274,7 +274,7 @@ Create the `AnalyticsFilter` class:
 
 source:AnalyticsFilter[app=books]
 
-<1> Annotate the class with `@Filter` and define the ANT Matcher pattern to intercept all the calls to the desire URI.
+<1> Annotate the class with `@Filter` and define the ANT Matcher pattern to intercept all the calls to the desired URI.
 <2> The class needs to implement `HttpServerFilter`.
 <3> Constructor injection for RabbitMQ `AnalyticsClient`.
 <4> Override `doFilter` method.
@@ -301,7 +301,7 @@ implement the consumer at compile time. Create `AnalyticsListener`:
 
 source:AnalyticsListener[app=analytics]
 
-<1> Do not load this bean for the test environment. This enable us to run the tests without having a RabbitMQ instance running.
+<1> Do not load this bean for the test environment. This enables us to run the tests without having a RabbitMQ instance running.
 <2> Annotate the class with `@RabbitListener` to indicate that this bean will consume messages from RabbitMQ.
 <3> Constructor injection for `AnalyticsService`.
 <4> Annotate the method with `@Queue`. This listener will listen to messages in `analytics` queue.
@@ -358,7 +358,7 @@ Open RabbitMQ Admin UI on http://localhost:15672 and use `guest` for both userna
 
 image::rabbitmq-message.png[]
 
-Expand the "Get messages" option and get one message. You can see all the information: `exchange`, `routing key, and the
+Expand the "Get messages" option and get one message. You can see all the information: `exchange`, `routing key`, and the
 `payload` serialized to JSON:
 
 image::rabbitmq-message-detail.png[]
@@ -419,6 +419,6 @@ Start the native executables for the two microservices and run the same `curl` r
 
 :exclude-for-languages:
 
-== Next steps
+== Next Steps
 
 Read more about https://micronaut-projects.github.io/micronaut-rabbitmq/latest/guide/[RabbitMQ support] in the Micronaut framework.

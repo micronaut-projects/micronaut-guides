@@ -20,7 +20,7 @@ To learn more about this sample application, read the guideLink:micronaut-micros
 
 * `bookcatalogue` - This returns a list of books. It uses a domain consisting of a book name and an ISBN.
 
-* `bookinventory` - This exposes an endpoint to check whether a book has sufficient stock to fulfil an order. It uses a domain consisting of a stock level and an ISBN.
+* `bookinventory` - This exposes an endpoint to check whether a book has sufficient stock to fulfill an order. It uses a domain consisting of a stock level and an ISBN.
 
 * `bookrecommendation` - This consumes previous services and exposes an endpoint that recommends book names that are in stock.
 
@@ -30,7 +30,7 @@ image::flow.svg[]
 
 A request to `bookrecommendation` (http://localhost:8080/books) triggers several requests through our microservices mesh.
 
-https://guides.micronaut.io/latest/micronaut-intellij-idea-ide-setup.html[Setup IntelliJ IDEA to develop Micronaut Applications].
+https://micronaut-projects.github.io/micronaut-guides/latest/micronaut-intellij-idea-ide-setup.html[Setup IntelliJ IDEA to develop Micronaut Applications].
 
 == Zipkin and the Micronaut Framework
 
@@ -56,11 +56,10 @@ Each service adds the OpenTelemetry Zipkin exporter dependency.
 
 dependency:opentelemetry-exporter-zipkin[groupId=io.opentelemetry,scope=compile]
 
-Each service sets `zipkin` as exporter in configuration:
+Each service sets `zipkin` as the exporter in configuration:
 
-common:yaml-dependency.adoc[]
 
-resource:application.yml[app=bookcatalogue,tag=zipkin]
+resource:application.properties[app=bookcatalogue,tag=zipkin]
 
 common:opentelemetry-disable.adoc[]
 
@@ -70,8 +69,8 @@ Annotate the `BookController` method with `@ContinueSpan` and the method paramet
 
 source:BooksController[app=bookinventory]
 
-callout:continue-span[1]
-callout:span-tag[2]
+callout:continue-span[]
+callout:span-tag[]
 
 == Running the Application
 
@@ -153,7 +152,7 @@ The previous request generates a trace composed of 5 spans.
 
 image::zipkinui-opentelemetry.png[]
 
-In the previous image, you can see the requests to `bookinventory` are done in parallel.
+In the previous image, you can see the requests to `bookinventory` are made in parallel.
 
 In the previous image, you can see that:
 
@@ -181,4 +180,3 @@ Also, you have at your disposal the `@NewSpan` annotation, which will create a n
 
 Make sure to read more about https://micronaut-projects.github.io/micronaut-tracing/latest/guide/#zipkin[Tracing with Zipkin] in the Micronaut framework.
 
-common:helpWithMicronaut.adoc[]

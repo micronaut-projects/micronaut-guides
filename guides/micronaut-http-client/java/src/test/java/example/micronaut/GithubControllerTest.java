@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2024 original authors
+ * Copyright 2017-2026 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -93,7 +93,7 @@ class GithubControllerTest {
         @Produces("application/vnd.github.v3+json")
         @Get("/repos/micronaut-projects/micronaut-core/releases")
         Optional<String> coreReleases() {
-            return resourceLoader.getResourceAsStream("releases.json") // <3>
+            return resourceLoader.getResourceAsStream("single-release.json") // <3>
                     .flatMap(inputStream -> {
                         try {
                             return Optional.of(new String(inputStream.readAllBytes(), UTF_8));

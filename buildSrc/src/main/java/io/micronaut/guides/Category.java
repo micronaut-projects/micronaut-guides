@@ -3,45 +3,82 @@ package io.micronaut.guides;
 import io.micronaut.core.order.Ordered;
 
 public enum Category implements Ordered {
-    GETTING_STARTED("Getting Started", 1),
-    BEYOND_THE_BASICS("Beyond the Basics", 2),
-    DISTRIBUTION("Distribution", 3),
-    GRAALVM("GraalVM", 4),
-    CRAC("CRaC", 5),
-    SCHEMA_MIGRATION("Schema Migration", 6),
-    MICRONAUT_DATA("Micronaut Data", 7),
-    DATA_ACCESS("Data Access", 8),
-    CACHE("Cache", 9),
-    TEST("Testing", 10),
 
-    VIEWS("Views", 11),
-    SECURITY("Micronaut Security",12),
-    AUTHORIZATION_CODE("Authorization Code",13),
-    CLIENT_CREDENTIALS("Client Credentials",14),
-    SECRETS_MANAGER("Secrets Manager", 15),
-    PATTERNS("Patterns", 16),
-    EMAIL("Email", 17),
-    KOTLIN("Kotlin", 18),
-    MESSAGING("Messaging", 19),
-    API("API", 20),
-    OPEN_API("OpenAPI", 21),
-    TURBO("Turbo", 22),
-    GRAPHQL("GraphQL", 23),
-    METRICS("Metrics", 24),
-    DISTRIBUTED_TRACING("Distributed Tracing", 25),
-    SERVICE_DISCOVERY("Service Discovery", 26),
-    DISTRIBUTED_CONFIGURATION("Distributed Configuration", 27),
-    COMMON_TASKS("Common Tasks", 28),
-    OBJECT_STORAGE("Object Storage", 29),
-    AWS("AWS", 30),
-    AWS_LAMBDA("AWS Lambda", 31),
-    AZURE("Microsoft Azure", 32),
-    GCP("Google Cloud", 33),
-    GOOGLE_CLOUD_RUN("Google Cloud Run", 34),
-    ORACLE_CLOUD("Oracle Cloud", 35),
-    KUBERNETES( "Kubernetes", 36),
-    SPRING_BOOT_TO_MICRONAUT("Spring Boot to Micronaut Framework", 37),
-    BUILDING_A_REST_API("Building a REST API - Spring Boot to Micronaut Framework", 38);
+    // GETTING STARTED
+    GETTING_STARTED("Getting Started", 1),
+    CORE_BASICS("Core Basics", 2),
+    VALIDATION("Validation", 3),
+    DEVELOPMENT("Development", 4),
+    TEST("Testing", 5),
+
+    // AI
+    MCP("MCP", 6),
+
+    // BEYOND THE BASICS
+    OBJECT_STORAGE("Object Storage", 7),
+    EMAIL("Email", 8),
+    MESSAGING("Messaging", 9),
+    LOGGING("Logging", 10),
+    SCHEDULING("Scheduling", 11),
+    CACHE("Cache", 12),
+    PATTERNS("Patterns", 13),
+    INTERNATIONALIZATION("i18n", 14),
+
+    // DATA ACCESS
+    DATABASE_MODELING("Database Modeling", 15),
+    DATA_JDBC("Data JDBC", 16),
+    DATA_JPA("Data JPA", 17),
+    SCHEMA_MIGRATION("Schema Migration", 18),
+    DATA_RDBC("Data R2DBC", 19),
+    DATA_MONGO("MongoDB", 20),
+    DATA_ACCESS("Data Access", 21),
+
+    // SECURITY
+    SECURITY("Micronaut Security", 22),
+    AUTHORIZATION_CODE("Authorization Code", 23),
+    CLIENT_CREDENTIALS("Client Credentials", 24),
+    SECRETS_MANAGER("Secrets Manager", 25),
+
+    // HTTP & API
+    HTTP("HTTP Server", 26),
+    HTTP_CLIENT("HTTP Client", 27),
+    BEYOND_JSON("Beyond JSON", 28),
+    JAX_RS("JAX-RS", 29),
+    WEBSOCKETS("WebSockets", 30),
+    GRAPHQL("GraphQL", 31),
+    OPEN_API("OpenAPI", 32),
+    JSON_SCHEMA("JSON Schema", 33),
+
+    // DISTRIBUTED SYSTEMS
+    DISTRIBUTED_TRACING("Distributed Tracing", 34),
+    SERVICE_DISCOVERY("Service Discovery", 35),
+    DISTRIBUTED_CONFIGURATION("Distributed Configuration", 36),
+    METRICS("Metrics", 37),
+
+    // DISTRIBUTION
+    DISTRIBUTION("Distribution", 38),
+    REGISTRY("Registry", 39),
+    GRAALVM("GraalVM", 40),
+    CRAC("Coordinated Restore at Checkpoint", 41),
+    KUBERNETES("Kubernetes", 42),
+
+    // CLOUD
+    SERVERLESS("Serverless", 43),
+    AWS_LAMBDA("AWS Lambda", 44),
+    SCALE_TO_ZERO_CONTAINERS("Scale to Zero Containers", 45),
+
+    // SERVER-SIDE HTML
+    VIEWS("Views", 46),
+    TURBO("Turbo", 47),
+    STATIC_RESOURCES("Static Resources", 48),
+
+    // LANGUAGES
+    KOTLIN("Kotlin", 49),
+    GRAALPY("GraalPy", 50),
+
+    // FRAMEWORKS
+    SPRING("Spring Boot", 51),
+    SPRING_BOOT_TO_MICRONAUT_BUILDING_A_REST_API("Boot to Micronaut Building a REST API", 52);
 
     private final String val;
     private final int order;

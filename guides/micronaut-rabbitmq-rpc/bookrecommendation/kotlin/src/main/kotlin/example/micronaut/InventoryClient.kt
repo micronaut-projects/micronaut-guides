@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2024 original authors
+ * Copyright 2017-2026 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,5 +25,5 @@ import reactor.core.publisher.Mono
 interface InventoryClient {
 
     @Binding("books.inventory")// <3>
-    fun stock(isbn: String): Mono<Boolean?> // <4>
+    fun stock(isbn: String): Mono<Boolean> // <4>
 }

@@ -8,11 +8,11 @@ common:completesolution.adoc[]
 
 To provide authentication, sign in to your https://auth0.com[Auth0] account.
 
-Create an Application
+Create an application.
 
 image::auth0-create-application.png[]
 
-Fill the Application URIs:
+Fill the application URIs:
 
 image::auth0-application-uris.png[]
 
@@ -20,9 +20,9 @@ image::auth0-application-uris.png[]
 
 - Enter `\http://localhost:8080/logout` as allowed logout URL.
 
-- Enter `\http://localhost:8080` as allowed web origins.
+- Enter `\http://localhost:8080` as the allowed web origin.
 
-Once you have an HTTPS domain (e.g. `\https://myapp.org`), enter it as Application Login URI: `\https://myapp.org/oauth/login/auth0`.
+Once you have an HTTPS domain (for example, `\https://myapp.org`), enter it as the application login URI: `\https://myapp.org/oauth/login/auth0`.
 
 You can obtain the application's domain, client id, and secret in the Auth0 console.
 
@@ -46,20 +46,19 @@ dependency:micronaut-security-jwt[groupId=io.micronaut.security]
 
 === Configuration
 
-Add the following OAuth2 Configuration:
+Add the following OAuth 2.0 configuration:
 
-common:yaml-dependency.adoc[]
 
-resource:application.yml[tag=oauth2]
+resource:application.properties[tag=oauth2]
 
-callout:authentication-idtoken[number=1,arg0=Auth0]
-callout:oauth2-client-name[number=2,arg0=auth0]
+callout:authentication-idtoken[arg0=Auth0]
+callout:oauth2-client-name[arg0=auth0]
 <3> Client ID. See previous screenshot.
 <4> Client Secret. See previous screenshot.
 <5> `issuer` URL. It allows the Micronaut framework to https://auth0.com/docs/configure/applications/configure-applications-with-oidc-discovery[discover the configuration of the OpenID Connect server]. Note: we will use the application's domain.
 <6> Accept GET request to the `/logout` endpoint.
 
-When you start the Micronaut application, it fetches the Auth0 application's `openidconfiguration`:
+When you start the Micronaut application, it fetches the Auth0 application's `openid-configuration`:
 
 [source, bash]
 ----
@@ -68,7 +67,7 @@ https://{auth0domain}/.well-known/openid-configuration
 
 The previous configuration uses several placeholders. You will need to set up `OAUTH_CLIENT_ID`, `OAUTH_CLIENT_SECRET`, and `OAUTH_DOMAIN` environment variables.
 
-[soruce, bash]
+[source, bash]
 ----
 export OAUTH_CLIENT_ID=XXXXXXXXXX
 export OAUTH_CLIENT_SECRET=YYYYYYYYYY
@@ -83,10 +82,10 @@ Create a controller to handle the requests to `/`. You will display the email of
 
 source:HomeController[]
 
-callout:controller[number=1,arg0=/]
-callout:secured-anonymous[number=2]
-callout:view[number=3]
-callout:get[number=4,arg0=index,arg1=/]
+callout:controller[arg0=/]
+callout:secured-anonymous[]
+callout:view[]
+callout:get[arg0=index,arg1=/]
 
 === Thymeleaf template
 
@@ -107,12 +106,10 @@ common:graal-with-plugins.adoc[]
 
 :exclude-for-languages:groovy
 
-After you execute the native executable, navigate to localhost:8080 and authenticate with Auth0.
+After you execute the native executable, navigate to `localhost:8080` and authenticate with Auth0.
 
 :exclude-for-languages:
 
-== Next steps
+== Next Steps
 
 Read https://micronaut-projects.github.io/micronaut-security/latest/guide/#oauth[Micronaut OAuth 2.0 documentation] to learn more.
-
-common:helpWithMicronaut.adoc[]

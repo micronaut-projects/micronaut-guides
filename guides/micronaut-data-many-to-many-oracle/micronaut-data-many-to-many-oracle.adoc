@@ -1,0 +1,160 @@
+common:header.adoc[]
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+common:many-to-many.adoc[]
+
+common:create-app-features.adoc[]
+
+common:default-package.adoc[]
+
+common:diff.adoc[]
+
+common:micronaut-data-jdbc.adoc[]
+
+common:oracle-driver.adoc[]
+
+:exclude-for-languages:python
+
+common:datasource-configuration-oracle.adoc[]
+
+:exclude-for-languages:
+
+:only-for-languages:python
+
+=== Database Configuration
+
+And the database configuration:
+
+resource:application.toml[tag=datasource]
+
+<1> Use Oracle driver.
+<2> In order for the database to be properly detected by Micronaut Test Resources.
+<3> Configure the Oracle dialect.
+
+:only-for-languages:
+
+:exclude-for-languages:python
+
+common:liquibase.adoc[]
+
+:exclude-for-languages:
+
+:only-for-languages:python
+
+=== Database Migration with Liquibase
+
+We need a way to create the database schema. For that, we use
+https://micronaut-projects.github.io/micronaut-liquibase/latest/guide/[Micronaut integration with Liquibase].
+
+Add the following snippet to include the necessary dependencies:
+
+dependency:micronaut-liquibase[groupId=io.micronaut.liquibase]
+
+Configure the database migrations directory for http://www.liquibase.org[Liquibase] in `application.toml`.
+
+resource:application.toml[tag=liquibase]
+
+Create the following files with the database schema creation:
+
+resource:db/liquibase-changelog.xml[]
+
+:only-for-languages:
+
+resource:db/changelog/01-schema.xml[]
+
+=== Entities
+
+==== User
+
+source:UserEntity[]
+
+callout:mapped-entity[]
+callout:mapped-entity-id[]
+callout:generated-value[]
+callout:constraints[]
+
+==== Role
+
+Create a `Role` domain class to store authorities within the application.
+
+source:Role[]
+
+callout:mapped-entity[]
+callout:mapped-entity-id[]
+callout:generated-value[]
+callout:constraints[]
+
+==== UserRole
+
+Create a `UserRole` entity that stores a many-to-many relationship between `User` and `Role`.
+
+source:UserRole[]
+
+callout:mapped-entity[]
+callout:embeddedid[]
+
+source:UserRoleId[]
+
+callout:embeddable[]
+callout:relation[]
+
+=== Projection
+
+Create a `User` record that represents a user and their assigned roles.
+
+source:User[]
+
+callout:introspected[]
+
+=== JDBC Repositories
+
+Create the following JDBC repositories:
+
+==== User Repository
+
+source:UserJdbcRepository[]
+
+callout:jdbcrepository[]
+callout:crudrepository[]
+callout:at-query[]
+
+==== Role Repository
+
+source:RoleJdbcRepository[]
+
+callout:jdbcrepository[]
+callout:crudrepository[]
+
+==== UserRole Repository
+
+source:UserRoleJdbcRepository[]
+
+callout:jdbcrepository[]
+callout:crudrepository[]
+
+common:quotedomainclass.adoc[]
+
+=== Test
+
+Add a test that verifies the many-to-many relationship:
+
+test:ManyToManyTest[]
+
+callout:micronaut-test-start-application-false[]
+
+common:testApp.adoc[]
+
+If you run the test, you will see an Oracle Database container being started by https://micronaut-projects.github.io/micronaut-test-resources/latest/guide/[Micronaut Test Resources] through integration with https://testcontainers.org[Testcontainers] to provide throwaway containers for testing.
+
+common:test-resources-benefits.adoc[]
+
+:exclude-for-languages:python
+
+common:nativetest.adoc[]
+
+:exclude-for-languages:
+
+common:next.adoc[]

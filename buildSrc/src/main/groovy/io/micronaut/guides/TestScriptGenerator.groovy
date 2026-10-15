@@ -1,17 +1,27 @@
 package io.micronaut.guides
 
 import groovy.transform.CompileStatic
+import io.micronaut.guides.core.App
+import io.micronaut.guides.core.DefaultGuideParser
+import io.micronaut.guides.core.DefaultJsonSchemaProvider
+import io.micronaut.guides.core.Guide
+import io.micronaut.guides.core.GuideParser
+import io.micronaut.guides.core.GuideUtils
+import io.micronaut.guides.core.GuidesOption
+import io.micronaut.guides.core.JsonSchemaProvider
+import io.micronaut.json.JsonMapper
+
 import java.util.stream.Collectors
 import static io.micronaut.guides.GuideProjectGenerator.DEFAULT_APP_NAME
 import static io.micronaut.starter.options.BuildTool.GRADLE
 import static io.micronaut.starter.options.BuildTool.MAVEN
+import static io.micronaut.starter.options.BuildTool.PYRONAUT
 import io.micronaut.starter.api.TestFramework
 import io.micronaut.starter.options.Language
 import io.micronaut.starter.options.BuildTool
 
 @CompileStatic
 class TestScriptGenerator {
-
     public static final String GITHUB_WORKFLOW_JAVA_CI = 'Java CI'
     public static final String ENV_GITHUB_WORKFLOW = 'GITHUB_WORKFLOW'
     public static final String EMPTY_SCRIPT = '''\
@@ -44,7 +54,7 @@ exit 0
         changedFiles.any { it.contains('buildSrc') }
     }
 
-    private static boolean shouldSkip(GuideMetadata metadata,
+    private static boolean shouldSkip(Guide metadata,
                                       List<String> guidesChanged,
                                       boolean forceExecuteEveryTest) {
 
@@ -56,7 +66,7 @@ exit 0
             return false
         }
 
-        return !guidesChanged.contains(metadata.slug)
+        return !guidesChanged.contains(metadata.slug())
     }
 
     static String generateScript(File guidesFolder,
@@ -70,7 +80,11 @@ exit 0
                 (System.getenv(ENV_GITHUB_WORKFLOW) && System.getenv(ENV_GITHUB_WORKFLOW) != GITHUB_WORKFLOW_JAVA_CI) ||
                 (!changedFiles && !System.getenv(ENV_GITHUB_WORKFLOW))
 
-        List<GuideMetadata> metadatas = GuideProjectGenerator.parseGuidesMetadata(guidesFolder, metadataConfigName)
+        //TODO. We should have an application context and get it from it.
+        JsonMapper jsonMapper = JsonMapper.createDefault();
+        JsonSchemaProvider jsonSchemaProvider = new DefaultJsonSchemaProvider();
+        GuideParser guideParser = new DefaultGuideParser(jsonSchemaProvider, jsonMapper);
+        List<Guide> metadatas = guideParser.parseGuidesMetadata(guidesFolder, metadataConfigName)
         metadatas = metadatas.stream()
                 .filter(metadata -> !shouldSkip(metadata, slugsChanged, forceExecuteEveryTest))
                 .collect(Collectors.toList())
@@ -78,14 +92,22 @@ exit 0
     }
 
     static void generateTestScript(File output,
-                                   List<GuideMetadata> metadatas,
+                                   List<Guide> metadatas,
                                    boolean stopIfFailure) {
         String script = generateScript(metadatas, stopIfFailure)
         generateTestScript(output, script)
     }
 
+    static void generateTestScript(File output,
+                                   List<Guide> metadatas,
+                                   boolean stopIfFailure,
+                                   Language languageFilter) {
+        String script = generateScript(metadatas, stopIfFailure, false, languageFilter)
+        generateTestScript(output, script)
+    }
+
     static void generateNativeTestScript(File output,
-                                   List<GuideMetadata> metadatas,
+                                   List<Guide> metadatas,
                                    boolean stopIfFailure) {
         String script = generateScript(metadatas, stopIfFailure, true)
         generateTestScript(output, script, 'native-test.sh')
@@ -98,7 +120,7 @@ exit 0
         testScript.executable = true
     }
 
-    static boolean supportsNativeTest(GuideMetadata.App app, GuidesOption guidesOption) {
+    static boolean supportsNativeTest(App app, GuidesOption guidesOption) {
         isMicronautFramework(app) &&
         guidesOption.buildTool.isGradle() && // right now we don't support Maven native tests without adding a profile
         supportsNativeTest(guidesOption.language) &&
@@ -106,17 +128,18 @@ exit 0
 
     }
 
-    static boolean isMicronautFramework(GuideMetadata.App app) {
-        !app.framework || app.framework == "Micronaut"
+    static boolean isMicronautFramework(App app) {
+        !app.framework() || app.framework() == "Micronaut"
     }
 
     static boolean supportsNativeTest(Language language) {
         language != Language.GROOVY
     }
 
-    static String generateScript(List<GuideMetadata> metadatas,
+    static String generateScript(List<Guide> metadatas,
                                  boolean stopIfFailure,
-                                 boolean nativeTest = false) {
+                                 boolean nativeTest = false,
+                                 Language languageFilter = null) {
         StringBuilder bashScript = new StringBuilder('''\
 #!/usr/bin/env bash
 set -e
@@ -133,31 +156,44 @@ kill_kotlin_daemon () {
 }
 ''')
 
-        metadatas.sort { it.slug }
-        for (GuideMetadata metadata : metadatas) {
+        metadatas.sort { it.slug() }
+        for (Guide metadata : metadatas) {
             List<GuidesOption> guidesOptionList = GuideProjectGenerator.guidesOptions(metadata)
+            if (languageFilter != null) {
+                guidesOptionList = guidesOptionList.findAll { GuidesOption option -> option.language == languageFilter }
+            }
             bashScript << """\
 """
             for (GuidesOption guidesOption : guidesOptionList) {
-                String folder = GuideProjectGenerator.folderName(metadata.slug, guidesOption)
-                BuildTool buildTool = folder.contains(MAVEN.toString()) ? MAVEN : GRADLE
-                if (metadata.apps.any { it.name == DEFAULT_APP_NAME } ) {
-                    if (metadata.shouldSkip(buildTool)) {
+                String folder = GuideProjectGenerator.folderName(metadata.slug(), guidesOption)
+                BuildTool buildTool = guidesOption.getBuildTool()
+                if (buildTool == PYRONAUT && System.getenv('CI') != null) {
+                    continue
+                }
+                if (metadata.apps().any { it.name() == DEFAULT_APP_NAME } ) {
+                    if (GuideUtils.shouldSkip(metadata,buildTool, guidesOption.getLanguage())) {
                         continue
                     }
-                    def defaultApp = metadata.apps.find { it.name == DEFAULT_APP_NAME }
+                    def defaultApp = metadata.apps().find { it.name() == DEFAULT_APP_NAME }
                     if (!nativeTest || supportsNativeTest(defaultApp, guidesOption)) {
-                        def features = defaultApp.getFeatures(guidesOption.language)
-                        bashScript << scriptForFolder(folder, folder, stopIfFailure, buildTool, features.contains("kapt") && Runtime.version().feature() > 17 && buildTool == GRADLE, nativeTest, defaultApp.validateLicense)
+                        def features = GuideUtils.getAppFeatures(defaultApp,guidesOption.language)
+                        if (!folder.contains("-maven-groovy")) {
+                            bashScript << scriptForFolder(folder, folder, stopIfFailure, buildTool, features.contains("kapt") && Runtime.version().feature() > 17 && buildTool == GRADLE, nativeTest, defaultApp.validateLicense())
+                        }
                     }
                 } else {
                     bashScript << """\
 cd $folder
 """
-                    for (GuideMetadata.App app : metadata.apps) {
+                    for (App app : metadata.apps()) {
+                        if (GuideUtils.shouldSkip(metadata,buildTool, guidesOption.getLanguage())) {
+                            continue
+                        }
                         if (!nativeTest || supportsNativeTest(app, guidesOption)) {
-                            def features = app.getFeatures(guidesOption.language)
-                            bashScript << scriptForFolder(app.name, folder + '/' + app.name, stopIfFailure, buildTool, features.contains("kapt") && Runtime.version().feature() > 17 && buildTool == GRADLE, nativeTest, app.validateLicense)
+                            def features = GuideUtils.getAppFeatures(app,guidesOption.language)
+                            if (!folder.contains("-maven-groovy")) {
+                                bashScript << scriptForFolder(app.name(), folder + '/' + app.name(), stopIfFailure, buildTool, features.contains("kapt") && Runtime.version().feature() > 17 && buildTool == GRADLE, nativeTest, app.validateLicense())
+                            }
                         }
                     }
                     bashScript << """\
@@ -204,7 +240,13 @@ echo "Executing '$folder' $testcopy"
 if (noDaemon) {
     bashScript += "kill_kotlin_daemon\n"
 }
-if (nativeTest) {
+if (buildTool == PYRONAUT) {
+bashScript += """\
+pyronaut install || EXIT_STATUS=\$?
+pyronaut validate-config || EXIT_STATUS=\$?
+pyronaut test || EXIT_STATUS=\$?
+"""
+} else if (nativeTest) {
 bashScript += """\
 ${buildTool == MAVEN ? './mvnw -Pnative test' : './gradlew nativeTest'} || EXIT_STATUS=\$?
 """

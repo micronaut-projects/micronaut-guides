@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2024 original authors
+ * Copyright 2017-2026 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ import jakarta.validation.constraints.NotBlank
 open class GenreController(private val genreRepository: GenreRepository) { // <2>
 
     @Get("/{id}") // <3>
-    fun show(id: Long): Mono<Genre?> {
+    fun show(id: Long): Mono<Genre> {
         return genreRepository.findById(id) // <4>
     }
 
@@ -65,7 +65,7 @@ open class GenreController(private val genreRepository: GenreRepository) { // <2
     }
 
     @Post("/ex") // <11>
-    open fun saveExceptions(@NotBlank @Body name: String): Mono<MutableHttpResponse<Genre?>> {
+    open fun saveExceptions(@NotBlank @Body name: String): Mono<MutableHttpResponse<Genre>> {
         return genreRepository
             .saveWithException(name)
             .map { genre ->

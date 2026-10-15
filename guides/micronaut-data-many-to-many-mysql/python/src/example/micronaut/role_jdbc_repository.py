@@ -1,0 +1,13 @@
+from micronaut.data.jdbc.annotation import JdbcRepository
+from micronaut.data.repository import CrudRepository
+
+from .role import Role
+
+
+@JdbcRepository(dialect="MYSQL")  # <1>
+class RoleJdbcRepository(CrudRepository[Role, int]):  # <2>
+    def save(self, authority: str) -> Role: ...
+
+    def findByAuthority(self, authority: str) -> Role | None: ...
+
+    def deleteByAuthority(self, authority: str) -> None: ...

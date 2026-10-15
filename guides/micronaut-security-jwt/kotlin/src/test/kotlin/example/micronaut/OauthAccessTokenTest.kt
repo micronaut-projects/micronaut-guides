@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2024 original authors
+ * Copyright 2017-2026 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ internal class OauthAccessTokenTest(@Client("/") val client: HttpClient) {
 
         Thread.sleep(1000) // sleep for one second to give time for the issued at `iat` Claim to change
         val refreshResponse = client.toBlocking().retrieve(HttpRequest.POST("/oauth/access_token",
-                TokenRefreshRequest(TokenRefreshRequest.GRANT_TYPE_REFRESH_TOKEN, rsp.refreshToken)), AccessRefreshToken::class.java) // <1>
+                TokenRefreshRequest(TokenRefreshRequest.GRANT_TYPE_REFRESH_TOKEN, rsp.refreshToken!!)), AccessRefreshToken::class.java) // <1>
 
         assertNotNull(refreshResponse.accessToken)
         assertNotEquals(rsp.accessToken, refreshResponse.accessToken) // <2>

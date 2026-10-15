@@ -1,0 +1,102 @@
+package io.micronaut.guides.core;
+
+import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
+import jakarta.inject.Inject;
+import org.junit.jupiter.api.Test;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.nio.file.Files;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+@MicronautTest(startApplication = false)
+public class FilesTransferUtilityTest {
+
+    @Inject
+    FilesTransferUtility filesTransferUtility;
+
+    @Inject
+    GuideProjectGenerator guideProjectGenerator;
+
+    @Inject
+    GuideParser guideParser;
+
+    @Test
+    void testTransfer() throws Exception {
+        String outputPath = "build/tmp/test";
+        File outputDirectory = new File(outputPath);
+        outputDirectory.mkdir();
+        List<Guide> metadatas = new ArrayList<>();
+
+        String pathBase = "src/test/resources/guides/hello-base";
+        File fileBase = new File(pathBase);
+        guideParser.parseGuideMetadata(fileBase, "metadata.json").ifPresent(metadatas::add);
+        String path = "src/test/resources/guides/creating-your-first-micronaut-app";
+        File file = new File(path);
+        guideParser.parseGuideMetadata(file, "metadata.json").ifPresent(metadatas::add);
+
+        guideProjectGenerator.generate(outputDirectory, metadatas.get(0));
+        guideProjectGenerator.generate(outputDirectory, metadatas.get(1));
+
+        filesTransferUtility.transferFiles(fileBase, outputDirectory, metadatas.get(0));
+        filesTransferUtility.transferFiles(file, outputDirectory, metadatas.get(1));
+
+        assertTrue(new File(outputPath + "/creating-your-first-micronaut-app-gradle-groovy").exists());
+        assertTrue(new File(outputPath + "/creating-your-first-micronaut-app-gradle-java").exists());
+        assertTrue(new File(outputPath + "/creating-your-first-micronaut-app-gradle-kotlin").exists());
+        assertTrue(new File(outputPath + "/creating-your-first-micronaut-app-maven-groovy").exists());
+        assertTrue(new File(outputPath + "/creating-your-first-micronaut-app-maven-java").exists());
+        assertFalse(new File(outputPath + "/creating-your-first-micronaut-app-maven-kotlin").exists());
+
+        assertFalse(new File(outputPath + "/hello-base-gradle-groovy").exists());
+        assertFalse(new File(outputPath + "/hello-base-gradle-java").exists());
+        assertFalse(new File(outputPath + "/hello-base-gradle-kotlin").exists());
+        assertFalse(new File(outputPath + "/hello-base-maven-groovy").exists());
+        assertFalse(new File(outputPath + "/hello-base-maven-java").exists());
+        assertFalse(new File(outputPath + "/hello-base-maven-kotlin").exists());
+
+        assertTrue(new File(outputPath + "/creating-your-first-micronaut-app-gradle-groovy/src/main/groovy/example/micronaut/HelloController.groovy").exists());
+        assertTrue(new File(outputPath + "/creating-your-first-micronaut-app-gradle-java/src/main/java/example/micronaut/HelloController.java").exists());
+        assertTrue(new File(outputPath + "/creating-your-first-micronaut-app-gradle-kotlin/src/main/kotlin/example/micronaut/HelloController.kt").exists());
+        assertTrue(new File(outputPath + "/creating-your-first-micronaut-app-maven-groovy/src/main/groovy/example/micronaut/HelloController.groovy").exists());
+        assertTrue(new File(outputPath + "/creating-your-first-micronaut-app-maven-java/src/main/java/example/micronaut/HelloController.java").exists());
+        assertFalse(new File(outputPath + "/creating-your-first-micronaut-app-maven-kotlin/src/main/kotlin/example/micronaut/HelloController.kt").exists());
+
+        assertFalse(new File(outputPath + "/creating-your-first-micronaut-app-gradle-groovy/src/main/groovy/example/micronaut/Application.groovy").exists());
+        assertFalse(new File(outputPath + "/creating-your-first-micronaut-app-gradle-java/src/main/java/example/micronaut/Application.java").exists());
+        assertFalse(new File(outputPath + "/creating-your-first-micronaut-app-gradle-kotlin/src/main/kotlin/example/micronaut/Application.kt").exists());
+        assertFalse(new File(outputPath + "/creating-your-first-micronaut-app-maven-groovy/src/main/groovy/example/micronaut/Application.groovy").exists());
+        assertFalse(new File(outputPath + "/creating-your-first-micronaut-app-maven-java/src/main/java/example/micronaut/Application.java").exists());
+    }
+
+    @Test
+    void pythonViewsAreCopiedToConfig() throws Exception {
+        File inputDirectory = new File("src/test/resources/file-transfer/python-resources");
+        Guide guide = guideParser.parseGuideMetadata(inputDirectory, "metadata.json").orElseThrow();
+        File outputDirectory = new File("build/tmp/python-resources");
+        File destination = new File(outputDirectory, "python-resources-pyronaut-python");
+        assertTrue(destination.mkdirs() || destination.exists());
+        File starterView = new File(destination, "src/main/resources/views/starter.html");
+        Files.createDirectories(starterView.toPath().getParent());
+        Files.writeString(starterView.toPath(), "starter");
+        File starterStatic = new File(destination, "src/main/resources/static/starter.txt");
+        Files.createDirectories(starterStatic.toPath().getParent());
+        Files.writeString(starterStatic.toPath(), "starter");
+
+        filesTransferUtility.transferFiles(inputDirectory, outputDirectory, guide);
+
+        assertTrue(new File(destination, "config/views/index.html").exists());
+        assertTrue(new File(destination, "config/views/starter.html").exists());
+        assertTrue(new File(destination, "config/views/python.html").exists());
+        assertTrue(new File(destination, "config/static/starter.txt").exists());
+        assertTrue(new File(destination, "config/static/python.txt").exists());
+        assertTrue(new File(destination, "placeholder.py").exists());
+        assertFalse(new File(destination, "src/main/resources/views/index.html").exists());
+        assertFalse(new File(destination, "src/main/resources/views/starter.html").exists());
+        assertFalse(new File(destination, "src/main/resources/static/python.txt").exists());
+    }
+
+}

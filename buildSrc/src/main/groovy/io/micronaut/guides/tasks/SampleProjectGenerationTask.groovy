@@ -1,8 +1,9 @@
 package io.micronaut.guides.tasks
 
 import groovy.transform.CompileStatic
-import io.micronaut.guides.GuideMetadata
 import io.micronaut.guides.GuideProjectGenerator
+import io.micronaut.guides.core.Guide
+import io.micronaut.starter.options.Language
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
@@ -25,10 +26,14 @@ abstract class SampleProjectGenerationTask extends DefaultTask {
     GuideProjectGenerator guidesGenerator
 
     @Internal
-    GuideMetadata metadata
+    Guide metadata
 
     @Input
     abstract Property<String> getSlug()
+
+    @Optional
+    @Input
+    abstract Property<String> getLanguage()
 
     @InputDirectory
     @PathSensitive(RELATIVE)
@@ -44,6 +49,7 @@ abstract class SampleProjectGenerationTask extends DefaultTask {
 
     @TaskAction
     def perform() {
-        guidesGenerator.generateOne(metadata, inputDirectory.get().asFile, outputDir.get().asFile)
+        Language languageFilter = language.isPresent() ? Language.valueOf(language.get()) : null
+        guidesGenerator.generateOne(metadata, inputDirectory.get().asFile, outputDir.get().asFile, languageFilter)
     }
 }

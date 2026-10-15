@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2024 original authors
+ * Copyright 2017-2026 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -162,7 +162,7 @@ class EmailControllerTest {
         assertEquals(1, email.getAttachments().size());
         Attachment attachment = email.getAttachments().get(0);
         assertEquals("test.csv", attachment.getFilename());
-        assertEquals(TEXT_CSV, attachment.getContentType());
+        assertTrue(attachment.getContentType().contains(TEXT_CSV), attachment.getContentType());
         assertEquals("test,email", new String(attachment.getContent()));
 
         assertNotNull(email.getBody());

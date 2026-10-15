@@ -16,7 +16,7 @@ done
 
 shift $(($OPTIND - 1))
 
-version=`cat version.txt`
+version=`cat buildSrc/src/main/resources/version.txt`
 
 # Build array from version string.
 
@@ -45,4 +45,4 @@ fi
 NEW_VERSION="${a[0]}.${a[1]}.${a[2]}-SNAPSHOT"
 
 echo "New version is: ${NEW_VERSION}"
-echo -n $NEW_VERSION > version.txt
+echo -n $NEW_VERSION > buildSrc/src/main/resources/version.txt

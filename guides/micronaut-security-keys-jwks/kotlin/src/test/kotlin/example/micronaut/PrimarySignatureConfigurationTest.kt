@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2024 original authors
+ * Copyright 2017-2026 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,21 +34,24 @@ class PrimarySignatureConfigurationTest {
     @Test
     fun primarySignatureConfigurationIsAnnotatedWithRefreshable() {
         assertTrue(applicationContext.getBeanDefinition(PrimarySignatureConfiguration::class.java)
-                .getAnnotationNameByStereotype(Refreshable::class.java)
-                .isPresent)
+            .getAnnotationNameByStereotype(Refreshable::class.java)
+            .isPresent)
     }
 
     @Test
     fun primarySignatureConfigurationIsAnnotatedNamedGenerator() {
         assertNotNull(applicationContext.getBeanDefinition(PrimarySignatureConfiguration::class.java).annotationMetadata
-                .getAnnotation<Annotation>(NAMED))
+            .getAnnotation<Annotation>(NAMED))
 
-        assertTrue(applicationContext.getBeanDefinition(PrimarySignatureConfiguration::class.java).annotationMetadata
+        assertTrue(
+            applicationContext.getBeanDefinition(PrimarySignatureConfiguration::class.java).annotationMetadata
                 .getAnnotation<Annotation>(NAMED)
-                .getValue(String::class.java).isPresent)
+                ?.getValue(String::class.java)?.isPresent ?: false
+        )
 
         assertEquals("generator", applicationContext.getBeanDefinition(PrimarySignatureConfiguration::class.java).annotationMetadata
-                .getAnnotation<Annotation>(NAMED)
-                .getValue(String::class.java).get())
+            .getAnnotation<Annotation>(NAMED)
+            ?.getValue(String::class.java)?.get()
+        )
     }
 }

@@ -4,7 +4,7 @@ common:requirements.adoc[]
 
 == Getting started
 
-This guide shows a chat application such as the Rails application demonstrated in the  https://www.youtube.com/watch?v=eKY-QES1XQQ[Hotwire announcement screencast]
+This guide shows a chat application such as the Rails application demonstrated in the https://www.youtube.com/watch?v=eKY-QES1XQQ[Hotwire announcement screencast].
 
 === What is Hotwire?
 
@@ -19,7 +19,7 @@ This guide primarily focuses on how https://turbo.hotwired.dev/[Turbo] works wit
 
 == Screencast
 
-There is a screencast here which shows this guide in action:
+The following screencast shows this guide in action:
 
 video::KIh6AIKata4[youtube]
 
@@ -36,11 +36,11 @@ The initial application uses two models, `Room` and `Message`. One `Room` has ma
 
 The `initial` application contains a basic editing interface for Chat ``Room``s. It uses https://micronaut-projects.github.io/micronaut-views/latest/guide/#thymeleaf[Micronaut Views Thymeleaf] to render server-side HTML
 
-Moreover, the application leverages https://www.thymeleaf.org/doc/tutorials/3.0/usingthymeleaf.html#fragments[Thymleaf Fragments] to encapsulate the rendering of parts of the screen.
+Moreover, the application leverages https://www.thymeleaf.org/doc/tutorials/3.0/usingthymeleaf.html#fragments[Thymeleaf Fragments] to encapsulate the rendering of parts of the screen.
 
 For ``Message``s, we will have just two actions. `create` to render the form to create a message and `save` to handle the form submission.
 
-It gives us a foundation flow for an admittedly cumbersome chat application which we can then use to level up with https://hotwired.dev/[Hotwire] techniques one at a time.
+It gives us a foundation flow for an admittedly cumbersome chat application, which we can then use to level up with https://hotwired.dev/[Hotwire] techniques one at a time.
 
 <<Appendix A: Initial application>> describes the initial application if you want to learn more.
 
@@ -158,7 +158,7 @@ And when clicking the Edit link, the form from the Edit screen is presented.
 
 And upon submission, it's replaced again with just a display.
 
-If we go straight to the full page editing screen, we can see it has both a header and navigation links, parts we were emitting from the frame.
+If we go straight to the full page editing screen, we can see it has both a header and navigation links, parts we were omitting from the frame.
 
 === Underscore Top
 
@@ -266,13 +266,13 @@ Turbo will plug out just the matching frame from the server response. As you can
 
 === TurboFrameView Annotation
 
-In a Micronaut application, we can optimize the response by using the `@TurboFrameView` annotation only to render the layout Turbo uses when parsing the response. A Request coming from a Frame includes the HTTP Header `Turbo-Frame`. Annotate `RoomsControllerEdit::edit` method with `@TurboFrameView("/rooms/_edit")`
+In a Micronaut application, we can optimize the response by using the `@TurboFrameView` annotation only to render the layout Turbo uses when parsing the response. A request coming from a frame includes the HTTP header `Turbo-Frame`. Annotate the `RoomsControllerEdit::edit` method with `@TurboFrameView("/rooms/_edit")`.
 
 source:controllers/RoomsControllerEdit[app=complete]
 
-callout:turbo-frame-view[1]
+callout:turbo-frame-view[]
 
-The above controller returns the following HTML for a request without HTTP Header `Turbo-Frame`.
+The above controller returns the following HTML for a request without the HTTP header `Turbo-Frame`.
 
 [source,html]
 ----
@@ -311,7 +311,7 @@ The above controller returns the following HTML for a request without HTTP Heade
 </html>
 ----
 
-For a request including an HTTP Header `Turbo-Frame` with value `rooms`, the above controller returns the following HTML.
+For a request including an HTTP header `Turbo-Frame` with value `rooms`, the above controller returns the following HTML.
 
 [source,html]
 ----
@@ -347,8 +347,8 @@ This template invokes the `append` action with the DOM ID of the target containe
 
 source:controllers/MessagesControllerSave[app=complete]
 
-<1> `TurboMediaType::acceptsTurboStream` is a convenient method to verify if the request accepts a turbo stream response.
-callout:turbostream-fluid-api[2]
+<.> `TurboMediaType::acceptsTurboStream` is a convenient method to verify if the request accepts a turbo stream response.
+callout:turbostream-fluid-api[]
 
 Now we can add Messages to the page without resetting it completely.
 
@@ -380,7 +380,7 @@ The form is reset, and the `Message` is added dynamically.
 
 == Turbo Streams via Web Sockets
 
-But how interesting is a chat app where you're just talking to yourself?. Let's start a conversation with another window.
+But how interesting is a chat app where you're just talking to yourself? Let's start a conversation with another window.
 You'll see that new Messages are only added live to the originator's window.
 On the other side, we have to reload to see what's been said.
 
@@ -392,7 +392,7 @@ When the message is saved, raise an event:
 
 source:services/DefaultMessageService[app=complete]
 
-callout:application-event-publisher[number=1,arg0=RoomMessage]
+callout:application-event-publisher[arg0=RoomMessage]
 
 === WebSocket Server
 
@@ -400,12 +400,12 @@ Create a https://docs.micronaut.io/latest/guide/#websocketServer[WebSocket Serve
 
 source:ChatServerWebSocket[app=complete]
 
-callout:websocket-server[1]
-callout:websocket-broadcaster[2]
-callout:websocket-on-open[3]
-callout:websocket-on-message[4]
-callout:websocket-on-close[5]
-callout:turbostream-fluid-api[6]
+callout:websocket-server[]
+callout:websocket-broadcaster[]
+callout:websocket-on-open[]
+callout:websocket-on-message[]
+callout:websocket-on-close[]
+callout:turbostream-fluid-api[]
 
 Establish a WebSocket connection to the WebSocket server identified by the `Room` we're in.
 
@@ -430,9 +430,8 @@ The following sections introduce you to the initial application.
 
 common:datasource-header.adoc[]
 
-common:yaml-dependency.adoc[]
 
-resource:application.yml[tag=datasource,app=initial]
+resource:application.properties[tag=datasource,app=initial]
 
 common:datasource-footer.adoc[]
 
@@ -442,9 +441,8 @@ common:flyway-header.adoc[]
 
 common:flyway-mysql.adoc[]
 
-common:yaml-dependency.adoc[]
 
-resource:application.yml[tag=flyway,app=initial]
+resource:application.properties[tag=flyway,app=initial]
 
 common:flyway-footer.adoc[]
 
@@ -456,19 +454,19 @@ The application contains two entities with a one-to-many relationship.
 
 source:entities/Room[app=initial]
 
-callout:mapped-entity[1]
-callout:mapped-entity-id[2]
-callout:generated-value[3]
-callout:relation[4]
+callout:mapped-entity[]
+callout:mapped-entity-id[]
+callout:generated-value[]
+callout:relation[]
 
 source:entities/Message[app=initial]
 
-callout:mapped-entity[1]
-callout:mapped-entity-id[2]
-callout:generated-value[3]
-callout:relation[4]
-callout:date-created[5]
-callout:creator[6]
+callout:mapped-entity[]
+callout:mapped-entity-id[]
+callout:generated-value[]
+callout:relation[]
+callout:date-created[]
+callout:creator[]
 
 === Models
 
@@ -476,13 +474,13 @@ The application includes a POJO to map the form submission when the user submits
 
 source:models/MessageForm[app=initial]
 
-callout:serdeable[1]
+callout:serdeable[]
 
 The application includes a POJO which represents a room's message.
 
 source:models/RoomMessage[app=initial]
 
-callout:serdeable[1]
+callout:serdeable[]
 
 === Repositories
 
@@ -490,14 +488,14 @@ The application includes a repository per entity.
 
 source:repositories/MessageRepository[app=initial]
 
-callout:jdbcrepository[1]
-callout:crudrepository[2]
+callout:jdbcrepository[]
+callout:crudrepository[]
 
 source:repositories/RoomRepository[app=initial]
 
-callout:jdbcrepository[1]
-callout:crudrepository[2]
-callout:join-left-fetch[number=3,arg0=messages]
+callout:jdbcrepository[]
+callout:crudrepository[]
+callout:join-left-fetch[arg0=messages]
 
 === Services
 
@@ -505,27 +503,26 @@ The application contains a service that publishes an event when a message is sav
 
 source:services/MessageService[app=initial]
 
-callout:default-implementation[1]
-callout:valid[2]
+callout:default-implementation[]
+callout:valid[]
 
 source:services/DefaultMessageService[app=initial]
 
-callout:singleton[1]
-callout:application-event-publisher[number=2,arg0=RoomMessage]
+callout:singleton[]
+callout:application-event-publisher[arg0=RoomMessage]
 
 ==== Static Resources
 
-Update `application.yml` to add static resource configuration:
+Update `application.properties` to add static resource configuration:
 
-common:yaml-dependency.adoc[]
 
-resource:application.yml[tag=static-resources,app=initial]
+resource:application.properties[tag=static-resources,app=initial]
 
 <1> Configure the Framework to resolve static resources from the request path `/assets/**` in `src/main/resources/assets`.
 
 common:micronaut-views-thymeleaf.adoc[]
 
-The initial application uses Thymleaf Fragments to organize the views.
+The initial application uses Thymeleaf Fragments to organize the views.
 
 It uses a root layout:
 
@@ -547,8 +544,8 @@ Create a `MessageSource` that uses the previous properties files:
 
 source:i18n/MessageSourceFactory[app=initial]
 
-callout:factory[1]
-callout:singleton[2]
+callout:factory[]
+callout:singleton[]
 
 === Controllers
 
@@ -556,8 +553,8 @@ The apex url is redirected to `/rooms`.
 
 source:controllers/HomeController[app=initial]
 
-callout:controller[number=1,arg0=/]
-callout:get-generic[number=2]
+callout:controller[arg0=/]
+callout:get-generic[]
 
 We have an abstract class to simplify redirection:
 
@@ -567,16 +564,16 @@ Create CRUD controllers for `Room`.
 
 ==== Rooms Index Controller
 
-Create a controller which displays a list of rooms.
+Create a controller that displays a list of rooms.
 
 source:controllers/RoomsControllerIndex[app=initial]
 
-callout:controller[number=1,arg0=/rooms]
-callout:constructor-di[number=2,arg0=RoomRepository]
-callout:executes-on[3]
-callout:view[4]
-callout:get-generic[number=5]
-callout:produces-html[6]
+callout:controller[arg0=/rooms]
+callout:constructor-di[arg0=RoomRepository]
+callout:executes-on[]
+callout:view[]
+callout:get-generic[]
+callout:produces-html[]
 
 ===== Rooms Index Views
 
@@ -590,17 +587,17 @@ resource:views/rooms/_tr.html[app=initial]
 
 ==== Rooms Show Controller
 
-Create a controller which displays room.
+Create a controller that displays a room.
 
 source:controllers/RoomsControllerShow[app=initial]
 
-callout:controller[number=1,arg0=/rooms]
-callout:constructor-di[number=2,arg0=RoomRepository]
-callout:executes-on[3]
-callout:view[4]
-callout:get-generic[number=5]
-callout:produces-html[6]
-callout:pathvariable[7]
+callout:controller[arg0=/rooms]
+callout:constructor-di[arg0=RoomRepository]
+callout:executes-on[]
+callout:view[]
+callout:get-generic[]
+callout:produces-html[]
+callout:pathvariable[]
 
 ===== Rooms Show Views
 
@@ -612,15 +609,15 @@ resource:views/rooms/_room.html[app=initial]
 
 ==== Rooms Create Controller
 
-Create a controller which displays a form to create a room.
+Create a controller that displays a form to create a room.
 
 source:controllers/RoomsControllerCreate[app=initial]
 
-callout:controller[number=1,arg0=/rooms]
-callout:constructor-di[number=2,arg0=RoomRepository]
-callout:view[3]
-callout:get-generic[number=4]
-callout:produces-html[5]
+callout:controller[arg0=/rooms]
+callout:constructor-di[arg0=RoomRepository]
+callout:view[]
+callout:get-generic[]
+callout:produces-html[]
 
 ===== Rooms Create Views
 
@@ -632,31 +629,31 @@ resource:views/rooms/_create.html[app=initial]
 
 ==== Rooms Save Controller
 
-Create a controller which handles the room creation form submission.
+Create a controller that handles the room creation form submission.
 
 source:controllers/RoomsControllerSave[app=initial]
 
-callout:controller[number=1,arg0=/rooms]
-callout:constructor-di[number=2,arg0=RoomRepository]
-callout:executes-on[3]
-callout:produces-html[4]
-callout:consumes[5]
-callout:post-generic[6]
-callout:body-qualifier[7]
+callout:controller[arg0=/rooms]
+callout:constructor-di[arg0=RoomRepository]
+callout:executes-on[]
+callout:produces-html[]
+callout:consumes[]
+callout:post-generic[]
+callout:body-qualifier[]
 
 ==== Rooms Edit Controller
 
-Create a controller which shows a form to edit a room.
+Create a controller that shows a form to edit a room.
 
 source:controllers/RoomsControllerEdit[app=initial]
 
-callout:controller[number=1,arg0=/rooms]
-callout:constructor-di[number=2,arg0=RoomRepository]
-callout:executes-on[3]
-callout:view[4]
-callout:get-generic[number=5]
-callout:produces-html[6]
-callout:pathvariable[7]
+callout:controller[arg0=/rooms]
+callout:constructor-di[arg0=RoomRepository]
+callout:executes-on[]
+callout:view[]
+callout:get-generic[]
+callout:produces-html[]
+callout:pathvariable[]
 
 ===== Rooms Edit Views
 
@@ -668,31 +665,31 @@ resource:views/rooms/_edit.html[app=initial]
 
 ==== Rooms Update Controller
 
-Create a controller which handles the room update form submission.
+Create a controller that handles the room update form submission.
 
 source:controllers/RoomsControllerUpdate[app=initial]
 
-callout:controller[number=1,arg0=/rooms]
-callout:constructor-di[number=2,arg0=RoomRepository]
-callout:executes-on[3]
-callout:produces-html[4]
-callout:consumes[5]
-callout:post-generic[6]
-callout:body-qualifier[7]
+callout:controller[arg0=/rooms]
+callout:constructor-di[arg0=RoomRepository]
+callout:executes-on[]
+callout:produces-html[]
+callout:consumes[]
+callout:post-generic[]
+callout:body-qualifier[]
 
 ==== Rooms Delete Controller
 
-Create a controller which handles the room deletion form submission.
+Create a controller that handles the room deletion form submission.
 
 source:controllers/RoomsControllerDelete[app=initial]
 
-callout:controller[number=1,arg0=/rooms]
-callout:constructor-di[number=2,arg0=RoomRepository]
-callout:executes-on[3]
-callout:produces-html[4]
-callout:consumes[5]
-callout:post-generic[6]
-callout:pathvariable[7]
+callout:controller[arg0=/rooms]
+callout:constructor-di[arg0=RoomRepository]
+callout:executes-on[]
+callout:produces-html[]
+callout:consumes[]
+callout:post-generic[]
+callout:pathvariable[]
 
 ==== Message Create Controller
 
@@ -700,13 +697,13 @@ Create a controller to display a form to create a message within a room.
 
 source:controllers/MessagesControllerCreate[app=initial]
 
-callout:executes-on[1]
-callout:controller[number=2,arg0=/rooms]
-callout:constructor-di[number=3,arg0=MessageService]
-callout:view[4]
-callout:produces-html[5]
-callout:get-generic[number=6]
-callout:pathvariable[7]
+callout:executes-on[]
+callout:controller[arg0=/rooms]
+callout:constructor-di[arg0=MessageService]
+callout:view[]
+callout:produces-html[]
+callout:get-generic[]
+callout:pathvariable[]
 
 ===== Message Create Views
 
@@ -720,18 +717,18 @@ resource:views/messages/create.html[app=initial]
 
 ==== Message Save Controller
 
-Create a controller which handles the message creation form submission.
+Create a controller that handles the message creation form submission.
 
 source:controllers/MessagesControllerSave[app=initial]
 
-callout:executes-on[1]
-callout:controller[number=2,arg0=/rooms]
-callout:constructor-di[number=3,arg0=MessageService]
-callout:produces-html[4]
-callout:consumes[5]
-callout:post-generic[6]
-callout:pathvariable[7]
-callout:body-qualifier[8]
+callout:executes-on[]
+callout:controller[arg0=/rooms]
+callout:constructor-di[arg0=MessageService]
+callout:produces-html[]
+callout:consumes[]
+callout:post-generic[]
+callout:pathvariable[]
+callout:body-qualifier[]
 
 common:test-resources-mysql-datasource.adoc[]
 

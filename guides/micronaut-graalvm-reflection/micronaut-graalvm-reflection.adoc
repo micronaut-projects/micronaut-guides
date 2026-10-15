@@ -33,11 +33,11 @@ source:StringCapitalizer[app=reflectconfigjson]
 
 === Singleton
 
-Create a singleton class that transform a `java.lang.String` via reflection.
+Create a singleton class that transforms a `java.lang.String` via reflection.
 
 source:StringTransformer[app=reflectconfigjson]
 
-callout:singleton[1]
+callout:singleton[]
 
 === Controller
 
@@ -45,14 +45,14 @@ Create a controller, which exposes two routes, and calls the `StringTransformer`
 
 source:StringTransformerController[app=reflectconfigjson]
 
-callout:controller[number=1,arg0=/transformer]
-callout:constructor-di[number=2,arg0=StringTransformer]
-callout:produces[3]
-callout:query-value-server[number=4,arg0=q]
+callout:controller[arg0=/transformer]
+callout:constructor-di[arg0=StringTransformer]
+callout:produces[]
+callout:query-value-server[arg0=q]
 
 common:runapp.adoc[]
 
-You can execute the endpoint exposed by application:
+You can execute the endpoint exposed by the application:
 
 [source, bash]
 ----
@@ -85,7 +85,7 @@ curl "localhost:8080/transformer/capitalize?q=Hello"
 Hello
 ----
 
-Transformation does not work the native executable. The response is `Hello` instead of the expected `HELLO`.
+Transformation does not work in the native executable. The response is `Hello` instead of the expected `HELLO`.
 
 You will see an ERROR log in the native image execution logs:
 
@@ -94,7 +94,7 @@ You will see an ERROR log in the native image execution logs:
  ERROR example.micronaut.StringTransformer - Class not found: example.micronaut.StringCapitalizer
 ----
 
-In the next sections, you wil provide the necessary reflection metadata.
+In the next sections, you will provide the necessary reflection metadata.
 
 === Tests
 
@@ -102,17 +102,17 @@ Write a test which should pass both for JIT or Native Image.
 
 test:StringTransformerControllerTest[app=reflectconfigjson]
 
-callout:micronaut-test[1]
-callout:http-client[2]
-callout:uri-builder[3]
+callout:micronaut-test[]
+callout:http-client[]
+callout:uri-builder[]
 
 common:testApp.adoc[]
 
 common:nativetest.adoc[]
 
-==== Test Failures
+=== Test Failures
 
-Test will fail you will see something like:
+The test will fail and you will see something like:
 
 [source,bash]
 ----
@@ -126,7 +126,7 @@ Test will fail you will see something like:
        org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:177)
        org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:1141)
        example.micronaut.StringTransformerControllerTest.reverse(StringTransformerControllerTest.java:29)
-       java.base@17.0.8/java.lang.reflect.Method.invoke(Method.java:568)
+       java.base@17.0.9/java.lang.reflect.Method.invoke(Method.java:568)
        io.micronaut.test.extensions.junit5.MicronautJunit5Extension$2.proceed(MicronautJunit5Extension.java:142)
        io.micronaut.test.extensions.AbstractMicronautExtension.interceptEach(AbstractMicronautExtension.java:155)
        [...]
@@ -151,10 +151,10 @@ FAILURE: Build failed with an exception.
 
 == Handling Reflection
 
-**You can use https://www.graalvm.org/latest/reference-manual/native-image/dynamic-features/Reflection/[Reflection in Native Image]**. GraalVM analysis attempts to automatic detection of reflection usages.
-If automatic analysis fails, you can provide manually the program elements reflectively accessed at run time.
+**You can use https://www.graalvm.org/latest/reference-manual/native-image/dynamic-features/Reflection/[Reflection in Native Image]**. GraalVM analysis attempts automatic detection of reflection usage.
+If automatic analysis fails, you can manually provide the program elements reflectively accessed at run time.
 
-You will see learn how to do this several ways with Micronaut Framework
+You will learn several ways to do this with the Micronaut Framework.
 
 === Generating Reflection Metadata with GraalVM Tracing Agent
 
@@ -176,7 +176,7 @@ Delete the JSON file you created in the previous step. Replace it with a class w
 
 source:GraalConfig[app=reflectconfig]
 
-callout:reflectionconfig[1]
+callout:reflectionconfig[]
 
 common:graalvm-annotation-processor.adoc[]
 
@@ -192,11 +192,11 @@ source:StringReverser[app=reflectiveaccess]
 
 source:StringCapitalizer[app=reflectiveaccess]
 
-callout:reflective-access[1]
+callout:reflective-access[]
 
 If you execute the <<native-tests, Native Tests>> again, they will pass.
 
-== Next steps
+== Next Steps
 
 Learn more about:
 
@@ -206,13 +206,12 @@ Learn more about:
 
 === Docker and GraalVM
 
-- https://guides.micronaut.io/latest/micronaut-docker-image.html[Builing a Docker Image of your Micronaut Application].
+- https://micronaut-projects.github.io/micronaut-guides/latest/micronaut-docker-image.html[Building a Docker Image of your Micronaut Application].
 
 === GraalVM Cloud deployment Guides
 
-- https://guides.micronaut.io/latest/micronaut-graalvm-native-image-google-cloud-platform-cloud-run.html[Deploy a GraalVM Native Executable to Google Cloud Run]
-- Deploy a GraalVM Native Executable of an https://guides.micronaut.io/latest/mn-application-aws-lambda-graalvm.html[application] or a https://guides.micronaut.io/latest/mn-serverless-function-aws-lambda-graalvm.html[function] to AWS Lambda
+- https://micronaut-projects.github.io/micronaut-guides/latest/micronaut-graalvm-native-image-google-cloud-platform-cloud-run.html[Deploy a GraalVM Native Executable to Google Cloud Run]
+- Deploy a GraalVM Native Executable of an https://micronaut-projects.github.io/micronaut-guides/latest/mn-application-aws-lambda-graalvm.html[application] or a https://micronaut-projects.github.io/micronaut-guides/latest/mn-serverless-function-aws-lambda-graalvm.html[function] to AWS Lambda
 
 
 
-common:helpWithMicronaut.adoc[]

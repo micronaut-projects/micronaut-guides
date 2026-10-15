@@ -14,16 +14,17 @@ common:completesolution.adoc[]
 
 common:cli-or-launch.adoc[]
 
+common:create-app-features.adoc[]
+
 [source,bash]
 ----
-mn @cli-command@ --jdk=17 \
+mn @cli-command@ \
    example.micronaut.micronautguide \
    --features=data-jdbc,postgres,liquibase \
    --build=@build@ \
    --lang=@lang@ \
 ----
 
-NOTE: To use Java records, specify JDK 17 when you create the application.
 
 common:build-lang-arguments.adoc[]
 
@@ -31,20 +32,20 @@ common:default-package.adoc[]
 
 NOTE: If you use https://launch.micronaut.io[Micronaut Launch], select "Micronaut Application" as application type and add `postgres`, `data-jdbc`, and `liquibase` as features.
 
-https://guides.micronaut.io/latest/micronaut-intellij-idea-ide-setup.html[Setup IntelliJ IDEA to develop Micronaut Applications].
+https://micronaut-projects.github.io/micronaut-guides/latest/micronaut-intellij-idea-ide-setup.html[Setup IntelliJ IDEA to develop Micronaut Applications].
 
 === Immutable Configuration with Java Records
 
 source:ValueAddedTaxConfiguration[]
 
-callout:configuration-properties[1]
+callout:configuration-properties[]
 
 Write a test:
 
 test:ValueAddedTaxConfigurationTest[]
 
-callout:property[1]
-callout:micronaut-test-start-application-false[2]
+callout:property[]
+callout:micronaut-test-start-application-false[]
 
 === Database Migration with Liquibase
 
@@ -55,11 +56,10 @@ Add the following snippet to include the necessary dependencies:
 
 dependency:micronaut-liquibase[groupId=io.micronaut.liquibase]
 
-Configure the database migrations directory for http://www.liquibase.org[Liquibase] in `application.yml`.
+Configure the database migrations directory for http://www.liquibase.org[Liquibase] in `application.properties`.
 
-common:yaml-dependency.adoc[]
 
-resource:application.yml[tag=liquibase]
+resource:application.properties[tag=liquibase]
 
 Create the following files with the database schema creation and a book:
 
@@ -77,10 +77,10 @@ Create a Micronaut Data Mapped Entity
 
 source:Book[]
 
-callout:mapped-entity[1]
-<2> The primary key is annotated with `@Id`. It is an assigned primary key.
-callout:constraints[3]
-<4> Annotate `about` with `@Nullable`, since it is optional.
+callout:mapped-entity[]
+<.> The primary key is annotated with `@Id`. It is an assigned primary key.
+callout:constraints[]
+<.> Annotate `about` with `@Nullable`, since it is optional.
 
 === Projections with Java Records
 
@@ -88,16 +88,16 @@ Create a record to project some data from the `book` table. For example, exclude
 
 source:BookCard[]
 
-callout:serdeable[1]
-callout:constraints[2]
+callout:serdeable[]
+callout:constraints[]
 
 Create a https://micronaut-projects.github.io/micronaut-data/latest/guide/#dbcRepositories[Repository], which uses the previous Java record as a DTO projection.
 
 source:BookRepository[]
 
-callout:jdbcrepository[1]
-callout:crudrepository[2]
-callout:dto-projection[3]
+callout:jdbcrepository[]
+callout:crudrepository[]
+callout:dto-projection[]
 
 === JSON serialization with Java Records
 
@@ -105,19 +105,18 @@ Create a Java record to represent a JSON response:
 
 source:BookForSale[]
 
-callout:serdeable[1]
-<2> Jackson requires reflection to use Records. With `@ReflectiveAccess` the Micronaut framework will add the class to the GraalVM `reflect-config.json` file.
-callout:constraints[3]
+callout:serdeable[]
+callout:constraints[]
 
 Create a Controller that uses the previous record:
 
 source:BookController[]
 
-callout:controller[number=1,arg0=/books]
-callout:constructor-di[number=2,arg0=BookRepository]
-callout:executes-on[3]
-callout:get[number=4,arg0=index,arg1='/']
-<5> Respond a Java Record and the application responds JSON representation of the object
+callout:controller[arg0=/books]
+callout:constructor-di[arg0=BookRepository]
+callout:executes-on[]
+callout:get[arg0=index,arg1='/']
+<.> Return a Java record, and the application responds with the JSON representation of the object.
 
 === Create a Test
 
@@ -125,19 +124,19 @@ Create a test:
 
 test:BookControllerTest[]
 
-callout:property[1]
-callout:micronaut-test-transactional-false[2]
-callout:http-client[3]
-<4> Multiline string
-callout:binding-json-array[5]
+callout:property[]
+callout:micronaut-test-transactional-false[]
+callout:http-client[]
+<.> Multiline string
+callout:binding-json-array[]
 
 common:test-resources-postgres.adoc[]
 
 == Datasource configuration
 
-Although the URL is configured automatically via <<Test Resources>>, we must configure the PostgreSQL driver and dialect in `application.yml`:
+Although the URL is configured automatically via <<test-resources,Test Resources>>, we must configure the PostgreSQL driver and dialect in `application.properties`:
 
-resource:application.yml[tag=datasource]
+resource:application.properties[tag=datasource]
 
 <1> Use PostgreSQL driver.
 <2> Configure the PostgreSQL dialect.
@@ -171,10 +170,6 @@ curl http://localhost:8080/books
 
 common:graal-with-plugins.adoc[]
 
-WARNING: Due to a https://github.com/oracle/graal/issues/3984[bug with GraalVM and Java Records] it is necessary to include the flag `--report-unsupported-elements-at-runtime` when building the native executable. Create the file `native-image.properties`:
-
-resource:META-INF/native-image/example.micronaut/guide/native-image.properties[]
-
 You can run a cURL command to test the application:
 
 [source, bash]
@@ -191,4 +186,3 @@ You receive an empty array because there are no books in the database. You can c
 
 common:next.adoc[]
 
-common:helpWithMicronaut.adoc[]

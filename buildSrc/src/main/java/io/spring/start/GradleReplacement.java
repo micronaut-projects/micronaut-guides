@@ -2,7 +2,6 @@ package io.spring.start;
 import io.micronaut.context.annotation.Replaces;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.starter.build.Property;
-import io.micronaut.starter.feature.KotlinSymbolProcessing;
 import io.micronaut.starter.feature.build.gradle.Gradle;
 import io.micronaut.starter.build.RepositoryResolver;
 import io.micronaut.starter.build.gradle.GradleBuildCreator;

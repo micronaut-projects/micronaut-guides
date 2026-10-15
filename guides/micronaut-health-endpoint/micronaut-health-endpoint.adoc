@@ -16,8 +16,15 @@ dependency:micronaut-management[]
 
 test:HealthTest[]
 
-callout:micronaut-test[1]
-callout:http-client[2]
+:exclude-for-languages:python
+callout:micronaut-test[]
+callout:http-client[]
+:exclude-for-languages:
+
+:only-for-languages:python
+<1> `MicronautTest` starts the application context and embedded server.
+<2> The test sends an HTTP request with a context-bound `requests` client.
+:only-for-languages:
 <3> The health endpoint returns information about the "health" of the application, which is determined by any number of "health indicators".
 
 ==== Base Path
@@ -29,18 +36,18 @@ The leading and trailing `/` are required for `endpoints.all.path`, unless `micr
 
 test:HealthPathTest[]
 
-<1> Sets the base path for all management endpoints to `/endpoints/`. This is normally specified in the application configuration (e.g. `application.yml`).
+<1> Sets the base path for all management endpoints to `/endpoints/`. This is normally specified in the application configuration (e.g. `application.properties`).
 <2> The "health" endpoint is now rooted at `/endpoints/health`
 <3> The "health" endpoint is no longer reachable at the default path and results in a "Not Found" status (HTTP 404).
 
 ==== Failed Health Status
 
-Disk-space threshold is one of the build-in indicators. This test demonstrates a failed health status when free disk space drops below the specified threshold. The `endpoints.health.disk-space.threshold` configuration property can be provided as a string, like "10MB" or "200KB", or the number of bytes.
+Disk-space threshold is one of the built-in indicators. This test demonstrates a failed health status when free disk space drops below the specified threshold. The `endpoints.health.disk-space.threshold` configuration property can be provided as a string, like "10MB" or "200KB", or the number of bytes.
 
 test:PoorHealthTest[]
 
-<1> Sets the `endpoints.health.disk-space.threshold` property to an impossibly high value to force a service down status. This is normally specified in the application configuration (e.g. `application.yml`).
-<2> A failed heath check results in a Service Unavailable status (HTTP 503)
+<1> Sets the `endpoints.health.disk-space.threshold` property to an impossibly high value to force a service down status. This is normally specified in the application configuration (e.g. `application.properties`).
+<2> A failed health check results in a Service Unavailable status (HTTP 503)
 <3> The response body of the error contains the json string `{"status":"DOWN"}`
 
 common:testApp.adoc[]
@@ -77,8 +84,7 @@ curl localhost:8080/health
 
 :exclude-for-languages:
 
-== Next steps
+== Next Steps
 
 Visit https://docs.micronaut.io/latest/guide/#management[Micronaut Management & Monitoring] to learn more.
 
-common:helpWithMicronaut.adoc[]

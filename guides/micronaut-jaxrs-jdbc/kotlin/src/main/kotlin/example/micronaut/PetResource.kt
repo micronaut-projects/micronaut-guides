@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2024 original authors
+ * Copyright 2017-2026 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,8 +30,8 @@ class PetResource(val petRepository: PetRepository) { // <2>
     fun all() = petRepository.findAll() // <4>
 
     @GET // <3>
-    @Path("/{name}") // <4>
-    fun byName(@PathParam("name") petsName: String) = petRepository.findByName(petsName) // <5>
+    @Path("/{name}") // <5>
+    fun byName(@PathParam("name") petsName: String) = petRepository.findByName(petsName) // <6>
 
     @POST
     @Status(HttpStatus.CREATED)

@@ -1,7 +1,7 @@
 plugins {
     id "java-gradle-plugin"
     id 'groovy'
-    id 'nu.studer.rocker' version '3.0.4'
+    id 'nu.studer.rocker' version '3.3'
 }
 
 ext {
@@ -10,38 +10,78 @@ ext {
 }
 
 repositories {
-    mavenCentral()
-    maven { url "https://repo.grails.org/grails/core" }
-    maven { url "https://s01.oss.sonatype.org/content/repositories/snapshots/" }
+    mavenCentral {
+        mavenContent {
+            releasesOnly()
+        }
+    }
+    maven {
+        url = uri("https://repo.grails.org/grails/core")
+        mavenContent {
+            releasesOnly()
+        }
+    }
+    maven {
+        url = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+        mavenContent {
+            snapshotsOnly()
+        }
+    }
+    maven {
+        url = "https://central.sonatype.com/repository/maven-snapshots/"
+        mavenContent {
+            snapshotsOnly()
+        }
+    }
+}
+
+ext {
+    micronautStarterVersion = "5.2.0"
 }
 
 dependencies {
     annotationProcessor(platform("io.micronaut.platform:micronaut-platform:$micronautVersion"))
     annotationProcessor("io.micronaut:micronaut-inject-java")
-
+    annotationProcessor("io.micronaut.jsonschema:micronaut-json-schema-processor")
+    implementation("io.micronaut.jsonschema:micronaut-json-schema-annotations")
     implementation(platform("io.micronaut.platform:micronaut-platform:$micronautVersion"))
-    implementation("io.micronaut.starter:micronaut-starter-api:$micronautVersion")
-    implementation("io.micronaut:micronaut-inject-java")
-    implementation('org.apache.commons:commons-compress:1.21')
+    implementation("io.micronaut.rss:micronaut-jsonfeed-core")
+    annotationProcessor("io.micronaut.validation:micronaut-validation-processor")
+    implementation("io.micronaut.validation:micronaut-validation")
+    annotationProcessor("io.micronaut.serde:micronaut-serde-processor")
+    implementation("io.micronaut.serde:micronaut-serde-jackson")
+    implementation("io.micronaut.starter:micronaut-starter-api:$micronautStarterVersion")
+    testImplementation(platform("io.micronaut.platform:micronaut-platform:$micronautVersion"))
+    testImplementation("io.micronaut.test:micronaut-test-junit5")
+    testImplementation("org.junit.jupiter:junit-jupiter-engine")
+    testImplementation("org.junit.platform:junit-platform-launcher")
+    testAnnotationProcessor(platform("io.micronaut.platform:micronaut-platform:$micronautVersion"))
+    testAnnotationProcessor("io.micronaut:micronaut-inject-java")
+    implementation('org.apache.commons:commons-compress:1.26.0')
     implementation "io.micronaut.docs:micronaut-docs-asciidoc-extensions:$micronautDocsVersion", {
         exclude group: "org.codehaus.groovy"
     }
-}
-
-sourceSets {
-    main {
-        java {
-            srcDir 'src/generated/rocker'
-        }
-    }
+    implementation("com.networknt:json-schema-validator")
+    implementation("io.micronaut.rss:micronaut-rss")
+    implementation("org.asciidoctor:asciidoctorj:3.0.0")
+    testImplementation("org.skyscreamer:jsonassert:1.5.3")
 }
 
 rocker {
-    configurations {
+    version = rockerVersion
+    configurations{
         main {
-            templateDir = file('src/main/java')
+            discardLogicWhitespace = true
+            templateDir = file('src/rocker')
             outputDir = file('src/generated/rocker')
-            optimize = true
         }
     }
+}
+
+tasks.named('test', Test) {
+    useJUnitPlatform()
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs.add("-Amicronaut.jsonschema.baseUri=https://micronaut-projects.github.io/micronaut-guides/schemas") // (1)
 }

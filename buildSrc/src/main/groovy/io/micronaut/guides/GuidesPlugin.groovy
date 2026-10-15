@@ -2,7 +2,12 @@ package io.micronaut.guides
 
 import groovy.transform.CompileStatic
 import io.micronaut.core.util.CollectionUtils
-import io.micronaut.guides.GuideMetadata.App
+import io.micronaut.guides.core.DefaultGuideParser
+import io.micronaut.guides.core.DefaultJsonSchemaProvider
+import io.micronaut.guides.core.Guide
+import io.micronaut.guides.core.GuideParser
+import io.micronaut.guides.core.GuidesOption
+import io.micronaut.guides.core.JsonSchemaProvider
 import io.micronaut.guides.tasks.AsciidocGenerationTask
 import io.micronaut.guides.tasks.GuidesIndexGradleTask
 import io.micronaut.guides.tasks.SampleProjectGenerationTask
@@ -10,6 +15,8 @@ import io.micronaut.guides.tasks.TestScriptRunnerTask
 import io.micronaut.guides.tasks.TestScriptTask
 import io.micronaut.guides.tasks.NativeTestScriptRunnerTask
 import io.micronaut.guides.tasks.NativeTestScriptTask
+import io.micronaut.json.JsonMapper
+import io.micronaut.starter.options.Language
 import org.apache.tools.ant.filters.ReplaceTokens
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -34,7 +41,7 @@ import static io.micronaut.starter.options.BuildTool.MAVEN
 class GuidesPlugin implements Plugin<Project> {
 
     private static final String TASK_SUFFIX_GENERATE_PROJECTS = "GenerateProjects"
-    private static final List<Integer> JAVA_MATRIX = [8, 11, 17]
+    private static final List<Integer> JAVA_MATRIX = [21]
     private static final List<String> FINALIZED_TASKS = ['generateTestScript',
                                                          'generateGuidesIndex',
                                                          'generateGuidesJsonMetadata',
@@ -43,7 +50,9 @@ class GuidesPlugin implements Plugin<Project> {
     private static final String KEY_WORKFLOW = "workflow"
     private static final String KEY_WORKFLOW_SNAPSHOT = "workflow-snapshot"
     private static final String TEST_RUNNER = "test-runner"
+    private static final String PYTHON_TEST_RUNNER = "python-test-runner"
     private static final String KEY_DOC = "doc"
+    private static final String KEY_PYTHON_BUILD = "python-build"
     private static final String COMMA = ","
     private static final String TASK_SUFFIX_BUILD = "Build"
 
@@ -57,14 +66,18 @@ class GuidesPlugin implements Plugin<Project> {
                 load(inputStream)
             }
         } as Properties
-        List<GuideMetadata> metadatas = GuideProjectGenerator.parseGuidesMetadata(
+
+        JsonMapper jsonMapper = JsonMapper.createDefault();
+        JsonSchemaProvider jsonSchemaProvider = new DefaultJsonSchemaProvider();
+        GuideParser guideParser = new DefaultGuideParser(jsonSchemaProvider, jsonMapper);
+        List<Guide> metadatas = guideParser.parseGuidesMetadata(
                 guidesDir.asFile,
                 project.extensions.extraProperties.get("metadataConfigName").toString())
         List<Map<String, TaskProvider<Task>>> sampleTasks = metadatas
                 .stream()
                 .filter(guideMetadata -> Utils.process(guideMetadata, false))
                 .map(metadata -> {
-                    String taskSlug = kebabCaseToGradleName(metadata.slug)
+                    String taskSlug = kebabCaseToGradleName(metadata.slug())
 
                     TaskProvider<Copy> githubActionWorkflowTask = registerGenerateGithubActionWorkflow(project,
                             metadata,
@@ -89,16 +102,53 @@ class GuidesPlugin implements Plugin<Project> {
                     TaskProvider<NativeTestScriptRunnerTask> nativeTestScriptRunnerTask = registerNativeTestScriptRunnerTask(project, taskSlug, metadata, nativeTestScriptTask)
 
                     registerGuideBuild(project, taskSlug, metadata, docTask, zip, indexTask, testScriptTask, testScriptRunnerTask, nativeTestScriptTask, nativeTestScriptRunnerTask)
-                    [(KEY_DOC)              : docTask,
+                    TaskProvider<Task> pythonBuildTask = null
+                    TaskProvider<Task> pythonTestRunnerTask = null
+                    List<Language> languages = options.stream()
+                            .map(option -> option.language)
+                            .distinct()
+                            .collect(Collectors.toList())
+                    for (Language language : languages) {
+                        GuidesOption languageOption = options.find { GuidesOption option -> option.language == language }
+                        TaskProvider<SampleProjectGenerationTask> languageGenerateTask = registerGenerateTask(project, metadata, projectGenerator, guidesDir, codeDir, taskSlug, language)
+                        TaskProvider<AsciidocGenerationTask> languageDocTask = registerDocTask(project, metadata, guidesDir, languageGenerateTask, taskSlug, language)
+                        TaskProvider<Zip> languageZipTask = registerLanguageZipTask(project, taskSlug, metadata, language, languageOption, languageGenerateTask)
+                        TaskProvider<TestScriptTask> languageTestScriptTask = registerTestScriptTask(project, taskSlug, metadata, languageGenerateTask, language)
+                        TaskProvider<TestScriptRunnerTask> languageTestScriptRunnerTask = registerTestScriptRunnerTask(project, taskSlug, metadata, languageTestScriptTask, language)
+                        TaskProvider<Task> languageBuildTask = registerGuideBuildForLanguage(project, taskSlug, language.toString().capitalize(), metadata, languageDocTask, languageZipTask, languageTestScriptTask, languageTestScriptRunnerTask)
+                        if (language == Language.PYTHON) {
+                            pythonBuildTask = languageBuildTask
+                            pythonTestRunnerTask = languageTestScriptRunnerTask as TaskProvider<Task>
+                        }
+                    }
+                    Map<String, TaskProvider<Task>> taskMap = [(KEY_DOC)              : docTask,
                      (KEY_ZIP)              : zip,
                      (KEY_WORKFLOW)         : githubActionWorkflowTask,
                      (KEY_WORKFLOW_SNAPSHOT): githubActionSnapshotWorkflowTask,
-                     (TEST_RUNNER)          : testScriptRunnerTask]
+                     (TEST_RUNNER)          : testScriptRunnerTask] as Map<String, TaskProvider<Task>>
+                    if (pythonBuildTask != null) {
+                        taskMap.put(KEY_PYTHON_BUILD, pythonBuildTask)
+                    }
+                    if (pythonTestRunnerTask != null) {
+                        taskMap.put(PYTHON_TEST_RUNNER, pythonTestRunnerTask)
+                    }
+                    taskMap
                 }).toList() as List<Map<String, TaskProvider<Task>>>
 
         List<TaskProvider<Task>> docTasks = sampleTasks.stream()
                 .map(m -> m.get(KEY_DOC))
                 .toList() as List<TaskProvider<Task>>
+
+        List<TaskProvider<Task>> pythonBuildTasks = sampleTasks.stream()
+                .map(m -> m.get(KEY_PYTHON_BUILD))
+                .filter(task -> task != null)
+                .toList() as List<TaskProvider<Task>>
+
+        project.tasks.register("buildPython") { Task it ->
+            it.group = 'build'
+            it.description = 'Builds the Python guides'
+            it.dependsOn(pythonBuildTasks)
+        }
 
         TaskProvider<Task> sampleProjects = project.tasks.register("generateSampleProjects") { Task it ->
             it.dependsOn(docTasks)
@@ -122,6 +172,17 @@ class GuidesPlugin implements Plugin<Project> {
             it.group = 'guides'
             it.description = 'Runs all Guide test scripts'
             it.dependsOn(sampleTasks.stream().map(m -> m.get(TEST_RUNNER)).collect(Collectors.toList()))
+        }
+
+        List<TaskProvider<Task>> pythonTestRunnerTasks = sampleTasks.stream()
+                .map(m -> m.get(PYTHON_TEST_RUNNER))
+                .filter(task -> task != null)
+                .toList() as List<TaskProvider<Task>>
+
+        project.tasks.register("runAllPythonGuidesTests") { Task it ->
+            it.group = 'guides'
+            it.description = 'Runs all Python Guide test scripts'
+            it.dependsOn(pythonTestRunnerTasks)
         }
 
         List<TaskProvider<Task>> zipTasks = sampleTasks.stream()
@@ -151,15 +212,15 @@ class GuidesPlugin implements Plugin<Project> {
     /**
      * https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#onpushpull_requestpull_request_targetpathspaths-ignore
      */
-    private static String workflowPaths(GuideMetadata metadata) {
+    private static String workflowPaths(Guide metadata) {
         List<String> paths = [
                 'version.txt',
                 //'buildSrc/main/java/io/micronaut/features/**',
                 //'buildSrc/main/resources/pom.xml',
-                "guides/" + metadata.slug + "/**",
+                "guides/" + metadata.slug() + "/**",
         ] as List<String>
-        if (metadata.base) {
-            paths << "guides/" + metadata.base + "/**"
+        if (metadata.base()) {
+            paths << "guides/" + metadata.base() + "/**"
         }
         String.join(COMMA, paths.stream()
                 .map(p -> quote(p))
@@ -178,20 +239,20 @@ class GuidesPlugin implements Plugin<Project> {
 
     private static TaskProvider<Task> registerZipTask(Project project,
                                                       String taskSlug,
-                                                      GuideMetadata metadata,
+                                                      Guide metadata,
                                                       List<TaskProvider<Zip>> zippers) {
         project.tasks.register("${taskSlug}GenerateZips") { Task it ->
-            it.group = "guides $metadata.slug"
+            it.group = "guides ${metadata.slug()}"
             it.dependsOn(zippers)
         }
     }
 
     private static TaskProvider<GuidesIndexGradleTask> registerIndexTask(Project project,
                                                                          String taskSlug,
-                                                                         GuideMetadata metadata) {
+                                                                         Guide metadata) {
         project.tasks.register("${taskSlug}Index", GuidesIndexGradleTask) { GuidesIndexGradleTask it ->
-            it.group = "guides $metadata.slug"
-            it.description = "Generate index.html for '${metadata.title}'"
+            it.group = "guides ${metadata.slug()}"
+            it.description = "Generate index.html for '${metadata.title()}'"
             it.metadata = metadata
             it.template.set(project.file("assets/template.html"))
             it.outputDir.set(project.layout.buildDirectory.dir("dist"))
@@ -201,30 +262,42 @@ class GuidesPlugin implements Plugin<Project> {
 
     private static TaskProvider<TestScriptTask> registerTestScriptTask(Project project,
                                                                        String taskSlug,
-                                                                       GuideMetadata metadata,
+                                                                       Guide metadata,
                                                                        TaskProvider<SampleProjectGenerationTask> generateTask) {
-        project.tasks.register("${taskSlug}TestScript", TestScriptTask) { TestScriptTask it ->
-            it.group = "guides $metadata.slug"
-            it.description = "Create a test.sh script for the projects generated by $metadata.slug"
+        registerTestScriptTask(project, taskSlug, metadata, generateTask, null)
+    }
+
+    private static TaskProvider<TestScriptTask> registerTestScriptTask(Project project,
+                                                                       String taskSlug,
+                                                                       Guide metadata,
+                                                                       TaskProvider<SampleProjectGenerationTask> generateTask,
+                                                                       Language language) {
+        String languageSuffix = language ? language.toString().capitalize() : ''
+        project.tasks.register("${taskSlug}TestScript${languageSuffix}", TestScriptTask) { TestScriptTask it ->
+            it.group = "guides ${metadata.slug()}"
+            it.description = "Create a test.sh script for the projects generated by ${metadata.slug()}"
             it.metadata = metadata
-            it.guideSlug.set(metadata.slug)
-            it.metadataFile.set(project.layout.projectDirectory.dir("guides/${metadata.slug}").file("metadata.json"))
-            it.scriptFile.set(project.layout.buildDirectory.dir("code/${metadata.slug}").map(d -> d.file("test.sh")))
+            it.guideSlug.set(metadata.slug())
+            it.metadataFile.set(project.layout.projectDirectory.dir("guides/${metadata.slug()}").file("metadata.json"))
+            it.scriptFile.set(project.layout.buildDirectory.dir("code/${metadata.slug()}").map(d -> d.file("test.sh")))
+            if (language) {
+                it.language.set(language.name())
+            }
             it.dependsOn(generateTask)
         }
     }
 
     private static TaskProvider<NativeTestScriptTask> registerNativeTestScriptTask(Project project,
                                                                        String taskSlug,
-                                                                       GuideMetadata metadata,
+                                                                       Guide metadata,
                                                                        TaskProvider<SampleProjectGenerationTask> generateTask) {
         project.tasks.register("${taskSlug}NativeTestScript", NativeTestScriptTask) { NativeTestScriptTask it ->
-            it.group = "guides $metadata.slug"
-            it.description = "Create a native-test.sh script for the projects generated by $metadata.slug"
+            it.group = "guides ${metadata.slug()}"
+            it.description = "Create a native-test.sh script for the projects generated by ${metadata.slug()}"
             it.metadata = metadata
-            it.guideSlug.set(metadata.slug)
-            it.metadataFile.set(project.layout.projectDirectory.dir("guides/${metadata.slug}").file("metadata.json"))
-            it.scriptFile.set(project.layout.buildDirectory.dir("code/${metadata.slug}").map(d -> d.file("native-test.sh")))
+            it.guideSlug.set(metadata.slug())
+            it.metadataFile.set(project.layout.projectDirectory.dir("guides/${metadata.slug()}").file("metadata.json"))
+            it.scriptFile.set(project.layout.buildDirectory.dir("code/${metadata.slug()}").map(d -> d.file("native-test.sh")))
             it.dependsOn(generateTask)
             it.enabled = isGraalVMJava()
         }
@@ -232,18 +305,18 @@ class GuidesPlugin implements Plugin<Project> {
 
     private static TaskProvider<NativeTestScriptRunnerTask> registerNativeTestScriptRunnerTask(Project project,
                                                                                                String taskSlug,
-                                                                                               GuideMetadata metadata,
+                                                                                               Guide metadata,
                                                                                                TaskProvider<NativeTestScriptTask> nativeTestScriptTask) {
         project.tasks.register("${taskSlug}RunNativeTestScript", NativeTestScriptRunnerTask) { NativeTestScriptRunnerTask it ->
             it.onlyIf { !Utils.skipBecauseOfJavaVersion(metadata) }
 
-            Provider<Directory> codeDirectory = project.layout.buildDirectory.dir("code/${metadata.slug}")
+            Provider<Directory> codeDirectory = project.layout.buildDirectory.dir("code/${metadata.slug()}")
 
-            it.group = "guides $metadata.slug"
-            it.description = "Run the native tests for all projects generated by $metadata.slug"
+            it.group = "guides ${metadata.slug()}"
+            it.description = "Run the native tests for all projects generated by ${metadata.slug()}"
 
             it.nativeTestScript.set(nativeTestScriptTask.flatMap { t -> t.scriptFile })
-            it.guideSourceDirectory.set(project.layout.projectDirectory.dir("guides/${metadata.slug}"))
+            it.guideSourceDirectory.set(project.layout.projectDirectory.dir("guides/${metadata.slug()}"))
 
             // We tee the script output to a file, this is the cached result
             it.outputFile.set(codeDirectory.map(d -> d.file("output.log")))
@@ -253,56 +326,82 @@ class GuidesPlugin implements Plugin<Project> {
 
     private static TaskProvider<TestScriptRunnerTask> registerTestScriptRunnerTask(Project project,
                                                                                    String taskSlug,
-                                                                                   GuideMetadata metadata,
+                                                                                   Guide metadata,
                                                                                    TaskProvider<TestScriptTask> testScriptTask) {
-        project.tasks.register("${taskSlug}RunTestScript", TestScriptRunnerTask) { TestScriptRunnerTask it ->
-            it.onlyIf { !Utils.skipBecauseOfJavaVersion(metadata) }
+        registerTestScriptRunnerTask(project, taskSlug, metadata, testScriptTask, null)
+    }
 
-            Provider<Directory> codeDirectory = project.layout.buildDirectory.dir("code/${metadata.slug}")
+    private static TaskProvider<TestScriptRunnerTask> registerTestScriptRunnerTask(Project project,
+                                                                                   String taskSlug,
+                                                                                   Guide metadata,
+                                                                                   TaskProvider<TestScriptTask> testScriptTask,
+                                                                                   Language language) {
+        String languageSuffix = language ? language.toString().capitalize() : ''
+        String outputFileName = language ? "output-${language.toString().toLowerCase()}.log" : "output.log"
+        project.tasks.register("${taskSlug}RunTestScript${languageSuffix}", TestScriptRunnerTask) { TestScriptRunnerTask it ->
+            it.onlyIf {
+                !Utils.skipBecauseOfJavaVersion(metadata) &&
+                        (language != Language.PYTHON || System.getenv('CI') == null)
+            }
 
-            it.group = "guides $metadata.slug"
-            it.description = "Run the tests for all projects generated by $metadata.slug"
+            Provider<Directory> codeDirectory = project.layout.buildDirectory.dir("code/${metadata.slug()}")
 
-            it.environment.set(metadata.env)
+            it.group = "guides ${metadata.slug()}"
+            it.description = "Run the tests for all projects generated by ${metadata.slug()}"
+
+            it.environment.set(metadata.env())
 
             it.testScript.set(testScriptTask.flatMap { t -> t.scriptFile })
-            it.guideSourceDirectory.set(project.layout.projectDirectory.dir("guides/${metadata.slug}"))
+            it.guideSourceDirectory.set(project.layout.projectDirectory.dir("guides/${metadata.slug()}"))
 
             // We tee the script output to a file, this is the cached result
-            it.outputFile.set(codeDirectory.map(d -> d.file("output.log")))
+            it.outputFile.set(codeDirectory.map(d -> d.file(outputFileName)))
         }
     }
 
     private static TaskProvider<AsciidocGenerationTask> registerDocTask(Project project,
-                                                                        GuideMetadata metadata,
+                                                                        Guide metadata,
                                                                         Directory guidesDir,
                                                                         TaskProvider<SampleProjectGenerationTask> generateTask,
                                                                         String taskSlug) {
-        project.tasks.register("${taskSlug}GenerateDocs", AsciidocGenerationTask) { AsciidocGenerationTask it ->
-            it.group = "guides $metadata.slug"
+        registerDocTask(project, metadata, guidesDir, generateTask, taskSlug, null)
+    }
+
+    private static TaskProvider<AsciidocGenerationTask> registerDocTask(Project project,
+                                                                        Guide metadata,
+                                                                        Directory guidesDir,
+                                                                        TaskProvider<SampleProjectGenerationTask> generateTask,
+                                                                        String taskSlug,
+                                                                        Language language) {
+        String languageSuffix = language ? language.toString().capitalize() : ''
+        project.tasks.register("${taskSlug}GenerateDocs${languageSuffix}", AsciidocGenerationTask) { AsciidocGenerationTask it ->
+            it.group = "guides ${metadata.slug()}"
             it.dependsOn(generateTask)
-            it.description = "Generate asciidoc files for '${metadata.title}'"
-            it.slug.set(metadata.slug)
-            it.inputDirectory.set(guidesDir.dir(metadata.slug))
+            it.description = "Generate asciidoc files for '${metadata.title()}'"
+            it.slug.set(metadata.slug())
+            it.inputDirectory.set(guidesDir.dir(metadata.slug()))
             it.outputDir.set(project.layout.projectDirectory.dir("src/docs/asciidoc"))
+            if (language) {
+                it.language.set(language.name())
+            }
             it.metadata = metadata
         }
     }
 
-    private static String optionName(GuideMetadata metadata, GuidesOption option) {
-        "${metadata.slug}-${option.buildTool}-${option.language}"
+    private static String optionName(Guide metadata, GuidesOption option) {
+        "${metadata.slug()}-${option.buildTool}-${option.language}"
     }
 
     private static TaskProvider<Zip> registerZipTask(Project project,
-                                                     GuideMetadata metadata,
+                                                     Guide metadata,
                                                      GuidesOption option,
                                                      TaskProvider<SampleProjectGenerationTask> generateTask) {
         String name = optionName(metadata, option)
         String taskName = "${kebabCaseToGradleName(name)}ZipCode"
-        String fromPath = "code/$metadata.slug/$name"
+        String fromPath = "code/${metadata.slug()}/$name"
         String archiveFileName = "${name}.zip"
         project.tasks.register(taskName, Zip) { Zip it ->
-            it.group = "guides $metadata.slug"
+            it.group = "guides ${metadata.slug()}"
             it.description = "Zips the source project for '${name}'"
             it.dependsOn(generateTask)
             it.from(project.layout.buildDirectory.dir(fromPath))
@@ -311,7 +410,26 @@ class GuidesPlugin implements Plugin<Project> {
         }
     }
 
-    private static Map<String, Object> workflowTokens(GuideMetadata metadata,
+    private static TaskProvider<Zip> registerLanguageZipTask(Project project,
+                                                             String taskSlug,
+                                                             Guide metadata,
+                                                             Language language,
+                                                             GuidesOption option,
+                                                             TaskProvider<SampleProjectGenerationTask> generateTask) {
+        String name = optionName(metadata, option)
+        String languageSuffix = language.toString().capitalize()
+        String archiveFileName = name + ".zip"
+        project.tasks.register("${taskSlug}${languageSuffix}ZipCode", Zip) { Zip it ->
+            it.group = "guides ${metadata.slug()}"
+            it.description = "Zips the ${language} source project for '${name}'"
+            it.dependsOn(generateTask)
+            it.from(project.layout.buildDirectory.dir("code/${metadata.slug()}/${name}"))
+            it.archiveFileName.set(archiveFileName)
+            it.destinationDirectory.set(project.layout.buildDirectory.dir("dist"))
+        }
+    }
+
+    private static Map<String, Object> workflowTokens(Guide metadata,
                                                       String taskSlug) {
         List<GuidesOption> options = GuideProjectGenerator.guidesOptions(metadata)
 
@@ -329,12 +447,12 @@ class GuidesPlugin implements Plugin<Project> {
 
         String mavenProjects = projects(metadata, mavenOptions)
 
-        boolean mavenEnabled = !(CollectionUtils.isEmpty(mavenOptions) || metadata.skipMavenTests)
-        boolean gradleEnabled = !(CollectionUtils.isEmpty(gradleOptions) || metadata.skipGradleTests)
+        boolean mavenEnabled = !(CollectionUtils.isEmpty(mavenOptions) || metadata.skipMavenTests())
+        boolean gradleEnabled = !(CollectionUtils.isEmpty(gradleOptions) || metadata.skipGradleTests())
         [
                 gradleTask    : taskSlug + TASK_SUFFIX_GENERATE_PROJECTS,
                 javaMatrix    : javaMatrix(metadata),
-                slug          : metadata.slug,
+                slug          : metadata.slug(),
                 mavenProjects : mavenProjects,
                 gradleProjects: gradleProjects,
                 paths         : workflowPaths(metadata),
@@ -343,7 +461,7 @@ class GuidesPlugin implements Plugin<Project> {
         ] as Map
     }
 
-    private static String projects(GuideMetadata metadata, List<GuidesOption> options) {
+    private static String projects(Guide metadata, List<GuidesOption> options) {
 
         List<String> combinations = options
                 .stream()
@@ -353,11 +471,11 @@ class GuidesPlugin implements Plugin<Project> {
         List<String> allCombinations = []
 
         for (String combination : combinations) {
-            for (App app : metadata.apps) {
-                if (DEFAULT_APP_NAME.equals(app.name)) {
+            for (io.micronaut.guides.core.App app : metadata.apps()) {
+                if (DEFAULT_APP_NAME.equals(app.name())) {
                     allCombinations << quote(combination)
                 } else {
-                    allCombinations << quote(combination + '/' + app.name)
+                    allCombinations << quote(combination + '/' + app.name())
                 }
             }
         }
@@ -366,10 +484,10 @@ class GuidesPlugin implements Plugin<Project> {
     }
 
     private static TaskProvider<Copy> registerGenerateGithubActionSnapshotWorkflow(Project project,
-                                                                                   GuideMetadata metadata,
+                                                                                   Guide metadata,
                                                                                    String taskSlug) {
         Map<String, Object> tokens = workflowTokens(metadata, taskSlug)
-        tokens.workflowName = "Test " + metadata.slug + " Snapshot"
+        tokens.workflowName = "Test " + metadata.slug() + " Snapshot"
         project.tasks.register("${taskSlug}GenerateGithubActionSnapshotWorkflow", Copy) { Copy it ->
             it.from("github-action-snapshot-template.yml")
             it.into(project.layout.projectDirectory.dir(".github/workflows"))
@@ -377,17 +495,17 @@ class GuidesPlugin implements Plugin<Project> {
             it.rename(new Transformer<String, String>() {
                 @Override
                 String transform(String s) {
-                    "guide-${metadata.slug}-snapshot.yml"
+                    "guide-${metadata.slug()}-snapshot.yml"
                 }
             })
         }
     }
 
     private static TaskProvider<Copy> registerGenerateGithubActionWorkflow(Project project,
-                                                                           GuideMetadata metadata,
+                                                                           Guide metadata,
                                                                            String taskSlug) {
         Map<String, Object> tokens = workflowTokens(metadata, taskSlug)
-        tokens.workflowName = "Test " + metadata.slug
+        tokens.workflowName = "Test " + metadata.slug()
         project.tasks.register("${taskSlug}GenerateGithubActionWorkflow", Copy) { Copy it ->
             it.from("github-action-template.yml")
             it.into(project.layout.projectDirectory.dir(".github/workflows"))
@@ -395,13 +513,13 @@ class GuidesPlugin implements Plugin<Project> {
             it.rename(new Transformer<String, String>() {
                 @Override
                 String transform(String s) {
-                    "guide-${metadata.slug}.yml"
+                    "guide-${metadata.slug()}.yml"
                 }
             })
         }
     }
 
-    private static String javaMatrix(GuideMetadata guideMetadata) {
+    private static String javaMatrix(Guide guideMetadata) {
         String.join(COMMA, JAVA_MATRIX
                 .stream()
                 .filter(minFilter(guideMetadata))
@@ -410,30 +528,44 @@ class GuidesPlugin implements Plugin<Project> {
                 .collect(Collectors.toList()))
     }
 
-    private static Predicate<Integer> minFilter(GuideMetadata guideMetadata) {
-        (guideMetadata.minimumJavaVersion ? { int v -> v >= guideMetadata.minimumJavaVersion } : { true }) as Predicate
+    private static Predicate<Integer> minFilter(Guide guideMetadata) {
+        (guideMetadata.minimumJavaVersion() ? { int v -> v >= guideMetadata.minimumJavaVersion() } : { true }) as Predicate
     }
 
-    private static Predicate<Integer> maxFilter(GuideMetadata guideMetadata) {
-        (guideMetadata.maximumJavaVersion ? { int v -> v <= guideMetadata.maximumJavaVersion } : { true }) as Predicate
+    private static Predicate<Integer> maxFilter(Guide guideMetadata) {
+        (guideMetadata.maximumJavaVersion() ? { int v -> v <= guideMetadata.maximumJavaVersion() } : { true }) as Predicate
     }
 
     private static TaskProvider<SampleProjectGenerationTask> registerGenerateTask(Project project,
-                                                                                  GuideMetadata metadata,
+                                                                                  Guide metadata,
                                                                                   GuideProjectGenerator projectGenerator,
                                                                                   Directory guidesDir,
                                                                                   Provider<Directory> codeDir,
                                                                                   String taskSlug) {
-        project.tasks.register("${taskSlug}${TASK_SUFFIX_GENERATE_PROJECTS}", SampleProjectGenerationTask) { SampleProjectGenerationTask it ->
-            it.group = "guides $metadata.slug"
-            it.description = "Generate sample project for guide '${metadata.title}'"
+        registerGenerateTask(project, metadata, projectGenerator, guidesDir, codeDir, taskSlug, null)
+    }
+
+    private static TaskProvider<SampleProjectGenerationTask> registerGenerateTask(Project project,
+                                                                                  Guide metadata,
+                                                                                  GuideProjectGenerator projectGenerator,
+                                                                                  Directory guidesDir,
+                                                                                  Provider<Directory> codeDir,
+                                                                                  String taskSlug,
+                                                                                  Language language) {
+        String languageSuffix = language ? language.toString().capitalize() : ''
+        project.tasks.register("${taskSlug}${TASK_SUFFIX_GENERATE_PROJECTS}${languageSuffix}", SampleProjectGenerationTask) { SampleProjectGenerationTask it ->
+            it.group = "guides ${metadata.slug()}"
+            it.description = "Generate sample project for guide '${metadata.title()}'"
             it.guidesGenerator = projectGenerator
-            it.slug.set(metadata.slug)
-            it.inputDirectory.set(guidesDir.dir(metadata.slug))
-            if (metadata.base != null) {
-                it.baseInputDirectory.set(guidesDir.dir(metadata.base))
+            it.slug.set(metadata.slug())
+            it.inputDirectory.set(guidesDir.dir(metadata.slug()))
+            if (metadata.base() != null) {
+                it.baseInputDirectory.set(guidesDir.dir(metadata.base()))
             }
-            it.outputDir.set(codeDir.map(s -> s.dir(metadata.slug)))
+            it.outputDir.set(codeDir.map(s -> s.dir(metadata.slug())))
+            if (language) {
+                it.language.set(language.name())
+            }
             it.guidesGenerator = projectGenerator
             it.metadata = metadata
         }
@@ -441,11 +573,24 @@ class GuidesPlugin implements Plugin<Project> {
 
     private static TaskProvider<Task> registerGuideBuild(Project project,
                                                          String taskSlug,
-                                                         GuideMetadata metadata,
+                                                         Guide metadata,
                                                          TaskProvider<? extends Task>... dependsOnTasks) {
         project.tasks.register("${taskSlug}${TASK_SUFFIX_BUILD}") { Task it ->
-            it.group = "guides $metadata.slug"
+            it.group = "guides ${metadata.slug()}"
             it.dependsOn(dependsOnTasks)
+            it.finalizedBy(project.tasks.named('asciidoctor'), project.tasks.named('themeGuides'))
+        }
+    }
+
+    private static TaskProvider<Task> registerGuideBuildForLanguage(Project project,
+                                                                    String taskSlug,
+                                                                    String language,
+                                                                    Guide metadata,
+                                                                    TaskProvider<? extends Task>... dependsOnTasks) {
+        project.tasks.register("${taskSlug}${TASK_SUFFIX_BUILD}${language}") { Task it ->
+            it.group = "guides ${metadata.slug()}"
+            it.dependsOn(dependsOnTasks)
+            it.dependsOn(project.tasks.named('createDist'))
             it.finalizedBy(project.tasks.named('asciidoctor'), project.tasks.named('themeGuides'))
         }
     }

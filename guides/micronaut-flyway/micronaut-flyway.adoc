@@ -25,18 +25,30 @@ common:default-package.adoc[]
 
 NOTE: If you use https://launch.micronaut.io[Micronaut Launch], select "Micronaut Application" as application type and add `mysql`, `data-jdbc`, and `flyway` as features.
 
-https://guides.micronaut.io/latest/micronaut-intellij-idea-ide-setup.html[Setup IntelliJ IDEA to develop Micronaut Applications].
+https://micronaut-projects.github.io/micronaut-guides/latest/micronaut-intellij-idea-ide-setup.html[Set up IntelliJ IDEA to develop Micronaut applications].
 
 === Create Entity
+
+:exclude-for-languages:python
 
 Create a `@MappedEntity` to save persons. Initially, consider name and age required. Use `int` primitive for the age.
 
 source:Person[tags=package|clazz1|ageint|clazz2]
 
-callout:mapped-entity[1]
-callout:mapped-entity-id[2]
-callout:generated-value[3]
-callout:version-optimistic-locking[4]
+:exclude-for-languages:
+
+:only-for-languages:python
+
+Create a dataclass annotated with `@MappedEntity` to save persons:
+
+source:Person[]
+
+:only-for-languages:
+
+callout:mapped-entity[]
+callout:mapped-entity-id[]
+callout:generated-value[]
+callout:version-optimistic-locking[]
 
 common:flyway.adoc[]
 
@@ -47,9 +59,9 @@ During application startup, https://www.flywaydb.org[Flyway] executes the SQL fi
 If you check the database schema, there are two tables:
 
 - `person`
-- `flyway_scheme_history`
+- `flyway_schema_history`
 
-Flyway uses the table `flyway_scheme_history` to keep track of database migrations.
+Flyway uses the table `flyway_schema_history` to keep track of database migrations.
 
 The `person` table looks like:
 
@@ -71,9 +83,19 @@ The `person` table looks like:
 
 === Drop Not Null Constraint
 
+:exclude-for-languages:python
+
 Applications change. Make `age` optional:
 
 source:Person[tags=nullableage]
+
+:exclude-for-languages:
+
+:only-for-languages:python
+
+Applications change. The Python dataclass uses `int | None` for the optional `age` field.
+
+:only-for-languages:
 
 Add a new migration to drop the null constraint:
 
@@ -113,8 +135,14 @@ Create a test that invokes the Flyway endpoint.
 
 test:FlywayEndpointTest[]
 
-callout:micronaut-test[1]
-callout:http-client[2]
+:exclude-for-languages:python
+callout:micronaut-test[]
+callout:http-client[]
+:exclude-for-languages:
+:only-for-languages:python
+<1> Create a Micronaut test fixture for the application under test.
+<2> Use `requests.with_context(my_context)` to call the application under test with a context-bound HTTP client.
+:only-for-languages:
 
 common:test-resources-mysql-datasource.adoc[]
 
@@ -122,7 +150,7 @@ common:testApp.adoc[]
 
 common:runapp.adoc[]
 
-You can run a cURL command to test the application:
+You can run a curl command to test the application:
 
 [source, bash]
 ----
@@ -133,19 +161,9 @@ You will see information about migrations.
 
 common:graal-with-plugins.adoc[]
 
-You can run a cURL command to test the application:
-
-[source, bash]
-----
-curl http://localhost:8080/flyway
-----
-
-You will see information about migrations.
-
 common:next.adoc[]
 
 Check https://micronaut-projects.github.io/micronaut-flyway/latest/guide/[Micronaut Flyway] integration.
 
 Learn more about https://flywaydb.org[Flyway].
 
-common:helpWithMicronaut.adoc[]

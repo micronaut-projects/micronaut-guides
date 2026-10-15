@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2024 original authors
+ * Copyright 2017-2026 original authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import jakarta.validation.constraints.PositiveOrZero;
 
 @Serdeable
 public record SortingAndOrderArguments(
-        @Nullable @PositiveOrZero Integer offset,
+        @Nullable @PositiveOrZero Integer offset, // <1>
         @Nullable @Positive Integer max,
         @Nullable @Pattern(regexp = "id|name") String sort,
         @Nullable @Pattern(regexp = "asc|ASC|desc|DESC") String order

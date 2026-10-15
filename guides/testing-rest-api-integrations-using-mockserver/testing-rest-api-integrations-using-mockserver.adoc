@@ -39,11 +39,11 @@ First, create *Album* and *Photo* models using Java records.
 
 source:Photo[]
 
-callout:serdeable[1]
+callout:serdeable[]
 
 source:Album[]
 
-callout:serdeable[1]
+callout:serdeable[]
 
 == Create PhotoServiceClient
 
@@ -51,7 +51,7 @@ Let's create *PhotoServiceClient*, which is a https://docs.micronaut.io/latest/g
 
 source:PhotoServiceClient[]
 
-callout:client[1]
+callout:client[]
 
 We have externalized the photo-service base URL as a configurable property.
 So, let us add the following property in the *src/main/resources/application.properties* file.
@@ -64,11 +64,11 @@ Let us implement a REST API endpoint to return an Album for the given albumId as
 
 source:AlbumController[]
 
-callout:controller[number=1,arg0=/api]
-callout:constructor-di[number=2,arg0=PhotoServiceClient]
-callout:executes-on[3]
-callout:get[number=4,arg0=getAlbumById,arg1=/albums/{albumId}]
-callout:pathvariable[5]
+callout:controller[arg0=/api]
+callout:constructor-di[arg0=PhotoServiceClient]
+callout:executes-on[]
+callout:get[arg0=getAlbumById,arg1=/albums/{albumId}]
+callout:pathvariable[]
 
 Our application is exposing a REST API endpoint GET `/api/albums/\{albumId}`
 which internally makes an API call to `https://jsonplaceholder.typicode.com/albums/\{albumId}/photos`
@@ -107,11 +107,11 @@ Let us see how we can test the photo-service API integration using https://wirem
 
 It is better to mock the external API interactions at the HTTP protocol level instead of mocking
 the *photoServiceClient.getPhotos(albumId)* method because you will be able to verify any
-marshaling/unmarshalling errors, simulating network latency issues, etc.
+marshalling/unmarshalling errors, simulating network latency issues, etc.
 
 Add the WireMock Standalone dependency to your project:
 
-dependency:wiremock-standalone[groupId=org.wiremock,scope=test,version=@wiremock-standaloneVersion@]]
+dependency:wiremock-standalone[groupId=org.wiremock,scope=test,version=@wiremock-standaloneVersion@]
 
 NOTE: Add the repository `https://jitpack.io` to your build file to resolve the previous dependency.
 
@@ -119,19 +119,19 @@ Let us write the test for our GET `/api/albums/\{albumId}` API endpoint as follo
 
 test:AlbumControllerTest[]
 
-callout:test-containers-disabled-without-docker[1]
-<2> We can create an instance of WireMock server using *WireMockExtension* .
-<3> We have registered the *"micronaut.http.services.photosapi.url"* property pointing to WireMock endpoint URL.
-<4> In the *shouldGetAlbumById()* test, we have set the expected mock response for `/albums/\{albumId}/photos` API call and make a request to our application endpoint `/api/albums/\{albumId}` and verified the response.
-<5> We are using the RestAssured library to test our API endpoint, so we captured the random port on which the application started and initialized RestAssured *port*.
-<6> Set the expectations for an API call.
-<7> In the *shouldReturnServerErrorWhenPhotoServiceCallFailed()* test, we have set the expected mock response for `/albums/\{albumId}/photos` API call to return InternalServerError status code 500 and make a request to our application endpoint `/api/albums/\{albumId}` and verified the response.
+callout:test-containers-disabled-without-docker[]
+<.> We can create an instance of WireMock server using *WireMockExtension* .
+<.> We have registered the *"micronaut.http.services.photosapi.url"* property pointing to WireMock endpoint URL.
+<.> In the *shouldGetAlbumById()* test, we have set the expected mock response for `/albums/\{albumId}/photos` API call and make a request to our application endpoint `/api/albums/\{albumId}` and verified the response.
+<.> We are using the RestAssured library to test our API endpoint, so we captured the random port on which the application started and initialized RestAssured *port*.
+<.> Set the expectations for an API call.
+<.> In the *shouldReturnServerErrorWhenPhotoServiceCallFailed()* test, we have set the expected mock response for `/albums/\{albumId}/photos` API call to return InternalServerError status code 500 and make a request to our application endpoint `/api/albums/\{albumId}` and verified the response.
 
 === Stubbing using JSON mapping files
 
 Add the https://github.com/wiremock/wiremock-testcontainers-java[Testcontainers Java modules for WireMock] dependency to your project:
 
-dependency:wiremock-testcontainers-java[groupId=com.github.wiremock,scope=test,version=@wiremock-testcontainers-javaVersion@]]
+dependency:wiremock-testcontainers-java[groupId=com.github.wiremock,scope=test,version=@wiremock-testcontainers-javaVersion@]
 
 In the previous test, we saw how to stub an API using *wireMock.stubFor(...)*.
 Instead of stubbing using WireMock Java API, we can use JSON mapping-based configuration.
@@ -158,9 +158,9 @@ to initialize a wiremock server and stubbing as follows:
 
 test:AlbumControllerTestcontainersTests[]
 
-callout:test-containers-disabled-without-docker[1]
-<2> We are using Testcontainers JUnit 5 Extension annotations *@Container* to initialize *WireMockContainer*.
-<3> We have configured to load stub mappings from *mocks-config.json* file
+callout:test-containers-disabled-without-docker[]
+<.> We are using Testcontainers JUnit 5 Extension annotations *@Container* to initialize *WireMockContainer*.
+<.> We have configured to load stub mappings from *mocks-config.json* file
 
 Create *src/test/resources/example/micronaut/AlbumControllerTestcontainersTests/mocks-config.json* file as follows:
 
@@ -182,11 +182,11 @@ ____
 
 Add the Testcontainers *MockServer* dependency:
 
-dependency:mockserver[groupId=org.testcontainers,scope=test]
+dependency:testcontainers-mockserver[groupId=org.testcontainers,scope=test]
 
 Add the MockServer Java Client dependency:
 
-dependency:mockserver-client-java[groupId=org.mock-server,scope=test,version=@mockserver-client-javaVersion@]]
+dependency:mockserver-client-java[groupId=org.mock-server,scope=test,version=@mockserver-client-javaVersion@]
 
 ==== MockServer Test
 
@@ -194,13 +194,13 @@ You can write a test using MockServer as follows:
 
 test:AlbumControllerMockServerTest[]
 
-callout:micronaut-test[1]
-callout:test-instance-per-class[2]
-callout:test-containers-disabled-without-docker[3]
-callout:test-property-provider[4]
-<5> We have registered the *"micronaut.http.services.photosapi.url"* property pointing to MockServer container endpoint.
-callout:injection-request-specification[6]
-callout:rest-assured-spec-port[7]
+callout:micronaut-test[]
+callout:test-instance-per-class[]
+callout:test-containers-disabled-without-docker[]
+callout:test-property-provider[]
+<.> We have registered the *"micronaut.http.services.photosapi.url"* property pointing to MockServer container endpoint.
+callout:injection-request-specification[]
+callout:rest-assured-spec-port[]
 
 common:testApp.adoc[]
 
@@ -217,7 +217,5 @@ and test it using https://testcontainers.com/modules/wiremock/[Testcontainers Wi
 Refer to https://wiremock.org/docs/solutions/testcontainers/[Testcontainers WireMock module's documentation] for more information.
 
 Learn more about https://micronaut-projects.github.io/micronaut-test/latest/guide/[Micronaut Test] and http://testcontainers.com[Testcontainers].
-
-common:helpWithMicronaut.adoc[]
 
 

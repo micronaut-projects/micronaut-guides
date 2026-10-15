@@ -9,12 +9,13 @@ import io.micronaut.starter.application.ApplicationType;
 import io.micronaut.starter.application.generator.GeneratorContext;
 import io.micronaut.starter.build.BuildPlugin;
 import io.micronaut.starter.build.dependencies.Coordinate;
+import io.micronaut.starter.build.gradle.GradleDsl;
 import io.micronaut.starter.build.gradle.GradlePlugin;
 import io.micronaut.starter.build.maven.MavenPlugin;
 import io.micronaut.starter.feature.Category;
 import io.micronaut.starter.feature.Feature;
 import io.micronaut.starter.feature.FeaturePhase;
-import io.micronaut.starter.feature.build.MicronautGradleEnterprise;
+import io.micronaut.starter.feature.build.Develocity;
 import io.micronaut.starter.options.BuildTool;
 import io.micronaut.starter.options.Language;
 import io.micronaut.starter.template.BinaryTemplate;
@@ -94,11 +95,11 @@ public class Spotless implements Feature {
         GradlePlugin.Builder gradlePlugin = GradlePlugin.builder()
                 .id("com.diffplug.spotless");
         // If we are applying the MicronautGradle Enterprise plugin, we don't need to add the spotless plugin version (as it is already included)
-        if (!generatorContext.hasFeature(MicronautGradleEnterprise.class)) {
+        if (!generatorContext.hasFeature(Develocity.class)) {
             gradlePlugin.lookupArtifactId("spotless-plugin-gradle");
         }
         return gradlePlugin
-                .extension(new RockerWritable(spotlessGradle.template(languages(generatorContext))))
+                .extension(new RockerWritable(spotlessGradle.template(generatorContext.getBuildTool().getGradleDsl().orElse(GradleDsl.KOTLIN), languages(generatorContext), generatorContext.getFramework())))
                 .build();
     }
 

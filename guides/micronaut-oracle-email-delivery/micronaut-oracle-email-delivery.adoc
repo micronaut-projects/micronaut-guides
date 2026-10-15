@@ -19,7 +19,7 @@ To configure email delivery, we need to:
 
 * add an "Approved Sender"
 * generate SMTP credentials
-* find the SMTP Endpoint for your region.
+* find the SMTP endpoint for your region.
 
 === Approved Sender
 
@@ -135,7 +135,7 @@ export C='ocid1.compartment.oc1..aaaaaaaarkh3s2wcxbbm...'
 
 https://docs.oracle.com/en-us/iaas/tools/oci-cli/latest/oci_cli_docs/cmdref/iam/policy/create.html[Create an IAM policy] to grant members of the group permission to send emails:
 
-For Linux or Mac, run
+For Linux or Mac, run:
 [source,bash]
 ----
 oci iam policy create -c $C --description "mn-email-guide-policy" \
@@ -143,7 +143,7 @@ oci iam policy create -c $C --description "mn-email-guide-policy" \
  --statements '["Allow group mn-email-group to use email-family in compartment id ocid1.compartment.oc1..aaaaaaaarkh3s2wcxbbm..."]'
 ----
 
-or for Windows
+or for Windows:
 [source,bash]
 ----
 oci iam policy create -c %C% --description "mn-email-guide-policy" \
@@ -187,7 +187,7 @@ https://docs.oracle.com/en-us/iaas/tools/oci-cli/latest/oci_cli_docs/cmdref/emai
 oci email sender create -c $C --email-address noreply@test.com
 ----
 
-NOTE: `email-address` is the "from" address
+NOTE: `email-address` is the "from" address.
 
 === SMTP Endpoint
 
@@ -213,24 +213,24 @@ Micronaut Email requires a bean of type `SessionProvider` when using JavaMail to
 
 source:OciSessionProvider[]
 
-callout:singleton[1]
-callout:property-constructor-parameter[2]
-<3> Use the username and password to create the `Session`
+callout:singleton[]
+callout:property-constructor-parameter[]
+<.> Use the username and password to create the `Session`.
 
 === EmailController class
 
-Create a controller that uses the Micronaut EmailSender to send emails:
+Create a controller that uses the Micronaut `EmailSender` to send emails:
 
 source:EmailController[]
 
-callout:executes-on[1]
-callout:controller[number=2,arg0=/email]
-callout:constructor-di[number=3,arg0=emailSender]
-callout:text-plain[4]
-<5> You can send plain-text emails.
-<6> You can send HTML emails leveraging Micronaut template rendering capabilities.
-callout:consumes[7]
-<8> You can send email with attachments.
+callout:executes-on[]
+callout:controller[arg0=/email]
+callout:constructor-di[arg0=emailSender]
+callout:text-plain[]
+<.> You can send plain-text emails.
+<.> You can send HTML emails leveraging Micronaut template rendering capabilities.
+callout:consumes[]
+<.> You can send email with attachments.
 
 === Email template
 Create a Thymeleaf template in:
@@ -239,38 +239,37 @@ resource:views/email.html[]
 
 === From Configuration
 
-If you always use the same Sender you can add the following configuration snippet to `application.yml`
+If you always use the same sender, you can add the following configuration snippet to `application.properties`:
 
-common:yaml-dependency.adoc[]
 
-resource:application.yml[tag=micronaut-email]
+resource:application.properties[tag=micronaut-email]
 
-<1> Sender's email
-<2> Sender's name
+<1> Sender's email.
+<2> Sender's name.
 
 === SMTP configuration
 
-Add the following snippet to `application.yml` to supply the SMTP credentials.
+Add the following snippet to `application.properties` to supply the SMTP credentials.
 
-We injected SMTP configuration via constructor paramters annotated with `@Property`. You could have used a POJO annotated with
+We injected SMTP configuration via constructor parameters annotated with `@Property`. You could have used a POJO annotated with
 https://docs.micronaut.io/latest/api/io/micronaut/context/annotation/ConfigurationProperties.html[@ConfigurationProperties] as well.
 
-resource:application.yml[tag=smtp]
+resource:application.properties[tag=smtp]
 
-<1> the SMTP password
-<2> the SMTP username
+<1> The SMTP password.
+<2> The SMTP username.
 
 === Java Mail Properties Configuration
 
-Add the following snippet to  `application.yml` to supply JavaMail properties:
+Add the following snippet to `application.properties` to supply JavaMail properties:
 
-resource:application.yml[tag=javamail]
+resource:application.properties[tag=javamail]
 
-<1> the SMTP server
+<1> The SMTP server.
 
 === Set Configuration Variables
 
-It's best to avoid hard-coding credentials and other sensitive information directly in config files. By using placeholder variables in `application.yml` like `SMTP_PASSWORD` and `SMTP_USER`, we can externalize the values via environment variables or secure storage such as https://docs.oracle.com/en-us/iaas/Content/KeyManagement/Concepts/keyoverview.htm[Oracle Cloud Infrastructure (OCI) Vault].
+It's best to avoid hard-coding credentials and other sensitive information directly in config files. By using placeholder variables in `application.properties` like `SMTP_PASSWORD` and `SMTP_USER`, we can externalize the values via environment variables or secure storage such as https://docs.oracle.com/en-us/iaas/Content/KeyManagement/Concepts/keyoverview.htm[Oracle Cloud Infrastructure (OCI) Vault].
 
 For simplicity, we'll use environment variables. Set the "from" email to the value you used earlier, and choose a "from" name. Set the SMTP username and password from the values you saved earlier when you generated the SMTP credentials, and set the SMTP server as the regional endpoint:
 
@@ -289,8 +288,8 @@ Create a test class to ensure emails are sent successfully:
 
 test:EmailControllerTest[]
 
-callout:micronaut-test[1]
-callout:http-client[2]
+callout:micronaut-test[]
+callout:http-client[]
 
 common:application-test-yaml.adoc[]
 
@@ -320,7 +319,7 @@ Send an email with an attachment. If you use Mac/Linux, run
 ----
 curl -X POST \
      -H "Content-Type: multipart/form-data" \
-     -F "file=@ /Users/test/Pictures/demo/email.jpg" \
+     -F "file=@/Users/test/Pictures/demo/email.jpg" \
      localhost:8080/email/attachment
 ----
 
@@ -337,10 +336,10 @@ curl -X POST \
 common:graal-with-plugins.adoc[]
 
 
-== Next steps
+== Next Steps
 
 Read more about the https://micronaut-projects.github.io/micronaut-email/latest/guide/[Micronaut Email] project.
 
-Learn about the OCI https://docs.oracle.com/en-us/iaas/Content/Email/Concepts/overview.htm[Email Delivery Service]
+Learn about the OCI https://docs.oracle.com/en-us/iaas/Content/Email/Concepts/overview.htm[Email Delivery Service].
 
 See https://recursive.codes/blog/post/2128[this blog post] which covers much of the same material as this guide.
