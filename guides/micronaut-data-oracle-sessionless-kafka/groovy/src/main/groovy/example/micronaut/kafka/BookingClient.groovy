@@ -26,10 +26,10 @@ import io.micronaut.configuration.kafka.annotation.Topic
 import org.apache.kafka.clients.producer.RecordMetadata
 
 @CompileStatic
-@KafkaClient(acks = KafkaClient.Acknowledge.ALL)
+@KafkaClient(acks = KafkaClient.Acknowledge.ALL) // <1>
 interface BookingClient {
-    @Topic("payment-requests")
-    RecordMetadata requestPayment(@KafkaKey Long bookingId, PaymentRequested request)
+    @Topic("payment-requests") // <2>
+    RecordMetadata requestPayment(@KafkaKey Long bookingId, PaymentRequested request) // <3>
 
     @Topic("payment-results")
     RecordMetadata paymentCompleted(@KafkaKey Long bookingId, PaymentCompleted result)

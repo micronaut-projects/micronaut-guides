@@ -16,13 +16,15 @@
 package example.micronaut.repository;
 
 import example.micronaut.entity.FlightSeat;
+import example.micronaut.entity.SeatStatus;
 
 import io.micronaut.data.jdbc.annotation.JdbcRepository;
 import io.micronaut.data.model.query.builder.sql.Dialect;
 import io.micronaut.data.repository.CrudRepository;
 import java.util.Optional;
 
-@JdbcRepository(dialect = Dialect.ORACLE)
-public interface FlightSeatRepository extends CrudRepository<FlightSeat, String> {
+@JdbcRepository(dialect = Dialect.ORACLE) // <1>
+public interface FlightSeatRepository extends CrudRepository<FlightSeat, String> { // <2>
     Optional<FlightSeat> findByIdForUpdate(String id);
+    Optional<FlightSeat> findByIdAndStatus(String id, SeatStatus status);
 }

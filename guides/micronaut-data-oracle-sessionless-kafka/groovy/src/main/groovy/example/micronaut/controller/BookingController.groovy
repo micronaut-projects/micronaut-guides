@@ -40,8 +40,8 @@ import jakarta.validation.Valid
 import java.util.Optional
 
 @CompileStatic
-@Controller("/bookings")
-@ExecuteOn(TaskExecutors.BLOCKING)
+@Controller("/bookings") // <1>
+@ExecuteOn(TaskExecutors.BLOCKING) // <2>
 class BookingController {
     private final BookingClient bookingClient
     private final BookingService bookingService
@@ -61,29 +61,29 @@ class BookingController {
         this.flightSeatRepository = flightSeatRepository
     }
 
-    @Serdeable // <5>
+    @Serdeable // <10>
     @groovy.transform.Canonical
     static class AcceptedBooking {
         Long bookingId
     }
 
-    @Post
+    @Post // <3>
     HttpResponse<AcceptedBooking> book(@Body @Valid BookingRequest request) {
-        PaymentRequested payment = propagation.withPropagation({ -> // <1>
-            Booking booking = bookingService.reserve(request.seatId) // <2>
-            String transactionId = propagation.currentTransactionId().orElseThrow() // <3>
+        PaymentRequested payment = propagation.withPropagation({ -> // <4>
+            Booking booking = bookingService.reserve(request.seatId) // <5>
+            String transactionId = propagation.currentTransactionId().orElseThrow() // <6>
             return new PaymentRequested(booking.getId(), transactionId, booking.getAmount(), request.paymentToken)
         })
-        bookingClient.requestPayment(payment.bookingId, payment) // <4>
+        bookingClient.requestPayment(payment.bookingId, payment) // <7>
         return HttpResponse.accepted().body(new AcceptedBooking(payment.bookingId))
     }
 
-    @Get("/{id}")
+    @Get("/{id}") // <8>
     Optional<BookingView> find(Long id) {
         return bookingRepository.findById(id).map(BookingView::from)
     }
 
-    @Get("/seats/{id}")
+    @Get("/seats/{id}") // <9>
     Optional<FlightSeatView> seat(String id) {
         return flightSeatRepository.findById(id).map(FlightSeatView::from)
     }

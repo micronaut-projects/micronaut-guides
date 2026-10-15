@@ -35,8 +35,8 @@ import io.micronaut.transaction.jdbc.oracle.OracleSessionlessTransactionPropagat
 import jakarta.validation.Valid
 import java.util.Optional
 
-@Controller("/bookings")
-@ExecuteOn(TaskExecutors.BLOCKING)
+@Controller("/bookings") // <1>
+@ExecuteOn(TaskExecutors.BLOCKING) // <2>
 open class BookingController(
     private val bookingClient: BookingClient,
     private val bookingService: BookingService,
@@ -44,23 +44,23 @@ open class BookingController(
     private val bookingRepository: BookingRepository,
     private val flightSeatRepository: FlightSeatRepository
 ) {
-    @Serdeable // <5>
+    @Serdeable // <10>
     data class AcceptedBooking(val bookingId: Long)
 
-    @Post
+    @Post // <3>
     open fun book(@Body @Valid request: BookingRequest): HttpResponse<AcceptedBooking> {
-        val payment = propagation.withPropagation { // <1>
-            val booking = bookingService.reserve(request.seatId) // <2>
-            val transactionId = propagation.currentTransactionId().orElseThrow() // <3>
+        val payment = propagation.withPropagation { // <4>
+            val booking = bookingService.reserve(request.seatId) // <5>
+            val transactionId = propagation.currentTransactionId().orElseThrow() // <6>
             PaymentRequested(requireNotNull(booking.id), transactionId, booking.amount, request.paymentToken)
         }
-        bookingClient.requestPayment(payment.bookingId, payment) // <4>
+        bookingClient.requestPayment(payment.bookingId, payment) // <7>
         return HttpResponse.accepted<AcceptedBooking>().body(AcceptedBooking(payment.bookingId))
     }
 
-    @Get("/{id}")
+    @Get("/{id}") // <8>
     open fun find(id: Long): Optional<BookingView> = bookingRepository.findById(id).map(BookingView::from)
 
-    @Get("/seats/{id}")
+    @Get("/seats/{id}") // <9>
     open fun seat(id: String): Optional<FlightSeatView> = flightSeatRepository.findById(id).map(FlightSeatView::from)
 }

@@ -21,59 +21,13 @@ import io.micronaut.data.annotation.MappedEntity;
 import java.math.BigDecimal;
 
 @MappedEntity("booking") // <1>
-public class Booking {
+public record Booking(
     @Id // <2>
     @GeneratedValue // <3>
-    private Long id;
-    private String seatId;
-    private BigDecimal amount;
-    private BookingStatus status;
-    private String paymentReference;
-
-    public Booking(String seatId, BigDecimal amount, BookingStatus status, String paymentReference) {
-        this.seatId = seatId;
-        this.amount = amount;
-        this.status = status;
-        this.paymentReference = paymentReference;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getSeatId() {
-        return seatId;
-    }
-
-    public void setSeatId(String seatId) {
-        this.seatId = seatId;
-    }
-
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
-    }
-
-    public BookingStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(BookingStatus status) {
-        this.status = status;
-    }
-
-    public String getPaymentReference() {
-        return paymentReference;
-    }
-
-    public void setPaymentReference(String paymentReference) {
-        this.paymentReference = paymentReference;
-    }
+    Long id,
+    String seatId,
+    BigDecimal amount,
+    BookingStatus status,
+    String paymentReference
+) {
 }

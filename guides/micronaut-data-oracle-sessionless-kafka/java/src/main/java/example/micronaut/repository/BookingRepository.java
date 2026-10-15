@@ -16,11 +16,14 @@
 package example.micronaut.repository;
 
 import example.micronaut.entity.Booking;
+import example.micronaut.entity.BookingStatus;
 
 import io.micronaut.data.jdbc.annotation.JdbcRepository;
 import io.micronaut.data.model.query.builder.sql.Dialect;
 import io.micronaut.data.repository.CrudRepository;
+import java.util.Optional;
 
-@JdbcRepository(dialect = Dialect.ORACLE)
-public interface BookingRepository extends CrudRepository<Booking, Long> {
+@JdbcRepository(dialect = Dialect.ORACLE) // <1>
+public interface BookingRepository extends CrudRepository<Booking, Long> { // <2>
+    Optional<Booking> findByIdAndStatus(Long id, BookingStatus status);
 }

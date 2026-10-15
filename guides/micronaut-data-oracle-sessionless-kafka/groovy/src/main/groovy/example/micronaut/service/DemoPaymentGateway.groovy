@@ -24,7 +24,7 @@ import java.util.Map
 import java.util.concurrent.ConcurrentHashMap
 
 @CompileStatic
-@Singleton
+@Singleton // <1>
 class DemoPaymentGateway {
     private final Map<Long, Decision> decisions = new ConcurrentHashMap<>()
 

@@ -22,10 +22,10 @@ import io.micronaut.configuration.kafka.annotation.KafkaKey
 import io.micronaut.configuration.kafka.annotation.Topic
 import org.apache.kafka.clients.producer.RecordMetadata
 
-@KafkaClient(acks = KafkaClient.Acknowledge.ALL)
+@KafkaClient(acks = KafkaClient.Acknowledge.ALL) // <1>
 interface BookingClient {
-    @Topic("payment-requests")
-    fun requestPayment(@KafkaKey bookingId: Long, request: PaymentRequested): RecordMetadata
+    @Topic("payment-requests") // <2>
+    fun requestPayment(@KafkaKey bookingId: Long, request: PaymentRequested): RecordMetadata // <3>
 
     @Topic("payment-results")
     fun paymentCompleted(@KafkaKey bookingId: Long, result: PaymentCompleted): RecordMetadata

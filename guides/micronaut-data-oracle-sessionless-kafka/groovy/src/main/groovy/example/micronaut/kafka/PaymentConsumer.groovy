@@ -26,7 +26,7 @@ import io.micronaut.configuration.kafka.annotation.OffsetStrategy
 import io.micronaut.configuration.kafka.annotation.Topic
 
 @CompileStatic
-@KafkaListener(groupId = "payment-processing", offsetStrategy = OffsetStrategy.SYNC_PER_RECORD)
+@KafkaListener(groupId = "payment-processing", offsetStrategy = OffsetStrategy.SYNC_PER_RECORD) // <1>
 class PaymentConsumer {
     private final DemoPaymentGateway demoPaymentGateway
     private final BookingClient bookingClient
@@ -36,10 +36,10 @@ class PaymentConsumer {
         this.bookingClient = bookingClient
     }
 
-    @Topic("payment-requests")
+    @Topic("payment-requests") // <2>
     void pay(PaymentRequested request) {
-        DemoPaymentGateway.Decision decision = demoPaymentGateway.pay(request) // <1>
+        DemoPaymentGateway.Decision decision = demoPaymentGateway.pay(request) // <3>
         bookingClient.paymentCompleted(request.bookingId, new PaymentCompleted(
-            request.bookingId, request.transactionId, decision.approved, decision.reference)) // <2>
+            request.bookingId, request.transactionId, decision.approved, decision.reference)) // <4>
     }
 }

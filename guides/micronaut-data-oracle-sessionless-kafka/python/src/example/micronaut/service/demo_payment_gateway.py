@@ -6,7 +6,7 @@ from ..dto.payment_completed import PaymentCompleted
 from ..dto.payment_requested import PaymentRequested
 
 
-@Singleton
+@Singleton  # <1>
 class DemoPaymentGateway:
     def __init__(self):
         self.decisions = {}

@@ -36,10 +36,9 @@ import org.junit.jupiter.api.Timeout
 import java.time.Duration
 import java.util.Optional
 
-@MicronautTest(transactional = false)
-@Property(name = "micronaut.test.resources.scope", value = "booking-controller-e2e")
+@MicronautTest(transactional = false) // <1>
+@Property(name = "micronaut.test.resources.scope", value = "booking-controller-e2e") // <2>
 @Property(name = "micronaut.http.client.read-timeout", value = "30s")
-@Sql("classpath:seed.sql")
 @Sql(scripts = ["classpath:rollbackSeed.sql"], phase = Sql.Phase.AFTER_ALL)
 @Timeout(120)
 class KafkaBookingTest {

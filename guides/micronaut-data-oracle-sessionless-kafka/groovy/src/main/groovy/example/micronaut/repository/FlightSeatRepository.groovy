@@ -18,6 +18,7 @@ package example.micronaut.repository
 import groovy.transform.CompileStatic
 
 import example.micronaut.entity.FlightSeat
+import example.micronaut.entity.SeatStatus
 
 import io.micronaut.data.jdbc.annotation.JdbcRepository
 import io.micronaut.data.model.query.builder.sql.Dialect
@@ -25,7 +26,8 @@ import io.micronaut.data.repository.CrudRepository
 import java.util.Optional
 
 @CompileStatic
-@JdbcRepository(dialect = Dialect.ORACLE)
-interface FlightSeatRepository extends CrudRepository<FlightSeat, String> {
+@JdbcRepository(dialect = Dialect.ORACLE) // <1>
+interface FlightSeatRepository extends CrudRepository<FlightSeat, String> { // <2>
     Optional<FlightSeat> findByIdForUpdate(String id)
+    Optional<FlightSeat> findByIdAndStatus(String id, SeatStatus status)
 }

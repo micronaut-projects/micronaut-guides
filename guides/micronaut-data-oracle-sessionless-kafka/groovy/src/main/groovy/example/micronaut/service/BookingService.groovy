@@ -33,7 +33,7 @@ import static io.micronaut.transaction.annotation.OracleTransactional.Sessionles
 import static io.micronaut.transaction.annotation.OracleTransactional.Sessionless.SUSPEND
 
 @CompileStatic
-@Singleton
+@Singleton // <9>
 class BookingService {
     private final FlightSeatRepository flightSeatRepository
     private final BookingRepository bookingRepository
@@ -57,18 +57,15 @@ class BookingService {
 
     @OracleTransactional(sessionless = REQUIRES_SUSPENDED) // <4>
     void complete(PaymentCompleted result) {
-        Booking booking = bookingRepository.findById(result.bookingId).orElseThrow() // <5>
+        Booking booking = bookingRepository.findByIdAndStatus(result.bookingId, BookingStatus.PENDING).orElseThrow() // <5>
         if (!result.approved) {
             throw new PaymentDeclinedException() // <6>
         }
-        FlightSeat seat = flightSeatRepository.findById(booking.getSeatId()).orElseThrow()
-        if (seat.getStatus() != SeatStatus.HELD || booking.getStatus() != BookingStatus.PENDING) {
-            throw new IllegalStateException("Booking could not be confirmed")
-        }
+        FlightSeat seat = flightSeatRepository.findByIdAndStatus(booking.getSeatId(), SeatStatus.HELD).orElseThrow() // <7>
         seat.setStatus(SeatStatus.BOOKED)
         flightSeatRepository.update(seat)
         booking.setStatus(BookingStatus.CONFIRMED)
         booking.setPaymentReference(result.paymentReference)
         bookingRepository.update(booking)
-    } // <7>
+    } // <8>
 }

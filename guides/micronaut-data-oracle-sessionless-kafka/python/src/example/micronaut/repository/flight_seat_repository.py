@@ -4,8 +4,10 @@ from micronaut.data.model.query.builder.sql import Dialect
 from micronaut.data.repository import CrudRepository
 
 from ..entity.flight_seat import FlightSeat
+from ..entity.seat_status import SeatStatus
 
 
-@JdbcRepository(dialect=Dialect.ORACLE)
-class FlightSeatRepository(CrudRepository[FlightSeat, str]):
+@JdbcRepository(dialect=Dialect.ORACLE)  # <1>
+class FlightSeatRepository(CrudRepository[FlightSeat, str]):  # <2>
     def findByIdForUpdate(self, id: str) -> Optional[FlightSeat]: ...
+    def findByIdAndStatus(self, id: str, status: SeatStatus) -> Optional[FlightSeat]: ...

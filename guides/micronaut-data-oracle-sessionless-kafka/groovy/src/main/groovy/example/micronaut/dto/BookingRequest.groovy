@@ -25,7 +25,7 @@ import jakarta.validation.constraints.Pattern
 @CompileStatic
 @Serdeable // <1>
 class BookingRequest {
-    @NotBlank
+    @NotBlank // <2>
     String seatId
     @NotBlank
     @Pattern(regexp = "demo-approve|demo-decline")

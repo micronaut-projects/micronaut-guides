@@ -19,7 +19,7 @@ import example.micronaut.dto.PaymentRequested
 import jakarta.inject.Singleton
 import java.util.concurrent.ConcurrentHashMap
 
-@Singleton
+@Singleton // <1>
 class DemoPaymentGateway {
     private val decisions = ConcurrentHashMap<Long, Decision>()
 

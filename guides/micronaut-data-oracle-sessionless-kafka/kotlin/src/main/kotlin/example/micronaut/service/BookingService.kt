@@ -27,7 +27,7 @@ import io.micronaut.transaction.annotation.OracleTransactional.Sessionless.SUSPE
 import jakarta.inject.Singleton
 import java.math.BigDecimal
 
-@Singleton
+@Singleton // <9>
 open class BookingService(
     private val flightSeatRepository: FlightSeatRepository,
     private val bookingRepository: BookingRepository
@@ -44,18 +44,15 @@ open class BookingService(
 
     @OracleTransactional(sessionless = REQUIRES_SUSPENDED) // <4>
     open fun complete(result: PaymentCompleted) {
-        val booking = bookingRepository.findById(result.bookingId).orElseThrow() // <5>
+        val booking = bookingRepository.findByIdAndStatus(result.bookingId, BookingStatus.PENDING).orElseThrow() // <5>
         if (!result.approved) {
             throw PaymentDeclinedException() // <6>
         }
-        val seat = flightSeatRepository.findById(booking.seatId).orElseThrow()
-        check(seat.status == SeatStatus.HELD && booking.status == BookingStatus.PENDING) {
-            "Booking could not be confirmed"
-        }
+        val seat = flightSeatRepository.findByIdAndStatus(booking.seatId, SeatStatus.HELD).orElseThrow() // <7>
         seat.status = SeatStatus.BOOKED
         flightSeatRepository.update(seat)
         booking.status = BookingStatus.CONFIRMED
         booking.paymentReference = result.paymentReference
         bookingRepository.update(booking)
-    } // <7>
+    } // <8>
 }

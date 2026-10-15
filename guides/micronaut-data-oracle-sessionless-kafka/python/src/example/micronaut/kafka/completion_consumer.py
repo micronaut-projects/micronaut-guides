@@ -11,7 +11,7 @@ from ..service.payment_declined_exception import PaymentDeclinedException
 
 @KafkaListener(groupId="booking-completion", offsetStrategy=OffsetStrategy.SYNC_PER_RECORD,
                properties=[Property(name="auto.offset.reset", value="earliest"),
-                           Property(name="enable.auto.commit", value="false")])
+                           Property(name="enable.auto.commit", value="false")])  # <1>
 class CompletionConsumer:
     def __init__(self, booking_service: BookingService, booking_repository: BookingRepository,
                  propagation: OracleSessionlessTransactionPropagationOperations):
@@ -19,14 +19,14 @@ class CompletionConsumer:
         self.booking_repository = booking_repository
         self.propagation = propagation
 
-    @Topic("payment-results")
+    @Topic("payment-results")  # <2>
     def complete(self, result: PaymentCompleted) -> None:
         booking = self.booking_repository.findById(result.bookingId)
         if booking.isPresent() and booking.get().status == BookingStatus.CONFIRMED:
-            return  # <1>
+            return  # <3>
         try:
-            self.propagation.withPropagation(result.transactionId,  # <2>
-                                            lambda: self.booking_service.complete(result))  # <3>
-        except PaymentDeclinedException:  # <4>
+            self.propagation.withPropagation(result.transactionId,  # <4>
+                                            lambda: self.booking_service.complete(result))  # <5>
+        except PaymentDeclinedException:  # <6>
             # The transactional interceptor has already rolled back the reservation.
             pass

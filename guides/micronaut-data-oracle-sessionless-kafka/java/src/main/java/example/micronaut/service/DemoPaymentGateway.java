@@ -21,7 +21,7 @@ import jakarta.inject.Singleton;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Singleton
+@Singleton // <1>
 public class DemoPaymentGateway {
     private final Map<Long, Decision> decisions = new ConcurrentHashMap<>();
 

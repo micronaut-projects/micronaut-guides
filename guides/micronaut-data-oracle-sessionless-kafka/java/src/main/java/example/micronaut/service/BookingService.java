@@ -30,7 +30,7 @@ import java.math.BigDecimal;
 import static io.micronaut.transaction.annotation.OracleTransactional.Sessionless.REQUIRES_SUSPENDED;
 import static io.micronaut.transaction.annotation.OracleTransactional.Sessionless.SUSPEND;
 
-@Singleton
+@Singleton // <9>
 public class BookingService {
     private final FlightSeatRepository flightSeatRepository;
     private final BookingRepository bookingRepository;
@@ -49,23 +49,19 @@ public class BookingService {
         seat.setStatus(SeatStatus.HELD);
         flightSeatRepository.update(seat);
         BigDecimal amount = new BigDecimal("199.00");
-        return bookingRepository.save(new Booking(seatId, amount, BookingStatus.PENDING, "NONE")); // <3>
+        return bookingRepository.save(new Booking(null, seatId, amount, BookingStatus.PENDING, "NONE")); // <3>
     }
 
     @OracleTransactional(sessionless = REQUIRES_SUSPENDED) // <4>
     public void complete(PaymentCompleted result) {
-        Booking booking = bookingRepository.findById(result.bookingId()).orElseThrow(); // <5>
+        Booking booking = bookingRepository.findByIdAndStatus(result.bookingId(), BookingStatus.PENDING).orElseThrow(); // <5>
         if (!result.approved()) {
             throw new PaymentDeclinedException(); // <6>
         }
-        FlightSeat seat = flightSeatRepository.findById(booking.getSeatId()).orElseThrow();
-        if (seat.getStatus() != SeatStatus.HELD || booking.getStatus() != BookingStatus.PENDING) {
-            throw new IllegalStateException("Booking could not be confirmed");
-        }
+        FlightSeat seat = flightSeatRepository.findByIdAndStatus(booking.seatId(), SeatStatus.HELD).orElseThrow(); // <7>
         seat.setStatus(SeatStatus.BOOKED);
         flightSeatRepository.update(seat);
-        booking.setStatus(BookingStatus.CONFIRMED);
-        booking.setPaymentReference(result.paymentReference());
-        bookingRepository.update(booking);
-    } // <7>
+        bookingRepository.update(new Booking(booking.id(), booking.seatId(), booking.amount(),
+            BookingStatus.CONFIRMED, result.paymentReference()));
+    } // <8>
 }

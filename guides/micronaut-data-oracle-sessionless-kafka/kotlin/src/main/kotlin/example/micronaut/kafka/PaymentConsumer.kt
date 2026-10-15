@@ -22,13 +22,13 @@ import io.micronaut.configuration.kafka.annotation.KafkaListener
 import io.micronaut.configuration.kafka.annotation.OffsetStrategy
 import io.micronaut.configuration.kafka.annotation.Topic
 
-@KafkaListener(groupId = "payment-processing", offsetStrategy = OffsetStrategy.SYNC_PER_RECORD)
+@KafkaListener(groupId = "payment-processing", offsetStrategy = OffsetStrategy.SYNC_PER_RECORD) // <1>
 class PaymentConsumer(private val demoPaymentGateway: DemoPaymentGateway, private val bookingClient: BookingClient) {
-    @Topic("payment-requests")
+    @Topic("payment-requests") // <2>
     fun pay(request: PaymentRequested) {
-        val decision = demoPaymentGateway.pay(request) // <1>
+        val decision = demoPaymentGateway.pay(request) // <3>
         bookingClient.paymentCompleted(request.bookingId, PaymentCompleted(
             request.bookingId, request.transactionId, decision.approved, decision.reference
-        )) // <2>
+        )) // <4>
     }
 }

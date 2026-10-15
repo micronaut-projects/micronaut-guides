@@ -8,5 +8,5 @@ from micronaut.serde.annotation import Serdeable
 @Serdeable  # <1>
 @dataclass
 class BookingRequest:
-    seatId: Annotated[str, NotBlank]
+    seatId: Annotated[str, NotBlank]  # <2>
     paymentToken: Annotated[str, NotBlank, Pattern(regexp="demo-approve|demo-decline")]

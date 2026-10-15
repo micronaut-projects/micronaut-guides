@@ -9,12 +9,12 @@ from ..dto.payment_completed import PaymentCompleted
 from ..dto.payment_requested import PaymentRequested
 
 
-@KafkaClient(acks=-1,
+@KafkaClient(acks=-1,  # <1>
              properties=[Property(name="enable.idempotence", value="true")])
 class BookingClient:
-    @Topic("payment-requests")
+    @Topic("payment-requests")  # <2>
     def requestPayment(self, bookingId: Annotated[Long, KafkaKey],
-                       request: PaymentRequested) -> RecordMetadata: ...
+                       request: PaymentRequested) -> RecordMetadata: ...  # <3>
 
     @Topic("payment-results")
     def paymentCompleted(self, bookingId: Annotated[Long, KafkaKey],

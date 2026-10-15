@@ -21,7 +21,7 @@ import jakarta.validation.constraints.Pattern;
 
 @Serdeable // <1>
 public record BookingRequest(
-    @NotBlank String seatId,
+    @NotBlank String seatId, // <2>
     @NotBlank @Pattern(regexp = "demo-approve|demo-decline") String paymentToken
 ) {
 }

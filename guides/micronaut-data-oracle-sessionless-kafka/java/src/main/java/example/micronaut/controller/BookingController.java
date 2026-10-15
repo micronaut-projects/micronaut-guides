@@ -37,8 +37,8 @@ import io.micronaut.transaction.jdbc.oracle.OracleSessionlessTransactionPropagat
 import jakarta.validation.Valid;
 import java.util.Optional;
 
-@Controller("/bookings")
-@ExecuteOn(TaskExecutors.BLOCKING)
+@Controller("/bookings") // <1>
+@ExecuteOn(TaskExecutors.BLOCKING) // <2>
 public class BookingController {
     private final BookingClient bookingClient;
     private final BookingService bookingService;
@@ -58,27 +58,27 @@ public class BookingController {
         this.flightSeatRepository = flightSeatRepository;
     }
 
-    @Serdeable // <5>
+    @Serdeable // <10>
     public record AcceptedBooking(Long bookingId) {
     }
 
-    @Post
+    @Post // <3>
     public HttpResponse<AcceptedBooking> book(@Body @Valid BookingRequest request) {
-        PaymentRequested payment = propagation.withPropagation(() -> { // <1>
-            Booking booking = bookingService.reserve(request.seatId()); // <2>
-            String transactionId = propagation.currentTransactionId().orElseThrow(); // <3>
-            return new PaymentRequested(booking.getId(), transactionId, booking.getAmount(), request.paymentToken());
+        PaymentRequested payment = propagation.withPropagation(() -> { // <4>
+            Booking booking = bookingService.reserve(request.seatId()); // <5>
+            String transactionId = propagation.currentTransactionId().orElseThrow(); // <6>
+            return new PaymentRequested(booking.id(), transactionId, booking.amount(), request.paymentToken());
         });
-        bookingClient.requestPayment(payment.bookingId(), payment); // <4>
+        bookingClient.requestPayment(payment.bookingId(), payment); // <7>
         return HttpResponse.<AcceptedBooking>accepted().body(new AcceptedBooking(payment.bookingId()));
     }
 
-    @Get("/{id}")
+    @Get("/{id}") // <8>
     public Optional<BookingView> find(Long id) {
         return bookingRepository.findById(id).map(BookingView::from);
     }
 
-    @Get("/seats/{id}")
+    @Get("/seats/{id}") // <9>
     public Optional<FlightSeatView> seat(String id) {
         return flightSeatRepository.findById(id).map(FlightSeatView::from);
     }

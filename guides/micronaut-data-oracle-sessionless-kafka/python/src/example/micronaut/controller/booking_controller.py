@@ -20,14 +20,14 @@ from ..repository.flight_seat_repository import FlightSeatRepository
 from ..service.booking_service import BookingService
 
 
-@Serdeable  # <5>
+@Serdeable  # <10>
 @dataclass
 class AcceptedBooking:
     bookingId: Long
 
 
-@Controller("/bookings")
-@ExecuteOn(TaskExecutors.BLOCKING)
+@Controller("/bookings")  # <1>
+@ExecuteOn(TaskExecutors.BLOCKING)  # <2>
 class BookingController:
     def __init__(self, booking_client: BookingClient, booking_service: BookingService,
                  propagation: OracleSessionlessTransactionPropagationOperations,
@@ -38,23 +38,23 @@ class BookingController:
         self.booking_repository = booking_repository
         self.flight_seat_repository = flight_seat_repository
 
-    @Post
+    @Post  # <3>
     def book(self, request: Annotated[BookingRequest, Body, Valid]) -> HttpResponse[AcceptedBooking]:
         def reserve() -> PaymentRequested:
-            booking = self.booking_service.reserve(request.seatId)  # <2>
-            transaction_id = self.propagation.currentTransactionId().orElseThrow()  # <3>
+            booking = self.booking_service.reserve(request.seatId)  # <5>
+            transaction_id = self.propagation.currentTransactionId().orElseThrow()  # <6>
             return PaymentRequested(booking.id, transaction_id, booking.amount, request.paymentToken)
 
-        payment = self.propagation.withPropagation(reserve)  # <1>
-        self.booking_client.requestPayment(payment.bookingId, payment)  # <4>
+        payment = self.propagation.withPropagation(reserve)  # <4>
+        self.booking_client.requestPayment(payment.bookingId, payment)  # <7>
         return HttpResponse.accepted().body(AcceptedBooking(payment.bookingId))
 
-    @Get("/{id}")
+    @Get("/{id}")  # <8>
     def find(self, id: Long) -> BookingView | None:
         booking = self.booking_repository.findById(id)
         return BookingView.from_booking(booking.get()) if booking.isPresent() else None
 
-    @Get("/seats/{id}")
+    @Get("/seats/{id}")  # <9>
     def seat(self, id: str) -> FlightSeatView | None:
         seat = self.flight_seat_repository.findById(id)
         return FlightSeatView.from_seat(seat.get()) if seat.isPresent() else None

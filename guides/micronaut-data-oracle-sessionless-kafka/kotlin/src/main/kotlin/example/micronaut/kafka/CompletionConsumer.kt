@@ -25,23 +25,23 @@ import io.micronaut.configuration.kafka.annotation.OffsetStrategy
 import io.micronaut.configuration.kafka.annotation.Topic
 import io.micronaut.transaction.jdbc.oracle.OracleSessionlessTransactionPropagationOperations
 
-@KafkaListener(groupId = "booking-completion", offsetStrategy = OffsetStrategy.SYNC_PER_RECORD)
+@KafkaListener(groupId = "booking-completion", offsetStrategy = OffsetStrategy.SYNC_PER_RECORD) // <1>
 class CompletionConsumer(
     private val bookingService: BookingService,
     private val bookingRepository: BookingRepository,
     private val propagation: OracleSessionlessTransactionPropagationOperations
 ) {
-    @Topic("payment-results")
+    @Topic("payment-results") // <2>
     fun complete(result: PaymentCompleted) {
         if (bookingRepository.findById(result.bookingId).filter { it.status == BookingStatus.CONFIRMED }.isPresent) {
-            return // <1>
+            return // <3>
         }
         try {
-            propagation.withPropagation(result.transactionId) { // <2>
-                bookingService.complete(result) // <3>
+            propagation.withPropagation(result.transactionId) { // <4>
+                bookingService.complete(result) // <5>
                 null
             }
-        } catch (expected: PaymentDeclinedException) { // <4>
+        } catch (expected: PaymentDeclinedException) { // <6>
             // The transactional interceptor has already rolled back the reservation.
         }
     }

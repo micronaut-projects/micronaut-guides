@@ -5,10 +5,6 @@ import requests
 from micronaut.transaction import TransactionOperations
 from pyronaut.test import MicronautTest, micronaut_test_fixture
 
-SEED = [
-    "INSERT INTO flight_seat (id, status) VALUES ('MN123-12A', 'AVAILABLE')",
-    "INSERT INTO flight_seat (id, status) VALUES ('MN123-12B', 'AVAILABLE')",
-]
 ROLLBACK_SEED = [
     "DELETE FROM booking WHERE seat_id IN ('MN123-12A', 'MN123-12B')",
     "DELETE FROM flight_seat WHERE id IN ('MN123-12A', 'MN123-12B')",
@@ -17,8 +13,7 @@ ROLLBACK_SEED = [
 
 @pytest.fixture(scope="module")
 def my_context(request):
-    fixture = micronaut_test_fixture(request, MicronautTest(environments=["test"], transactional=False))
-    run_sql(fixture[TransactionOperations], SEED)
+    fixture = micronaut_test_fixture(request, MicronautTest(environments=["test"], transactional=False))  # <1>
     yield fixture
     run_sql(fixture[TransactionOperations], ROLLBACK_SEED)
     fixture.stop()
