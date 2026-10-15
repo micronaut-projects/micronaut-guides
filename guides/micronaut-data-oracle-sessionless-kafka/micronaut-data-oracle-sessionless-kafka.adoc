@@ -34,7 +34,7 @@ IMPORTANT: This is an Oracle Database transaction spanning workflow steps. Kafka
 
 common:create-app-features.adoc[]
 
-:exclude-for-languages:java,groovy,kotlin
+:only-for-languages:python
 Create a GraalPy virtual environment and install pytest for the booking tests:
 
 [source,bash]
@@ -45,17 +45,17 @@ python -m pip install pytest
 ----
 
 Use compatible versions of GraalPy, the Pyronaut CLI, and the Micronaut platform.
-:exclude-for-languages:
+:only-for-languages:
 
 common:oracle-driver.adoc[]
 
-:exclude-for-languages:java,kotlin,python
+:only-for-languages:python
 :exclude-for-build:gradle,pyronaut
 The Groovy Maven compiler also needs the Jakarta Persistence API on its compile classpath:
 
 dependency:jakarta.persistence-api[groupId=jakarta.persistence,scope=compileOnly]
 :exclude-for-build:
-:exclude-for-languages:
+:only-for-languages:
 
 == Configure Oracle Database and Kafka
 
@@ -63,9 +63,9 @@ dependency:jakarta.persistence-api[groupId=jakarta.persistence,scope=compileOnly
 resource:application.properties[tag=datasource]
 :exclude-for-languages:
 
-:exclude-for-languages:java,groovy,kotlin
+:only-for-languages:python
 resource:application.toml[tag=datasource]
-:exclude-for-languages:
+:only-for-languages:
 
 Liquibase creates the tables. Schema generation is disabled so that application restarts preserve committed bookings.
 
@@ -79,9 +79,9 @@ resource:db/booking.sql[]
 resource:application.properties[tag=kafka]
 :exclude-for-languages:
 
-:exclude-for-languages:java,groovy,kotlin
+:only-for-languages:python
 For Python, the Kafka client and listener annotations configure these options in the source files below.
-:exclude-for-languages:
+:only-for-languages:
 
 The consumers start from the earliest available offset for a new group. Automatic offset commits are disabled; each listener uses `SYNC_PER_RECORD`. The producer requests acknowledgments from all in-sync replicas and enables Kafka producer idempotence. That setting covers producer retries; it does not deduplicate repeated business operations.
 
@@ -91,9 +91,9 @@ The consumers start from the earliest available offset for a new group. Automati
 resource:application.properties[tag=testresources]
 :exclude-for-languages:
 
-:exclude-for-languages:java,groovy,kotlin
+:only-for-languages:python
 resource:application.toml[tag=testresources]
-:exclude-for-languages:
+:only-for-languages:
 
 Micronaut Test Resources supplies the datasource URL, username, password, and `kafka.bootstrap.servers` when they are absent. The pinned Oracle Database Free image supports sessionless transactions. For your own services, set `DATASOURCES_DEFAULT_URL`, `DATASOURCES_DEFAULT_USERNAME`, `DATASOURCES_DEFAULT_PASSWORD`, and `KAFKA_BOOTSTRAP_SERVERS`; do not put credentials in source control.
 
@@ -227,13 +227,13 @@ A declined booking leaves no booking row: the original insert was rolled back. A
 test:controller/KafkaBookingTest[]
 :exclude-for-languages:
 
-:exclude-for-languages:java,groovy,kotlin
+:only-for-languages:python
 test:KafkaBookingTest[]
 
 The test configuration selects a dedicated Test Resources scope and sets the HTTP client timeout:
 
 testResource:application-test.toml[]
-:exclude-for-languages:
+:only-for-languages:
 
 The test submits booking requests through the HTTP API and polls the booking and seat endpoints to verify the outcome.
 
