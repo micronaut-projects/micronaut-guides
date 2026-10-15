@@ -5,6 +5,8 @@ import io.micronaut.starter.options.Language;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -33,6 +35,20 @@ public final class GuideUtils {
         return relative.getNameCount() == 1
                 && relative.getFileName().toString().matches("bootstrap(?:-[^.]+)?\\.(properties|yml|yaml|json|toml)");
     }
+
+    public static void normalizeMavenSpockTestIncludes(Path projectDirectory) throws IOException {
+        Path pom = projectDirectory.resolve("pom.xml");
+        String original = Files.readString(pom);
+        // Surefire 3.6 also uses include patterns as class-name filters. It
+        // normalizes .java suffixes, while wildcard extensions exclude classes.
+        String normalized = original
+                .replace("<include>**/*Spec.*</include>", "<include>**/*Spec.java</include>")
+                .replace("<include>**/*Test.*</include>", "<include>**/*Test.java</include>");
+        if (!original.equals(normalized)) {
+            Files.writeString(pom, normalized);
+        }
+    }
+
 
     public static List<String> getTags(Guide guide) {
         Set<String> tagsList = new HashSet<>();
