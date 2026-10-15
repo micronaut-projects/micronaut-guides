@@ -10,5 +10,3 @@ CREATE TABLE booking (
     status VARCHAR2(20) NOT NULL CHECK (status IN ('PENDING', 'CONFIRMED')),
     payment_reference VARCHAR2(80) NOT NULL
 );
-INSERT INTO flight_seat (id, status) VALUES ('MN123-12A', 'AVAILABLE');
-INSERT INTO flight_seat (id, status) VALUES ('MN123-12B', 'AVAILABLE');

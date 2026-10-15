@@ -26,6 +26,7 @@ import io.micronaut.http.HttpStatus;
 import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.http.client.exceptions.HttpClientResponseException;
+import io.micronaut.test.annotation.Sql;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
@@ -40,6 +41,8 @@ import static org.junit.jupiter.api.Assertions.*;
 @MicronautTest(transactional = false)
 @Property(name = "micronaut.test.resources.scope", value = "booking-controller-e2e")
 @Property(name = "micronaut.http.client.read-timeout", value = "30s")
+@Sql("classpath:seed.sql")
+@Sql(scripts = "classpath:rollbackSeed.sql", phase = Sql.Phase.AFTER_ALL)
 @Timeout(120)
 class KafkaBookingTest {
     @Inject @Client("/") HttpClient httpClient;
