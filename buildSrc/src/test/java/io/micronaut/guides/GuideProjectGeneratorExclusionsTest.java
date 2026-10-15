@@ -74,7 +74,7 @@ class GuideProjectGeneratorExclusionsTest {
 
         App app = new App(appName, "example.micronaut", ApplicationType.DEFAULT, "Micronaut",
                 List.of("http-client"), List.of(), List.of(), List.of(), List.of(), List.of(), null,
-                List.of("FruitControllerTest", "FruitServiceTest"), List.of("FruitController", "FruitService"), false);
+                List.of("FruitControllerTest", "FruitServiceTest"), List.of("FruitController", "FruitService"), false, null);
         Guide guide = new Guide("Source exclusions", "Excluded inherited samples must not be generated.",
                 List.of("Author"), List.of("Data Access"), LocalDate.of(2026, 1, 1), null, null, null,
                 false, false, null, List.of(language), List.of(), List.of(BuildTool.GRADLE), null, List.of(),
