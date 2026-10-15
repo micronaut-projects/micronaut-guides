@@ -49,6 +49,7 @@ public final class GuideUtils {
             addAllSafe(allFeatures, app.javaFeatures());
             addAllSafe(allFeatures, app.kotlinFeatures());
             addAllSafe(allFeatures, app.groovyFeatures());
+            addAllSafe(allFeatures, app.pythonFeatures());
             for (String featureName : allFeatures) {
                 String tagToAdd = featureName;
                 for (String prefix : FEATURES_PREFIXES) {
@@ -74,6 +75,9 @@ public final class GuideUtils {
         if (language == Language.GROOVY) {
             return mergeLists(app.features(), getAppInvisibleFeatures(app), app.jvmFeatures(), app.groovyFeatures());
         }
+        if (language == Language.PYTHON) {
+            return mergeLists(app.features(), getAppInvisibleFeatures(app), app.pythonFeatures());
+        }
         return mergeLists(app.features(), getAppInvisibleFeatures(app));
     }
 
@@ -96,6 +100,9 @@ public final class GuideUtils {
         }
         if (language == Language.GROOVY) {
             return mergeLists(app.features(), app.jvmFeatures(), app.groovyFeatures());
+        }
+        if (language == Language.PYTHON) {
+            return mergeLists(app.features(), app.pythonFeatures());
         }
         return app.features();
     }
@@ -192,7 +199,8 @@ public final class GuideUtils {
                     guideApp.testFramework(),
                     guideApp.excludeTest(),
                     guideApp.excludeSource(),
-                    baseApp.validateLicense()
+                    baseApp.validateLicense(),
+                    mergeLists(guideApp.pythonFeatures(), baseApp.pythonFeatures())
             );
             merged.add(mergedApp);
         }
