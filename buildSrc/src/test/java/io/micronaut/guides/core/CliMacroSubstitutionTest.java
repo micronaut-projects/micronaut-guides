@@ -44,7 +44,8 @@ public class CliMacroSubstitutionTest {
                 null,
                 null,
                 null,
-                true
+                true,
+                null
         );
 
         Guide guide = new Guide(
@@ -100,7 +101,8 @@ public class CliMacroSubstitutionTest {
                 null,
                 null,
                 null,
-                true
+                true,
+                null
         );
 
         Guide guide = new Guide(
