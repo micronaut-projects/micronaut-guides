@@ -37,8 +37,10 @@ def user_role_repo(my_context):
 
 
 def test_many_to_many_persistence(role_repo, user_repo, user_role_repo):
+    assert role_repo.findByAuthority(ROLE_ADMIN) is None
     role_user = role_repo.save(ROLE_USER)
     role_admin = role_repo.save(ROLE_ADMIN)
+    assert role_repo.findByAuthority(ROLE_ADMIN).id == role_admin.id
 
     assert user_repo.findByUsername(U_SERGIO) is None
 

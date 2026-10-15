@@ -11,6 +11,9 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static io.micronaut.starter.options.BuildTool.PYRONAUT;
+import static io.micronaut.starter.options.Language.PYTHON;
+
 public final class GuideUtils {
 
     private static final Logger LOG = LoggerFactory.getLogger(GuideUtils.class);
@@ -21,6 +24,16 @@ public final class GuideUtils {
     private static final String FEATURE_SPOTLESS = "spotless";
 
     private GuideUtils() {
+    }
+
+    /**
+     * Identifies root configuration files that Python samples must not inherit from JVM resources.
+     * @param relative The resource's path relative to its configuration directory
+     * @return Whether this is a bootstrap configuration file
+     */
+    public static boolean isBootstrapConfiguration(Path relative) {
+        return relative.getNameCount() == 1
+                && relative.getFileName().toString().matches("bootstrap(?:-[^.]+)?\\.(properties|yml|yaml|json|toml)");
     }
 
     public static void normalizeMavenSpockTestIncludes(Path projectDirectory) throws IOException {
@@ -124,6 +137,9 @@ public final class GuideUtils {
         if (buildTool == BuildTool.MAVEN) {
             return guide.skipMavenTests();
         }
+        if (buildTool == BuildTool.PYRONAUT) {
+            return guide.skipPyronautTests();
+        }
 
         return false;
     }
@@ -133,6 +149,21 @@ public final class GuideUtils {
     }
 
     public static Guide merge(Guide base, Guide guide) {
+        List<Language> languages = new ArrayList<>();
+        if (guide.languages() != null) {
+            languages.addAll(guide.languages());
+        } else if (base.languages() != null) {
+            languages.addAll(base.languages());
+        }
+        List<BuildTool> buildTools = new ArrayList<>();
+        if (guide.buildTools() != null) {
+            buildTools.addAll(guide.buildTools());
+        } else if (base.buildTools() != null) {
+            buildTools.addAll(base.buildTools());
+        }
+        if (languages.contains(PYTHON) && !buildTools.contains(PYRONAUT)) {
+            buildTools.add(PYRONAUT);
+        }
         return new Guide(
                 guide.title() == null ? base.title() : guide.title(),
                 guide.intro() == null ? base.intro() : guide.intro(),
@@ -145,16 +176,17 @@ public final class GuideUtils {
                 base.skipGradleTests() || guide.skipGradleTests(),
                 base.skipMavenTests() || guide.skipMavenTests(),
                 guide.asciidoctor(),
-                guide.languages() == null ? base.languages() : guide.languages(),
+                languages,
                 mergeLists(GuideUtils.getTags(base), GuideUtils.getTags(guide)),
-                guide.buildTools() == null ? base.buildTools() : guide.buildTools(),
+                buildTools,
                 guide.testFramework() == null ? base.testFramework() : guide.testFramework(),
                 guide.zipIncludes(),
                 guide.slug(),
                 guide.publish(),
                 guide.base(),
                 guide.env() == null ? base.env() : guide.env(),
-                mergeApps(base.apps(), guide.apps())
+                mergeApps(base.apps(), guide.apps()),
+                Boolean.TRUE.equals(base.skipPyronautTests()) || Boolean.TRUE.equals(guide.skipPyronautTests())
         );
     }
 

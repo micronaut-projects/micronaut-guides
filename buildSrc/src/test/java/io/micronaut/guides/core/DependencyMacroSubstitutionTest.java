@@ -128,6 +128,7 @@ public class DependencyMacroSubstitutionTest {
         assertTrue(DependencyLines.asciidoc(platform, BuildTool.MAVEN, Language.JAVA)
                 .contains("    <type>pom</type>"));
     }
+
     @Test
     void groupedPythonDependenciesPreserveScopesVersionsAndCallouts() {
         String source = """

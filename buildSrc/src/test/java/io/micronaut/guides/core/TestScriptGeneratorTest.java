@@ -13,6 +13,7 @@ import java.util.List;
 
 import static io.micronaut.starter.options.BuildTool.GRADLE;
 import static io.micronaut.starter.options.BuildTool.MAVEN;
+import static io.micronaut.starter.options.BuildTool.PYRONAUT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -120,6 +121,51 @@ public class TestScriptGeneratorTest {
     }
 
     @Test
+    void testGeneratePython() {
+        App app = new App("default", null, null, null, null, null, null, null, null, null, null, null, true);
+        Guide guide = new Guide(
+                "Python guide",
+                "Tests Python guide script generation.",
+                List.of("Micronaut"),
+                List.of("Getting Started"),
+                java.time.LocalDate.of(2026, 5, 13),
+                null,
+                null,
+                null,
+                false,
+                false,
+                null,
+                List.of(Language.PYTHON),
+                List.of(),
+                List.of(PYRONAUT),
+                TestFramework.PYTEST,
+                List.of(),
+                "python-guide",
+                true,
+                null,
+                java.util.Map.of(),
+                List.of(app),
+                false
+        );
+
+        String result = testScriptGenerator.generatePythonTestScript(new ArrayList<>(List.of(guide)));
+
+        assertTrue(result.contains("set_pyronaut_test_resources &&"));
+        for (String command : List.of("install", "validate-config", "process", "test")) {
+            assertTrue(result.contains("pyronaut " + command));
+        }
+        assertFalse(result.contains("PYRONAUT_LOCAL_REPOSITORY"));
+        assertFalse(result.contains("PYRONAUT_INSTALL_EXECUTABLE"));
+        assertFalse(result.contains("pyronaut_native_toolchain"));
+        assertFalse(result.contains("local tmp_dir"));
+        assertTrue(result.contains("cd python-guide-pyronaut-python"));
+        assertFalse(result.contains("}cd python-guide-pyronaut-python"));
+        assertTrue(result.contains("run_pyronaut_tests || EXIT_STATUS=$?"));
+        assertFalse(result.contains("pyenv"));
+        assertFalse(result.contains("./gradlew -q check"));
+    }
+
+    @Test
     void testGenerateNative() {
         String path = "src/test/resources/guides";
         File file = new File(path);
@@ -134,17 +180,17 @@ public class TestScriptGeneratorTest {
     }
 
     @Test
-    void testGeneratePython() {
+    void testGenerateGenericScriptSkipsPython() {
         File guideFolder = new File("src/test/resources/file-transfer/python-resources");
         Guide guide = guideParser.parseGuideMetadata(guideFolder, "metadata.json").orElseThrow();
 
         String result = testScriptGenerator.generateTestScript(new ArrayList<>(List.of(guide)));
 
-        assertTrue(result.contains("cd python-resources-pyronaut-python"));
+        assertFalse(result.contains("python-resources-pyronaut-python"));
         assertFalse(result.contains("pyenv"));
-        assertTrue(result.contains("pyronaut install"));
-        assertTrue(result.contains("pyronaut validate-config"));
-        assertTrue(result.contains("pyronaut test"));
+        assertFalse(result.contains("pyronaut install"));
+        assertFalse(result.contains("pyronaut validate-config"));
+        assertFalse(result.contains("pyronaut test"));
         assertFalse(result.contains("./gradlew -q check"));
         assertFalse(result.contains("./mvnw -q test"));
     }

@@ -15,6 +15,7 @@ import io.micronaut.guides.tasks.TestScriptRunnerTask
 import io.micronaut.guides.tasks.TestScriptTask
 import io.micronaut.guides.tasks.NativeTestScriptRunnerTask
 import io.micronaut.guides.tasks.NativeTestScriptTask
+import io.micronaut.guides.tasks.PythonTestScriptTask
 import io.micronaut.json.JsonMapper
 import io.micronaut.starter.options.Language
 import org.apache.tools.ant.filters.ReplaceTokens
@@ -36,6 +37,7 @@ import java.util.stream.Collectors
 
 import static io.micronaut.guides.GuideProjectGenerator.DEFAULT_APP_NAME
 import static io.micronaut.starter.options.BuildTool.MAVEN
+import static io.micronaut.starter.options.BuildTool.PYRONAUT
 
 @CompileStatic
 class GuidesPlugin implements Plugin<Project> {
@@ -50,6 +52,7 @@ class GuidesPlugin implements Plugin<Project> {
     private static final String KEY_WORKFLOW = "workflow"
     private static final String KEY_WORKFLOW_SNAPSHOT = "workflow-snapshot"
     private static final String TEST_RUNNER = "test-runner"
+    private static final String PYTHON_TEST_SCRIPT = "python-test-script"
     private static final String PYTHON_TEST_RUNNER = "python-test-runner"
     private static final String KEY_DOC = "doc"
     private static final String KEY_PYTHON_BUILD = "python-build"
@@ -78,32 +81,34 @@ class GuidesPlugin implements Plugin<Project> {
                 .filter(guideMetadata -> Utils.process(guideMetadata, false))
                 .map(metadata -> {
                     String taskSlug = kebabCaseToGradleName(metadata.slug())
+                    boolean hasApps = !metadata.apps().isEmpty()
 
-                    TaskProvider<Copy> githubActionWorkflowTask = registerGenerateGithubActionWorkflow(project,
+                    TaskProvider<Copy> githubActionWorkflowTask = hasApps ? registerGenerateGithubActionWorkflow(project,
                             metadata,
-                            taskSlug)
+                            taskSlug) : null
 
-                    TaskProvider<Copy> githubActionSnapshotWorkflowTask = registerGenerateGithubActionSnapshotWorkflow(project,
+                    TaskProvider<Copy> githubActionSnapshotWorkflowTask = hasApps ? registerGenerateGithubActionSnapshotWorkflow(project,
                             metadata,
-                            taskSlug)
+                            taskSlug) : null
 
                     List<GuidesOption> options = GuideProjectGenerator.guidesOptions(metadata)
                     TaskProvider<SampleProjectGenerationTask> generateTask = registerGenerateTask(project, metadata, projectGenerator, guidesDir, codeDir, taskSlug)
                     TaskProvider<AsciidocGenerationTask> docTask = registerDocTask(project, metadata, guidesDir, generateTask, taskSlug)
-                    List<TaskProvider<Zip>> zippers = options.stream()
+                    List<TaskProvider<Zip>> zippers = hasApps ? options.stream()
                             .map(option -> {
                                 registerZipTask(project, metadata, option, generateTask)
-                            }).collect(Collectors.toList())
-                    TaskProvider<Task> zip = registerZipTask(project, taskSlug, metadata, zippers)
+                            }).collect(Collectors.toList()) : []
+                    TaskProvider<Task> zip = hasApps ? registerZipTask(project, taskSlug, metadata, zippers) : null
                     TaskProvider<GuidesIndexGradleTask> indexTask = registerIndexTask(project, taskSlug, metadata)
-                    TaskProvider<TestScriptTask> testScriptTask = registerTestScriptTask(project, taskSlug, metadata, generateTask)
-                    TaskProvider<TestScriptRunnerTask> testScriptRunnerTask = registerTestScriptRunnerTask(project, taskSlug, metadata, testScriptTask)
-                    TaskProvider<NativeTestScriptTask> nativeTestScriptTask = registerNativeTestScriptTask(project, taskSlug, metadata, generateTask)
-                    TaskProvider<NativeTestScriptRunnerTask> nativeTestScriptRunnerTask = registerNativeTestScriptRunnerTask(project, taskSlug, metadata, nativeTestScriptTask)
+                    TaskProvider<TestScriptTask> testScriptTask = hasApps ? registerTestScriptTask(project, taskSlug, metadata, generateTask) : null
+                    TaskProvider<TestScriptRunnerTask> testScriptRunnerTask = hasApps ? registerTestScriptRunnerTask(project, taskSlug, metadata, testScriptTask) : null
+                    TaskProvider<NativeTestScriptTask> nativeTestScriptTask = hasApps ? registerNativeTestScriptTask(project, taskSlug, metadata, generateTask) : null
+                    TaskProvider<NativeTestScriptRunnerTask> nativeTestScriptRunnerTask = hasApps ? registerNativeTestScriptRunnerTask(project, taskSlug, metadata, nativeTestScriptTask) : null
 
-                    registerGuideBuild(project, taskSlug, metadata, docTask, zip, indexTask, testScriptTask, testScriptRunnerTask, nativeTestScriptTask, nativeTestScriptRunnerTask)
                     TaskProvider<Task> pythonBuildTask = null
                     TaskProvider<Task> pythonTestRunnerTask = null
+                    TaskProvider<Task> pythonTestScriptTask = null
+                    List<TaskProvider<? extends Task>> guideBuildTasks = [docTask, zip, indexTask, testScriptTask, testScriptRunnerTask, nativeTestScriptTask, nativeTestScriptRunnerTask].findAll { it != null }
                     List<Language> languages = options.stream()
                             .map(option -> option.language)
                             .distinct()
@@ -111,21 +116,49 @@ class GuidesPlugin implements Plugin<Project> {
                     for (Language language : languages) {
                         GuidesOption languageOption = options.find { GuidesOption option -> option.language == language }
                         TaskProvider<SampleProjectGenerationTask> languageGenerateTask = registerGenerateTask(project, metadata, projectGenerator, guidesDir, codeDir, taskSlug, language)
+                        languageGenerateTask.configure { it.mustRunAfter(generateTask) }
                         TaskProvider<AsciidocGenerationTask> languageDocTask = registerDocTask(project, metadata, guidesDir, languageGenerateTask, taskSlug, language)
+                        if (!hasApps) {
+                            TaskProvider<Task> languageBuildTask = registerGuideBuildForLanguage(project, taskSlug, language.toString().capitalize(), metadata, languageDocTask)
+                            if (language == Language.PYTHON) {
+                                pythonBuildTask = languageBuildTask
+                            }
+                            continue
+                        }
                         TaskProvider<Zip> languageZipTask = registerLanguageZipTask(project, taskSlug, metadata, language, languageOption, languageGenerateTask)
-                        TaskProvider<TestScriptTask> languageTestScriptTask = registerTestScriptTask(project, taskSlug, metadata, languageGenerateTask, language)
-                        TaskProvider<TestScriptRunnerTask> languageTestScriptRunnerTask = registerTestScriptRunnerTask(project, taskSlug, metadata, languageTestScriptTask, language)
-                        TaskProvider<Task> languageBuildTask = registerGuideBuildForLanguage(project, taskSlug, language.toString().capitalize(), metadata, languageDocTask, languageZipTask, languageTestScriptTask, languageTestScriptRunnerTask)
                         if (language == Language.PYTHON) {
-                            pythonBuildTask = languageBuildTask
-                            pythonTestRunnerTask = languageTestScriptRunnerTask as TaskProvider<Task>
+                            for (int i = 0; i < options.size(); i++) {
+                                if (options.get(i).language == Language.PYTHON) {
+                                    zippers.get(i).configure { it.dependsOn(languageGenerateTask) }
+                                }
+                            }
+                            TaskProvider<PythonTestScriptTask> pythonScript = registerPythonTestScriptTask(project, taskSlug, metadata, languageGenerateTask)
+                            TaskProvider<TestScriptRunnerTask> pythonRunner = registerPythonTestScriptRunnerTask(
+                                    project,
+                                    taskSlug,
+                                    metadata,
+                                    pythonScript
+                            )
+                            pythonBuildTask = registerGuideBuildForLanguage(project, taskSlug, language.toString().capitalize(), metadata, languageDocTask, languageZipTask, pythonScript, pythonRunner)
+                            pythonTestRunnerTask = pythonRunner as TaskProvider<Task>
+                            pythonTestScriptTask = pythonScript as TaskProvider<Task>
+                            guideBuildTasks.add(pythonScript)
+                            guideBuildTasks.add(pythonRunner)
+                        } else {
+                            TaskProvider<TestScriptTask> languageTestScriptTask = registerTestScriptTask(project, taskSlug, metadata, languageGenerateTask, language)
+                            TaskProvider<TestScriptRunnerTask> languageTestScriptRunnerTask = registerTestScriptRunnerTask(project, taskSlug, metadata, languageTestScriptTask, language)
+                            registerGuideBuildForLanguage(project, taskSlug, language.toString().capitalize(), metadata, languageDocTask, languageZipTask, languageTestScriptTask, languageTestScriptRunnerTask)
                         }
                     }
+                    registerGuideBuild(project, taskSlug, metadata, guideBuildTasks)
                     Map<String, TaskProvider<Task>> taskMap = [(KEY_DOC)              : docTask,
                      (KEY_ZIP)              : zip,
                      (KEY_WORKFLOW)         : githubActionWorkflowTask,
                      (KEY_WORKFLOW_SNAPSHOT): githubActionSnapshotWorkflowTask,
                      (TEST_RUNNER)          : testScriptRunnerTask] as Map<String, TaskProvider<Task>>
+                    if (pythonTestScriptTask != null) {
+                        taskMap.put(PYTHON_TEST_SCRIPT, pythonTestScriptTask)
+                    }
                     if (pythonBuildTask != null) {
                         taskMap.put(KEY_PYTHON_BUILD, pythonBuildTask)
                     }
@@ -139,6 +172,9 @@ class GuidesPlugin implements Plugin<Project> {
                 .map(m -> m.get(KEY_DOC))
                 .toList() as List<TaskProvider<Task>>
 
+        project.tasks.named("asciidoctor").configure { Task it ->
+            it.mustRunAfter(project.tasks.withType(AsciidocGenerationTask))
+        }
         List<TaskProvider<Task>> pythonBuildTasks = sampleTasks.stream()
                 .map(m -> m.get(KEY_PYTHON_BUILD))
                 .filter(task -> task != null)
@@ -164,14 +200,14 @@ class GuidesPlugin implements Plugin<Project> {
             project.tasks.register("testsGroup${i + 1}") { Task it ->
                 it.group = 'guides'
                 it.description = "Run group of guide tests"
-                it.dependsOn(tasks.collect { it[TEST_RUNNER] })
+                it.dependsOn(tasks.collect { it[TEST_RUNNER] }.findAll { it != null })
             }
         }
 
         project.tasks.register("runAllGuideTests") { Task it ->
             it.group = 'guides'
             it.description = 'Runs all Guide test scripts'
-            it.dependsOn(sampleTasks.stream().map(m -> m.get(TEST_RUNNER)).collect(Collectors.toList()))
+            it.dependsOn(sampleTasks.stream().map(m -> m.get(TEST_RUNNER)).filter(task -> task != null).collect(Collectors.toList()))
         }
 
         List<TaskProvider<Task>> pythonTestRunnerTasks = sampleTasks.stream()
@@ -179,14 +215,37 @@ class GuidesPlugin implements Plugin<Project> {
                 .filter(task -> task != null)
                 .toList() as List<TaskProvider<Task>>
 
-        project.tasks.register("runAllPythonGuidesTests") { Task it ->
+        if (!pythonTestRunnerTasks.isEmpty()) {
+            int pythonGroupSize = (pythonTestRunnerTasks.size() / Integer.parseInt(testProps.get("numberOfTestGroups") as String))
+                    .setScale(0, RoundingMode.UP).toInteger()
+            pythonTestRunnerTasks.collate(pythonGroupSize, true).eachWithIndex { List<TaskProvider<Task>> tasks, int i ->
+                project.tasks.register("pythonTestsGroup${i + 1}") { Task it ->
+                    it.group = 'guides'
+                    it.description = "Run group of Python guide tests"
+                    it.dependsOn(tasks)
+                }
+            }
+        }
+
+        project.tasks.register("runAllPythonGuideTests") { Task it ->
             it.group = 'guides'
             it.description = 'Runs all Python Guide test scripts'
             it.dependsOn(pythonTestRunnerTasks)
         }
 
+        List<TaskProvider<Task>> pythonTestScriptTasks = sampleTasks.stream()
+                .map(m -> m.get(PYTHON_TEST_SCRIPT))
+                .filter(task -> task != null)
+                .toList() as List<TaskProvider<Task>>
+
+        project.tasks.register("generateAllPythonGuideTestScripts") { Task it ->
+            it.group = 'guides'
+            it.description = 'Generates every Python guide project and test script without running Pyronaut'
+            it.dependsOn(pythonTestScriptTasks)
+        }
         List<TaskProvider<Task>> zipTasks = sampleTasks.stream()
                 .map(m -> m.get(KEY_ZIP))
+                .filter(task -> task != null)
                 .toList() as List<TaskProvider<Task>>
 
         project.tasks.register("generateCodeZip") { Task it ->
@@ -197,9 +256,11 @@ class GuidesPlugin implements Plugin<Project> {
 
         List<TaskProvider<Task>> workflowTasks = sampleTasks.stream()
                 .map(m -> m.get(KEY_WORKFLOW))
+                .filter(task -> task != null)
                 .toList() as List<TaskProvider<Task>>
         workflowTasks.addAll(sampleTasks.stream()
                 .map(m -> m.get(KEY_WORKFLOW_SNAPSHOT))
+                .filter(task -> task != null)
                 .toList())
 
         project.tasks.register("generateGithubActionWorkflows") { Task it ->
@@ -208,6 +269,7 @@ class GuidesPlugin implements Plugin<Project> {
             it.dependsOn(workflowTasks)
         }
     }
+
 
     /**
      * https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#onpushpull_requestpull_request_targetpathspaths-ignore
@@ -279,10 +341,27 @@ class GuidesPlugin implements Plugin<Project> {
             it.metadata = metadata
             it.guideSlug.set(metadata.slug())
             it.metadataFile.set(project.layout.projectDirectory.dir("guides/${metadata.slug()}").file("metadata.json"))
-            it.scriptFile.set(project.layout.buildDirectory.dir("code/${metadata.slug()}").map(d -> d.file("test.sh")))
+            String scriptFileName = language ? "test-${language.toString().toLowerCase()}.sh" : "test.sh"
+            it.scriptFile.set(project.layout.buildDirectory.dir("code/${metadata.slug()}").map(d -> d.file(scriptFileName)))
             if (language) {
                 it.language.set(language.name())
             }
+            it.dependsOn(generateTask)
+        }
+    }
+
+    private static TaskProvider<PythonTestScriptTask> registerPythonTestScriptTask(Project project,
+                                                                                   String taskSlug,
+                                                                                   Guide metadata,
+                                                                                   TaskProvider<SampleProjectGenerationTask> generateTask) {
+        project.tasks.register("${taskSlug}PythonTestScript", PythonTestScriptTask) { PythonTestScriptTask it ->
+            it.group = "guides ${metadata.slug()}"
+            it.description = "Create a python-test.sh script for the Pyronaut project generated by ${metadata.slug()}"
+            it.metadata = metadata
+            it.guideSlug.set(metadata.slug())
+            it.metadataFile.set(project.layout.projectDirectory.dir("guides/${metadata.slug()}").file("metadata.json"))
+            it.pyronautTestFunctionsFile.set(project.layout.projectDirectory.file("buildSrc/src/main/resources/pyronaut-test-functions.sh"))
+            it.scriptFile.set(project.layout.buildDirectory.dir("code/${metadata.slug()}").map(d -> d.file("python-test.sh")))
             it.dependsOn(generateTask)
         }
     }
@@ -356,6 +435,25 @@ class GuidesPlugin implements Plugin<Project> {
 
             // We tee the script output to a file, this is the cached result
             it.outputFile.set(codeDirectory.map(d -> d.file(outputFileName)))
+        }
+    }
+
+    private static TaskProvider<TestScriptRunnerTask> registerPythonTestScriptRunnerTask(Project project,
+                                                                                        String taskSlug,
+                                                                                        Guide metadata,
+                                                                                        TaskProvider<PythonTestScriptTask> pythonTestScriptTask) {
+        project.tasks.register("${taskSlug}RunPythonTestScript", TestScriptRunnerTask) { TestScriptRunnerTask it ->
+            it.onlyIf { !Utils.skipBecauseOfJavaVersion(metadata) && !Boolean.TRUE.equals(metadata.skipPyronautTests()) }
+
+            Provider<Directory> codeDirectory = project.layout.buildDirectory.dir("code/${metadata.slug()}")
+
+            it.group = "guides ${metadata.slug()}"
+            it.description = "Run the Python tests for the Pyronaut project generated by ${metadata.slug()}"
+
+            it.environment.set(metadata.env())
+            it.testScript.set(pythonTestScriptTask.flatMap { t -> t.scriptFile })
+            it.guideSourceDirectory.set(project.layout.projectDirectory.dir("guides/${metadata.slug()}"))
+            it.outputFile.set(codeDirectory.map(d -> d.file("python-output.log")))
         }
     }
 
@@ -443,21 +541,30 @@ class GuidesPlugin implements Plugin<Project> {
                 .filter(option -> option.buildTool == MAVEN)
                 .collect(Collectors.toList())
 
+        List<GuidesOption> pyronautOptions = options
+                .stream()
+                .filter(option -> option.buildTool == PYRONAUT)
+                .collect(Collectors.toList())
+
         String gradleProjects = projects(metadata, gradleOptions)
 
         String mavenProjects = projects(metadata, mavenOptions)
+        String pyronautProjects = projects(metadata, pyronautOptions)
 
         boolean mavenEnabled = !(CollectionUtils.isEmpty(mavenOptions) || metadata.skipMavenTests())
         boolean gradleEnabled = !(CollectionUtils.isEmpty(gradleOptions) || metadata.skipGradleTests())
+        boolean pyronautEnabled = !(CollectionUtils.isEmpty(pyronautOptions) || metadata.skipPyronautTests())
         [
                 gradleTask    : taskSlug + TASK_SUFFIX_GENERATE_PROJECTS,
                 javaMatrix    : javaMatrix(metadata),
                 slug          : metadata.slug(),
                 mavenProjects : mavenProjects,
                 gradleProjects: gradleProjects,
+                pyronautProjects: pyronautProjects,
                 paths         : workflowPaths(metadata),
                 mavenEnabled  : String.valueOf(mavenEnabled),
-                gradleEnabled : String.valueOf(gradleEnabled)
+                gradleEnabled : String.valueOf(gradleEnabled),
+                pyronautEnabled: String.valueOf(pyronautEnabled)
         ] as Map
     }
 
@@ -566,6 +673,10 @@ class GuidesPlugin implements Plugin<Project> {
             if (language) {
                 it.language.set(language.name())
             }
+            List<String> projectOutputDirectories = SampleProjectGenerationTask.outputDirectoryNames(metadata, language)
+            it.outputDirectories.from(projectOutputDirectories.collect { String outputDirectoryName ->
+                codeDir.map(outputDirectory -> outputDirectory.dir("${metadata.slug()}/${outputDirectoryName}"))
+            })
             it.guidesGenerator = projectGenerator
             it.metadata = metadata
         }
@@ -574,7 +685,7 @@ class GuidesPlugin implements Plugin<Project> {
     private static TaskProvider<Task> registerGuideBuild(Project project,
                                                          String taskSlug,
                                                          Guide metadata,
-                                                         TaskProvider<? extends Task>... dependsOnTasks) {
+                                                         Collection<TaskProvider<? extends Task>> dependsOnTasks) {
         project.tasks.register("${taskSlug}${TASK_SUFFIX_BUILD}") { Task it ->
             it.group = "guides ${metadata.slug()}"
             it.dependsOn(dependsOnTasks)

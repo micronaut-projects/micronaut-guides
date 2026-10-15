@@ -23,6 +23,11 @@ class MacroUtilsTest {
     }
 
     @Test
+    void testPythonModuleNameNormalizesMixedSnakeCase() {
+        assertEquals("hello_controller", MacroUtils.pythonModuleName("Hello_Controller"));
+    }
+
+    @Test
     void testFindMacroGroups() {
         String str = """
                 https://micronaut-projects.github.io/micronaut-validation/snapshot/guide/[Micronaut validation] is built on the standard framework – https://www.jcp.org/en/jsr/detail?id=380[JSR 380], also known as Bean Validation 2.0. Micronaut Validation has built-in support for validation of beans that are annotated with `jakarta.validation` annotations.
