@@ -20,9 +20,7 @@ class BookingService:
 
     @OracleTransactional(sessionless=OracleTransactional.Sessionless.SUSPEND, timeout=300)  # <1>
     def reserve(self, seat_id: str) -> Booking:
-        seat = self.flight_seat_repository.findByIdForUpdate(seat_id).orElseThrow()  # <2>
-        if seat.status != SeatStatus.AVAILABLE:
-            raise RuntimeError(f"Seat is unavailable: {seat_id}")
+        seat = self.flight_seat_repository.findByIdAndStatusForUpdate(seat_id, SeatStatus.AVAILABLE).orElseThrow()  # <2>
         seat.status = SeatStatus.HELD
         self.flight_seat_repository.update(seat)
         amount = BigDecimal("199.00")

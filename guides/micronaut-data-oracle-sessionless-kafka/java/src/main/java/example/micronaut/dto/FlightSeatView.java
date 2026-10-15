@@ -23,6 +23,6 @@ import io.micronaut.serde.annotation.Serdeable;
 @Serdeable // <1>
 public record FlightSeatView(String id, SeatStatus status) {
     public static FlightSeatView from(FlightSeat seat) {
-        return new FlightSeatView(seat.getId(), seat.getStatus());
+        return new FlightSeatView(seat.id(), seat.status());
     }
 }

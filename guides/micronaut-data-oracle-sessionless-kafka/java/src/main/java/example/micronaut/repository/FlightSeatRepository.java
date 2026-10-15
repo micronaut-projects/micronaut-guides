@@ -25,6 +25,6 @@ import java.util.Optional;
 
 @JdbcRepository(dialect = Dialect.ORACLE) // <1>
 public interface FlightSeatRepository extends CrudRepository<FlightSeat, String> { // <2>
-    Optional<FlightSeat> findByIdForUpdate(String id);
+    Optional<FlightSeat> findByIdAndStatusForUpdate(String id, SeatStatus status);
     Optional<FlightSeat> findByIdAndStatus(String id, SeatStatus status);
 }

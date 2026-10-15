@@ -45,10 +45,7 @@ class BookingService {
 
     @OracleTransactional(sessionless = SUSPEND, timeout = 300) // <1>
     Booking reserve(String seatId) {
-        FlightSeat seat = flightSeatRepository.findByIdForUpdate(seatId).orElseThrow() // <2>
-        if (seat.getStatus() != SeatStatus.AVAILABLE) {
-            throw new IllegalStateException("Seat is unavailable: " + seatId)
-        }
+        FlightSeat seat = flightSeatRepository.findByIdAndStatusForUpdate(seatId, SeatStatus.AVAILABLE).orElseThrow() // <2>
         seat.setStatus(SeatStatus.HELD)
         flightSeatRepository.update(seat)
         BigDecimal amount = new BigDecimal("199.00")

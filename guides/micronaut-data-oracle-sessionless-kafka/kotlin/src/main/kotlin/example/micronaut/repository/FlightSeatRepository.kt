@@ -23,6 +23,6 @@ import io.micronaut.data.repository.CrudRepository
 import java.util.Optional
 @JdbcRepository(dialect = Dialect.ORACLE) // <1>
 interface FlightSeatRepository : CrudRepository<FlightSeat, String> { // <2>
-    fun findByIdForUpdate(id: String): Optional<FlightSeat>
+    fun findByIdAndStatusForUpdate(id: String, status: SeatStatus): Optional<FlightSeat>
     fun findByIdAndStatus(id: String, status: SeatStatus): Optional<FlightSeat>
 }

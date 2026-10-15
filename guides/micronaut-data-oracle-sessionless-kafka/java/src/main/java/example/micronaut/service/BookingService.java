@@ -42,12 +42,8 @@ public class BookingService {
 
     @OracleTransactional(sessionless = SUSPEND, timeout = 300) // <1>
     public Booking reserve(String seatId) {
-        FlightSeat seat = flightSeatRepository.findByIdForUpdate(seatId).orElseThrow(); // <2>
-        if (seat.getStatus() != SeatStatus.AVAILABLE) {
-            throw new IllegalStateException("Seat is unavailable: " + seatId);
-        }
-        seat.setStatus(SeatStatus.HELD);
-        flightSeatRepository.update(seat);
+        FlightSeat seat = flightSeatRepository.findByIdAndStatusForUpdate(seatId, SeatStatus.AVAILABLE).orElseThrow(); // <2>
+        flightSeatRepository.update(new FlightSeat(seat.id(), SeatStatus.HELD));
         BigDecimal amount = new BigDecimal("199.00");
         return bookingRepository.save(new Booking(null, seatId, amount, BookingStatus.PENDING, "NONE")); // <3>
     }
@@ -59,8 +55,7 @@ public class BookingService {
             throw new PaymentDeclinedException(); // <6>
         }
         FlightSeat seat = flightSeatRepository.findByIdAndStatus(booking.seatId(), SeatStatus.HELD).orElseThrow(); // <7>
-        seat.setStatus(SeatStatus.BOOKED);
-        flightSeatRepository.update(seat);
+        flightSeatRepository.update(new FlightSeat(seat.id(), SeatStatus.BOOKED));
         bookingRepository.update(new Booking(booking.id(), booking.seatId(), booking.amount(),
             BookingStatus.CONFIRMED, result.paymentReference()));
     } // <8>

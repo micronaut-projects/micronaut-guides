@@ -34,8 +34,7 @@ open class BookingService(
 ) {
     @OracleTransactional(sessionless = SUSPEND, timeout = 300) // <1>
     open fun reserve(seatId: String): Booking {
-        val seat = flightSeatRepository.findByIdForUpdate(seatId).orElseThrow() // <2>
-        check(seat.status == SeatStatus.AVAILABLE) { "Seat is unavailable: $seatId" }
+        val seat = flightSeatRepository.findByIdAndStatusForUpdate(seatId, SeatStatus.AVAILABLE).orElseThrow() // <2>
         seat.status = SeatStatus.HELD
         flightSeatRepository.update(seat)
         val amount = BigDecimal("199.00")

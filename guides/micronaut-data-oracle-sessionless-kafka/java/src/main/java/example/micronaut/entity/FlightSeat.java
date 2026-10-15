@@ -19,29 +19,9 @@ import io.micronaut.data.annotation.Id;
 import io.micronaut.data.annotation.MappedEntity;
 
 @MappedEntity("flight_seat") // <1>
-public class FlightSeat {
+public record FlightSeat(
     @Id // <2>
-    private String id;
-    private SeatStatus status;
-
-    public FlightSeat(String id, SeatStatus status) {
-        this.id = id;
-        this.status = status;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public SeatStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(SeatStatus status) {
-        this.status = status;
-    }
+    String id,
+    SeatStatus status
+) {
 }
