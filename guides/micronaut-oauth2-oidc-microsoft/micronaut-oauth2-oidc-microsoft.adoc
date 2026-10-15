@@ -1,0 +1,148 @@
+common:header.adoc[]
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+== OAuth 2.0
+
+- Sign in to the https://entra.microsoft.com/[Microsoft Entra admin center].
+- Browse to `Identity > Applications > App registrations`
+- New Registration
+
+image::microsoft-identity-platform/microsoft-identity-platform-new-registration.png[]
+
+- As supported account types select "Accounts in any organizational directory (Any Azure AD directory - Multitenant) and personal Microsoft accounts (e.g. Skype, Xbox)"
+- Set as redirect URI `Web: http://localhost:8080/oauth/callback/microsoft`
+
+image::microsoft-identity-platform/microsoft-identity-platform-1.png[]
+
+=== Client ID
+
+- Annotate the `Application (client) ID`. You will use it as the OAuth 2 Client ID  in the Micronaut application.
+
+image::microsoft-identity-platform/microsoft-identity-platform-client-id.png[]
+
+=== Tenancy
+
+Click on Endpoints and annotate the Tenant - highlighted in the red in the following screenshot:
+
+image::microsoft-identity-platform/oidc-microsoft-endpoints.png[]
+
+=== Client Secret
+
+Create a client secret:
+
+image::microsoft-identity-platform/microsoft-identity-platform-2.png[]
+
+- Annotate the secret value. You will use it as the OAuth 2 Client Secret  in the Micronaut application.
+
+image::microsoft-identity-platform/microsoft-identity-platform-client-secret.png[]
+
+=== Token Login Hint
+
+Enable the `login_hint` token which is used for https://learn.microsoft.com/en-us/entra/identity-platform/v2-protocols-oidc#send-a-sign-out-request[sending a sign-out request].
+
+____
+Enables sign-out to occur without prompting the user to select an account. To use logout_hint, enable the login_hint optional claim in your client application and use the value of the `login_hint` optional claim as the `logout_hint` parameter.
+____
+
+image::microsoft-identity-platform/oidc_microsoft_token_login_hint.png[]
+
+common:create-app.adoc[]
+
+=== Dependencies
+
+:leveloffset: +2
+
+common:micronaut-views-thymeleaf.adoc[]
+
+== Security Dependencies
+
+To use OAuth 2.0 integration in your Micronaut application, add the following dependency:
+
+dependency:micronaut-security-oauth2[groupId=io.micronaut.security]
+
+Also add https://micronaut-projects.github.io/micronaut-security/latest/guide/#jwt[Micronaut JWT support] dependencies:
+
+dependency:micronaut-security-jwt[groupId=io.micronaut.security]
+
+:leveloffset: 0
+
+=== Configuration
+
+Add the following OAuth2 Configuration:
+
+resource:application.properties[tag=oauth2]
+
+callout:authentication-idtoken[number=1,arg0=Microsoft]
+<2> You can choose any name. The name you select, will be used in your routes. E.g. If you set `microsoft` the login route for this OAuth 2.0 client is `/oauth/login/microsoft`
+<3> Client Secret. See previous screenshot.
+<4> Client ID. See previous screenshot.
+<5> `issuer` URL. It allows the Micronaut framework to discover the configuration of the OpenID Connect server.
+<6> Accept GET request to the `/logout` endpoint.
+<7> Disable issuer claim validation
+
+The previous configuration uses several placeholders. You will need to set up `OAUTH_CLIENT_ID`, `OAUTH_CLIENT_SECRET`, and `OAUTH_TENANT` environment variables.
+
+[soruce, bash]
+----
+export OAUTH_CLIENT_ID=XXXXXXXXXX
+export OAUTH_CLIENT_SECRET=YYYYYYYYYY
+export OAUTH_TENANT=ZZZZZZZ
+----
+
+Check Microsoft https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration[.well-known/openid-configuration documentation].
+
+=== Authorization Code Flow
+
+We want to use an **Authorization Code** grant type flow which it is described in the following diagram:
+
+image::diagramm.png[]
+
+=== Controller
+
+Create a controller to handle the requests to `/`. You will display the email of the authenticated person if any. Annotate the controller endpoint with `@View` since we will use a Thymeleaf template.
+
+source:HomeController[]
+
+callout:controller[number=1,arg0=/]
+callout:secured-anonymous[number=2]
+<3> Use https://micronaut-projects.github.io/micronaut-views/latest/api/io/micronaut/views/View.html[View] annotation to specify which template to use to render the response.
+<4> The @api@/io/micronaut/http/annotation/Get.html[@Get] annotation maps the `index` method to GET `/` requests.
+
+=== View
+
+Create a thymeleaf template:
+
+resource:views/home.html[]
+
+Also, note that we return an empty model in the controller. However, we are accessing `security` in the thymeleaf template.
+
+- The https://micronaut-projects.github.io/micronaut-views/latest/api/io/micronaut/views/model/security/SecurityViewModelProcessor.html[SecurityViewModelProcessor^] injects into the model a `security` map with the authenticated user. See https://micronaut-projects.github.io/micronaut-views/latest/guide/#security-model-enhancement[User in a view] documentation.
+
+common:runapp.adoc[]
+
+image::microsoft-identity-platform/microsoftvideo.gif[]
+
+== GraalVM Reflection Metadata
+
+Thymleaf accesses several classes via reflection.
+
+common:reflect-config-json.adoc[]
+
+resource:META-INF/native-image/example.micronaut.micronautguide/reflect-config.json[]
+
+common:graal-with-plugins.adoc[]
+
+:exclude-for-languages:groovy
+
+After you execute the native executable, navigate to localhost:8080 and authenticate with Microsoft.
+
+:exclude-for-languages:
+
+== Next steps
+
+Read https://micronaut-projects.github.io/micronaut-security/latest/guide/#oauth[Micronaut OAuth 2.0 documentation] to learn more.
+
+common:helpWithMicronaut.adoc[]
