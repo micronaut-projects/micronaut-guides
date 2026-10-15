@@ -128,4 +128,35 @@ public class DependencyMacroSubstitutionTest {
         assertTrue(DependencyLines.asciidoc(platform, BuildTool.MAVEN, Language.JAVA)
                 .contains("    <type>pom</type>"));
     }
+
+    @Test
+    void groupedPythonDependenciesPreserveScopesVersionsAndCallouts() {
+        String source = """
+                :dependencies:
+                dependency:micronaut-http-client[scope=runtimeOnly]
+                dependency:micronaut-serde-processor[groupId=io.micronaut.serde,scope=annotationProcessor,callout=1]
+                dependency:micronaut-test-junit5[groupId=io.micronaut.test,scope=testImplementation,version=1.2.3,callout=2]
+                :dependencies:
+                """;
+        String result = dependencyMacroSubstitution.substitute(
+                source, GuideTestUtils.guideWithSlug("python-dependencies"),
+                new GuidesOption(BuildTool.PYRONAUT, Language.PYTHON, TestFramework.PYTEST));
+        assertEquals("""
+                [source, toml]
+                .pyproject.toml
+                ----
+                [tool.pyronaut.dependencies]
+                runtime = [
+                    "io.micronaut:micronaut-http-client",
+                ]
+                build = [
+                    "io.micronaut.serde:micronaut-serde-processor", # <1>
+                ]
+                test = [
+                    "io.micronaut.test:micronaut-test-junit5:1.2.3", # <2>
+                ]
+                ----
+                """, result);
+    }
+
 }
