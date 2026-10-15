@@ -48,6 +48,6 @@ class MyToolsTest {
         McpSchema.Tool tool = listToolsResult.tools().get(0);
         assertEquals("freeDiskSpace", tool.name());
         assertEquals("Free Disk Space", tool.title());
-        assertEquals("Return the free disk space in the users computer", tool.description());
+        assertEquals("Return the free disk space in the user's computer", tool.description());
     }
 }
