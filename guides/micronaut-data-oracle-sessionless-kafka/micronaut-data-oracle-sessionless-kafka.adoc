@@ -231,10 +231,22 @@ A declined booking leaves no booking row: the original insert was rolled back. A
 == End-to-End Tests
 
 :exclude-for-languages:python
+The tests seed the two demonstration seats before they run:
+
+testResource:seed.sql[]
+
+After the tests, they delete the seats and any bookings created for them:
+
+testResource:rollbackSeed.sql[]
+
+The test class loads both scripts with `@Sql`. The default phase runs `seed.sql` before all tests; `Sql.Phase.AFTER_ALL` runs `rollbackSeed.sql` after them.
+
 test:controller/KafkaBookingTest[]
 :exclude-for-languages:
 
 :only-for-languages:python
+The module-scoped `my_context` fixture seeds the two demonstration seats through `TransactionOperations` after the application context starts. Before the context stops, it deletes the seats and any bookings created for them.
+
 test:KafkaBookingTest[]
 
 The test configuration selects a dedicated Test Resources scope and sets the HTTP client timeout:
@@ -253,7 +265,7 @@ The approval scenario submits a booking for the seeded `MN123-12A` seat, then po
 
 An absent booking or an `AVAILABLE` seat alone would be a false positive: those are also visible while a reservation is suspended. Successfully booking the same seat again and confirming that the declined booking remains absent verify rollback through the public API. The tests use a 30-second HTTP request timeout and a 60-second polling deadline, both shorter than the five-minute Oracle Database suspension timeout, so transaction expiry cannot make this scenario pass.
 
-The test has no surrounding transaction and uses a dedicated Micronaut Test Resources scope, with its own Oracle Database and Kafka containers. The test loads the two demonstration seats from `seed.sql` before the tests and removes them, together with their bookings, with `rollbackSeed.sql` afterward. Docker is required; the build stops the disposable Test Resources services after the tests.
+The test has no surrounding transaction and uses a dedicated Micronaut Test Resources scope, with its own Oracle Database and Kafka containers. Docker is required; the build stops the disposable Test Resources services after the tests.
 
 common:testApp.adoc[]
 
