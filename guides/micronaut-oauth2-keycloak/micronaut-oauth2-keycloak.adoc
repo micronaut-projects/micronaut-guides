@@ -125,15 +125,17 @@ Create a controller to handle the requests to `/`. You will display the email of
 :exclude-for-languages:
 
 :only-for-languages:python
-Create a controller for `/` that returns a Python dictionary. `@View` selects the Jinja template, which displays the authenticated user's preferred username when available.
+Create a route function for `/` that returns an empty Python dictionary. `@View` selects the Jinja template, which displays the authenticated user's preferred username when available.
 :only-for-languages:
 
 source:HomeController[]
 
+:exclude-for-languages:python
 callout:controller[arg0=/]
+:exclude-for-languages:
 callout:secured-anonymous[]
-<3> Use https://micronaut-projects.github.io/micronaut-views/latest/api/io/micronaut/views/View.html[View] annotation to specify which template to use to render the response.
-<4> The @api@/io/micronaut/http/annotation/Get.html[@Get] annotation maps the `index` method to GET `/` requests.
+callout:view[]
+callout:get[arg0=index,arg1=/]
 
 :exclude-for-languages:python
 Create a Thymeleaf template:
@@ -172,7 +174,7 @@ The `authorization-server = "KEYCLOAK"` setting selects Micronaut Security's bui
 
 === Controller Test
 
-The test verifies the anonymous HTML page and its login link. OAuth discovery is disabled only in `config/application-test.toml`, so this local test does not need a Keycloak server. Check the real login and provider logout manually using the running Keycloak server below.
+The test verifies the anonymous HTML page and its login link. It activates only the `test` environment, so the OAuth client configuration in `config/application-dev.toml` is not loaded and no Keycloak server is needed. Check the real login and provider logout manually using the running Keycloak server below.
 
 test:HomeControllerTest[]
 
