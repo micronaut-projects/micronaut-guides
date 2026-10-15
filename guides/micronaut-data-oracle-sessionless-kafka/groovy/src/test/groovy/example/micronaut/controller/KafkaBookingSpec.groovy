@@ -19,7 +19,10 @@ import example.micronaut.dto.BookingRequest
 import example.micronaut.dto.BookingView
 import example.micronaut.dto.FlightSeatView
 import example.micronaut.entity.BookingStatus
+import example.micronaut.entity.FlightSeat
 import example.micronaut.entity.SeatStatus
+import example.micronaut.repository.BookingRepository
+import example.micronaut.repository.FlightSeatRepository
 import io.micronaut.context.annotation.Property
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.HttpStatus
@@ -43,6 +46,18 @@ class KafkaBookingSpec extends Specification {
     @Client("/")
     HttpClient httpClient
 
+    @Inject
+    BookingRepository bookingRepository
+
+    @Inject
+    FlightSeatRepository flightSeatRepository
+
+    void cleanup() { // <3>
+        bookingRepository.deleteAll()
+        flightSeatRepository.update(new FlightSeat("MN123-12A", SeatStatus.AVAILABLE))
+        flightSeatRepository.update(new FlightSeat("MN123-12B", SeatStatus.AVAILABLE))
+    }
+
     void "approved payment confirms the booking"() {
         given:
         String seatId = "MN123-12A"
@@ -61,13 +76,13 @@ class KafkaBookingSpec extends Specification {
         assert findSeat(seatId).status == SeatStatus.AVAILABLE
 
         when:
-        Long declinedBookingId = book(seatId, "demo-decline") // <1>
-        Long approvedBookingId = book(seatId, "demo-approve") // <2>
+        Long declinedBookingId = book(seatId, "demo-decline") // <4>
+        Long approvedBookingId = book(seatId, "demo-approve") // <5>
 
         then:
         declinedBookingId != approvedBookingId
-        awaitConfirmed(approvedBookingId, seatId) // <3>
-        findBooking(declinedBookingId).empty // <4>
+        awaitConfirmed(approvedBookingId, seatId) // <6>
+        findBooking(declinedBookingId).empty // <7>
     }
 
     private Long book(String seatId, String paymentToken) {

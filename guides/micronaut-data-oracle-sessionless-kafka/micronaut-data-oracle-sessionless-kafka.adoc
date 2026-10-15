@@ -49,7 +49,7 @@ Use compatible versions of GraalPy, the Pyronaut CLI, and the Micronaut platform
 
 common:oracle-driver.adoc[]
 
-:only-for-languages:python
+:only-for-languages:groovy
 :exclude-for-build:gradle,pyronaut
 The Groovy Maven compiler also needs the Jakarta Persistence API on its compile classpath:
 
@@ -67,11 +67,19 @@ resource:application.properties[tag=datasource]
 resource:application.toml[tag=datasource]
 :only-for-languages:
 
+:exclude-for-languages:python
 common:liquibase.adoc[]
+:exclude-for-languages:
 
-Liquibase creates the tables. Schema generation is disabled so that application restarts preserve committed bookings.
+:only-for-languages:python
+=== Database Migration with Liquibase
+
+The `[liquibase.datasources.default]` table in the datasource configuration above points https://micronaut-projects.github.io/micronaut-liquibase/latest/guide/[Micronaut Liquibase] at the changelog:
 
 resource:db/liquibase-changelog.xml[]
+:only-for-languages:
+
+Liquibase creates the tables. Schema generation is disabled so that application restarts preserve committed bookings.
 
 resource:db/booking.sql[]
 
@@ -194,14 +202,14 @@ source:service/PaymentDeclinedException[]
 
 source:service/BookingService[]
 
-<1> Start an Oracle Database sessionless transaction with a five-minute suspension timeout. Oracle Database cancels a transaction that remains suspended past its timeout.
-<2> Lock the seat with the generated `findByIdForUpdate` query before checking availability. Change its status to `HELD` and call `update`; create the pending booking with `save`. A competing reservation waits for the lock and then checks the latest committed status, preventing two bookings of the same seat. Failure throws an exception and rolls back the transaction.
-<3> `save` returns the booking with its database-generated ID. After the intercepted method returns, Micronaut suspends the transaction instead of committing it. The generated ID and price can be published, but the database writes are still uncommitted.
-<4> Resume the transaction whose GTRID is in the active propagation scope.
-<5> This derived finder runs inside the resumed transaction and returns only the pending booking written by the controller.
-<6> A runtime exception rolls back the original transaction, undoing both the seat reservation and the pending booking.
-<7> Find the seat only when its status is `HELD`; if either derived finder returns no row, the operation fails and the suspended transaction is not committed.
-<8> Update the seat and persist the confirmed booking through the standard repository `update` methods. A normal return commits both changes together. Micronaut clears the GTRID from the propagation state after completion.
+<.> Start an Oracle Database sessionless transaction with a five-minute suspension timeout. Oracle Database cancels a transaction that remains suspended past its timeout.
+<.> Lock the seat with the generated `findByIdForUpdate` query before checking availability. Change its status to `HELD` and call `update`; create the pending booking with `save`. A competing reservation waits for the lock and then checks the latest committed status, preventing two bookings of the same seat. Failure throws an exception and rolls back the transaction.
+<.> `save` returns the booking with its database-generated ID. After the intercepted method returns, Micronaut suspends the transaction instead of committing it. The generated ID and price can be published, but the database writes are still uncommitted.
+<.> Resume the transaction whose GTRID is in the active propagation scope.
+<.> This derived finder runs inside the resumed transaction and returns only the pending booking written by the controller.
+<.> A runtime exception rolls back the original transaction, undoing both the seat reservation and the pending booking.
+<.> Find the seat only when its status is `HELD`; if either derived finder returns no row, the operation fails and the suspended transaction is not committed.
+<.> Update the seat and persist the confirmed booking through the standard repository `update` methods. A normal return commits both changes together. Micronaut clears the GTRID from the propagation state after completion.
 callout:singleton[]
 
 These methods are top-level transaction boundaries on an injected bean. Do not call them inside another active transaction or through self-invocation. The sessionless modes require the default `REQUIRED` propagation and cannot be combined with `@OracleTransactional.Recoverable`.
@@ -234,10 +242,10 @@ callout:controller[arg0=/bookings]
 callout:executes-on[]
 callout:post[arg0=book,arg1=/bookings]
 
-<4> Create an empty lexical Oracle Database propagation scope for the incoming HTTP booking request.
-<5> Call the injected transactional service. It saves the booking and returns the entity with its generated ID and price. Its interceptor suspends the Oracle Database transaction before returning to the controller.
-<6> Obtain the encoded GTRID after suspension, while the propagation scope is still active.
-<7> Publish the payment request after the transaction has been suspended. The event carries the GTRID even though the lexical scope has ended.
+<.> Create an empty lexical Oracle Database propagation scope for the incoming HTTP booking request.
+<.> Call the injected transactional service. It saves the booking and returns the entity with its generated ID and price. Its interceptor suspends the Oracle Database transaction before returning to the controller.
+<.> Obtain the encoded GTRID after suspension, while the propagation scope is still active.
+<.> Publish the payment request after the transaction has been suspended. The event carries the GTRID even though the lexical scope has ended.
 
 callout:get[arg0=find,arg1=/bookings/\{id\}]
 callout:get[arg0=seat,arg1=/bookings/seats/\{id\}]
@@ -278,31 +286,34 @@ A declined booking leaves no booking row: the original insert was rolled back. A
 
 == End-to-End Tests
 
+Liquibase seeds the two demonstration seats only once per database, and each test books one of them. Test Resources can reuse the same database, for example when native tests run after the JVM tests, so each test cleans up after itself through the repositories:
+
 :exclude-for-languages:python
 test:controller/KafkaBookingTest[]
 callout:micronaut-test-transactional-false[]
 callout:property[]
+<.> After each test, delete the bookings with `BookingRepository` and make both demonstration seats `AVAILABLE` again with `FlightSeatRepository`.
 :exclude-for-languages:
 
 :only-for-languages:python
 test:KafkaBookingTest[]
 callout:micronaut-test-transactional-false[]
+<.> After each test, delete the bookings with `BookingRepository` and make both demonstration seats `AVAILABLE` again with `FlightSeatRepository`.
+:only-for-languages:
+<.> Submit a declined booking for the seeded `MN123-12B` seat.
+<.> Submit an approved booking for the exact same seat. This request must acquire the lock held by the first reservation, so it can return only after that lock is released.
+<.> Poll until the replacement booking is `CONFIRMED` and its seat is `BOOKED`.
+<.> Verify the declined booking lookup returns `404`, showing that its pending insert was rolled back.
 
+The test submits booking requests through the HTTP API and polls the booking and seat endpoints to verify the outcome. The approval scenario books the seeded `MN123-12A` seat, then polls until the booking is `CONFIRMED` with a payment reference and the seat is `BOOKED`.
+
+An absent booking or an `AVAILABLE` seat alone would be a false positive: those are also visible while a reservation is suspended. Successfully booking the same seat again and confirming that the declined booking remains absent verify rollback through the public API. The tests use a 30-second HTTP request timeout and a 60-second polling deadline, both shorter than the five-minute Oracle Database suspension timeout, so transaction expiry cannot make this scenario pass.
+
+:only-for-languages:python
 The test configuration selects a dedicated Test Resources scope and sets the HTTP client timeout:
 
 testResource:application-test.toml[]
 :only-for-languages:
-
-The test submits booking requests through the HTTP API and polls the booking and seat endpoints to verify the outcome.
-
-The approval scenario submits a booking for the seeded `MN123-12A` seat, then polls until the booking is `CONFIRMED` with a payment reference and the seat is `BOOKED`.
-
-<1> Submit a declined booking for the seeded `MN123-12B` seat.
-<2> Submit an approved booking for the exact same seat. This request must acquire the lock held by the first reservation, so it can return only after that lock is released.
-<3> Poll until the replacement booking is `CONFIRMED` and its seat is `BOOKED`.
-<4> Verify the declined booking lookup returns `404`, showing that its pending insert was rolled back.
-
-An absent booking or an `AVAILABLE` seat alone would be a false positive: those are also visible while a reservation is suspended. Successfully booking the same seat again and confirming that the declined booking remains absent verify rollback through the public API. The tests use a 30-second HTTP request timeout and a 60-second polling deadline, both shorter than the five-minute Oracle Database suspension timeout, so transaction expiry cannot make this scenario pass.
 
 The test has no surrounding transaction and uses a dedicated Micronaut Test Resources scope, with its own Oracle Database and Kafka containers. Docker is required; the build stops the disposable Test Resources services after the tests.
 

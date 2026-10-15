@@ -19,7 +19,10 @@ import example.micronaut.dto.BookingRequest
 import example.micronaut.dto.BookingView
 import example.micronaut.dto.FlightSeatView
 import example.micronaut.entity.BookingStatus
+import example.micronaut.entity.FlightSeat
 import example.micronaut.entity.SeatStatus
+import example.micronaut.repository.BookingRepository
+import example.micronaut.repository.FlightSeatRepository
 import io.micronaut.context.annotation.Property
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.HttpStatus
@@ -30,6 +33,7 @@ import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import jakarta.inject.Inject
 import org.awaitility.Awaitility.await
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Timeout
 import java.time.Duration
@@ -44,6 +48,19 @@ class KafkaBookingTest {
     @field:Client("/")
     lateinit var httpClient: HttpClient
 
+    @Inject
+    lateinit var bookingRepository: BookingRepository
+
+    @Inject
+    lateinit var flightSeatRepository: FlightSeatRepository
+
+    @AfterEach // <3>
+    fun resetSeats() {
+        bookingRepository.deleteAll()
+        flightSeatRepository.update(FlightSeat("MN123-12A", SeatStatus.AVAILABLE))
+        flightSeatRepository.update(FlightSeat("MN123-12B", SeatStatus.AVAILABLE))
+    }
+
     @Test
     fun approvedPaymentConfirmsTheBooking() {
         val seatId = "MN123-12A"
@@ -56,11 +73,11 @@ class KafkaBookingTest {
     fun declinedPaymentRollsBackAndAllowsTheSameSeatToBeBookedAgain() {
         val seatId = "MN123-12B"
         assertEquals(SeatStatus.AVAILABLE, findSeat(seatId).status)
-        val declinedBookingId = book(seatId, "demo-decline") // <1>
-        val approvedBookingId = book(seatId, "demo-approve") // <2>
+        val declinedBookingId = book(seatId, "demo-decline") // <4>
+        val approvedBookingId = book(seatId, "demo-approve") // <5>
         assertNotEquals(declinedBookingId, approvedBookingId)
-        awaitConfirmed(approvedBookingId, seatId) // <3>
-        assertTrue(findBooking(declinedBookingId).isEmpty) // <4>
+        awaitConfirmed(approvedBookingId, seatId) // <6>
+        assertTrue(findBooking(declinedBookingId).isEmpty) // <7>
     }
 
     private fun book(seatId: String, paymentToken: String): Long {

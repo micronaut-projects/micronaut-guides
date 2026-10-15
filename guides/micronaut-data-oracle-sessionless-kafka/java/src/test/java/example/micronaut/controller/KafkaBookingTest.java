@@ -19,7 +19,10 @@ import example.micronaut.dto.BookingRequest;
 import example.micronaut.dto.BookingView;
 import example.micronaut.dto.FlightSeatView;
 import example.micronaut.entity.BookingStatus;
+import example.micronaut.entity.FlightSeat;
 import example.micronaut.entity.SeatStatus;
+import example.micronaut.repository.BookingRepository;
+import example.micronaut.repository.FlightSeatRepository;
 import io.micronaut.context.annotation.Property;
 import io.micronaut.http.HttpRequest;
 import io.micronaut.http.HttpStatus;
@@ -28,6 +31,7 @@ import io.micronaut.http.client.annotation.Client;
 import io.micronaut.http.client.exceptions.HttpClientResponseException;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 
@@ -43,6 +47,15 @@ import static org.junit.jupiter.api.Assertions.*;
 @Timeout(120)
 class KafkaBookingTest {
     @Inject @Client("/") HttpClient httpClient;
+    @Inject BookingRepository bookingRepository;
+    @Inject FlightSeatRepository flightSeatRepository;
+
+    @AfterEach // <3>
+    void resetSeats() {
+        bookingRepository.deleteAll();
+        flightSeatRepository.update(new FlightSeat("MN123-12A", SeatStatus.AVAILABLE));
+        flightSeatRepository.update(new FlightSeat("MN123-12B", SeatStatus.AVAILABLE));
+    }
 
     @Test
     void approvedPaymentConfirmsTheBooking() {
@@ -58,11 +71,11 @@ class KafkaBookingTest {
         String seatId = "MN123-12B";
         assertEquals(SeatStatus.AVAILABLE, findSeat(seatId).status());
 
-        Long declinedBookingId = book(seatId, "demo-decline"); // <1>
-        Long approvedBookingId = book(seatId, "demo-approve"); // <2>
+        Long declinedBookingId = book(seatId, "demo-decline"); // <4>
+        Long approvedBookingId = book(seatId, "demo-approve"); // <5>
         assertNotEquals(declinedBookingId, approvedBookingId);
-        awaitConfirmed(approvedBookingId, seatId); // <3>
-        assertTrue(findBooking(declinedBookingId).isEmpty()); // <4>
+        awaitConfirmed(approvedBookingId, seatId); // <6>
+        assertTrue(findBooking(declinedBookingId).isEmpty()); // <7>
     }
 
     private Long book(String seatId, String paymentToken) {
