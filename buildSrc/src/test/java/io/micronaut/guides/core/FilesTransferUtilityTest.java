@@ -3,12 +3,15 @@ package io.micronaut.guides.core;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.nio.file.Files;
+import java.nio.file.Path;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -97,6 +100,26 @@ public class FilesTransferUtilityTest {
         assertFalse(new File(destination, "src/main/resources/views/index.html").exists());
         assertFalse(new File(destination, "src/main/resources/views/starter.html").exists());
         assertFalse(new File(destination, "src/main/resources/static/python.txt").exists());
+    }
+
+    @Test
+    void pythonUsesApplicationConfigurationWithoutInheritingBootstrapFiles(@TempDir Path output) throws Exception {
+        File inputDirectory = new File("src/test/resources/file-transfer/python-application-config");
+        Guide guide = guideParser.parseGuideMetadata(inputDirectory, "metadata.json").orElseThrow();
+
+        filesTransferUtility.transferFiles(inputDirectory, output.toFile(), guide);
+
+        Path python = output.resolve("python-application-config-pyronaut-python");
+        assertEquals("[micronaut.application]\nname = \"python-application-config\"\n",
+                Files.readString(python.resolve("config/application.toml")));
+        assertEquals("[micronaut.config]\nimport = []\n",
+                Files.readString(python.resolve("tests-config/application-test.toml")));
+        assertFalse(Files.exists(python.resolve("config/bootstrap.properties")));
+        assertFalse(Files.exists(python.resolve("tests-config/bootstrap-test.properties")));
+
+        Path java = output.resolve("python-application-config-gradle-java");
+        assertTrue(Files.exists(java.resolve("src/main/resources/bootstrap.properties")));
+        assertTrue(Files.exists(java.resolve("src/test/resources/bootstrap-test.properties")));
     }
 
 }

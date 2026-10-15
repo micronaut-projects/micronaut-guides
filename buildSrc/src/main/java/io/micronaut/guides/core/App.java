@@ -82,5 +82,40 @@ public record App(
         @Nullable
         List<String> pythonFeatures
 ) {
-}
+    public App(
+            @NonNull String name,
+            @Nullable String packageName,
+            @Nullable ApplicationType applicationType,
+            @Nullable String framework,
+            @Nullable List<String> features,
+            @Nullable List<String> invisibleFeatures,
+            @Nullable List<String> kotlinFeatures,
+            @Nullable List<String> javaFeatures,
+            @Nullable List<String> groovyFeatures,
+            @Nullable TestFramework testFramework,
+            @Nullable List<String> excludeTest,
+            @Nullable List<String> excludeSource,
+            @Nullable Boolean validateLicense) {
+        this(name, packageName, applicationType, framework, features, invisibleFeatures, kotlinFeatures, javaFeatures,
+                groovyFeatures, null, testFramework, excludeTest, excludeSource, validateLicense, null);
+    }
 
+    public App(
+            @NonNull String name,
+            @Nullable String packageName,
+            @Nullable ApplicationType applicationType,
+            @Nullable String framework,
+            @Nullable List<String> features,
+            @Nullable List<String> invisibleFeatures,
+            @Nullable List<String> kotlinFeatures,
+            @Nullable List<String> javaFeatures,
+            @Nullable List<String> groovyFeatures,
+            @Nullable List<String> jvmFeatures,
+            @Nullable TestFramework testFramework,
+            @Nullable List<String> excludeTest,
+            @Nullable List<String> excludeSource,
+            @Nullable Boolean validateLicense) {
+        this(name, packageName, applicationType, framework, features, invisibleFeatures, kotlinFeatures, javaFeatures,
+                groovyFeatures, jvmFeatures, testFramework, excludeTest, excludeSource, validateLicense, null);
+    }
+}
