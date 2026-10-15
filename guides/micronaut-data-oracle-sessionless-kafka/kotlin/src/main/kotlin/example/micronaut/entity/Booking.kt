@@ -20,14 +20,14 @@ import io.micronaut.data.annotation.Id
 import io.micronaut.data.annotation.MappedEntity
 import java.math.BigDecimal
 
-@MappedEntity("booking")
+@MappedEntity("booking") // <1>
 class Booking(
     var seatId: String,
     var amount: BigDecimal,
     var status: BookingStatus,
     var paymentReference: String
 ) {
-    @field:Id
-    @field:GeneratedValue
+    @field:Id // <2>
+    @field:GeneratedValue // <3>
     var id: Long? = null
 }

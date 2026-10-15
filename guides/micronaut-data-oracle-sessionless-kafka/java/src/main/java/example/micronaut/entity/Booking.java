@@ -20,10 +20,10 @@ import io.micronaut.data.annotation.GeneratedValue;
 import io.micronaut.data.annotation.MappedEntity;
 import java.math.BigDecimal;
 
-@MappedEntity("booking")
+@MappedEntity("booking") // <1>
 public class Booking {
-    @Id
-    @GeneratedValue
+    @Id // <2>
+    @GeneratedValue // <3>
     private Long id;
     private String seatId;
     private BigDecimal amount;

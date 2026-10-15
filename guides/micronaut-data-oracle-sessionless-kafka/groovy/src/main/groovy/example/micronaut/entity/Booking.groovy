@@ -21,10 +21,10 @@ import io.micronaut.data.annotation.MappedEntity
 import io.micronaut.data.annotation.GeneratedValue
 
 @CompileStatic
-@MappedEntity("booking")
+@MappedEntity("booking") // <1>
 class Booking {
-    @Id
-    @GeneratedValue
+    @Id // <2>
+    @GeneratedValue // <3>
     Long id
     String seatId
     BigDecimal amount

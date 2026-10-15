@@ -18,9 +18,9 @@ package example.micronaut.entity;
 import io.micronaut.data.annotation.Id;
 import io.micronaut.data.annotation.MappedEntity;
 
-@MappedEntity("flight_seat")
+@MappedEntity("flight_seat") // <1>
 public class FlightSeat {
-    @Id
+    @Id // <2>
     private String id;
     private SeatStatus status;
 

@@ -20,9 +20,9 @@ import io.micronaut.data.annotation.Id
 import io.micronaut.data.annotation.MappedEntity
 
 @CompileStatic
-@MappedEntity("flight_seat")
+@MappedEntity("flight_seat") // <1>
 class FlightSeat {
-    @Id
+    @Id // <2>
     String id
     SeatStatus status
 
