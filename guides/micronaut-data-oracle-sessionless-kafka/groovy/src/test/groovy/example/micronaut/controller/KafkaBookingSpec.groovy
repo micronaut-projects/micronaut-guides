@@ -26,7 +26,6 @@ import io.micronaut.http.HttpStatus
 import io.micronaut.http.client.HttpClient
 import io.micronaut.http.client.annotation.Client
 import io.micronaut.http.client.exceptions.HttpClientResponseException
-import io.micronaut.test.annotation.Sql
 import io.micronaut.test.extensions.spock.annotation.MicronautTest
 import jakarta.inject.Inject
 import spock.lang.Specification
@@ -38,7 +37,6 @@ import static org.awaitility.Awaitility.await
 @MicronautTest(transactional = false) // <1>
 @Property(name = "micronaut.test.resources.scope", value = "booking-controller-e2e") // <2>
 @Property(name = "micronaut.http.client.read-timeout", value = "30s")
-@Sql(scripts = "classpath:rollbackSeed.sql", phase = Sql.Phase.AFTER_ALL)
 @Timeout(120)
 class KafkaBookingSpec extends Specification {
     @Inject

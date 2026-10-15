@@ -2,20 +2,13 @@ import time
 
 import pytest
 import requests
-from micronaut.transaction import TransactionOperations
 from pyronaut.test import MicronautTest, micronaut_test_fixture
-
-ROLLBACK_SEED = [
-    "DELETE FROM booking WHERE seat_id IN ('MN123-12A', 'MN123-12B')",
-    "UPDATE flight_seat SET status = 'AVAILABLE' WHERE id IN ('MN123-12A', 'MN123-12B')",
-]
 
 
 @pytest.fixture(scope="module")
 def my_context(request):
     fixture = micronaut_test_fixture(request, MicronautTest(environments=["test"], transactional=False))  # <1>
     yield fixture
-    run_sql(fixture[TransactionOperations], ROLLBACK_SEED)
     fixture.stop()
 
 
@@ -75,16 +68,3 @@ def find_seat(client, seat_id):
     response = client.get(f"/bookings/seats/{seat_id}", timeout=30)
     assert response.status_code == 200, response.text
     return response.json()
-
-
-def run_sql(transaction_operations, statements):
-    def execute(status):
-        connection = status.getConnection()
-        for sql in statements:
-            statement = connection.createStatement()
-            try:
-                statement.executeUpdate(sql)
-            finally:
-                statement.close()
-
-    transaction_operations.executeWrite(execute)

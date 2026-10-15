@@ -10,7 +10,7 @@ common:requirements.adoc[]
 * Micronaut Data 5.2.0 or later.
 * Oracle AI Database 26ai (version 23.6 or later) and a recent Oracle JDBC Thin driver exposing `startTransaction`, `suspendTransactionImmediately`, and `resumeTransaction`.
 
-See the https://docs.oracle.com/en/database/oracle/oracle-database/26/jjdbc/sessionless-transactions.html[Oracle Database sessionless transaction documentation] for database and driver requirements.
+Read https://docs.oracle.com/en/database/oracle/oracle-database/26/adfns/developing-applications-sessionless-transactions.html[Developing Applications with Sessionless Transactions] in the Oracle AI Database Development Guide for how the feature works, and https://docs.oracle.com/en/database/oracle/oracle-database/26/jjdbc/sessionless-transactions.html[Sessionless Transactions] in the Oracle AI Database JDBC Developer's Guide for database and driver requirements.
 
 common:completesolution.adoc[]
 
@@ -279,20 +279,12 @@ A declined booking leaves no booking row: the original insert was rolled back. A
 == End-to-End Tests
 
 :exclude-for-languages:python
-The Liquibase changelog creates the two demonstration seats when it initializes the test database. After the tests, they delete the bookings created for the seats and make both seats available again, so later runs against the same database start from the same state:
-
-testResource:rollbackSeed.sql[]
-
-The test class loads `rollbackSeed.sql` with `@Sql` and `Sql.Phase.AFTER_ALL`.
-
 test:controller/KafkaBookingTest[]
 callout:micronaut-test-transactional-false[]
 callout:property[]
 :exclude-for-languages:
 
 :only-for-languages:python
-The Liquibase changelog creates the two demonstration seats. Before the module-scoped `my_context` fixture stops, it deletes the bookings created for the seats and makes both seats available again through `TransactionOperations`, so later runs against the same database start from the same state.
-
 test:KafkaBookingTest[]
 callout:micronaut-test-transactional-false[]
 
@@ -371,4 +363,4 @@ Pyronaut stops the Test Resources server it owns when the development or test co
 
 The containers are disposable; no cloud resources are provisioned by this guide. Remove demonstration topics only from a broker dedicated to this example.
 
-Read the https://micronaut-projects.github.io/micronaut-data/latest/guide/#sessionlessTransactions[Micronaut Data sessionless transaction documentation], the https://micronaut-projects.github.io/micronaut-kafka/latest/guide/[Micronaut Kafka guide], and the https://docs.oracle.com/en/database/oracle/oracle-database/26/jjdbc/sessionless-transactions.html[Oracle Database sessionless transaction documentation].
+Read the https://micronaut-projects.github.io/micronaut-data/latest/guide/#sessionlessTransactions[Micronaut Data sessionless transaction documentation], the https://micronaut-projects.github.io/micronaut-kafka/latest/guide/[Micronaut Kafka guide], and the Oracle AI Database documentation on sessionless transactions: https://docs.oracle.com/en/database/oracle/oracle-database/26/adfns/developing-applications-sessionless-transactions.html[Developing Applications with Sessionless Transactions] and https://docs.oracle.com/en/database/oracle/oracle-database/26/jjdbc/sessionless-transactions.html[JDBC Sessionless Transactions].
