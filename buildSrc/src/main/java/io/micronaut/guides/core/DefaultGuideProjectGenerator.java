@@ -118,6 +118,9 @@ public class DefaultGuideProjectGenerator implements GuideProjectGenerator {
             LOG.error("Error generating application: " + e.getMessage(), e);
             throw new IOException(e.getMessage(), e);
         }
+        if (guidesOption.getBuildTool() == BuildTool.MAVEN && guidesOption.getLanguage() == Language.GROOVY) {
+            GuideUtils.normalizeMavenSpockTestIncludes(destinationPath);
+        }
     }
 
     private GeneratorContext createProjectGeneratorContext(
