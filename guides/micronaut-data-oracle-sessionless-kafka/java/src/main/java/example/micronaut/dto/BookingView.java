@@ -15,7 +15,6 @@
  */
 package example.micronaut.dto;
 
-import example.micronaut.entity.Booking;
 import example.micronaut.entity.BookingStatus;
 
 import io.micronaut.serde.annotation.Serdeable;
@@ -23,8 +22,4 @@ import java.math.BigDecimal;
 
 @Serdeable // <1>
 public record BookingView(Long id, String seatId, BigDecimal amount, BookingStatus status, String paymentReference) {
-    public static BookingView from(Booking booking) {
-        return new BookingView(booking.id(), booking.seatId(), booking.amount(),
-            booking.status(), booking.paymentReference());
-    }
 }

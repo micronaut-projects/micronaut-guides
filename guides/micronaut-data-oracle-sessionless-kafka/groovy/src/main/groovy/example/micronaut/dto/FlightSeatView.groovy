@@ -18,7 +18,7 @@ package example.micronaut.dto
 import groovy.transform.Canonical
 import groovy.transform.CompileStatic
 import io.micronaut.serde.annotation.Serdeable
-import example.micronaut.entity.*
+import example.micronaut.entity.SeatStatus
 
 @Canonical
 @CompileStatic
@@ -26,8 +26,4 @@ import example.micronaut.entity.*
 class FlightSeatView {
     String id
     SeatStatus status
-
-    static FlightSeatView from(FlightSeat seat) {
-        new FlightSeatView(seat.id, seat.status)
-    }
 }

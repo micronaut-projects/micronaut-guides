@@ -179,12 +179,25 @@ callout:serdeable[]
 
 `BookingStatus` represents the pending and confirmed states. Micronaut Data stores the enum names in the existing `VARCHAR2` status column, and the HTTP response serializes them as `PENDING` or `CONFIRMED`. The enum is serializable because it appears in `BookingView`; the persistence entity still has no serialization annotation.
 
+The HTTP endpoints return DTOs instead of persistence entities. Create `FlightSeatView` to represent a seat:
+
+source:dto/FlightSeatView[]
+
+callout:serdeable[]
+
+Create `BookingView` to represent a booking:
+
+source:dto/BookingView[]
+
+callout:serdeable[]
+
 Create a repository interface for seats. Micronaut Data implements the interface at compilation time:
 
 source:repository/FlightSeatRepository[]
 
 callout:jdbcrepository[]
 callout:crudrepository[]
+callout:dto-projection[]
 
 The derived `findByIdAndStatusForUpdate` method lets Micronaut Data generate a locking read for the Oracle Database dialect that returns the seat only when it is `AVAILABLE`. The service persists the new status with the standard `update` method while holding this lock. During completion, `findByIdAndStatus` retrieves only a seat whose status is `HELD`. Oracle Database holds the lock until the original transaction commits or rolls back, including while it is suspended. Another reservation for the same seat can wait on that lock. A normal read still sees the previously committed `AVAILABLE` value; it cannot tell you whether a suspended reservation holds the seat.
 
@@ -194,8 +207,9 @@ source:repository/BookingRepository[]
 
 callout:jdbcrepository[]
 callout:crudrepository[]
+callout:dto-projection[]
 
-The Java `FlightSeat` and `Booking` entities are records, which Micronaut Data JDBC supports; the Groovy, Kotlin, and Python variants use mutable entities. The Java service creates new record values with the updated status. None of the persistence entities has serialization annotations. The booking ID uses `@GeneratedValue` with its default settings. For Oracle Database, Micronaut Data selects sequence generation and derives the sequence name from the table name plus `_seq`, so Liquibase creates `booking_seq` for the `booking` table. A new booking has no assigned ID; the inherited `save` method inserts it and returns the entity with its generated ID. Sequence values can have gaps after rollback. During completion, the derived `findByIdAndStatus` method retrieves only a booking that is still `PENDING`. Changes to seats and bookings use the inherited `update` method. Both repositories let Micronaut Data generate their SQL.
+The Java `FlightSeat` and `Booking` entities are records, which Micronaut Data JDBC supports; the Groovy, Kotlin, and Python variants use mutable entities. The Java service creates new record values with the updated status. None of the persistence entities has serialization annotations. The booking ID uses `@GeneratedValue` with its default settings. For Oracle Database, Micronaut Data selects sequence generation and derives the sequence name from the table name plus `_seq`, so Liquibase creates `booking_seq` for the `booking` table. A new booking has no assigned ID; the inherited `save` method inserts it and returns the entity with its generated ID. Sequence values can have gaps after rollback. During completion, the derived `findByIdAndStatus` method retrieves only a booking that is still `PENDING`. Changes to seats and bookings use the inherited `update` method. The `queryById` methods return the `FlightSeatView` and `BookingView` DTOs directly, so Micronaut Data selects only their properties and the controller does not map entities. Both repositories let Micronaut Data generate their SQL.
 
 == Request and Message Contracts
 
@@ -259,20 +273,6 @@ callout:kafka-key.adoc[3]
 Returning `RecordMetadata` makes each producer method synchronous: it waits for a Kafka acknowledgment before returning. The controller waits for its payment request to be acknowledged before returning `202 Accepted`. The payment consumer waits for its result publication before its input offset is committed. There is still a crash window between suspending the Oracle Database transaction and receiving a Kafka acknowledgment.
 
 == Controller: Reserve and Suspend
-
-Create the DTOs that the controller returns. `BookingView` represents a booking:
-
-source:dto/BookingView[]
-
-callout:serdeable[]
-
-`FlightSeatView` represents a seat:
-
-source:dto/FlightSeatView[]
-
-callout:serdeable[]
-
-The HTTP response DTOs expose booking and seat snapshots without serializing persistence entities.
 
 Create `BookingController` to reserve seats and to expose bookings and seats over HTTP:
 

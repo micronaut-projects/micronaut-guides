@@ -15,6 +15,7 @@
  */
 package example.micronaut.repository
 
+import example.micronaut.dto.FlightSeatView
 import example.micronaut.entity.FlightSeat
 import example.micronaut.entity.SeatStatus
 import io.micronaut.data.jdbc.annotation.JdbcRepository
@@ -25,4 +26,5 @@ import java.util.Optional
 interface FlightSeatRepository : CrudRepository<FlightSeat, String> { // <2>
     fun findByIdAndStatusForUpdate(id: String, status: SeatStatus): Optional<FlightSeat>
     fun findByIdAndStatus(id: String, status: SeatStatus): Optional<FlightSeat>
+    fun queryById(id: String): Optional<FlightSeatView> // <3>
 }

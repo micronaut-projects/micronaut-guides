@@ -59,8 +59,8 @@ open class BookingController(
     }
 
     @Get("/{id}") // <8>
-    open fun find(id: Long): Optional<BookingView> = bookingRepository.findById(id).map(BookingView::from)
+    open fun find(id: Long): Optional<BookingView> = bookingRepository.queryById(id)
 
     @Get("/seats/{id}") // <9>
-    open fun seat(id: String): Optional<FlightSeatView> = flightSeatRepository.findById(id).map(FlightSeatView::from)
+    open fun seat(id: String): Optional<FlightSeatView> = flightSeatRepository.queryById(id)
 }

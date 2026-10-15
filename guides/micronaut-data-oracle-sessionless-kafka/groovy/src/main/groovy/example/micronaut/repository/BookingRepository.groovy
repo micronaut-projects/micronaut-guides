@@ -17,6 +17,7 @@ package example.micronaut.repository
 
 import groovy.transform.CompileStatic
 
+import example.micronaut.dto.BookingView
 import example.micronaut.entity.Booking
 import example.micronaut.entity.BookingStatus
 
@@ -29,4 +30,5 @@ import java.util.Optional
 @JdbcRepository(dialect = Dialect.ORACLE) // <1>
 interface BookingRepository extends CrudRepository<Booking, Long> { // <2>
     Optional<Booking> findByIdAndStatus(Long id, BookingStatus status)
+    Optional<BookingView> queryById(Long id) // <3>
 }

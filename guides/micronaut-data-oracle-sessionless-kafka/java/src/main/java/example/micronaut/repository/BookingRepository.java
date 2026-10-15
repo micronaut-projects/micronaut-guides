@@ -15,6 +15,7 @@
  */
 package example.micronaut.repository;
 
+import example.micronaut.dto.BookingView;
 import example.micronaut.entity.Booking;
 import example.micronaut.entity.BookingStatus;
 
@@ -26,4 +27,5 @@ import java.util.Optional;
 @JdbcRepository(dialect = Dialect.ORACLE) // <1>
 public interface BookingRepository extends CrudRepository<Booking, Long> { // <2>
     Optional<Booking> findByIdAndStatus(Long id, BookingStatus status);
+    Optional<BookingView> queryById(Long id); // <3>
 }

@@ -18,7 +18,7 @@ package example.micronaut.dto
 import groovy.transform.Canonical
 import groovy.transform.CompileStatic
 import io.micronaut.serde.annotation.Serdeable
-import example.micronaut.entity.*
+import example.micronaut.entity.BookingStatus
 
 @Canonical
 @CompileStatic
@@ -29,8 +29,4 @@ class BookingView {
     BigDecimal amount
     BookingStatus status
     String paymentReference
-
-    static BookingView from(Booking booking) {
-        new BookingView(booking.id, booking.seatId, booking.amount, booking.status, booking.paymentReference)
-    }
 }

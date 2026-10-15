@@ -16,15 +16,10 @@
 package example.micronaut.dto
 
 import io.micronaut.serde.annotation.Serdeable
-import example.micronaut.entity.FlightSeat
 import example.micronaut.entity.SeatStatus
 
 @Serdeable // <1>
 data class FlightSeatView(
     val id: String,
     val status: SeatStatus
-) {
-    companion object {
-        fun from(seat: FlightSeat): FlightSeatView = FlightSeatView(seat.id, seat.status)
-    }
-}
+)

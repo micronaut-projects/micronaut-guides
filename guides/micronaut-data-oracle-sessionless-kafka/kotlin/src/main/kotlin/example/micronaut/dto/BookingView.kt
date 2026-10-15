@@ -17,7 +17,6 @@ package example.micronaut.dto
 
 import io.micronaut.serde.annotation.Serdeable
 import java.math.BigDecimal
-import example.micronaut.entity.Booking
 import example.micronaut.entity.BookingStatus
 
 @Serdeable // <1>
@@ -27,8 +26,4 @@ data class BookingView(
     val amount: BigDecimal,
     val status: BookingStatus,
     val paymentReference: String
-) {
-    companion object {
-        fun from(booking: Booking): BookingView = BookingView(requireNotNull(booking.id), booking.seatId, booking.amount, booking.status, booking.paymentReference)
-    }
-}
+)

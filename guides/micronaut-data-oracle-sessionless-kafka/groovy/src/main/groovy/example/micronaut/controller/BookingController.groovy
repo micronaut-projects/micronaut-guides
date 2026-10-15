@@ -80,11 +80,11 @@ class BookingController {
 
     @Get("/{id}") // <8>
     Optional<BookingView> find(Long id) {
-        return bookingRepository.findById(id).map(BookingView::from)
+        return bookingRepository.queryById(id)
     }
 
     @Get("/seats/{id}") // <9>
     Optional<FlightSeatView> seat(String id) {
-        return flightSeatRepository.findById(id).map(FlightSeatView::from)
+        return flightSeatRepository.queryById(id)
     }
 }

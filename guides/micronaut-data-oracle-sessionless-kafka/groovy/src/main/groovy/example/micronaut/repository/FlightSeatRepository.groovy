@@ -17,6 +17,7 @@ package example.micronaut.repository
 
 import groovy.transform.CompileStatic
 
+import example.micronaut.dto.FlightSeatView
 import example.micronaut.entity.FlightSeat
 import example.micronaut.entity.SeatStatus
 
@@ -30,4 +31,5 @@ import java.util.Optional
 interface FlightSeatRepository extends CrudRepository<FlightSeat, String> { // <2>
     Optional<FlightSeat> findByIdAndStatusForUpdate(String id, SeatStatus status)
     Optional<FlightSeat> findByIdAndStatus(String id, SeatStatus status)
+    Optional<FlightSeatView> queryById(String id) // <3>
 }

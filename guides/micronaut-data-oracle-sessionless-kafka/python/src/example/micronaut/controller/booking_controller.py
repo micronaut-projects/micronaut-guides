@@ -51,10 +51,8 @@ class BookingController:
 
     @Get("/{id}")  # <8>
     def find(self, id: Long) -> BookingView | None:
-        booking = self.booking_repository.findById(id)
-        return BookingView.from_booking(booking.get()) if booking.isPresent() else None
+        return self.booking_repository.queryById(id).orElse(None)
 
     @Get("/seats/{id}")  # <9>
     def seat(self, id: str) -> FlightSeatView | None:
-        seat = self.flight_seat_repository.findById(id)
-        return FlightSeatView.from_seat(seat.get()) if seat.isPresent() else None
+        return self.flight_seat_repository.queryById(id).orElse(None)

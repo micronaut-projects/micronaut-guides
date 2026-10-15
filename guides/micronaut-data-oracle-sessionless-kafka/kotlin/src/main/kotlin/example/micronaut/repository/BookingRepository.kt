@@ -15,6 +15,7 @@
  */
 package example.micronaut.repository
 
+import example.micronaut.dto.BookingView
 import example.micronaut.entity.Booking
 import example.micronaut.entity.BookingStatus
 import io.micronaut.data.jdbc.annotation.JdbcRepository
@@ -25,4 +26,5 @@ import java.util.Optional
 @JdbcRepository(dialect = Dialect.ORACLE) // <1>
 interface BookingRepository : CrudRepository<Booking, Long> { // <2>
     fun findByIdAndStatus(id: Long, status: BookingStatus): Optional<Booking>
+    fun queryById(id: Long): Optional<BookingView> // <3>
 }
