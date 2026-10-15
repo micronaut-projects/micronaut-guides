@@ -109,14 +109,14 @@ The consumers start from the earliest available offset for a new group. Automati
 
 === Test Resources Configuration
 
-Configure Micronaut Test Resources to start an Oracle Database Free image that supports sessionless transactions:
+Configure Micronaut Test Resources to start an Oracle Database Free image that supports sessionless transactions in the tests:
 
 :exclude-for-languages:python
-resource:application.properties[tag=testresources]
+testResource:application-test.properties[tag=testresources]
 :exclude-for-languages:
 
 :only-for-languages:python
-resource:application.toml[tag=testresources]
+testResource:application-test.toml[tag=testresources]
 :only-for-languages:
 
 Micronaut Test Resources supplies the datasource URL, username, password, and `kafka.bootstrap.servers` when they are absent. The pinned Oracle Database Free image supports sessionless transactions. For your own services, set `DATASOURCES_DEFAULT_URL`, `DATASOURCES_DEFAULT_USERNAME`, `DATASOURCES_DEFAULT_PASSWORD`, and `KAFKA_BOOTSTRAP_SERVERS`; do not put credentials in source control.
@@ -356,7 +356,7 @@ The test submits booking requests through the HTTP API and polls the booking and
 An absent booking or an `AVAILABLE` seat alone would be a false positive: those are also visible while a reservation is suspended. Successfully booking the same seat again and confirming that the declined booking remains absent verify rollback through the public API. The tests use a 30-second HTTP request timeout and a 60-second polling deadline, both shorter than the five-minute Oracle Database suspension timeout, so transaction expiry cannot make this scenario pass.
 
 :only-for-languages:python
-The test configuration selects a dedicated Test Resources scope and sets the HTTP client timeout:
+The test configuration selects a dedicated Test Resources scope, sets the HTTP client timeout, and pins the Oracle Database Free image:
 
 testResource:application-test.toml[]
 :only-for-languages:
