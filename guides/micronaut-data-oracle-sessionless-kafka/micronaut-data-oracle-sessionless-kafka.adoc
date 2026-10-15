@@ -7,7 +7,7 @@ The controller and consumers exchange the encoded global transaction identifier 
 common:requirements.adoc[]
 
 * Docker, for Oracle Database Free and Kafka through Micronaut Test Resources.
-* Micronaut Data 5.2.0 or later
+* Micronaut Data 5.2.0 or later.
 * Oracle AI Database 26ai (version 23.6 or later) and a recent Oracle JDBC Thin driver exposing `startTransaction`, `suspendTransactionImmediately`, and `resumeTransaction`.
 
 See the https://docs.oracle.com/en/database/oracle/oracle-database/26/jjdbc/sessionless-transactions.html[Oracle Database sessionless transaction documentation] for database and driver requirements.
@@ -18,7 +18,7 @@ common:completesolution.adoc[]
 
 . *Reserve the seat — `BookingController`*
 +
-Receives `POST /bookings`, reserves the seat, and saves a pending booking. It suspends the Oracle Database transaction, then publishes a `PaymentRequested` message containing the booking ID and GTRID to the `payment-requests` Kafka topic.
+Receives `POST /bookings`, reserves the seat, and saves a pending booking. It suspends the Oracle Database transaction, and then publishes a `PaymentRequested` message containing the booking ID and GTRID to the `payment-requests` Kafka topic.
 
 . *Process payment — `PaymentConsumer`*
 +
@@ -67,7 +67,7 @@ resource:application.properties[tag=datasource]
 resource:application.toml[tag=datasource]
 :exclude-for-languages:
 
-Liquibase creates the tables and two demonstration seats. Schema generation is disabled so that application restarts preserve committed bookings.
+Liquibase creates the tables. Schema generation is disabled so that application restarts preserve committed bookings.
 
 resource:db/liquibase-changelog.xml[]
 
@@ -81,7 +81,7 @@ resource:application.properties[tag=kafka]
 For Python, the Kafka client and listener annotations configure these options in the source files below.
 :exclude-for-languages:
 
-The consumers start from the earliest available offset for a new group. Automatic offset commits are disabled; each listener uses `SYNC_PER_RECORD`. The producer requests acknowledgments from all in-sync replicas, and enables Kafka producer idempotence. That setting covers producer retries; it does not deduplicate repeated business operations.
+The consumers start from the earliest available offset for a new group. Automatic offset commits are disabled; each listener uses `SYNC_PER_RECORD`. The producer requests acknowledgments from all in-sync replicas and enables Kafka producer idempotence. That setting covers producer retries; it does not deduplicate repeated business operations.
 
 :exclude-for-languages:python
 resource:application.properties[tag=testresources]
@@ -91,7 +91,7 @@ resource:application.properties[tag=testresources]
 resource:application.toml[tag=testresources]
 :exclude-for-languages:
 
-Micronaut Test Resources supplies the datasource URL, username, password and `kafka.bootstrap.servers` when they are absent. The pinned Oracle Database Free image supports sessionless transactions. For your own services, set `DATASOURCES_DEFAULT_URL`, `DATASOURCES_DEFAULT_USERNAME`, `DATASOURCES_DEFAULT_PASSWORD`, and `KAFKA_BOOTSTRAP_SERVERS`; do not put credentials in source control.
+Micronaut Test Resources supplies the datasource URL, username, password, and `kafka.bootstrap.servers` when they are absent. The pinned Oracle Database Free image supports sessionless transactions. For your own services, set `DATASOURCES_DEFAULT_URL`, `DATASOURCES_DEFAULT_USERNAME`, `DATASOURCES_DEFAULT_PASSWORD`, and `KAFKA_BOOTSTRAP_SERVERS`; do not put credentials in source control.
 
 Create the two topics before sending messages when using a broker without topic auto-creation:
 
@@ -138,7 +138,7 @@ The derived `findByIdForUpdate` method lets Micronaut Data generate a locking re
 
 source:repository/BookingRepository[]
 
-The persistence entities are mutable and have no serialization annotations. The booking ID uses `@GeneratedValue` with its default settings. For Oracle Database, Micronaut Data selects sequence generation and derives the sequence name from the table name plus `_seq`, so Liquibase creates `booking_seq` for the `booking` table. A new booking has no assigned ID; the inherited `save` method inserts it and returns the entity with its generated ID. Sequence values can have gaps after rollback. New bookings use the inherited `save` method; changes to seats and bookings use the inherited `update` method. Both repositories let Micronaut Data generate their SQL.
+The persistence entities are mutable and have no serialization annotations. The booking ID uses `@GeneratedValue` with its default settings. For Oracle Database, Micronaut Data selects sequence generation and derives the sequence name from the table name plus `_seq`, so Liquibase creates `booking_seq` for the `booking` table. A new booking has no assigned ID; the inherited `save` method inserts it and returns the entity with its generated ID. Sequence values can have gaps after rollback. Changes to seats and bookings use the inherited `update` method. Both repositories let Micronaut Data generate their SQL.
 
 == Request and Message Contracts
 
@@ -152,7 +152,7 @@ The controller passes only `seatId` to the booking service and uses the payment 
 
 Micronaut's propagation API returns the Oracle Database GTRID as a string encoded by `OracleSessionlessTransactionIdCodec`. Include this string in the `transactionId` field of the Kafka messages so the final consumer can resume the transaction. You can customize the codec, but the receiving application must be able to decode the transaction IDs sent by the producing application.
 
-Treat the encoded GTRID as sensitive transaction-control data. Restrict access to these topics, use authenticated encrypted connections outside local development, and avoid logging it. Do not send card details in Kafka messages; the sample uses only demonstration tokens.
+Treat the encoded GTRID as sensitive transaction-control data. Restrict access to these topics, use authenticated, encrypted connections outside local development, and avoid logging it. Do not send card details in Kafka messages; the sample uses only demonstration tokens.
 
 == Transactional Booking Service
 
@@ -174,7 +174,7 @@ These methods are top-level transaction boundaries on an injected bean. Do not c
 
 source:kafka/BookingClient[]
 
-Returning `RecordMetadata` makes each producer method synchronous: it waits for Kafka acknowledgment before returning. The controller waits for its payment request to be acknowledged before returning `202 Accepted`. The payment consumer waits for its result publication before its input offset is committed. There is still a crash window between suspending the Oracle Database transaction and receiving Kafka acknowledgment.
+Returning `RecordMetadata` makes each producer method synchronous: it waits for a Kafka acknowledgment before returning. The controller waits for its payment request to be acknowledged before returning `202 Accepted`. The payment consumer waits for its result publication before its input offset is committed. There is still a crash window between suspending the Oracle Database transaction and receiving a Kafka acknowledgment.
 
 == Controller: Reserve and Suspend
 
@@ -186,10 +186,10 @@ The HTTP response DTOs expose booking and seat snapshots without serializing per
 
 source:controller/BookingController[]
 
-<1> Create an empty, lexical Oracle Database propagation scope for the incoming HTTP booking request.
-<2> Call the injected transactional service. It saves the booking and returns its generated ID and price on the entity. Its interceptor suspends the Oracle Database transaction before returning to the controller.
+<1> Create an empty lexical Oracle Database propagation scope for the incoming HTTP booking request.
+<2> Call the injected transactional service. It saves the booking and returns the entity with its generated ID and price. Its interceptor suspends the Oracle Database transaction before returning to the controller.
 <3> Obtain the encoded GTRID after suspension, while the propagation scope is still active.
-<4> Publish the payment request after the transaction has suspended. The event carries the GTRID even though the lexical scope has ended.
+<4> Publish the payment request after the transaction has been suspended. The event carries the GTRID even though the lexical scope has ended.
 
 The controller returns `202 Accepted` with a booking ID after Kafka acknowledges the payment request. Reservation has already run and the Oracle Database transaction is suspended, but payment and booking completion are asynchronous. Blocking Kafka sends and JDBC work run on the blocking executor. The controller is an HTTP entry point; it does not listen to a Kafka topic.
 
@@ -199,7 +199,7 @@ Do not publish the payment request from inside the `SUSPEND` method: a consumer 
 
 source:service/DemoPaymentGateway[]
 
-The gateway simulates approval for `demo-approve` and decline for `demo-decline`. Its in-memory map makes repeated payments with the same booking ID return the same result during one process lifetime. Replace this with a payment provider that accepts a durable idempotency key; the demonstration map does not survive restarts.
+The gateway simulates an approval for `demo-approve` and a decline for `demo-decline`. Its in-memory map makes repeated payments with the same booking ID return the same result during one process lifetime. Replace this with a payment provider that accepts a durable idempotency key; the demonstration map does not survive restarts.
 
 source:kafka/PaymentConsumer[]
 
@@ -215,7 +215,7 @@ source:kafka/CompletionConsumer[]
 <3> Resume the original transaction and complete the booking through the injected service.
 <4> Catch the expected decline only outside the transactional service, after rollback. Catching it inside that method would allow the reservation to commit.
 
-A declined booking leaves no booking row: the original insert was rolled back. An absent booking can also mean it is pending, expired, or never started. A production workflow needs a separate durable status record to distinguish those outcomes and recognize duplicate declines.
+A declined booking leaves no booking row: the original insert was rolled back. An absent booking can also mean it is pending, has expired, or was never started. A production workflow needs a separate durable status record to distinguish those outcomes and recognize duplicate declines.
 
 == End-to-End Tests
 
@@ -240,9 +240,9 @@ The approval scenario submits a booking for the seeded `MN123-12A` seat, then po
 <3> Poll until the replacement booking is `CONFIRMED` and its seat is `BOOKED`.
 <4> Verify the declined booking lookup returns `404`, showing that its pending insert was rolled back.
 
-An absent booking or an `AVAILABLE` seat alone would be a false positive: those are also visible while a reservation is suspended. Successfully booking the same seat again and confirming that the declined booking remains absent verifies rollback through the public API. The tests use a 30-second HTTP request timeout and a 60-second polling deadline, both shorter than the five-minute Oracle Database suspension timeout, so transaction expiry cannot make this scenario pass.
+An absent booking or an `AVAILABLE` seat alone would be a false positive: those are also visible while a reservation is suspended. Successfully booking the same seat again and confirming that the declined booking remains absent verify rollback through the public API. The tests use a 30-second HTTP request timeout and a 60-second polling deadline, both shorter than the five-minute Oracle Database suspension timeout, so transaction expiry cannot make this scenario pass.
 
-The test has no surrounding transaction and uses a dedicated Micronaut Test Resources scope, with its own Oracle Database and Kafka containers. Liquibase supplies the two demonstration seats. Docker is required; the build stops the disposable Test Resources services after the tests.
+The test has no surrounding transaction and uses a dedicated Micronaut Test Resources scope, with its own Oracle Database and Kafka containers. The test loads the two demonstration seats from `seed.sql` before the tests and removes them, together with their bookings, with `rollbackSeed.sql` afterward. Docker is required; the build stops the disposable Test Resources services after the tests.
 
 common:testApp.adoc[]
 
@@ -260,7 +260,7 @@ Start the application with `./mvnw mn:run`.
 Start the application with `pyronaut dev`.
 :exclude-for-build:
 
-Test Resources starts local Oracle Database and Kafka if external connection properties are absent.
+Test Resources starts local Oracle Database and Kafka containers if external connection properties are absent.
 
 [source,bash]
 ----
@@ -277,7 +277,7 @@ curl http://localhost:8080/bookings/BOOKING_ID
 curl http://localhost:8080/bookings/seats/MN123-12A
 ----
 
-Before completion, the booking lookup returns `404`; after completion it returns a booking with `status: CONFIRMED` and the seat is `BOOKED`.
+Before completion, the booking lookup returns `404`; after completion, it returns a booking with `status: CONFIRMED` and the seat is `BOOKED`.
 
 Try `MN123-12B` with `demo-decline`. After payment processing and rollback, no booking is visible and the seat remains `AVAILABLE`. The sample has no separate rejection-status endpoint. Use a different available seat for later successful requests, or recreate the disposable database to reset the demonstration.
 
