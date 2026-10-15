@@ -46,7 +46,8 @@ class GuideProjectGeneratorTest {
                 null,
                 null,
                 null,
-                true
+                true,
+                null
         );
         Guide guide = new Guide(
                 "1. Testing Serialization - Spring Boot vs Micronaut Framework - Building a Rest API",
@@ -180,7 +181,8 @@ class GuideProjectGeneratorTest {
                 null,
                 null,
                 null,
-                true
+                true,
+                null
         );
         Guide guide = new Guide(
                 "Access an Oracle Autonomous Database",

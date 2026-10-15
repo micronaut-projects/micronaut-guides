@@ -82,24 +82,5 @@ public record App(
         @Nullable
         List<String> pythonFeatures
 ) {
-
-    public App(String name,
-               String packageName,
-               ApplicationType applicationType,
-               String framework,
-               List<String> features,
-               List<String> invisibleFeatures,
-               List<String> kotlinFeatures,
-               List<String> javaFeatures,
-               List<String> groovyFeatures,
-               List<String> jvmFeatures,
-               TestFramework testFramework,
-               List<String> excludeTest,
-               List<String> excludeSource,
-               Boolean validateLicense) {
-        this(name, packageName, applicationType, framework, features, invisibleFeatures, kotlinFeatures,
-                javaFeatures, groovyFeatures, jvmFeatures, testFramework, excludeTest, excludeSource,
-                validateLicense, null);
-    }
 }
 
