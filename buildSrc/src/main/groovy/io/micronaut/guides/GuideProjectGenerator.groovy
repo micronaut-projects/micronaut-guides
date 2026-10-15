@@ -155,6 +155,10 @@ class GuideProjectGenerator implements AutoCloseable {
                 guidesGenerator.generateAppIntoDirectory(destination, app.applicationType(), packageAndName, app.framework(),
                         appFeatures, buildTool, lang == PYTHON ? PYTEST : (app.testFramework() ?: testFramework), lang, javaVersion)
 
+                if (buildTool == BuildTool.MAVEN && lang == GROOVY) {
+                    GuideUtils.normalizeMavenSpockTestIncludes(destinationPath)
+                }
+
                 if (lang == PYTHON) {
                     movePythonResources(destinationPath)
                 }

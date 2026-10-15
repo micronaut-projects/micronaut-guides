@@ -116,7 +116,8 @@ class GuideAsciidocGeneratorTest {
                         null,
                         null,
                         null,
-                        false
+                        false,
+                        null
                 ))
         );
 
