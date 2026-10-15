@@ -20,7 +20,7 @@ import example.micronaut.entity.SeatStatus;
 
 import io.micronaut.serde.annotation.Serdeable;
 
-@Serdeable
+@Serdeable // <1>
 public record FlightSeatView(String id, SeatStatus status) {
     public static FlightSeatView from(FlightSeat seat) {
         return new FlightSeatView(seat.getId(), seat.getStatus());

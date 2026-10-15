@@ -22,7 +22,7 @@ import example.micronaut.entity.*
 
 @Canonical
 @CompileStatic
-@Serdeable
+@Serdeable // <1>
 class FlightSeatView {
     String id
     SeatStatus status

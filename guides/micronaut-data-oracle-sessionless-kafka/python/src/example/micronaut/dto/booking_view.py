@@ -8,7 +8,7 @@ from ..entity.booking import Booking
 from ..entity.booking_status import BookingStatus
 
 
-@Serdeable
+@Serdeable  # <1>
 @dataclass
 class BookingView:
     id: Long

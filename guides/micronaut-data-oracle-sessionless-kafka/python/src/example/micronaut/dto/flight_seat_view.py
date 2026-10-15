@@ -6,7 +6,7 @@ from ..entity.flight_seat import FlightSeat
 from ..entity.seat_status import SeatStatus
 
 
-@Serdeable
+@Serdeable  # <1>
 @dataclass
 class FlightSeatView:
     id: str

@@ -5,7 +5,7 @@ from java.math import BigDecimal
 from micronaut.serde.annotation import Serdeable
 
 
-@Serdeable
+@Serdeable  # <1>
 @dataclass
 class PaymentRequested:
     bookingId: Long

@@ -17,7 +17,7 @@ package example.micronaut.entity;
 
 import io.micronaut.serde.annotation.Serdeable;
 
-@Serdeable
+@Serdeable // <1>
 public enum BookingStatus {
     PENDING,
     CONFIRMED

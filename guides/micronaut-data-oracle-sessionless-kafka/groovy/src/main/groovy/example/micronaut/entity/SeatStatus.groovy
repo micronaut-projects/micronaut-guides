@@ -20,7 +20,7 @@ import groovy.transform.CompileStatic
 import io.micronaut.serde.annotation.Serdeable
 
 @CompileStatic
-@Serdeable
+@Serdeable // <1>
 enum SeatStatus {
     AVAILABLE,
     HELD,

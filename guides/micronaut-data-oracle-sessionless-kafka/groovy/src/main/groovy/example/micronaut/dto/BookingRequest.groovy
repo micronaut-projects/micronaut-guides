@@ -23,7 +23,7 @@ import jakarta.validation.constraints.Pattern
 
 @Canonical
 @CompileStatic
-@Serdeable
+@Serdeable // <1>
 class BookingRequest {
     @NotBlank
     String seatId

@@ -20,7 +20,7 @@ from ..repository.flight_seat_repository import FlightSeatRepository
 from ..service.booking_service import BookingService
 
 
-@Serdeable
+@Serdeable  # <5>
 @dataclass
 class AcceptedBooking:
     bookingId: Long

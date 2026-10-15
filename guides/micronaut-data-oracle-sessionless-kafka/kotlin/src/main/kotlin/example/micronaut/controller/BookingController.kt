@@ -44,7 +44,7 @@ open class BookingController(
     private val bookingRepository: BookingRepository,
     private val flightSeatRepository: FlightSeatRepository
 ) {
-    @Serdeable
+    @Serdeable // <5>
     data class AcceptedBooking(val bookingId: Long)
 
     @Post

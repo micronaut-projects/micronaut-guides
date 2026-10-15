@@ -22,7 +22,7 @@ import example.micronaut.entity.*
 
 @Canonical
 @CompileStatic
-@Serdeable
+@Serdeable // <1>
 class BookingView {
     Long id
     String seatId

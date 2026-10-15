@@ -61,7 +61,7 @@ class BookingController {
         this.flightSeatRepository = flightSeatRepository
     }
 
-    @Serdeable
+    @Serdeable // <5>
     @groovy.transform.Canonical
     static class AcceptedBooking {
         Long bookingId

@@ -20,7 +20,7 @@ import java.math.BigDecimal
 import example.micronaut.entity.Booking
 import example.micronaut.entity.BookingStatus
 
-@Serdeable
+@Serdeable // <1>
 data class BookingView(
     val id: Long,
     val seatId: String,

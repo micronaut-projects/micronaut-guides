@@ -17,7 +17,7 @@ package example.micronaut.dto;
 
 import io.micronaut.serde.annotation.Serdeable;
 
-@Serdeable
+@Serdeable // <1>
 public record PaymentCompleted(
     Long bookingId,
     String transactionId,

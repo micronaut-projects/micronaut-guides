@@ -58,7 +58,7 @@ public class BookingController {
         this.flightSeatRepository = flightSeatRepository;
     }
 
-    @Serdeable
+    @Serdeable // <5>
     public record AcceptedBooking(Long bookingId) {
     }
 

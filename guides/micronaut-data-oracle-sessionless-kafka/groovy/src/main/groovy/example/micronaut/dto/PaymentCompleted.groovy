@@ -21,7 +21,7 @@ import io.micronaut.serde.annotation.Serdeable
 
 @Canonical
 @CompileStatic
-@Serdeable
+@Serdeable // <1>
 class PaymentCompleted {
     Long bookingId
     String transactionId

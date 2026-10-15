@@ -19,7 +19,7 @@ import io.micronaut.serde.annotation.Serdeable
 import example.micronaut.entity.FlightSeat
 import example.micronaut.entity.SeatStatus
 
-@Serdeable
+@Serdeable // <1>
 data class FlightSeatView(
     val id: String,
     val status: SeatStatus

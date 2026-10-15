@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from micronaut.serde.annotation import Serdeable
 
 
-@Serdeable
+@Serdeable  # <1>
 @dataclass
 class PaymentCompleted:
     bookingId: Long

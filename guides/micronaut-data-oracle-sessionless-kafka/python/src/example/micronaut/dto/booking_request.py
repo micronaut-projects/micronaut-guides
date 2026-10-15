@@ -5,7 +5,7 @@ from jakarta.validation.constraints import NotBlank, Pattern
 from micronaut.serde.annotation import Serdeable
 
 
-@Serdeable
+@Serdeable  # <1>
 @dataclass
 class BookingRequest:
     seatId: Annotated[str, NotBlank]

@@ -19,7 +19,7 @@ import io.micronaut.serde.annotation.Serdeable;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 
-@Serdeable
+@Serdeable // <1>
 public record BookingRequest(
     @NotBlank String seatId,
     @NotBlank @Pattern(regexp = "demo-approve|demo-decline") String paymentToken

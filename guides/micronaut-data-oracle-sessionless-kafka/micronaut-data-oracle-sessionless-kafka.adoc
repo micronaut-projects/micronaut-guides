@@ -133,6 +133,8 @@ callout:mapped-entity-id[]
 
 source:entity/SeatStatus[]
 
+callout:serdeable[]
+
 `SeatStatus` represents an available seat, a held reservation, and a completed booking. Micronaut Data stores the enum names in the existing `VARCHAR2` status column. HTTP responses expose the same names through `FlightSeatView`, so the enum has `@Serdeable` while the entity does not.
 
 source:entity/Booking[]
@@ -142,6 +144,8 @@ callout:mapped-entity-id[]
 callout:generated-value[]
 
 source:entity/BookingStatus[]
+
+callout:serdeable[]
 
 `BookingStatus` represents the pending and confirmed states. Micronaut Data stores the enum names in the existing `VARCHAR2` status column, and the HTTP response serializes them as `PENDING` or `CONFIRMED`. The enum is serializable because it appears in `BookingView`; the persistence entity still has no serialization annotation.
 
@@ -157,9 +161,15 @@ The persistence entities are mutable and have no serialization annotations. The 
 
 source:dto/BookingRequest[]
 
+callout:serdeable[]
+
 source:dto/PaymentRequested[]
 
+callout:serdeable[]
+
 source:dto/PaymentCompleted[]
+
+callout:serdeable[]
 
 The controller passes only `seatId` to the booking service and uses the payment token from the HTTP request when constructing the payment message. Kafka messages contain only the dedicated `PaymentRequested` and `PaymentCompleted` DTOs. Persistence entities are never sent to Kafka. All events use the database-generated booking ID as their Kafka key. The controller gets this ID from the saved booking before constructing the payment request. The payment request carries the server-selected price because the pending booking is not visible outside its suspended transaction.
 
@@ -193,7 +203,11 @@ Returning `RecordMetadata` makes each producer method synchronous: it waits for 
 
 source:dto/BookingView[]
 
+callout:serdeable[]
+
 source:dto/FlightSeatView[]
+
+callout:serdeable[]
 
 The HTTP response DTOs expose booking and seat snapshots without serializing persistence entities.
 
@@ -203,6 +217,8 @@ source:controller/BookingController[]
 <2> Call the injected transactional service. It saves the booking and returns the entity with its generated ID and price. Its interceptor suspends the Oracle Database transaction before returning to the controller.
 <3> Obtain the encoded GTRID after suspension, while the propagation scope is still active.
 <4> Publish the payment request after the transaction has been suspended. The event carries the GTRID even though the lexical scope has ended.
+
+callout:serdeable[]
 
 The controller returns `202 Accepted` with a booking ID after Kafka acknowledges the payment request. Reservation has already run and the Oracle Database transaction is suspended, but payment and booking completion are asynchronous. Blocking Kafka sends and JDBC work run on the blocking executor. The controller is an HTTP entry point; it does not listen to a Kafka topic.
 

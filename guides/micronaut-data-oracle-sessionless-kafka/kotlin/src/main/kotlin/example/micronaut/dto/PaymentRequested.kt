@@ -18,7 +18,7 @@ package example.micronaut.dto
 import io.micronaut.serde.annotation.Serdeable
 import java.math.BigDecimal
 
-@Serdeable
+@Serdeable // <1>
 data class PaymentRequested(
     val bookingId: Long,
     val transactionId: String,
