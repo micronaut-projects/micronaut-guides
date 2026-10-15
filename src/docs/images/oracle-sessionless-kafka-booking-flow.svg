@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1080" height="800" viewBox="0 0 1080 800" version="1.1" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+    <title id="title">Booking flow with an Oracle Database sessionless transaction and Kafka</title>
+    <desc id="desc">BookingController reserves the seat, suspends the Oracle Database transaction and publishes PaymentRequested with the GTRID to payment-requests. PaymentConsumer processes the payment and publishes PaymentCompleted to payment-results. CompletionConsumer resumes the transaction by GTRID and commits when payment is approved or rolls back when it is declined.</desc>
+    <style>
+        text { font-family: Helvetica, Arial, sans-serif; }
+        .bg { fill: #FFFFFF; }
+        .band { fill: #F6F8FA; }
+        .band-title { font-size: 14px; font-weight: 700; fill: #111827; paint-order: stroke; stroke: #F6F8FA; stroke-width: 5px; stroke-linejoin: round; }
+        .step { fill: #111827; }
+        .step-number { font-size: 12px; font-weight: 700; fill: #FFFFFF; }
+        .client { fill: #FFFFFF; stroke: #6B7280; stroke-width: 1.5; }
+        .app { fill: #EAF2FF; stroke: #3B6FD8; stroke-width: 1.5; }
+        .kafka { fill: #F1F2F4; stroke: #374151; stroke-width: 1.5; }
+        .db { fill: #FDEDEA; stroke: #C74634; stroke-width: 1.5; }
+        .name { font-size: 13px; font-weight: 700; fill: #111827; }
+        .sub { font-size: 11px; fill: #4B5563; }
+        .life { stroke: #9CA3AF; stroke-width: 1; stroke-dasharray: 4 4; }
+        .act { fill: #FFFFFF; stroke: #3B6FD8; stroke-width: 1.5; }
+        .tx-active { fill: #2E9E5B; stroke: #1E7A43; stroke-width: 1; }
+        .tx-suspended { fill: url(#hatch); stroke: #D18A00; stroke-width: 1; }
+        .msg { fill: none; stroke: #1F2937; stroke-width: 1.4; }
+        .ret { fill: none; stroke: #1F2937; stroke-width: 1.2; stroke-dasharray: 5 4; }
+        .pill { fill: #FFFFFF; stroke: #374151; stroke-width: 1.2; }
+        .topic { font-family: Menlo, Consolas, monospace; font-size: 11px; fill: #111827; }
+        .label { font-size: 12px; fill: #111827; paint-order: stroke; stroke: #F6F8FA; stroke-width: 4px; stroke-linejoin: round; }
+        .detail { font-size: 11px; fill: #4B5563; paint-order: stroke; stroke: #F6F8FA; stroke-width: 4px; stroke-linejoin: round; }
+        .guard { font-size: 11px; font-style: italic; fill: #4B5563; paint-order: stroke; stroke: #F6F8FA; stroke-width: 4px; stroke-linejoin: round; }
+        .suspended-note { font-size: 11px; font-weight: 700; fill: #9A6700; paint-order: stroke; stroke: #F6F8FA; stroke-width: 4px; stroke-linejoin: round; }
+        .frame { fill: none; stroke: #6B7280; stroke-width: 1; }
+        .frame-tab { fill: #E5E7EB; stroke: #6B7280; stroke-width: 1; }
+        .frame-name { font-size: 11px; font-weight: 700; fill: #111827; }
+        .divider { stroke: #6B7280; stroke-width: 1; stroke-dasharray: 4 3; }
+        .legend { font-size: 12px; fill: #374151; }
+    </style>
+    <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#1F2937"/>
+        </marker>
+        <marker id="arrow-open" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10" fill="none" stroke="#1F2937" stroke-width="1.5"/>
+        </marker>
+        <pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+            <rect width="6" height="6" fill="#FFF3D6"/>
+            <line x1="0" y1="0" x2="0" y2="6" stroke="#E0A100" stroke-width="2"/>
+        </pattern>
+    </defs>
+
+    <rect class="bg" width="1080" height="800"/>
+
+    <!-- Step bands -->
+    <rect class="band" x="4" y="88" width="1072" height="264" rx="8"/>
+    <rect class="band" x="4" y="362" width="1072" height="150" rx="8"/>
+    <rect class="band" x="4" y="522" width="1072" height="230" rx="8"/>
+
+    <!-- Lifelines -->
+    <line class="life" x1="70" y1="70" x2="70" y2="760"/>
+    <line class="life" x1="235" y1="70" x2="235" y2="760"/>
+    <line class="life" x1="420" y1="70" x2="420" y2="760"/>
+    <line class="life" x1="610" y1="70" x2="610" y2="760"/>
+    <line class="life" x1="800" y1="70" x2="800" y2="760"/>
+    <line class="life" x1="985" y1="70" x2="985" y2="760"/>
+
+    <!-- Participants -->
+    <rect class="client" x="10" y="20" width="120" height="50" rx="6"/>
+    <text class="name" x="70" y="41" text-anchor="middle">Client</text>
+    <text class="sub" x="70" y="57" text-anchor="middle">HTTP</text>
+
+    <rect class="app" x="155" y="20" width="160" height="50" rx="6"/>
+    <text class="name" x="235" y="41" text-anchor="middle">BookingController</text>
+    <text class="sub" x="235" y="57" text-anchor="middle">POST /bookings</text>
+
+    <rect class="kafka" x="340" y="20" width="160" height="50" rx="6"/>
+    <text class="name" x="420" y="41" text-anchor="middle">Kafka</text>
+    <text class="sub" x="420" y="57" text-anchor="middle">topics</text>
+
+    <rect class="app" x="530" y="20" width="160" height="50" rx="6"/>
+    <text class="name" x="610" y="41" text-anchor="middle">PaymentConsumer</text>
+    <text class="sub" x="610" y="57" text-anchor="middle">group: payment-processing</text>
+
+    <rect class="app" x="720" y="20" width="160" height="50" rx="6"/>
+    <text class="name" x="800" y="41" text-anchor="middle">CompletionConsumer</text>
+    <text class="sub" x="800" y="57" text-anchor="middle">group: booking-completion</text>
+
+    <rect class="db" x="905" y="20" width="160" height="50" rx="6"/>
+    <text class="name" x="985" y="41" text-anchor="middle">Oracle Database</text>
+    <text class="sub" x="985" y="57" text-anchor="middle">sessionless transaction</text>
+
+    <!-- Step titles -->
+    <circle class="step" cx="26" cy="105" r="10"/>
+    <text class="step-number" x="26" y="109" text-anchor="middle">1</text>
+    <text class="band-title" x="42" y="110">Reserve the seat</text>
+
+    <circle class="step" cx="26" cy="379" r="10"/>
+    <text class="step-number" x="26" y="383" text-anchor="middle">2</text>
+    <text class="band-title" x="42" y="384">Process payment</text>
+
+    <circle class="step" cx="26" cy="539" r="10"/>
+    <text class="step-number" x="26" y="543" text-anchor="middle">3</text>
+    <text class="band-title" x="42" y="544">Complete the booking</text>
+
+    <!-- Activation bars -->
+    <rect class="act" x="229" y="124" width="12" height="218"/>
+    <rect class="act" x="604" y="400" width="12" height="100"/>
+    <rect class="act" x="794" y="562" width="12" height="166"/>
+
+    <!-- Oracle Database transaction state -->
+    <rect class="tx-active" x="979" y="165" width="12" height="70"/>
+    <rect class="tx-suspended" x="979" y="235" width="12" height="362"/>
+    <rect class="tx-active" x="979" y="597" width="12" height="121"/>
+    <text class="suspended-note" transform="translate(966 416) rotate(-90)" text-anchor="middle">SUSPENDED · no connection held · row locks kept</text>
+
+    <!-- 1. Reserve the seat -->
+    <line class="msg" x1="70" y1="130" x2="229" y2="130" marker-end="url(#arrow)"/>
+    <text class="label" x="150" y="123" text-anchor="middle">POST /bookings</text>
+
+    <line class="msg" x1="241" y1="165" x2="979" y2="165" marker-end="url(#arrow)"/>
+    <text class="label" x="255" y="158">start transaction · lock seat (SELECT … FOR UPDATE)</text>
+
+    <line class="msg" x1="241" y1="200" x2="979" y2="200" marker-end="url(#arrow)"/>
+    <text class="label" x="255" y="193">seat → HELD · insert booking (PENDING)</text>
+
+    <line class="msg" x1="241" y1="235" x2="979" y2="235" marker-end="url(#arrow)"/>
+    <text class="label" x="255" y="228">suspend transaction</text>
+
+    <line class="ret" x1="979" y1="265" x2="241" y2="265" marker-end="url(#arrow-open)"/>
+    <text class="label" x="255" y="258">GTRID (encoded global transaction identifier)</text>
+
+    <line class="msg" x1="241" y1="312" x2="360" y2="312" marker-end="url(#arrow)"/>
+    <text class="label" x="300" y="290" text-anchor="middle">PaymentRequested</text>
+    <text class="detail" x="300" y="304" text-anchor="middle">bookingId, GTRID</text>
+    <rect class="pill" x="360" y="302" width="120" height="20" rx="10"/>
+    <text class="topic" x="420" y="316" text-anchor="middle">payment-requests</text>
+
+    <line class="ret" x1="229" y1="338" x2="70" y2="338" marker-end="url(#arrow-open)"/>
+    <text class="label" x="150" y="331" text-anchor="middle">202 Accepted {bookingId}</text>
+
+    <!-- 2. Process payment -->
+    <rect class="pill" x="360" y="390" width="120" height="20" rx="10"/>
+    <text class="topic" x="420" y="404" text-anchor="middle">payment-requests</text>
+    <line class="msg" x1="480" y1="400" x2="604" y2="400" marker-end="url(#arrow)"/>
+    <text class="label" x="542" y="393" text-anchor="middle">PaymentRequested</text>
+
+    <path class="msg" d="M616,418 H650 V440 H616" marker-end="url(#arrow)"/>
+    <text class="label" x="658" y="433">process payment</text>
+
+    <line class="msg" x1="604" y1="494" x2="480" y2="494" marker-end="url(#arrow)"/>
+    <text class="label" x="596" y="466" text-anchor="end">PaymentCompleted</text>
+    <text class="detail" x="596" y="480" text-anchor="end">approved, bookingId, GTRID</text>
+    <rect class="pill" x="360" y="484" width="120" height="20" rx="10"/>
+    <text class="topic" x="420" y="498" text-anchor="middle">payment-results</text>
+
+    <!-- 3. Complete the booking -->
+    <rect class="pill" x="360" y="552" width="120" height="20" rx="10"/>
+    <text class="topic" x="420" y="566" text-anchor="middle">payment-results</text>
+    <line class="msg" x1="480" y1="562" x2="794" y2="562" marker-end="url(#arrow)"/>
+    <text class="label" x="545" y="555" text-anchor="middle">PaymentCompleted</text>
+
+    <line class="msg" x1="806" y1="597" x2="979" y2="597" marker-end="url(#arrow)"/>
+    <text class="label" x="892" y="590" text-anchor="middle">resume transaction (GTRID)</text>
+
+    <rect class="frame" x="768" y="612" width="300" height="128"/>
+    <path class="frame-tab" d="M768,612 H804 V624 L798,630 H768 Z"/>
+    <text class="frame-name" x="776" y="625">alt</text>
+
+    <text class="guard" x="816" y="640">[payment approved]</text>
+    <text class="label" x="816" y="654">confirm booking · commit</text>
+    <line class="msg" x1="806" y1="662" x2="979" y2="662" marker-end="url(#arrow)"/>
+
+    <line class="divider" x1="768" y1="678" x2="1068" y2="678"/>
+
+    <text class="guard" x="816" y="696">[payment declined]</text>
+    <text class="label" x="816" y="710">rollback reservation</text>
+    <line class="msg" x1="806" y1="718" x2="979" y2="718" marker-end="url(#arrow)"/>
+
+    <!-- Legend -->
+    <rect class="tx-active" x="20" y="772" width="12" height="16"/>
+    <text class="legend" x="40" y="784">Oracle Database transaction active on a connection</text>
+    <rect class="tx-suspended" x="370" y="772" width="12" height="16"/>
+    <text class="legend" x="390" y="784">transaction suspended: identified only by its GTRID, database locks still held</text>
+</svg>

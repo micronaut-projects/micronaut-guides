@@ -55,7 +55,7 @@ class AppTest {
         boolean validateLicense = true;
 
         Set<ConstraintViolation<App>> violations = validator.validate(
-                new App(name,packageName,applicationType,framework,emptyList,emptyList,emptyList,emptyList,emptyList,emptyList, TestFramework.JUNIT,emptyList,emptyList,validateLicense));
+                new App(name,packageName,applicationType,framework,emptyList,emptyList,emptyList,emptyList,emptyList,emptyList, TestFramework.JUNIT,emptyList,emptyList,validateLicense, null));
         assertTrue(violations.isEmpty());
     }
 

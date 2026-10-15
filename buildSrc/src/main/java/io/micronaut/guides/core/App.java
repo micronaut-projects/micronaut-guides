@@ -22,12 +22,12 @@ import java.util.List;
  * @param kotlinFeatures    The app's Kotlin features
  * @param javaFeatures      The app's Java features
  * @param groovyFeatures    The app's Groovy features
- * @param pythonFeatures    The app's Python features
  * @param jvmFeatures       The app's features shared by the JVM languages (Java, Kotlin and Groovy)
  * @param testFramework     The app's test framework
  * @param excludeTest       The tests that should not be run
  * @param excludeSource     The source files that should not be included
  * @param validateLicense   To enable Spotless code check
+ * @param pythonFeatures    The app's Python features
  */
 @JsonSchema
 @Serdeable

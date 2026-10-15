@@ -1,0 +1,178 @@
+common:header.adoc[]
+
+In this guide, you will build a small inventory application with Micronaut Data JDBC and Oracle Database. A slow stock reconciliation is background work, so it runs with `LOW` priority. A customer checkout needs the same last item and runs with `HIGH` priority. When Oracle priority transactions are enabled, Oracle rolls back the reconciliation once the checkout has waited long enough, so the customer does not wait for background work.
+
+You will use `@OracleTransactional` to declare the priority of each transaction, and handle `OracleTransactionPriorityException`, which Micronaut Data throws when Oracle rolls back a lower-priority transaction.
+
+common:requirements.adoc[]
+
+* https://www.docker.io/gettingstarted/[Docker] installed to run Oracle Database with https://micronaut-projects.github.io/micronaut-test-resources/latest/guide/[Micronaut Test Resources].
+
+common:completesolution.adoc[]
+
+common:create-app-features.adoc[]
+
+:exclude-for-languages:python
+common:oracle-driver.adoc[]
+
+common:datasource-configuration-oracle.adoc[]
+:exclude-for-languages:
+:exclude-for-languages:java,groovy,kotlin
+The `oracle` feature adds the Oracle JDBC driver, `com.oracle.database.jdbc:ojdbc11`, to the runtime dependencies in `pyproject.toml`.
+
+=== Database Configuration
+
+Configure the datasource:
+
+resource:application.toml[tag=datasource]
+
+<1> Use Oracle driver.
+<2> In order for the database to be properly detected by Micronaut Test Resources.
+<3> Configure the Oracle dialect.
+:exclude-for-languages:
+
+== Configure Oracle Priority Transactions
+
+Transaction priority is an Oracle Database feature. A database administrator decides how long a higher-priority transaction waits for a lower-priority one that holds a row lock, and whether Oracle then rolls back the blocker:
+
+* https://docs.oracle.com/en/database/oracle/oracle-database/26/refrn/PRIORITY_TXNS_HIGH_WAIT_TARGET.html[`PRIORITY_TXNS_HIGH_WAIT_TARGET`] sets how many seconds a `HIGH` transaction waits before Oracle rolls back a lower-priority blocker.
+* https://docs.oracle.com/en/database/oracle/oracle-database/26/refrn/PRIORITY_TXNS_MEDIUM_WAIT_TARGET.html[`PRIORITY_TXNS_MEDIUM_WAIT_TARGET`] does the same for `MEDIUM` transactions.
+* https://docs.oracle.com/en/database/oracle/oracle-database/26/refrn/PRIORITY_TXNS_MODE.html[`PRIORITY_TXNS_MODE`] set to `ROLLBACK` enables the rollback. The other modes only track or report the waits.
+
+See Oracle's https://docs.oracle.com/en/database/oracle/oracle-database/26/admin/managing-transactions.html[Managing Transactions] documentation for details.
+
+For this guide, Micronaut Test Resources copies a startup script into the Oracle Database Free container:
+
+:exclude-for-languages:python
+resource:application.properties[tag=testresources]
+:exclude-for-languages:
+:exclude-for-languages:java,groovy,kotlin
+resource:application.toml[tag=testresources]
+:exclude-for-languages:
+
+<1> Copy the script to the directory that the container runs on every database startup.
+
+resource:oracle/priority-txns.sql[]
+
+<1> Set the defaults for the container database, then switch to `FREEPDB1`, the pluggable database that the application connects to.
+<2> The container runs the script as `SYSDBA`, so the application user does not need privileges to change instance parameters.
+<3> `SCOPE=MEMORY` keeps the settings for the lifetime of the throwaway container.
+
+In other environments, a database administrator applies the same `ALTER SYSTEM` statements.
+
+:exclude-for-languages:python
+TIP: If you change the script while the Test Resources service is running, stop it with `./gradlew stopTestResourcesService` so the next run starts a new container.
+:exclude-for-languages:
+:exclude-for-languages:java,groovy,kotlin
+TIP: If you change the script while a Test Resources server is running, stop it with `pyronaut test-resources-server stop` so the next run starts a new container.
+:exclude-for-languages:
+
+== Inventory Item
+
+Create an entity for the inventory item:
+
+source:InventoryItem[]
+
+Create the item status:
+
+source:Status[]
+
+== Repository
+
+Create a repository that locks the item while a transaction works with it:
+
+source:InventoryItemRepository[]
+
+<1> Micronaut Data generates SQL for the Oracle dialect at compilation time.
+<2> The `ForUpdate` suffix generates a `SELECT ... FOR UPDATE` query. The row stays locked until the surrounding transaction ends.
+
+== Transactions with Different Priorities
+
+Create a service with a `LOW`-priority reconciliation and a `HIGH`-priority checkout:
+
+source:InventoryService[]
+
+<1> `@OracleTransactional` starts a transaction and sets the Oracle transaction priority for it. Micronaut Data restores the session priority when the transaction completes, so pooled connections do not keep it.
+<2> Lock the item. The lock alone makes the reconciliation a blocker for any other transaction that needs the row.
+<3> Simulate a slow count in an external system while the row is locked.
+<4> If Oracle rolled back the reconciliation while it was counting, this write is the first statement to find out. Micronaut Data rolls back the transaction and throws https://micronaut-projects.github.io/micronaut-data/latest/api/io/micronaut/transaction/exceptions/OracleTransactionPriorityException.html[`OracleTransactionPriorityException`].
+<5> Checkout is the critical operation, so it runs with `HIGH` priority. `HIGH` is also the default for `@OracleTransactional`.
+<6> Checkout waits for the row lock. After the configured wait target, Oracle rolls back the reconciliation and checkout acquires the lock.
+
+A priority rollback is a failed transaction; it is not retried automatically. The reconciliation read the item before checkout changed it, so replaying the same work could overwrite the checkout. To retry, run the operation in a new transaction that reads the item again and decides whether the work is still needed.
+
+== Controller
+
+Expose the operations as HTTP endpoints:
+
+source:InventoryController[]
+
+<1> The operations block while they wait for row locks, so run them on the blocking executor instead of the event loop.
+<2> The reconciliation request stays open while its transaction holds the lock, so you can send a checkout from another request.
+
+== Handle a Priority Rollback
+
+Without a handler, an `OracleTransactionPriorityException` results in a `500 Internal Server Error` response. A priority rollback is an expected outcome of contention, so report it as a conflict instead:
+
+source:TransactionPriorityExceptionHandler[]
+
+<1> Handle https://micronaut-projects.github.io/micronaut-data/latest/api/io/micronaut/transaction/exceptions/OracleTransactionPriorityException.html[`OracleTransactionPriorityException`]. Micronaut Data throws it for both Oracle errors that report a priority rollback: `ORA-63300` for the statement that was running when Oracle rolled back the transaction, and `ORA-63302` for a later statement or commit.
+<2> Tell the client why the operation failed.
+<3> Respond with `409 Conflict`, so the client can re-read the item and retry if the operation is still needed.
+
+== Test
+
+Add a test that runs a reconciliation and a checkout against the same item:
+
+test:InventoryControllerTest[]
+
+<1> Disable the test transaction so that each request runs its own transaction.
+<2> Send the reconciliation from another thread, because the request stays open while it holds the lock. The count takes eight seconds, longer than the five-second `HIGH` wait target in `priority-txns.sql`.
+<3> Wait until the reconciliation holds the row lock. The check uses `NOWAIT`, so it fails immediately with `ORA-00054` instead of waiting for the lock.
+<4> Checkout waits for the lock, and Oracle rolls back the reconciliation after five seconds.
+<5> The reconciliation request fails with `409 Conflict` from the exception handler.
+<6> The response body contains the message from the exception handler.
+<7> Only the checkout is committed.
+<8> Bean Validation rejects a `countSeconds` value outside the allowed range with `400 Bad Request`, before any transaction starts.
+
+common:testApp.adoc[]
+
+When you run the tests, Micronaut Test Resources starts an Oracle Database Free container and runs `priority-txns.sql` before the application connects.
+
+== Run the Application
+
+:exclude-for-languages:python
+Start the application with `./gradlew run` or `./mvnw mn:run`, and reset the item:
+:exclude-for-languages:
+:exclude-for-languages:java,groovy,kotlin
+Start the application with `pyronaut run`, and reset the item:
+:exclude-for-languages:
+
+[source,bash]
+----
+curl -X POST http://localhost:8080/inventory/reset
+----
+
+In one terminal, start a reconciliation. The request stays open for 20 seconds while it holds the item lock:
+
+[source,bash]
+----
+curl -i -X POST http://localhost:8080/inventory/reconcile
+----
+
+Within those 20 seconds, check out the item from a second terminal:
+
+[source,bash]
+----
+curl -X POST http://localhost:8080/inventory/checkout
+----
+
+After about five seconds, the checkout responds with the item in the `CHECKED_OUT` status, and the reconciliation responds with `409 Conflict`.
+
+If you start the checkout without a running reconciliation, it completes immediately. If you run only the reconciliation, it commits after the count and responds with the `RECONCILED` status.
+
+common:test-resources-benefits.adoc[]
+
+== Next Steps
+
+Read more about https://micronaut-projects.github.io/micronaut-data/latest/guide/#transactions[transactions in Micronaut Data] and Oracle https://docs.oracle.com/en/database/oracle/oracle-database/26/admin/managing-transactions.html[priority transactions].
