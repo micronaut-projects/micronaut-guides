@@ -79,7 +79,12 @@ export OAUTH_CLIENT_SECRET=YYYYYYYYYY
 export OAUTH_DOMAIN=micronautguides.eu.auth0.com
 ----
 
+:exclude-for-languages:python
 common:micronaut-views-thymeleaf.adoc[]
+:exclude-for-languages:
+:only-for-languages:python
+common:jinja.adoc[]
+:only-for-languages:
 
 === Home controller
 
@@ -87,7 +92,7 @@ common:micronaut-views-thymeleaf.adoc[]
 Create a controller to handle the requests to `/`. You will display the email of the authenticated person if any. Annotate the controller endpoint with `@View`, since we will use a Thymeleaf template.
 :exclude-for-languages:
 :only-for-languages:python
-Create a route function to handle the requests to `/`. You will display the email of the authenticated person if any. Annotate the route with `@View`, since we will use a Thymeleaf template.
+Create a route function for `/` that returns an empty Python dictionary. `@View` renders the `home.html` Jinja template. Micronaut's security model processor supplies the authenticated user's details without injecting a principal into the route.
 :only-for-languages:
 
 source:HomeController[]
@@ -99,18 +104,39 @@ callout:secured-anonymous[]
 callout:view[]
 callout:get[arg0=index,arg1=/]
 
+:exclude-for-languages:python
 === Thymeleaf template
 
 Create a Thymeleaf template:
+:exclude-for-languages:
+:only-for-languages:python
+=== Jinja template
+
+Create a Jinja template. The `e` filter escapes the authenticated user's email for HTML:
+:only-for-languages:
 
 resource:views/home.html[]
 
-Also, note that we return an empty model in the controller. However, we are accessing `security` in the Thymeleaf template.
+Also, note that we return an empty model, but access `security` in the template.
 
 - The https://micronaut-projects.github.io/micronaut-views/latest/api/io/micronaut/views/model/security/SecurityViewModelProcessor.html[SecurityViewModelProcessor]
 injects into the model a `security` map with the authenticated user. See https://micronaut-projects.github.io/micronaut-views/latest/guide/#security-model-enhancement[User in a view] documentation.
 
 common:runapp.adoc[]
+
+:only-for-languages:python
+=== Local tests
+
+The tests verify anonymous HTML rendering and the provider's login link without contacting the external provider. The test configuration disables OAuth clients only for the test environment; the application keeps its OAuth configuration.
+
+test:HomeControllerTest[]
+
+Run the tests:
+
+common:testApp.adoc[]
+
+Complete the provider configuration above and verify the authorization-code login and logout flow manually with your own account. The local tests do not verify a live provider login.
+:only-for-languages:
 
 image::auth0video.gif[]
 
