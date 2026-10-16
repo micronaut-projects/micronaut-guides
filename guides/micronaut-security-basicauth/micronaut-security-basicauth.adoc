@@ -18,8 +18,19 @@ To keep this guide simple, create a naive `AuthenticationProvider` to simulate u
 
 source:AuthenticationProviderUserPassword[]
 
+:exclude-for-languages:python
+
 callout:singleton[]
 callout:http-request-authentication-provider[]
+
+:exclude-for-languages:
+
+:only-for-languages:python
+
+callout:singleton-pyronaut[]
+callout:http-request-authentication-provider-pyronaut[]
+
+:only-for-languages:
 
 === Controllers
 
@@ -27,10 +38,18 @@ Create `HomeController` which resolves the base URL `/`:
 
 source:HomeController[]
 
+:exclude-for-languages:python
 <1> Annotate with `io.micronaut.security.Secured` to configure secured access. The `isAuthenticated()` expression will allow access only to authenticated users.
 <2> You can specify the HTTP verb that a controller action responds to. To respond to a GET request, use the `io.micronaut.http.annotation.Get` annotation.
 <3> The root route responds to `/`.
 <4> If a user is authenticated, the Micronaut framework will bind the user object to an argument of type `java.security.Principal` (if present).
+:exclude-for-languages:
+:only-for-languages:python
+<1> Decorate the route with `@Secured(SecurityRule.IS_AUTHENTICATED)` so only authenticated requests reach it.
+<2> The `@Get` decorator maps the function to an HTTP GET request.
+<3> The root route responds to `/`.
+<4> When the request is authenticated, Micronaut passes the authenticated user as the `authentication` argument. Its name is the identity returned by the authentication provider.
+:only-for-languages:
 
 === WWW-Authenticate
 
@@ -40,7 +59,12 @@ source:DefaultAuthorizationExceptionHandlerReplacement[]
 
 The previous code adds the https://datatracker.ietf.org/doc/html/rfc7235#section-4.1[WWW-Authenticate] header to indicate the authentication scheme.
 
+:exclude-for-languages:python
 callout:singleton[]
+:exclude-for-languages:
+:only-for-languages:python
+callout:singleton-pyronaut[]
+:only-for-languages:
 <.> Specify that `DefaultAuthorizationExceptionHandlerReplacement` replaces the bean `DefaultAuthorizationExceptionHandler`
 
 === Tests
@@ -49,18 +73,22 @@ Create a test to verify the user authentication flow via Basic Auth.
 
 test:BasicAuthTest[]
 
+:exclude-for-languages:python
 callout:micronaut-test[]
 callout:http-client[]
 callout:http-request[]
 <.> If you attempt to access a secured endpoint without authentication, 401 is returned
 <.> By using `basicAuth` method, you populate the `Authorization` header with user-id:password pairs, encoded using Base64.
-
-:exclude-for-languages:python
 <.> The Micronaut `HttpClient` simplifies parsing the HTTP response payload to Java objects. In this example, we parse the response to `String`.
 callout:body-method[]
 :exclude-for-languages:
 
 :only-for-languages:python
+callout:python-test-fixture[]
+callout:python-requests-client[]
+callout:http-request-pyronaut[]
+<.> If you attempt to access a secured endpoint without authentication, 401 is returned
+<.> Send the request with HTTP Basic credentials through `auth=("sherlock", "password")`. `requests` populates the `Authorization` header with the user-id:password pair, encoded using Base64.
 <.> The `requests` response exposes the response body through `text`.
 :only-for-languages:
 
@@ -79,9 +107,17 @@ Create a test which uses the previous `@Client`
 
 test:BasicAuthClientTest[]
 
+:exclude-for-languages:python
 callout:micronaut-test[]
 <.> Inject the `AppClient` bean.
 <.> Generate Basic Auth header value and pass it as the parameter value.
+:exclude-for-languages:
+
+:only-for-languages:python
+callout:python-test-fixture[]
+<.> Look the declarative client up from the application context with `my_context["example.micronaut.AppClient"]`.
+<.> Generate Basic Auth header value and pass it as the parameter value.
+:only-for-languages:
 
 common:testApp.adoc[]
 
@@ -100,7 +136,7 @@ If you open http://localhost:8080 in a browser, a login dialog pops up due to th
 
 common:graal-with-plugins.adoc[]
 
-:exclude-for-languages:groovy
+:exclude-for-languages:groovy,python
 
 You can invoke the controller exposed by the native executable:
 
@@ -114,4 +150,3 @@ curl "http://localhost:8080" -u 'sherlock:password'
 == Next Steps
 
 See the https://micronaut-projects.github.io/micronaut-security/latest/guide/[Micronaut security documentation] to learn more.
-
