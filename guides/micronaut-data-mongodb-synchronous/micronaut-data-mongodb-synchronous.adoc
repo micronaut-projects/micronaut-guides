@@ -26,7 +26,7 @@ dependency:mongodb-driver-sync[groupId=org.mongodb,scope=runtimeOnly]
 
 :exclude-for-languages:
 
-:exclude-for-languages:java,kotlin
+:exclude-for-languages:java,kotlin,python
 
 dependency:mongodb-driver-sync[groupId=org.mongodb]
 
@@ -34,17 +34,27 @@ dependency:mongodb-driver-sync[groupId=org.mongodb]
 
 :dependencies:
 
-:exclude-for-languages:groovy,kotlin
-
 === MappedEntity
 
+:exclude-for-languages:python
 Create a `Fruit` `MappedEntity`
+:exclude-for-languages:
+:only-for-languages:python
+Create a `Fruit` dataclass and map it to a MongoDB collection:
+:only-for-languages:
 
 source:Fruit[]
 
+:exclude-for-languages:python
 callout:mapped-entity[]
 callout:mapped-entity-id[]
 callout:constraints[]
+:exclude-for-languages:
+:only-for-languages:python
+callout:mapped-entity-pyronaut[]
+callout:constraints-pyronaut[]
+callout:mapped-entity-id-pyronaut[]
+:only-for-languages:
 
 === Repository
 
@@ -52,8 +62,15 @@ Create a repository interface to encapsulate the CRUD actions for `Fruit`.
 
 source:FruitRepository[]
 
+:exclude-for-languages:python
 <1> Annotate with `@MongoRepository`.
 <2> Add a finder for finding fruit by a list of names.
+:exclude-for-languages:
+:only-for-languages:python
+<.> Decorate the class with `@MongoRepository`.
+<.> Add a finder for finding fruit by a list of names.
+<.> The derived query `getById` returns a `Fruit` or `None`, as declared by its `Fruit | None` return type. Its name follows Micronaut Data's derived-query convention.
+:only-for-languages:
 
 === Service
 
@@ -66,7 +83,12 @@ And then create a default implementation of this service.
 
 source:DefaultFruitService[]
 
+:exclude-for-languages:python
 callout:singleton[]
+:exclude-for-languages:
+:only-for-languages:python
+callout:singleton-pyronaut[]
+:only-for-languages:
 
 === Controller
 
@@ -74,6 +96,7 @@ Create `FruitController`:
 
 source:FruitController[]
 
+:exclude-for-languages:python
 callout:controller[arg0=/fruits]
 callout:executes-on[]
 callout:constructor-di[arg0=FruitService]
@@ -84,16 +107,40 @@ callout:valid[]
 callout:get[arg0=find,arg1=/fruits/\{id\}]
 callout:get[arg0=findByNameInList,arg1=/fruits/q]
 <.> Bind a list of Strings to the query parameter `names`
+:exclude-for-languages:
+:only-for-languages:python
+callout:controller-pyronaut[arg0=/fruits]
+<.> Inject the `FruitService` through the constructor.
+callout:get-pyronaut[arg0=list_fruits,arg1=/fruits]
+callout:post-pyronaut[arg0=save,arg1=/fruits]
+<.> You can specify the HTTP status code via the `@Status` decorator.
+callout:valid-pyronaut[]
+callout:get-pyronaut[arg0=find,arg1=/fruits/\{id\}]
+callout:get-pyronaut[arg0=query,arg1=/fruits/q]
+<.> `names` is bound from the query string. Repeat it to send several values, as in `/fruits/q?names=apple&names=pineapple`. It has no default value, so a request without `names` gets `400 Bad Request`.
+:only-for-languages:
 
+:exclude-for-languages:python
 === Test Client
 
 Add a https://docs.micronaut.io/latest/guide/#httpClient[Micronaut declarative HTTP Client] to `src/test` to ease the testing of the application's API.
 
 test:FruitClient[]
+:exclude-for-languages:
+:only-for-languages:python
+=== Writing Tests
+
+Create pytest tests that use the Pyronaut `requests` integration to call the application's API.
+:only-for-languages:
 
 Then create a test that verifies the validation of the `Fruit` entity when we create a new entity via `POST`:
 
 test:FruitValidationControllerTest[]
+
+:only-for-languages:python
+callout:python-test-fixture[]
+callout:python-requests-client[]
+:only-for-languages:
 
 Create a test that checks the controller works against a real MongoDB database:
 
@@ -102,6 +149,10 @@ test:FruitControllerTest[]
 And finally, create a test which uses a replacement `FruitService` to test the controller without touching the database:
 
 test:ControllerIsolationTest[]
+
+:only-for-languages:python
+callout:spec-name-pyronaut[]
+:only-for-languages:
 
 common:test-resources-mongodb.adoc[]
 
