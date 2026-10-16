@@ -117,21 +117,21 @@ rocker:gitCommitIdPlugin[]
 
 == Generate Git Properties with Python
 
-The Micronaut https://docs.micronaut.io/latest/api/io/micronaut/management/endpoint/info/source/GitInfoSource.html[GitInfoSource] reads `git.properties` and exposes its values under the `git` key. Use Python's standard library and the Git command-line tool to generate this resource:
+The `/info` endpoint exposes the values from `config/git.properties` under the `git` key. Use Python's standard library and the `git` command-line tool to generate the file:
 
 source:GenerateGitProperties[]
 
-The helper writes ASCII Java properties, escaping Unicode, control characters, and separators so Micronaut can read the original values. No additional Python package or build hook is required.
+The helper writes `git.properties` in the format the `/info` endpoint reads; values are escaped so any commit message round-trips. No additional Python package or build hook is required.
 
-Run the helper from the project root before processing, running, or packaging the application, and regenerate the file after each commit:
+Run the helper from the project root, then start the application. Regenerate the file after each commit:
 
 [source,bash]
 ----
 python src/example/micronaut/generate_git_properties.py
-pyronaut process
+pyronaut dev
 ----
 
-The generated `config/git.properties` resource is included when you package the application with `pyronaut build`. Generate it before that command too; the Python helper is not run automatically. Add `config/git.properties` to `.gitignore` to avoid treating the generated resource as an uncommitted change.
+`pyronaut build` packages `config/git.properties` with the application, so run the helper before packaging too; it is not run automatically. Add `config/git.properties` to `.gitignore` so the generated file does not show up as an uncommitted change.
 
 :only-for-languages:
 
@@ -151,7 +151,9 @@ Create a pytest test to verify that when you make a GET request to `/info` you g
     "dirty": "true",
     "commit": {
       "id": "7368906193527fbf2b45f1ed5b08c56631f5b155",
+:exclude-for-languages:python
       "describe": "7368906-dirty",
+:exclude-for-languages:
       "time": "1527429126",
       "message": {
         "short": "Initial version",
@@ -171,7 +173,7 @@ Create a pytest test to verify that when you make a GET request to `/info` you g
 Create a JUnit test to verify the behaviour:
 :exclude-for-languages:
 :only-for-languages:python
-Create a pytest test to verify the behaviour:
+Create a pytest test to verify the behaviour. It commits to a temporary repository, generates `git.properties` from it, and checks that an author and a commit message with accents, an emoji, and control characters round-trip through `/info`:
 :only-for-languages:
 
 test:InfoTest[]
@@ -184,10 +186,10 @@ callout:body-method[]
 :exclude-for-languages:
 
 :only-for-languages:python
-callout:python-test-fixture[]
-callout:python-requests-client[]
-<.> Make a GET request to the `/info` endpoint.
-<.> The response exposes Git metadata as native Python dictionaries. The tests use temporary Git repositories and verify clean and dirty working trees, Unicode authors, multiline messages, commit IDs, and timestamps without changing the application's repository.
+callout:micronaut-test-pyronaut[]
+callout:http-client-pyronaut[]
+callout:http-request-pyronaut[]
+callout:body-method-pyronaut[]
 :only-for-languages:
 
 common:testApp.adoc[]
