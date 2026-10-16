@@ -15,6 +15,7 @@
  */
 package example.micronaut
 
+import io.micronaut.serde.annotation.Serdeable
 import io.micronaut.core.type.Argument
 import io.micronaut.http.HttpRequest
 import io.micronaut.http.HttpResponse
@@ -59,10 +60,12 @@ class FlywayEndpointSpec extends Specification {
         2 == flywayReport?.migrations?.size()
     }
 
+    @Serdeable
     static class FlywayReport {
         List<Migration> migrations
     }
 
+    @Serdeable
     static class Migration {
 
         String script

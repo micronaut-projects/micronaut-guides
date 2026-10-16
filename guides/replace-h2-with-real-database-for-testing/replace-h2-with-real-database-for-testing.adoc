@@ -6,7 +6,9 @@ In this guide you will learn how to:
 
 * Replace an https://www.h2database.com/html/main.html[H2] in-memory database that is used for testing with the same type of database that you use in production.
 * How to use the special https://java.testcontainers.org/modules/databases/jdbc/[Testcontainers JDBC URL] to use database containers.
+:exclude-for-languages:python
 * Use the https://java.testcontainers.org/test_framework_integration/junit_5/[Testcontainers JUnit 5] Extension to initialize database.
+:exclude-for-languages:
 * Test https://micronaut-projects.github.io/micronaut-data/latest/guide/[Micronaut Data] repositories.
 * Simplify testing with https://micronaut-projects.github.io/micronaut-test-resources/latest/guide/#modules-kafka[Micronaut Test Resources]
 
@@ -18,7 +20,7 @@ common:completesolution.adoc[]
 
 == What we are going to achieve in this guide
 
-We are going to create a sample Micronaut application using *Micronaut Data JPA* and *PostgreSQL*.
+We are going to create a sample Micronaut application using *Micronaut Data JDBC* and *PostgreSQL*.
 
 We will take a look at the common practice of using an https://www.h2database.com/html/main.html[H2] in-memory database for testing and
 understand the downsides of this approach. Then we will learn how we can replace this approach
@@ -31,23 +33,21 @@ common:create-app-features-h2.adoc[]
 
 == Create Entity
 
-First let us start with creating a JPA entity *Product.java*.
+First let us start with creating a Micronaut Data entity.
 
 source:Product[app=h2]
 
-callout:jpa-table[]
-callout:jpa-entity[]
-callout:jpa-id[]
-callout:jpa-column[]
+callout:mapped-entity[]
+callout:mapped-entity-id[]
 
 == Micronaut Data Repository
 
-Let us create a Micronaut Data `@Repository` interface for the *Product* entity.
+Let us create a Micronaut Data JDBC repository for the *Product* entity.
 
 source:ProductRepository[app=h2,tags=clazz|close]
 
-callout:repository[]
-callout:jparepository[]
+callout:jdbcrepository[]
+callout:crudrepository[]
 
 == Testing with H2 in-memory database
 
@@ -66,7 +66,12 @@ But still, in-memory databases like https://www.h2database.com/html/main.html[H2
 
 To use H2, add the following configuration to define your datasource.
 
+:exclude-for-languages:python
 resource:application.properties[app=h2,tag=datasource]
+:exclude-for-languages:
+:exclude-for-languages:java
+resource:application.toml[app=h2,tag=datasource]
+:exclude-for-languages:
 
 === H2 Dependency
 
@@ -86,11 +91,16 @@ Let us see how we can write tests for our *ProductRepository* using https://www.
 
 test:ProductRepositoryTest[app=h2]
 
+:exclude-for-languages:python
 callout:seed-db[]
+:exclude-for-languages:
+:exclude-for-languages:java
+callout:seed-db-pyronaut[]
+:exclude-for-languages:
 
 If you run this test, the application uses the https://www.h2database.com/html/main.html[H2] in-memory database.
 
-The test loads the sample data required for our test, calls the repository method, and asserts the expected result.
+The test initializes the table, loads the sample data required for our test, calls the repository method, and asserts the expected result.
 
 But the challenge comes when we want to use features supported only by our production database,
 but not by https://www.h2database.com/html/main.html[H2] database.
@@ -129,8 +139,8 @@ Modify the repository to add a method which uses `ON CONFLICT DO NOTHING`:
 
 source:ProductRepository[app=postgresql,tags=clazz|methods|close]
 
-callout:repository[]
-callout:jparepository[]
+callout:jdbcrepository[]
+callout:crudrepository[]
 callout:at-query[]
 
 == Testing using Testcontainers
@@ -139,9 +149,14 @@ callout:at-query[]
 
 Replace the DataSource configuration with the PostgreSQL configuration.
 
+:exclude-for-languages:python
 resource:application.properties[app=postgresql,tag=datasource]
+:exclude-for-languages:
+:exclude-for-languages:java
+resource:application.toml[app=postgresql,tag=datasource]
+:exclude-for-languages:
 
-We disable schema generation with `jpa.default.properties.hibernate.hbm2ddl.auto=none`. We will use a https://java.testcontainers.org/modules/databases/jdbc/#using-a-classpath-init-script[classpath init script with Testcontainers] instead to load the following SQL file.
+We disable schema generation with `datasources.default.schema-generate=none`. The datasource allows up to 60 seconds for PostgreSQL to accept connections before Hikari fails initialization. We will use a https://java.testcontainers.org/modules/databases/jdbc/#using-a-classpath-init-script[classpath init script with Testcontainers] instead to load the following SQL file.
 
 testResource:sql/init-db.sql[app=postgresql]
 
@@ -163,12 +178,26 @@ dependency:testcontainers-postgresql[groupId=org.testcontainers,scope=test]
 
 Use https://www.testcontainers.org/modules/databases/jdbc/[Testcontainers *special JDBC URL*] as the data source URL in the test.
 
+:exclude-for-languages:java
+testResource:application-test.toml[app=postgresql,tag=testcontainers-jdbc-url]
+
+callout:property-driver-class[]
+callout:property-jdbc-url[]
+:exclude-for-languages:
+
 test:ProductRepositoryWithJdbcUrlTest[app=postgresql]
 
 callout:micronaut-test-transactional-false[]
+:exclude-for-languages:python
 callout:property-driver-class[]
 callout:property-jdbc-url[]
+:exclude-for-languages:
+:exclude-for-languages:python
 callout:seed-db[]
+:exclude-for-languages:
+:exclude-for-languages:java
+callout:seed-db-pyronaut[]
+:exclude-for-languages:
 
 Now if you run the test, you can see in the console logs that our test is using a PostgreSQL database
 instead of the https://www.h2database.com/html/main.html[H2] in-memory database. *It is as simple as that!*
@@ -212,6 +241,7 @@ However, ideally you should be using a proper database migration tool like https
 
 The special JDBC URL also works for other databases such as *MySQL*, *PostGIS*, *YugabyteDB*, and *CockroachDB*.
 
+:exclude-for-languages:python
 === Initializing the database container using Testcontainers and JUnit
 
 If using a special JDBC URL doesn't meet your needs, or you need more control over the container creation,
@@ -228,6 +258,7 @@ callout:test-property-provider[]
 We have used the Testcontainers JUnit 5 extension annotations *@Testcontainers* and *@Container*
 to start *PostgreSQLContainer* and register the data source properties for the Test using
 the dynamic property registration through the *TestPropertyProvider* API.
+:exclude-for-languages:
 
 == Testing with Test Resources
 
@@ -250,7 +281,12 @@ Thanks to Test Resources, we can simplify the test as follows:
 test:ProductRepositoryTest[app=postgresqltestresources]
 
 callout:micronaut-test-transactional-false[]
+:exclude-for-languages:python
 callout:seed-db[]
+:exclude-for-languages:
+:exclude-for-languages:java
+callout:seed-db-pyronaut[]
+:exclude-for-languages:
 
 If you run the test, you will see a PostgreSQL container being started by Test Resources through integration with Testcontainers to provide throwaway containers for testing.
 
@@ -258,7 +294,7 @@ common:test-resources-benefits.adoc[]
 
 == Micronaut Data JDBC
 
-https://micronaut-projects.github.io/micronaut-data/latest/guide/#jdbc[Micronaut Data JDBC] goes one step further. You have
+https://micronaut-projects.github.io/micronaut-data/latest/guide/#jdbc[Micronaut Data JDBC] requires you
 to specify the dialect in the `JdbcRepository` annotation. Micronaut Data JDBC pre-computes native SQL queries for the specified dialect, providing a repository implementation that is a simple data mapper between a native result set and an entity.
 
 A Micronaut JDBC repository for this sample application would look like:
@@ -270,13 +306,15 @@ callout:crudrepository[]
 callout:at-query[]
 
 == Summary
-We have looked at how to test Micronaut Data JPA repositories using the https://www.h2database.com/html/main.html[H2] in-memory database and talked about
+We have looked at how to test Micronaut Data JDBC repositories using the https://www.h2database.com/html/main.html[H2] in-memory database and talked about
 the drawbacks of using different (in-memory) databases for testing while using a different type of database
 in production.
 
 Then we learned how to replace the https://www.h2database.com/html/main.html[H2] database with a real database for testing using
-Testcontainers special JDBC URL. We also looked at using Testcontainers JUnit 5 extension annotations
-to spin up the database for testing which gives more control over the lifecycle of the database container.
+Testcontainers special JDBC URL.
+:exclude-for-languages:python
+We also looked at using Testcontainers JUnit 5 extension annotations to spin up the database for testing which gives more control over the lifecycle of the database container.
+:exclude-for-languages:
 
 We learned that Micronaut Test Resources streamlines testing with throwaway containers through its integration with Testcontainers.
 

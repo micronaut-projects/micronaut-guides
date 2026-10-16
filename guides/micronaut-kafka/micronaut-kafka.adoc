@@ -129,13 +129,22 @@ To run the tests:
 
 :exclude-for-build:
 
+:exclude-for-languages:python
 common:default-dev-environment-application.adoc[]
 
 source:Application[app=analytics]
+:exclude-for-languages:
 
+:exclude-for-languages:python
 common:default-dev-environment-application-dev-yaml.adoc[]
 
 resource:application-dev.properties[app=analytics]
+:exclude-for-languages:
+:only-for-languages:python
+Create `config/application-dev.toml`. The Micronaut framework applies this configuration file only for the `dev` environment.
+
+resource:application-dev.toml[app=analytics]
+:only-for-languages:
 
 <1> Start the `analytics` microservice on port 8081
 
@@ -297,17 +306,17 @@ callout:lateinit[]
 ==== Send Analytics information automatically
 
 Sending a message to Kafka is as simple as injecting `AnalyticsClient` and calling the `updateAnalytics` method. The goal is to do it automatically every time a book is returned, i.e., every time there is a call to `\http://localhost:8080/books/{isbn}`.
-To achieve this we will create an https://docs.micronaut.io/latest/guide/#filters[Http Server Filter].
+To achieve this we will create an https://docs.micronaut.io/latest/guide/#filters[HTTP Server Filter].
 Create the `AnalyticsFilter` class:
 
 source:AnalyticsFilter[app=books]
 
-<1> Annotate the class with `@Filter` and define the Ant-style matcher pattern to intercept all calls to the desired URIs
-<2> The class must implement `HttpServerFilter`
+<1> Annotate the class with `@ServerFilter` and define the Ant-style matcher pattern to intercept all calls to the desired URIs
+<2> The filter uses an annotation-based `@ResponseFilter` method instead of implementing `HttpServerFilter`
 <3> Dependency injection for the Kafka `AnalyticsClient`
-<4> Implement the `doFilter` method
-<5> Execute the request; this will invoke the controller action
-<6> Get the response from the controller and return the body as a `Book`
+<4> The `@ResponseFilter` method runs after the request completes
+<5> The filter is annotated with `@Blocking` because it sends a Kafka message
+<6> Get the response body from the controller
 <7> If the book is found, use the Kafka client to send a message
 
 === Analytics Microservice

@@ -10,6 +10,7 @@ What is a dependency? Class A has a dependency on Class B when it interacts with
 
 NOTE: In Micronaut Framework documentation, we often use the terms `bean` and `dependency` interchangeably.
 
+:exclude-for-languages:python
 == JSR-330
 
 Micronaut Framework implements the https://javax-inject.github.io/javax-inject/[JSR-330 - Dependency Injection for Java specification].
@@ -17,6 +18,11 @@ Micronaut Framework implements the https://javax-inject.github.io/javax-inject/[
 == jakarta.inject vs javax.inject
 
 Early versions of Micronaut Framework used `javax.inject` annotations. Due to trademark restrictions imposed on the `javax.*` namespace, Micronaut Framework switched from `javax.inject` to `jakarta.inject` annotations. Since https://micronaut.io/2021/03/09/micronaut-2-4-released/[version 2.4], Micronaut Framework supports `jakarta.inject` annotations. Moreover, Micronaut Framework switched to `jakarta.inject` as the set of annotations included by default, and we strongly encourage you to use `jakarta.inject` going forward.
+:exclude-for-languages:
+
+:only-for-languages:python
+Use the Python decorators from `jakarta.inject` to declare beans and injection points. Prefer constructor injection: the required collaborators are explicit arguments to `__init__`. Field and method parameter injection are framework-supported alternatives.
+:only-for-languages:
 
 == Dependency Injection Types
 
@@ -28,7 +34,9 @@ In constructor-based injection, Micronaut Framework provides the dependencies re
 
 source:constructor/MessageController[]
 
+:exclude-for-languages:python
 If your class has multiple constructors, Micronaut Framework searches for one constructor annotated with `jakarta.inject.Inject`.
+:exclude-for-languages:
 
 === Field Injection
 
@@ -36,13 +44,17 @@ With field injection, Micronaut fulfills the injection endpoints for fields anno
 
 source:field/MessageController[]
 
-Field injection makes it harder to understand a class's requirements, making it easier to get a `NullPointerException` when testing a class using field injection. We recommend you use <<Benefits of Constructor Injection, constructor injection>>.
+Field injection makes it harder to understand a class's requirements and allows an instance to be created without its collaborators. We recommend you use <<Benefits of Constructor Injection, constructor injection>>.
 
+:exclude-for-languages:python
 WARNING: The previous code sample uses a field with the default access modifier. There are four types of access modifiers available in Java: `private`, `protected`, `public`, and the default. Field injection works with all of them. However, field injection in a field with the `private` access modifier requires reflection. Thus, we recommend you do not use `private`.
 
 NOTE: You use field injection in test classes annotated with `MicronautTest`. Micronaut does not instantiate the test class. Thus, you cannot use constructor injection in those classes.
+:exclude-for-languages:
 
+:exclude-for-languages:python
 NOTE: When using https://micronaut-projects.github.io/micronaut-spring/latest/guide/[Micronaut for Spring], you can also use Spring's `@Autowired` annotation for field injection. To learn more, read the guide: https://micronaut-projects.github.io/micronaut-guides/latest/micronaut-spring-boot.html[Run a Spring Boot application as a Micronaut application].
+:exclude-for-languages:
 
 === Method Parameter Injection
 
@@ -60,7 +72,13 @@ Constructor injection clearly expresses the requirements of the class and requir
 
 **Immutability**
 
+:exclude-for-languages:python
 Constructor injection allows you to define `final` dependencies, creating immutable objects.
+:exclude-for-languages:
+
+:only-for-languages:python
+Constructor injection keeps dependencies assigned when the object is created, so the instance starts with its required collaborators.
+:only-for-languages:
 
 **Identifying code smells**
 
@@ -68,10 +86,9 @@ Constructor injection helps you easily identify if your bean depends on too many
 
 **Testing**
 
-Constructor injection simplifies writing both unit and integration tests. The constructor forces us to provide valid objects for all dependencies. 
-Thus, it decreases the chance of a NullPointerException occurrence during testing.
+Constructor injection simplifies writing both unit and integration tests. The constructor forces us to provide valid objects for all dependencies.
+Thus, it decreases the chance of runtime failures during testing.
 
 == Next Steps
 
 Read more about https://docs.micronaut.io/latest/guide/#ioc[Micronaut Inversion of Control] capabilities.
-

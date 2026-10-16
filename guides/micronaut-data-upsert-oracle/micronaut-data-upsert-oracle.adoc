@@ -1,0 +1,138 @@
+common:header.adoc[]
+
+external:micronaut-data-upsert/upsert.adoc[]
+
+In this guide, you will declare an upsert method in a Micronaut Data JDBC repository and use it from an HTTP controller backed by https://www.oracle.com/database/free/[Oracle AI Database].
+
+:containerized: Oracle
+common:requirements-testcontainers.adoc[]
+
+common:completesolution.adoc[]
+
+common:create-app-features.adoc[]
+
+:exclude-for-languages:python
+common:micronaut-data-jdbc.adoc[]
+
+common:oracle-driver.adoc[]
+:exclude-for-languages:
+
+:only-for-languages:python
+The `data-jdbc` and `oracle` features add Micronaut Data JDBC and the Oracle JDBC driver to the dependencies in `pyproject.toml`.
+:only-for-languages:
+
+common:datasource-header.adoc[]
+
+:exclude-for-languages:python
+resource:application.properties[tag=datasource]
+:exclude-for-languages:
+
+:only-for-languages:python
+resource:application.toml[tag=datasource]
+:only-for-languages:
+
+<.> Use the Oracle driver.
+<.> Set the database type.
+<.> Configure the Oracle dialect.
+
+:exclude-for-languages:python
+common:liquibase.adoc[]
+:exclude-for-languages:
+
+:only-for-languages:python
+=== Database Migration with Liquibase
+
+We need a way to create the database schema. For that, we use
+https://micronaut-projects.github.io/micronaut-liquibase/latest/guide/[Micronaut integration with Liquibase].
+
+The `liquibase` feature adds Micronaut Liquibase to the dependencies in `pyproject.toml`.
+
+Configure the database migrations directory for http://www.liquibase.org[Liquibase] in `config/application.toml`:
+
+resource:application.toml[tag=liquibase]
+
+Create the following files with the database schema creation:
+
+resource:db/liquibase-changelog.xml[]
+:only-for-languages:
+
+resource:db/changelog/01-schema.xml[]
+
+The `id` column is the table's primary key. Oracle's `MERGE` statement matches rows with its `ON` condition, and the primary key on that same column keeps the upsert reliable under concurrent writes.
+
+external:micronaut-data-upsert/book-entity.adoc[]
+
+=== Repository
+
+Create a repository and declare an upsert method:
+
+source:BookRepository[]
+
+callout:jdbcrepository[]
+callout:crudrepository[]
+<.> Upsert methods are opt-in; they are not inherited from `CrudRepository`. Micronaut Data implements a method named exactly `upsert` (or `upsertAll` for an `Iterable` of entities) as a native upsert.
+
+For the `ORACLE` dialect, Micronaut Data generates a `MERGE` statement at compilation time. For the `Book` entity, the generated SQL is similar to:
+
+[source,sql]
+----
+MERGE INTO "BOOK" target
+USING (SELECT ? c0,? c1,? c2 FROM DUAL) source
+ON (target."ID"=source.c0)
+WHEN MATCHED THEN UPDATE SET target."TITLE"=source.c1,target."PAGES"=source.c2
+WHEN NOT MATCHED THEN INSERT ("ID","TITLE","PAGES") VALUES (source.c0,source.c1,source.c2)
+----
+
+The bound values are selected from `DUAL` as a single-row source. If no row with the given `id` exists, the `WHEN NOT MATCHED` branch inserts a new row. Otherwise, the `WHEN MATCHED` branch updates the `title` and `pages` columns of the existing row.
+
+TIP: Use the `@Upsert` annotation to give an upsert method a custom name, or its `conflictsOn` member to use another unique property, such as an ISBN, as the conflict target instead of the identity.
+
+external:micronaut-data-upsert/book-controller.adoc[]
+
+=== Tests
+
+:exclude-for-languages:python
+Create an abstract test class that starts an Oracle Database container with https://www.testcontainers.org[Testcontainers] and points the default datasource to it:
+
+test:AbstractTest[]
+
+callout:test-property-provider[]
+:exclude-for-languages:
+
+:exclude-for-languages:groovy,kotlin,python
+callout:testcontainers-at-container-static[]
+:exclude-for-languages:
+
+:only-for-languages:groovy,kotlin
+<.> Declare the container once, so every test which extends the abstract class shares it.
+:only-for-languages:
+
+:exclude-for-languages:python
+<.> Start the container if it is not running yet.
+<.> Use the Oracle JDBC driver and the container's JDBC URL and credentials.
+:exclude-for-languages:
+
+:only-for-languages:python
+Create `tests/conftest.py` with a fixture that starts an Oracle Database container with https://www.testcontainers.org[Testcontainers] and exposes the datasource properties:
+
+[source,python]
+.tests/conftest.py
+----
+include::{sourceDir}/micronaut-data-upsert-oracle/@sourceDir@/tests/conftest.py[]
+----
+
+<.> Start the container once; it is shared by every test.
+<.> Use the Oracle JDBC driver and the container's JDBC URL and credentials.
+:only-for-languages:
+
+external:micronaut-data-upsert/book-controller-test.adoc[]
+
+common:testApp.adoc[]
+
+:exclude-for-languages:python
+common:nativetest.adoc[]
+:exclude-for-languages:
+
+common:next.adoc[]
+
+external:micronaut-data-upsert/next.adoc[]

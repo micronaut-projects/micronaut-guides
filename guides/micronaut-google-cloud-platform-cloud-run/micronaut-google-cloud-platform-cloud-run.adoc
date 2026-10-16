@@ -12,9 +12,9 @@ common:gcp-containerregistry.adoc[]
 
 common:google-cloud-registry.adoc[]
 
-:exclude-for-build:
+:exclude-for-languages:python
 
-:exclude-for-build:maven
+:exclude-for-build:maven,pyronaut
 
 Modify your Gradle build to configure the image name:
 
@@ -32,7 +32,7 @@ dockerBuild {
 
 common:docker-push-gradle.adoc[]
 
-:exclude-for-build:gradle
+:exclude-for-build:gradle,pyronaut
 
 [source, bash]
 ----
@@ -43,9 +43,33 @@ common:docker-push-gradle.adoc[]
 
 :exclude-for-build:
 
-The previous URL uses the pattern `gcr.io/micronaut-guides-xxxxxx/micronautguide:latest`. Change it to use your project ID.
+:exclude-for-languages:
+
+:only-for-languages:python
+
+Configure the Pyronaut Docker image name in `pyproject.toml`:
+
+[source,toml]
+----
+[tool.pyronaut.build.docker]
+image-name = "gcr.io/micronaut-guides-xxxxxx/micronautguide"
+----
+
+Build and push the Docker image:
+
+[source, bash]
+----
+pyronaut build --docker
+docker push gcr.io/micronaut-guides-xxxxxx/micronautguide:1.0.0
+----
+
+:only-for-languages:
+
+The previous image names use the pattern `gcr.io/micronaut-guides-xxxxxx/micronautguide`. Change it to use your project ID.
 
 You get an output such as:
+
+:exclude-for-languages:python
 
 [source, bash]
 ----
@@ -55,9 +79,22 @@ You get an output such as:
 Pushing image 'gcr.io/micronaut-guides-xxxxxx/micronautguide:latest'.
 ----
 
+:exclude-for-languages:
+
+:only-for-languages:python
+
+[source, bash]
+----
+Docker image build complete: gcr.io/micronaut-guides-xxxxxx/micronautguide:1.0.0
+----
+
+:only-for-languages:
+
 == Google Cloud Run Deploy
 
 You can https://cloud.google.com/sdk/gcloud/reference/run/deploy[deploy to Google Cloud Run] via the CLI. Use the value you configured in your build as the image argument's value.
+
+:exclude-for-languages:python
 
 [source, bash]
 ----
@@ -66,6 +103,20 @@ gcloud run deploy \
     --platform managed \
     --allow-unauthenticated
 ----
+
+:exclude-for-languages:
+
+:only-for-languages:python
+
+[source, bash]
+----
+gcloud run deploy \
+    --image=gcr.io/micronaut-guides-xxxxxx/micronautguide:1.0.0 \
+    --platform managed \
+    --allow-unauthenticated
+----
+
+:only-for-languages:
 
 common:google-cloud-run-deploy-plain.adoc[]
 
@@ -77,7 +128,17 @@ common:gcloud-delete-project.adoc[]
 
 == Next Steps
 
+:exclude-for-languages:python
+
 You will probably want to deploy to Google Cloud Run from your CI server. https://launch.micronaut.io[Micronaut Launch] contains the https://micronaut.io/launch?type=DEFAULT&name=demo&package=com.example&javaVersion=JDK_25&lang=JAVA&build=GRADLE&test=JUNIT&features=github-workflow-google-cloud-run&version=3.0.3[github-workflow-google-cloud-run] feature, which adds a https://github.com/features/actions[GitHub Actions] workflow that deploys an application to Google Cloud Run from Google Container Registry.
+
+:exclude-for-languages:
+
+:only-for-languages:python
+
+You will probably want to deploy to Google Cloud Run from your CI server. For Pyronaut applications, run `pyronaut build --docker`, push the generated image tag, and deploy that tag with `gcloud run deploy`.
+
+:only-for-languages:
 
 Read more about:
 

@@ -1,4 +1,3 @@
-from java.util import Optional
 from micronaut.data.annotation import Join, Query
 from micronaut.data.jdbc.annotation import JdbcRepository
 from micronaut.data.model.query.builder.sql import Dialect
@@ -12,10 +11,10 @@ from .contact_preview import ContactPreview
 @JdbcRepository(dialect=Dialect.H2)  # <1>
 class ContactRepository(CrudRepository[ContactEntity, int]):  # <2>
     @Join(value="phones", type=Join.Type.LEFT_FETCH)  # <3>
-    def getById(self, id: int) -> Optional[ContactEntity]: ...
+    def getById(self, id: int) -> ContactEntity | None: ...
 
     @Query(value="select id, first_name, last_name from contact where id = :id")  # <4>
-    def findPreviewById(self, id: int) -> Optional[ContactPreview]: ...
+    def findPreviewById(self, id: int) -> ContactPreview | None: ...
 
     @Query(value="""
         select c.id, c.first_name, c.last_name, group_concat(p.phone) as phones
@@ -24,4 +23,4 @@ class ContactRepository(CrudRepository[ContactEntity, int]):  # <2>
         where c.id = :id
         group by c.id
         """)  # <5>
-    def findCompleteById(self, id: int) -> Optional[ContactComplete]: ...
+    def findCompleteById(self, id: int) -> ContactComplete | None: ...

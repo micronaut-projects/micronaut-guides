@@ -10,6 +10,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -23,7 +26,6 @@ import static io.micronaut.starter.options.BuildTool.PYRONAUT;
 @Singleton
 public class DefaultTestScriptGenerator implements TestScriptGenerator {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultTestScriptGenerator.class);
-    private static final String PYTHON_VERSION = "graalpy3.13-25.4.4";
 
     private final GuidesConfiguration guidesConfiguration;
     private final GuideParser guideParser;
@@ -81,16 +83,7 @@ public class DefaultTestScriptGenerator implements TestScriptGenerator {
         }
 
         if (buildTool == PYRONAUT) {
-            bashScript.append(String.format(
-                    """
-                            eval "$(pyenv init -)" || EXIT_STATUS=$?
-                            pyenv shell %s || EXIT_STATUS=$?
-                            pyronaut install || EXIT_STATUS=$?
-                            pyronaut validate-config || EXIT_STATUS=$?
-                            pyronaut test || EXIT_STATUS=$?
-                            """,
-                    PYTHON_VERSION
-            ));
+            bashScript.append("run_pyronaut_tests || EXIT_STATUS=$?\n");
         } else if (nativeTest) {
             bashScript.append(String.format(
                     "%s || EXIT_STATUS=$?\n",
@@ -185,6 +178,11 @@ public class DefaultTestScriptGenerator implements TestScriptGenerator {
         return generateScript(metadatas, false, false);
     }
 
+    @Override
+    public String generatePythonTestScript(@NonNull @NotNull List<Guide> metadatas) {
+        return generateScript(metadatas, false, false, true);
+    }
+
     public String generateScript(File guidesFolder,
                                  String metadataConfigName,
                                  boolean stopIfFailure,
@@ -207,13 +205,20 @@ public class DefaultTestScriptGenerator implements TestScriptGenerator {
     public String generateScript(List<Guide> metadatas,
                                  boolean stopIfFailure,
                                  boolean nativeTest) {
+        return generateScript(metadatas, stopIfFailure, nativeTest, false);
+    }
+
+    public String generateScript(List<Guide> metadatas,
+                                 boolean stopIfFailure,
+                                 boolean nativeTest,
+                                 boolean pythonTest) {
         StringBuilder bashScript = new StringBuilder("""
                 #!/usr/bin/env bash
                 set -e
-                
+
                 FAILED_PROJECTS=()
                 EXIT_STATUS=0
-                
+
                 kill_kotlin_daemon () {
                   echo "Killing KotlinCompile daemon to pick up fresh properties (due to kapt and java > 17)"
                   for daemon in $(jps | grep KotlinCompile | cut -d' ' -f1); do
@@ -221,12 +226,21 @@ public class DefaultTestScriptGenerator implements TestScriptGenerator {
                     kill -9 $daemon
                   done
                 }""");
+        if (pythonTest) {
+            bashScript.append("\n\n").append(pyronautFunctions());
+        }
 
         metadatas.sort(Comparator.comparing(Guide::slug));
         for (Guide metadata : metadatas) {
+            if (metadata.apps().isEmpty()) {
+                continue;
+            }
             List<GuidesOption> guidesOptionList = GuideGenerationUtils.guidesOptions(metadata, LOG);
             bashScript.append("\n");
             for (GuidesOption guidesOption : guidesOptionList) {
+                if (pythonTest != isPyronautPython(guidesOption)) {
+                    continue;
+                }
                 String folder = MacroUtils.getSourceDir(metadata.slug(), guidesOption);
                 BuildTool buildTool = guidesOption.getBuildTool();
                 if (metadata.apps().stream().anyMatch(app -> app.name().equals(guidesConfiguration.getDefaultAppName()))) {
@@ -275,10 +289,25 @@ public class DefaultTestScriptGenerator implements TestScriptGenerator {
                     else
                       exit 0
                     fi
-                    
+
                     """);
         }
 
         return bashScript.toString();
+    }
+
+    private static String pyronautFunctions() {
+        try (InputStream stream = DefaultTestScriptGenerator.class.getResourceAsStream("/pyronaut-test-functions.sh")) {
+            if (stream == null) {
+                throw new IllegalStateException("Missing pyronaut-test-functions.sh resource");
+            }
+            return new String(stream.readAllBytes(), StandardCharsets.UTF_8).stripTrailing() + "\n";
+        } catch (IOException e) {
+            throw new IllegalStateException("Unable to read pyronaut-test-functions.sh resource", e);
+        }
+    }
+
+    private static boolean isPyronautPython(GuidesOption guidesOption) {
+        return guidesOption.getBuildTool() == PYRONAUT && guidesOption.getLanguage() == Language.PYTHON;
     }
 }

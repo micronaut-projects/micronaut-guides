@@ -57,7 +57,7 @@ class GuideGenerationUtilsTest {
 
     @Test
     void testPythonGuideOptionsUsePyronautAndPytest() {
-        Guide guideMetadata = new Guide(null,null, null, null, null, null, null, null,false,false,null, List.of(Language.JAVA, Language.PYTHON),null, List.of(BuildTool.GRADLE, BuildTool.MAVEN), null,null,null,true,null,null,null);
+        Guide guideMetadata = new Guide(null,null, null, null, null, null, null, null,false,false,null, List.of(Language.JAVA, Language.PYTHON),null, List.of(BuildTool.GRADLE, BuildTool.MAVEN), TestFramework.SPOCK,null,null,true,null,null,null);
 
         List<GuidesOption> result = GuideGenerationUtils.guidesOptions(guideMetadata, LOG);
 
@@ -82,8 +82,40 @@ class GuideGenerationUtilsTest {
     }
 
     @Test
+    void pythonGuideOptionsUsePytestEvenWhenJvmGuideUsesJunit() {
+        Guide guideMetadata = new Guide(null,null, null, null, null, null, null, null,false,false,null, List.of(Language.JAVA, Language.PYTHON),null, List.of(BuildTool.GRADLE, BuildTool.PYRONAUT), TestFramework.JUNIT,null,null,true,null,null,null);
+
+        List<GuidesOption> result = GuideGenerationUtils.guidesOptions(guideMetadata, LOG);
+
+        assertTrue(result.stream()
+                .anyMatch(option -> option.getBuildTool() == BuildTool.GRADLE &&
+                        option.getLanguage() == Language.JAVA &&
+                        option.getTestFramework() == TestFramework.JUNIT));
+        assertTrue(result.stream()
+                .anyMatch(option -> option.getBuildTool() == BuildTool.PYRONAUT &&
+                        option.getLanguage() == Language.PYTHON &&
+                        option.getTestFramework() == TestFramework.PYTEST));
+    }
+
+    @Test
+    void groovyGuideProjectGeneratorPythonOptionsUsePytestEvenWhenJvmGuideUsesJunit() {
+        Guide guideMetadata = new Guide(null,null, null, null, null, null, null, null,false,false,null, List.of(Language.JAVA, Language.PYTHON),null, List.of(BuildTool.GRADLE, BuildTool.PYRONAUT), TestFramework.JUNIT,null,null,true,null,null,null);
+
+        List<GuidesOption> result = io.micronaut.guides.GuideProjectGenerator.guidesOptions(guideMetadata);
+
+        assertTrue(result.stream()
+                .anyMatch(option -> option.getBuildTool() == BuildTool.GRADLE &&
+                        option.getLanguage() == Language.JAVA &&
+                        option.getTestFramework() == TestFramework.JUNIT));
+        assertTrue(result.stream()
+                .anyMatch(option -> option.getBuildTool() == BuildTool.PYRONAUT &&
+                        option.getLanguage() == Language.PYTHON &&
+                        option.getTestFramework() == TestFramework.PYTEST));
+    }
+
+    @Test
     void testGroovyPythonGuideOptionsUsePyronautAndPytest() {
-        Guide guideMetadata = new Guide(null,null, null, null, null, null, null, null,false,false,null, List.of(Language.JAVA, Language.PYTHON),null, List.of(BuildTool.GRADLE, BuildTool.MAVEN), null,null,null,true,null,null,null);
+        Guide guideMetadata = new Guide(null,null, null, null, null, null, null, null,false,false,null, List.of(Language.JAVA, Language.PYTHON),null, List.of(BuildTool.GRADLE, BuildTool.MAVEN), TestFramework.SPOCK,null,null,true,null,null,null);
 
         List<GuidesOption> result = io.micronaut.guides.GuideProjectGenerator.guidesOptions(guideMetadata);
 
@@ -100,8 +132,10 @@ class GuideGenerationUtilsTest {
     void testTestFrameworkOption() {
         assertEquals(TestFramework.SPOCK, GuideGenerationUtils.testFrameworkOption(Language.GROOVY, null));
         assertEquals(TestFramework.PYTEST, GuideGenerationUtils.testFrameworkOption(Language.PYTHON, null));
+        assertEquals(TestFramework.PYTEST, GuideGenerationUtils.testFrameworkOption(Language.PYTHON, TestFramework.SPOCK));
         assertEquals(TestFramework.JUNIT, GuideGenerationUtils.testFrameworkOption(Language.JAVA, null));
         assertEquals(TestFramework.SPOCK, GuideGenerationUtils.testFrameworkOption(Language.JAVA, TestFramework.SPOCK));
+        assertEquals(TestFramework.PYTEST, GuideGenerationUtils.testFrameworkOption(Language.PYTHON, TestFramework.JUNIT));
     }
 
     @Test

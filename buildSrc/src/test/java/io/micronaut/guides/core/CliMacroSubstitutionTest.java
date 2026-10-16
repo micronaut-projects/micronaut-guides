@@ -40,10 +40,12 @@ public class CliMacroSubstitutionTest {
                 List.of(),
                 List.of(),
                 List.of(),
+                List.of(),
                 null,
                 null,
                 null,
-                true
+                true,
+                null
         );
 
         Guide guide = new Guide(
@@ -95,10 +97,12 @@ public class CliMacroSubstitutionTest {
                 List.of(),
                 List.of(),
                 List.of(),
+                List.of(),
                 null,
                 null,
                 null,
-                true
+                true,
+                null
         );
 
         Guide guide = new Guide(

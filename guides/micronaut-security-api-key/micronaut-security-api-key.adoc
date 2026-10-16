@@ -18,11 +18,23 @@ source:ApiKeyConfiguration[]
 
 callout:each-property[]
 
+:exclude-for-languages:python
 Create a functional interface to retrieve a user given an API Key.
+:exclude-for-languages:
+
+:only-for-languages:python
+Create an abstract base class to retrieve a user given an API Key.
+:only-for-languages:
 
 source:ApiKeyRepository[]
 
+:exclude-for-languages:python
 callout:functional-interface[]
+:exclude-for-languages:
+
+:only-for-languages:python
+<1> An abstract base class defines the repository contract; its implementation supplies `find_by_api_key`.
+:only-for-languages:
 
 Create an implementation of `ApiKeyRepository` which uses the API keys stored in configuration.
 
@@ -37,7 +49,13 @@ Micronaut Security is flexible. You define a bean of type https://micronaut-proj
 source:ApiKeyTokenReader[]
 
 callout:singleton[]
+:exclude-for-languages:python
 <2> `HttpHeaderTokenReader` is a convenient abstract class to ease reading a token from an HTTP header.
+:exclude-for-languages:
+
+:only-for-languages:python
+<2> Implement `TokenReader.findToken` to read the `X-API-KEY` header. Keep the method name required by the token reader interface.
+:only-for-languages:
 
 === Token Validator
 
@@ -49,6 +67,10 @@ callout:singleton[]
 callout:constructor-di[arg0=ApiKeyRepository]
 <3> You can restrict the validity of an API Key to specific paths.
 
+:only-for-languages:python
+Implement the token validator with `async def validateToken`, keeping the method name required by Micronaut Security. Return an `Authentication` for a valid key or `None` when it does not match.
+:only-for-languages:
+
 === Controllers
 
 To test the application create several controllers.
@@ -59,7 +81,13 @@ callout:controller[arg0=/api]
 callout:produces[]
 callout:get[arg0=index,arg1=/]
 callout:secured-is-authenticated[]
+:exclude-for-languages:python
 callout:principal[]
+:exclude-for-languages:
+
+:only-for-languages:python
+<5> Micronaut Security binds the current user to an `Authentication` argument.
+:only-for-languages:
 
 Create tests that verify `/api` returns 401 if no API Key is present or the request contains a wrong API Key.
 
@@ -92,8 +120,17 @@ common:testApp.adoc[]
 
 Set configuration to have an API available when you run your application:
 
+:exclude-for-languages:python
 
 resource:application.properties[tag=apikeys]
+
+:exclude-for-languages:
+
+:only-for-languages:python
+
+resource:application.toml[tag=apikeys]
+
+:only-for-languages:
 
 common:runapp.adoc[]
 
@@ -101,19 +138,19 @@ To test the running application, issue a GET request to localhost:8080 providing
 
 [source,bash]
 ----
-curl -i --header "Accept: text/plain" --header "X-API-KEY: FOOBAR" localhost:8080
+curl -i --header "Accept: text/plain" --header "X-API-KEY: FOOBAR" localhost:8080/api
 ----
 
 common:graal-with-plugins.adoc[]
 
-:exclude-for-languages:groovy
+:exclude-for-languages:groovy,python
 
 
 To test the native executable, issue a GET request to localhost:8080 providing a valid API Key:
 
 [source,bash]
 ----
-curl -i --header "Accept: text/plain" --header "X-API-KEY: FOOBAR" localhost:8080
+curl -i --header "Accept: text/plain" --header "X-API-KEY: FOOBAR" localhost:8080/api
 ----
 
 :exclude-for-languages:
@@ -121,4 +158,3 @@ curl -i --header "Accept: text/plain" --header "X-API-KEY: FOOBAR" localhost:808
 == Next Steps
 
 See the https://micronaut-projects.github.io/micronaut-security/latest/guide/[Micronaut security documentation] to learn more.
-

@@ -1,9 +1,6 @@
-import java
-
 from micronaut.http import HttpRequest, HttpResponse, MediaType
 from micronaut.http.annotation import Controller, Get, Produces
-
-ModelAndView = java.type("io.micronaut.views.ModelAndView")
+from micronaut.views import ModelAndView
 
 
 @Controller  # <1>

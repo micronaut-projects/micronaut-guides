@@ -32,10 +32,12 @@ public class FeaturesWordsMacroSubstitutionTest {
                 List.of(),
                 List.of(),
                 List.of(),
+                List.of(),
                 null,
                 null,
                 null,
-                true
+                true,
+                null
         );
 
         Guide guide = new Guide(

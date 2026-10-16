@@ -6,7 +6,12 @@ To complete this guide, you will need the following:
 
 * Some time on your hands
 * A decent text editor or IDE
+:exclude-for-languages:python
 * JDK 25 or greater installed with `JAVA_HOME` configured appropriately
+:exclude-for-languages:
+:only-for-languages:python
+* GraalPy installed and the Pyronaut CLI available locally
+:only-for-languages:
 common:oracle-cloud-account.adoc[]
 common:oracle-cloud-cli.adoc[]
 common:completesolution.adoc[]
@@ -64,6 +69,7 @@ image::oracleautodb/autonomous.database.9.png[]
 
 common:cli-or-launch.adoc[]
 
+:exclude-for-languages:python
 [source,bash]
 ----
 mn @cli-command@ example.micronaut.micronautguide \
@@ -78,6 +84,15 @@ common:default-package.adoc[]
 common:diff-general.adoc[]
 
 https://micronaut-projects.github.io/micronaut-guides/latest/micronaut-intellij-idea-ide-setup.html[Setup IntelliJ IDEA to develop Micronaut Applications].
+:exclude-for-languages:
+
+:only-for-languages:python
+[source,bash]
+----
+pyronaut @cli-command@ example.micronaut.micronautguide \
+    --features=data-jdbc,flyway,http-client,oracle-cloud-atp
+----
+:only-for-languages:
 
 === Entity class
 
@@ -90,6 +105,10 @@ source:domain/Thing[]
 Create a `ThingRepository` interface to read and write `Thing` database data:
 
 source:repository/ThingRepository[]
+
+:only-for-languages:python
+The derived `findByName` query returns a `Thing` or `None` when no matching row exists. `findAll` returns a built-in `list[Thing]`.
+:only-for-languages:
 
 === Data populator class
 
@@ -105,20 +124,34 @@ source:controller/ThingController[]
 
 === Configuration
 
+:exclude-for-languages:python
 Create a new Flyway migration SQL script in `src/main/resources/db/migration/V1__create-schema.sql` and add the following:
+:exclude-for-languages:
+:only-for-languages:python
+Create a new Flyway migration SQL script in `config/db/migration/V1__create-schema.sql` and add the following:
+:only-for-languages:
 
 resource:db/migration/V1__create-schema.sql[]
 
+:exclude-for-languages:python
 Edit `src/main/resources/logback.xml` and add the following (anywhere in the `<configuration>` element) to monitor the SQL queries that Micronaut Data performs:
 
 [source,xml]
 ----
 <logger name='io.micronaut.data.query' level='debug' />
 ----
+:exclude-for-languages:
 
+:exclude-for-languages:python
 Replace the generated `application.properties` with this:
 
 resource:application.properties[]
+:exclude-for-languages:
+:only-for-languages:python
+Replace the generated `config/application.toml` with this:
+
+resource:application.toml[]
+:only-for-languages:
 
 <1> This is optional, but it's a good idea to configure the IO pool size when using `@ExecuteOn(TaskExecutors.BLOCKING)` in controllers
 <2> Change the profile name if you're not using the default, and optionally add a value for the path to the config file if necessary as described in the https://micronaut-projects.github.io/micronaut-oracle-cloud/latest/guide/#config-auth[Authentication section] of the Micronaut Oracle Cloud docs
@@ -126,38 +159,28 @@ resource:application.properties[]
 <4> Set the `walletPassword` property with a password to encrypt the wallet keys (must be at least 8 characters and include at least 1 letter and either 1 numeric or special character)
 <5> Set the `password` property with the `micronautdemo` schema user password you created
 
+:only-for-languages:python
+For the cloud database, uncomment and set `ocid`, `walletPassword`, `username`, and `password` in `config/application.toml`.
+:only-for-languages:
+
 Oracle Cloud Autonomous Database connection information and credentials are stored in the https://docs.oracle.com/en-us/iaas/Content/Database/Tasks/adbconnecting.htm[Oracle Wallet]. See the https://micronaut-projects.github.io/micronaut-oracle-cloud/latest/guide/[Micronaut Oracle Cloud integration documentation] for more details and options for working with Oracle Cloud in Micronaut applications.
 
 === Writing Tests
 
 Create a test to verify that database access works:
 
+:exclude-for-languages:python
 test:repository/ThingRepositoryTest[]
+:exclude-for-languages:
+:only-for-languages:python
+test:ThingRepositoryTest[]
+:only-for-languages:
 
 == Testing the Application
 
-To run the tests:
+common:testApp-noheader.adoc[]
 
-:exclude-for-build:maven
-
-[source, bash]
-----
-./gradlew test
-----
-
-Then open `build/reports/tests/test/index.html` in a browser to see the results.
-
-:exclude-for-build:
-
-:exclude-for-build:gradle
-
-[source, bash]
-----
-./mvnw test
-----
-
-:exclude-for-build:
-
+:exclude-for-languages:python
 == Using Oracle Cloud Vault
 
 In the previous sections, we included the wallet and user passwords in cleartext inside `application.properties`, which is not a best practice. However, it's possible to externalize those (and other properties that shouldn't be in cleartext and/or in source control) with https://docs.oracle.com/en-us/iaas/Content/KeyManagement/Concepts/keyoverview.htm[Oracle Cloud Vault].
@@ -262,10 +285,11 @@ datasources.default.username=micronautdemo
 datasources.default.password=${ATP_USER_PASSWORD}
 ...
 ----
+:exclude-for-languages:
 
 == Running the Application
 
-:exclude-for-build:maven
+:exclude-for-build:maven,pyronaut
 
 To run the application use:
 
@@ -285,7 +309,7 @@ which will start the application on port 8080.
 
 :exclude-for-build:
 
-:exclude-for-build:gradle
+:exclude-for-build:gradle,pyronaut
 
 To run the application use
 
@@ -305,7 +329,14 @@ which will start the application on port 8080.
 
 :exclude-for-build:
 
-You should see output similar to the following, indicating that the database connectivity and wallet configuration is all handled automatically, and that Flyway is being used. Also, if you added the Logback logger above, you'll see the results of the work done by `DataPopulator`:
+:only-for-languages:python
+common:runapp-instructions.adoc[]
+:only-for-languages:
+
+You should see output similar to the following, indicating that the database connectivity and wallet configuration is all handled automatically, and that Flyway is being used.
+:exclude-for-languages:python
+Also, if you added the Logback logger above, you'll see the results of the work done by `DataPopulator`.
+:exclude-for-languages:
 
 [source, bash]
 ----

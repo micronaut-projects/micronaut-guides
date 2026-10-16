@@ -1,0 +1,34 @@
+[micronaut.application]
+name = "app"
+
+#tag::oauth2[]
+# <1>
+[micronaut.security]
+authentication = "idtoken"
+
+# <2>
+# <3>
+[micronaut.security.oauth2.clients.oci]
+client-id = "${OAUTH_CLIENT_ID:XXX}"
+# <4>
+client-secret = "${OAUTH_CLIENT_SECRET:YYY}"
+#end::oauth2[]
+
+#tag::scopes[]
+scopes = ["openid", "profile", "email", "get_groups"]
+#end::scopes[]
+
+#tag::oauth2[]
+# <5>
+[micronaut.security.oauth2.clients.oci.openid]
+issuer = "${OAUTH_ISSUER:`https://idcs-xxx.identity.oraclecloud.com/`}"
+
+[micronaut.security.endpoints.logout]
+# <6>
+get-allowed = true
+#end::oauth2[]
+
+#tag::scopes[]
+[micronaut.security.token]
+roles-name = "groups"
+#end::scopes[]

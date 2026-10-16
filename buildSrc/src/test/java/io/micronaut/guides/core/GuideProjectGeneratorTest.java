@@ -8,14 +8,17 @@ import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
 import org.gradle.api.JavaVersion;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
 import static io.micronaut.guides.core.TestUtils.readFile;
+import static io.micronaut.starter.options.JdkVersion.JDK_25;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -42,10 +45,12 @@ class GuideProjectGeneratorTest {
                 List.of(),
                 List.of(),
                 List.of(),
+                List.of(),
                 null,
                 null,
                 null,
-                true
+                true,
+                null
         );
         Guide guide = new Guide(
                 "1. Testing Serialization - Spring Boot vs Micronaut Framework - Building a Rest API",
@@ -175,10 +180,12 @@ class GuideProjectGeneratorTest {
                 List.of(),
                 List.of(),
                 List.of(),
+                List.of(),
                 null,
                 null,
                 null,
-                true
+                true,
+                null
         );
         Guide guide = new Guide(
                 "Access an Oracle Autonomous Database",
@@ -213,5 +220,54 @@ class GuideProjectGeneratorTest {
         assertTrue(result.contains("<artifactId>micronaut-test-resources-jdbc-oracle-free</artifactId>"), result);
     }
 
+    @Test
+    void testGenerateOracleAtpPythonProjectWithH2Runtime(@TempDir Path outputDirectory) throws Exception {
+        App app = new App(
+                "default", "example.micronaut", ApplicationType.DEFAULT, "Micronaut",
+                List.of("data-jdbc", "flyway", "oracle-cloud-atp"),
+                List.of(), List.of(), List.of(), List.of(), null, null, null, null, false,
+                List.of("h2-runtime")
+        );
+        Guide guide = GuideTestUtils.guideWithSlug("oracle-atp-h2-runtime");
+        GuidesOption option = new GuidesOption(BuildTool.PYRONAUT, Language.PYTHON, TestFramework.PYTEST);
+
+        ((DefaultGuideProjectGenerator) guideProjectGenerator).generate(
+                outputDirectory.toFile(), guide, option, JDK_25, app);
+
+        File dest = outputDirectory.resolve(MacroUtils.getSourceDir(guide.slug(), option)).toFile();
+        String result = readFile(new File(dest, "pyproject.toml"));
+        String runtime = result.substring(result.indexOf("runtime = ["), result.indexOf("build = ["));
+        assertTrue(runtime.contains("\"com.h2database:h2\""), result);
+        assertTrue(runtime.contains("\"io.micronaut.oraclecloud:micronaut-oraclecloud-atp\""), result);
+        String configuration = readFile(new File(dest, "config/application.toml"));
+        assertTrue(configuration.contains("dialect = 'ORACLE'"), configuration);
+    }
+
+
+    @Test
+    void testGenerateGroovyMavenProjectWithDiscoverableSpockTests(@TempDir File outputDirectory) {
+        App app = new App(
+                "default", "example.micronaut", ApplicationType.DEFAULT, "Micronaut",
+                List.of("serialization-jackson"), List.of(), List.of(), List.of(), List.of(), List.of(),
+                null, null, null, true
+        );
+        Guide guide = new Guide(
+                "Test a Groovy application with Spock", "Run Spock tests using Maven.",
+                List.of("Micronaut"), List.of("Testing"), LocalDate.of(2026, 10, 13),
+                null, null, null, false, false, "spock-maven.adoc",
+                List.of(Language.GROOVY), List.of("testing"), List.of(BuildTool.MAVEN),
+                TestFramework.SPOCK, List.of(), "spock-maven", true, null, Map.of(), List.of(app)
+        );
+
+        assertDoesNotThrow(() -> guideProjectGenerator.generate(outputDirectory, guide));
+
+        File destination = Paths.get(outputDirectory.getAbsolutePath(),
+                MacroUtils.getSourceDir(guide.slug(),
+                        new GuidesOption(BuildTool.MAVEN, Language.GROOVY, TestFramework.SPOCK))).toFile();
+        String pom = readFile(new File(destination, "pom.xml"));
+        assertTrue(new File(destination, "src/test/groovy/example/micronaut/DefaultSpec.groovy").exists());
+        assertTrue(pom.contains("<include>**/*Spec.java</include>"), pom);
+        assertTrue(pom.contains("<include>**/*Test.java</include>"), pom);
+    }
 
 }
