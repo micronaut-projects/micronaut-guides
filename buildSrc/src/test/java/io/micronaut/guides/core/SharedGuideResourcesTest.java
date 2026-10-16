@@ -11,9 +11,13 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @MicronautTest(startApplication = false)
 class SharedGuideResourcesTest {
@@ -50,6 +54,125 @@ class SharedGuideResourcesTest {
             if (python) {
                 assertFalse(Files.exists(project.resolve("src/main/resources/data.txt")));
                 assertFalse(Files.exists(project.resolve("src/test/resources/data.json")));
+                assertFalse(Files.exists(project.resolve("src/main")), "stale src/main must not be left empty");
+                assertFalse(Files.exists(project.resolve("src/test")), "stale src/test must not be left empty");
+            }
+        }
+    }
+
+    @Test
+    void doesNotCreateEmptySourceDirectoriesInPythonProjects() throws IOException {
+        Guide guide = guide("python-layout", null, "default");
+        Path source = source(guide, "default");
+        write(source.resolve("src/main/resources/data.txt"), "shared main");
+        write(source.resolve("src/test/resources/data.json"), "shared test");
+        write(source.resolve("python/src/example/app.py"), "app");
+        write(source.resolve("python/tests/test_app.py"), "test");
+
+        transfer(guide, "default");
+
+        for (GuidesOption option : GuideGenerationUtils.guidesOptions(guide, LOG)) {
+            Path project = project(guide, option, "default");
+            if (option.getLanguage() == Language.PYTHON) {
+                assertEquals(Set.of("src", "tests", "config", "tests-config"), children(project));
+                assertEquals(Set.of("example"), children(project.resolve("src")));
+                assertEquals("shared main", Files.readString(project.resolve("config/data.txt")));
+                assertEquals("shared test", Files.readString(project.resolve("tests-config/data.json")));
+            } else {
+                assertEquals("shared main", Files.readString(project.resolve("src/main/resources/data.txt")));
+                assertEquals("shared test", Files.readString(project.resolve("src/test/resources/data.json")));
+            }
+        }
+    }
+
+    @Test
+    void doesNotCopyJvmOnlyConfigurationIntoPython() throws IOException {
+        Guide guide = guide("jvm-only-resources", null, "default");
+        Path source = source(guide, "default");
+        write(source.resolve("src/main/resources/logback.xml"), "logging");
+        write(source.resolve("src/main/resources/bootstrap.properties"), "bootstrap");
+        write(source.resolve("src/main/resources/bootstrap-test.yml"), "bootstrap test");
+        write(source.resolve("src/main/resources/data.txt"), "data");
+        write(source.resolve("src/main/resources/static/bootstrap.min.css"), "css");
+        write(source.resolve("src/test/resources/logback-test.xml"), "test logging");
+        write(source.resolve("src/test/resources/bootstrap.yaml"), "test bootstrap");
+        write(source.resolve("src/test/resources/data.json"), "test data");
+
+        transfer(guide, "default");
+
+        for (GuidesOption option : GuideGenerationUtils.guidesOptions(guide, LOG)) {
+            Path project = project(guide, option, "default");
+            if (option.getLanguage() == Language.PYTHON) {
+                assertFalse(Files.exists(project.resolve("config/logback.xml")));
+                assertFalse(Files.exists(project.resolve("config/bootstrap.properties")));
+                assertFalse(Files.exists(project.resolve("config/bootstrap-test.yml")));
+                assertFalse(Files.exists(project.resolve("tests-config/logback-test.xml")));
+                assertFalse(Files.exists(project.resolve("tests-config/bootstrap.yaml")));
+                assertEquals("data", Files.readString(project.resolve("config/data.txt")));
+                assertEquals("css", Files.readString(project.resolve("config/static/bootstrap.min.css")));
+                assertEquals("test data", Files.readString(project.resolve("tests-config/data.json")));
+            } else {
+                assertEquals("logging", Files.readString(project.resolve("src/main/resources/logback.xml")));
+                assertEquals("bootstrap", Files.readString(project.resolve("src/main/resources/bootstrap.properties")));
+                assertEquals("bootstrap test", Files.readString(project.resolve("src/main/resources/bootstrap-test.yml")));
+                assertEquals("test logging", Files.readString(project.resolve("src/test/resources/logback-test.xml")));
+                assertEquals("test bootstrap", Files.readString(project.resolve("src/test/resources/bootstrap.yaml")));
+            }
+        }
+    }
+
+    @Test
+    void skipsSharedConfigurationThatPythonOverridesWithToml() throws IOException {
+        Guide guide = guide("toml-overrides", null, "default");
+        Path source = source(guide, "default");
+        write(source.resolve("src/main/resources/application.properties"), "shared");
+        write(source.resolve("src/main/resources/application.yml"), "shared yaml");
+        write(source.resolve("src/main/resources/other.properties"), "other");
+        write(source.resolve("src/test/resources/application-test.properties"), "shared test");
+        write(source.resolve("src/test/resources/other-test.properties"), "other test");
+        write(source.resolve("python/config/application.toml"), "python");
+        write(source.resolve("python/tests-config/application-test.toml"), "python test");
+
+        transfer(guide, "default");
+
+        for (GuidesOption option : GuideGenerationUtils.guidesOptions(guide, LOG)) {
+            Path project = project(guide, option, "default");
+            if (option.getLanguage() == Language.PYTHON) {
+                assertEquals("python", Files.readString(project.resolve("config/application.toml")));
+                assertFalse(Files.exists(project.resolve("config/application.properties")));
+                assertFalse(Files.exists(project.resolve("config/application.yml")));
+                assertEquals("other", Files.readString(project.resolve("config/other.properties")));
+                assertEquals("python test", Files.readString(project.resolve("tests-config/application-test.toml")));
+                assertFalse(Files.exists(project.resolve("tests-config/application-test.properties")));
+                assertEquals("other test", Files.readString(project.resolve("tests-config/other-test.properties")));
+            } else {
+                assertEquals("shared", Files.readString(project.resolve("src/main/resources/application.properties")));
+                assertEquals("shared yaml", Files.readString(project.resolve("src/main/resources/application.yml")));
+                assertEquals("shared test", Files.readString(project.resolve("src/test/resources/application-test.properties")));
+            }
+        }
+    }
+
+    @Test
+    void copiesSharedConfigurationWhenPythonHasNoTomlOverride() throws IOException {
+        Guide guide = guide("no-toml-override", null, "default");
+        Path source = source(guide, "default");
+        write(source.resolve("src/main/resources/application.properties"), "shared");
+        write(source.resolve("src/test/resources/application-test.properties"), "shared test");
+        // a TOML file for a different name, or in the other directory, is not an override
+        write(source.resolve("python/config/application-test.toml"), "python");
+        write(source.resolve("python/tests-config/application.toml"), "python test");
+
+        transfer(guide, "default");
+
+        for (GuidesOption option : GuideGenerationUtils.guidesOptions(guide, LOG)) {
+            Path project = project(guide, option, "default");
+            if (option.getLanguage() == Language.PYTHON) {
+                assertEquals("shared", Files.readString(project.resolve("config/application.properties")));
+                assertEquals("shared test", Files.readString(project.resolve("tests-config/application-test.properties")));
+            } else {
+                assertEquals("shared", Files.readString(project.resolve("src/main/resources/application.properties")));
+                assertEquals("shared test", Files.readString(project.resolve("src/test/resources/application-test.properties")));
             }
         }
     }
@@ -159,6 +282,13 @@ class SharedGuideResourcesTest {
         }
         filesTransferUtility.transferFiles(temporaryDirectory.resolve(guide.slug()).toFile(),
                 temporaryDirectory.resolve("generated").toFile(), guide);
+    }
+
+    private static Set<String> children(Path directory) throws IOException {
+        assertTrue(Files.isDirectory(directory), directory + " should be a directory");
+        try (Stream<Path> entries = Files.list(directory)) {
+            return entries.map(path -> path.getFileName().toString()).collect(Collectors.toSet());
+        }
     }
 
     private static void write(Path file, String content) throws IOException {
