@@ -16,10 +16,12 @@ def my_context(request):
 
 @pytest.fixture
 def client(my_context):
-    return requests.with_context(my_context)
+    with requests.with_context(my_context) as session:
+        yield session
 
 
 def test_health_endpoint_exposed(client):
     response = client.get("/health")  # <2>
 
     assert response.status_code == 200  # <3>
+    assert response.json()["status"] == "UP"
