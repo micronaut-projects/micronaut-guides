@@ -102,24 +102,39 @@ source:GraphQLDataFetchers[]
 :exclude-for-languages:python
 
 <2> Return a GraphQL `dataFetchingEnvironment` with the information about the query
+<3> Get the `id` parameter from the query
 
 :exclude-for-languages:
 
 :only-for-languages:python
 
-<2> Resolve a book from the query's `DataFetchingEnvironment`, returning `None` when it is not found
+<2> Resolve a book with a synchronous Python method, returning `None` when it is not found
+<3> Receive the query's `id` as a Python keyword argument; omitted and null values use `None`
 
 :only-for-languages:
 
-<3> Get the `id` parameter from the query
 <4> Access the repository to find the book. Remember that this should be backed by a real datastore
+
+:exclude-for-languages:python
+
 <5> Get the Book related to a specific author
+
+:exclude-for-languages:
+
+:only-for-languages:python
+
+<5> Receive the parent `Book` as the Python `source` argument
+
+:only-for-languages:
+
 <6> Get the Author
 <7> Access the repository to find the Author.
 
 :only-for-languages:python
 
-The singleton exposes typed Python resolver methods. Pass these bound methods directly to the GraphQL runtime wiring; no `DataFetcher` adapter classes are needed.
+The singleton exposes typed Python resolver methods with the signature `(source, info, **arguments)`.
+Pass these bound methods to `create_graphql`; no Java builders, environment accessors, or `DataFetcher` adapter classes are needed.
+`ResolverInfo` provides a Python dictionary snapshot of the GraphQL context as `info.context`.
 
 :only-for-languages:
 
@@ -130,24 +145,13 @@ Create the following factory that will bind the GraphQL schema to the code and t
 source:GraphQLFactory[]
 
 <1> Annotate the class with `@Factory` so the Micronaut framework knows that this class will create beans
-<2> Create a new `SchemaParser`
 :exclude-for-languages:python
 
+<2> Create a new `SchemaParser`
 <3> Get the previously created `schema.graphqls` file from the classpath
-
-:exclude-for-languages:
-
-:only-for-languages:python
-
-<3> Use the previously defined schema string
-
-:only-for-languages:
-
 <4> Parse the schema
 <5> Create the runtime wiring
 <6> Bind a data fetcher for the `bookById` query
-:exclude-for-languages:python
-
 <7> Bind a data fetcher to retrieve the author related to a book
 <8> Create the executable schema
 <9> Return the GraphQL bean
@@ -156,10 +160,16 @@ source:GraphQLFactory[]
 
 :only-for-languages:python
 
-<7> Bind the author resolver and map `pageCount` to the Python `page_count` attribute with `PropertyDataFetcher.fetching`
-<8> Map the author's `firstName` and `lastName` fields to its snake_case Python attributes
-<9> Create the executable schema
-<10> Return the GraphQL bean
+<2> Create the GraphQL bean with the Python schema and resolver API
+<3> Use the previously defined SDL schema string
+<4> Bind the Python method that resolves the `bookById` query
+<5> Bind the author resolver and map `pageCount` to the Python `page_count` attribute
+<6> Map the author's `firstName` and `lastName` fields to its snake_case Python attributes
+<7> Return the GraphQL bean used by Micronaut's `/graphql` endpoint
+
+Fields without an explicit binding use the matching Python attribute name, so `id` and `name` need no mapping.
+The Python factory and singleton decorators and the GraphQL bean type are imported through Pyronaut's curated facades.
+This variant requires the Micronaut GraphQL Python schema/resolver API and the corresponding Pyronaut facade support.
 
 :only-for-languages:
 

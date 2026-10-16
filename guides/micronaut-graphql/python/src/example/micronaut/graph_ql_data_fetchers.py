@@ -1,5 +1,5 @@
-from graphql.schema import DataFetchingEnvironment
-from jakarta.inject import Singleton
+from micronaut.graphql import ResolverInfo
+from pyronaut.context import Singleton
 
 from .author import Author
 from .book import Book
@@ -11,20 +11,27 @@ class GraphQLDataFetchers:
     def __init__(self, db_repository: DbRepository):  # <1>
         self._db_repository = db_repository
 
-    def book_by_id(self, data_fetching_environment: DataFetchingEnvironment) -> Book | None:  # <2>
-        book_id = data_fetching_environment.getArgument("id")  # <3>
+    def book_by_id(  # <2>
+        self,
+        source: object | None,
+        info: ResolverInfo,
+        id: str | None = None,  # <3>
+    ) -> Book | None:
         return next(  # <4>
             (
                 book
                 for book in self._db_repository.find_all_books()
-                if book.id == book_id
+                if book.id == id
             ),
             None,
         )
 
-    def author(self, data_fetching_environment: DataFetchingEnvironment) -> Author | None:
-        book = data_fetching_environment.getSource()  # <5>
-        author_book = book.author  # <6>
+    def author(
+        self,
+        source: Book,  # <5>
+        info: ResolverInfo,
+    ) -> Author | None:
+        author_book = source.author  # <6>
         return next(  # <7>
             (
                 author
