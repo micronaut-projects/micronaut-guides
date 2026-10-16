@@ -3,6 +3,8 @@ import requests
 
 from pyronaut.test import MicronautTest, micronaut_test_fixture
 
+from example.micronaut.fruit_repository import FruitRepository
+
 
 @pytest.fixture
 def my_context(request):
@@ -16,7 +18,7 @@ def my_context(request):
 
 @pytest.fixture
 def fruit_repository(my_context):
-    return my_context["example.micronaut.FruitRepository"]
+    return my_context[FruitRepository]
 
 
 @pytest.fixture(autouse=True)

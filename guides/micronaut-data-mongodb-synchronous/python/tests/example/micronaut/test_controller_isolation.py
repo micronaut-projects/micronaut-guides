@@ -11,7 +11,7 @@ from example.micronaut.fruit_service import FruitService
 
 @Singleton
 @Replaces(DefaultFruitService)
-@Requires(property="spec.name", value="controller-isolation")
+@Requires(property="spec.name", value="controller-isolation")  # <1>
 class MockService(FruitService):
     def list_fruits(self) -> list[Fruit]:
         return [
