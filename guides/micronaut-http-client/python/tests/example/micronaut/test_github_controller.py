@@ -1,8 +1,11 @@
 import json
+import logging
 import re
 
 import pytest
 import requests
+from logback import capture_logs, dictConfig
+from main import LOGGING
 from micronaut.context.annotation import Requires
 from micronaut.http.annotation import Controller, Get, Produces
 from micronaut.runtime.server import EmbeddedServer
@@ -73,3 +76,16 @@ def assert_releases(client, path: str):
 def test_github_releases_can_be_fetched(client):
     assert_releases(client, "/github/releases")
     assert_releases(client, "/github/releases-lowlevel")
+
+
+def test_http_client_logging_configuration(client):
+    dictConfig(LOGGING)
+    logger = logging.getLogger("io.micronaut.http.client")
+    with capture_logs(logger) as records:
+        logger.debug("Fetching GitHub releases")
+        assert_releases(client, "/github/releases-lowlevel")
+    assert any(record.getMessage() == "Fetching GitHub releases" for record in records)
+    assert any(
+        record.levelname == "TRACE" and record.getMessage() == "User-Agent: Micronaut HTTP Client"
+        for record in records
+    )

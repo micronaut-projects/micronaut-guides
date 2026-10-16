@@ -1,8 +1,4 @@
-import logging
-
 from logback.config import dictConfig
-
-logging.ALL = logging.NOTSET
 
 # tag::logging[]
 LOGGING = {
@@ -16,7 +12,7 @@ LOGGING = {
     "handlers": {
         "console": {
             "class": "logging.StreamHandler",
-            "level": "INFO",
+            "level": "TRACE",
             "formatter": "standard",
             "stream": "ext://sys.stdout"
         }
@@ -27,7 +23,7 @@ LOGGING = {
     },
     "loggers": {
         "io.micronaut.http.client": {
-            "level": "ALL"
+            "level": "TRACE"
         }
     }
 }
