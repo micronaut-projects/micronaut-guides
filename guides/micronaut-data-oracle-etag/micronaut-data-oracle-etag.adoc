@@ -102,10 +102,8 @@ Changes to fields excluded with `@ETagValue(exclude = true)`, or fields not sele
 
 Changes to fields annotated with `ETagValue(exclude=True)`, or fields not selected with explicit `ETagValue`, do not change the ETag. Always reload an entity after changing an ETag input before issuing another update.
 
-The Python tests construct a new `Book` or `Article`, retaining the original ID and ETag, and catch the specific
-`OptimisticLockException`; another exception does not satisfy the stale-write assertion.
-They also verify that a stale delete fails while a fresh delete succeeds, and that changing embedded
-`chapters` preserves the ETag while changing embedded `pages` changes it.
+The Python tests build the stale copy with the original ID and ETag and expect `OptimisticLockException` on the stale write.
+They also verify that a stale delete fails while a fresh delete succeeds, and that changing the embedded `chapters` preserves the ETag while changing the embedded `pages` changes it.
 Database cleanup runs before and after each test, before the application context is stopped.
 
 :only-for-languages:
