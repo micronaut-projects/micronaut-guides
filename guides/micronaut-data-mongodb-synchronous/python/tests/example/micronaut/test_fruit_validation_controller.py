@@ -5,7 +5,7 @@ from pyronaut.test import MicronautTest, micronaut_test_fixture
 
 
 @pytest.fixture
-def my_context(request):
+def my_context(request):  # <1>
     fixture = micronaut_test_fixture(
         request,
         MicronautTest(environments=["test"], transactional=False),
@@ -16,7 +16,7 @@ def my_context(request):
 
 @pytest.fixture
 def client(my_context):
-    return requests.with_context(my_context)
+    return requests.with_context(my_context)  # <2>
 
 
 def test_fruit_is_validated(client):
