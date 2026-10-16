@@ -5,7 +5,7 @@ from micronaut.views import View
 
 @Controller  # <1>
 class MessageController:
-    @Get(produces=MediaType.APPLICATION_JSON)  # <2>
+    @Get(produces=[MediaType.APPLICATION_JSON, MediaType.ALL])  # <2>
     def json_message(self) -> dict[str, str]:  # <3>
         return {"message": "Hello World"}
 

@@ -60,3 +60,11 @@ def test_prefers_html_when_it_has_the_higher_quality(client):
     assert response.status_code == 200
     assert response.headers["content-type"].startswith("text/html")
     assert "<h1>Hello World</h1>" in response.text
+
+
+def test_json_is_the_default_when_any_type_is_accepted(client):
+    response = client.get("/", headers={"Accept": "*/*"})
+
+    assert response.status_code == 200
+    assert response.headers["content-type"].startswith("application/json")
+    assert response.json() == {"message": "Hello World"}
