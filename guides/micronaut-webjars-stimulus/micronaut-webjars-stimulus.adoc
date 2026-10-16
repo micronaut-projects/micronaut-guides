@@ -30,10 +30,7 @@ ____
 
 We use https://www.webjars.org[WebJars] to load Stimulus into our application.
 
-:only-for-languages:python
-WebJars are an optional Micronaut static-asset packaging choice, not a general recommendation for Python dependency management. This guide uses a WebJar only to package JavaScript; Python code accesses it over HTTP, without importing Java APIs.
-:only-for-languages:
-
+:exclude-for-languages:python
 ____
 WebJars are client-side web libraries (e.g. jQuery & Bootstrap) packaged into JAR (Java Archive) files.
 
@@ -43,6 +40,11 @@ WebJars are client-side web libraries (e.g. jQuery & Bootstrap) packaged into JA
 * Transitive dependencies are automatically resolved and optionally loaded via RequireJS
 * Deployed on Maven Central
 ____
+:exclude-for-languages:
+
+:only-for-languages:python
+Add the Stimulus package as a dependency; Micronaut serves its files under `/webjars/**`.
+:only-for-languages:
 
 == WebJars via Static Resources
 
@@ -52,9 +54,9 @@ To use https://www.webjars.org[WebJars], we need to add a https://docs.micronaut
 resource:application.properties[tag=webjars]
 :exclude-for-languages:
 
-:exclude-for-languages:java
+:only-for-languages:python
 resource:application.toml[tag=webjars]
-:exclude-for-languages:
+:only-for-languages:
 
 == Stimulus via WebJars
 
@@ -63,7 +65,7 @@ You can obtain the https://stimulus.hotwired.dev[Stimulus] Maven coordinate in t
 :exclude-for-languages:
 
 :only-for-languages:python
-Add the Stimulus WebJar's Maven coordinate as a runtime dependency in `pyproject.toml`. Micronaut serves the packaged JavaScript through the configured static-resource route; the Python application does not import Java APIs.
+Add Stimulus as a runtime dependency in `pyproject.toml`. Micronaut serves its JavaScript files through the static-resource route configured above.
 :only-for-languages:
 
 dependency:hotwired__stimulus[groupId=org.webjars.npm,scope=runtimeOnly,version=@hotwired__stimulusVersion@]
@@ -79,9 +81,18 @@ test:WebJarsStimulusTest[]
 Create a controller that renders a https://micronaut-projects.github.io/micronaut-views/latest/guide[View].
 
 source:HomeController[]
+
+:exclude-for-languages:python
 callout:controller[arg0=/]
 callout:get-generic[]
 callout:view[]
+:exclude-for-languages:
+
+:only-for-languages:python
+callout:controller-pyronaut[arg0=/]
+callout:get-generic-pyronaut[]
+callout:view-pyronaut[]
+:only-for-languages:
 
 == View
 
@@ -102,6 +113,11 @@ The controller returns a native Python dictionary as the view model. The tests u
 :only-for-languages:
 
 test:HomeControllerTest[]
+
+:only-for-languages:python
+callout:micronaut-test-pyronaut[]
+callout:http-client-pyronaut[]
+:only-for-languages:
 
 common:testApp.adoc[]
 
