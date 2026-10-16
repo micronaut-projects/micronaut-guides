@@ -5,10 +5,16 @@ from pyronaut.test import MicronautTest, micronaut_test_fixture
 
 
 @pytest.fixture
-def client(request):
-    context = micronaut_test_fixture(request, MicronautTest(transactional=False))
-    yield requests.with_context(context)
-    context.stop()
+def my_context(request):
+    fixture = micronaut_test_fixture(request, MicronautTest(transactional=False))
+    yield fixture
+    fixture.stop()
+
+
+@pytest.fixture
+def client(my_context):
+    with requests.with_context(my_context) as session:
+        yield session
 
 
 def test_stores_and_finds_nearest_vectors(client):
