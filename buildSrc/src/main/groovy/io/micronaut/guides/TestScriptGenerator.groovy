@@ -243,6 +243,13 @@ if (noDaemon) {
 if (buildTool == PYRONAUT) {
 bashScript += """\
 pyronaut install || EXIT_STATUS=\$?
+if [ \$EXIT_STATUS -eq 0 ] && [ -f requirements-test.txt ]; then
+  if [ -f .venv/Scripts/python.exe ]; then
+    .venv/Scripts/python.exe -m pip install -r requirements-test.txt || EXIT_STATUS=\$?
+  else
+    .venv/bin/python -m pip install -r requirements-test.txt || EXIT_STATUS=\$?
+  fi
+fi
 pyronaut validate-config || EXIT_STATUS=\$?
 pyronaut test || EXIT_STATUS=\$?
 """
