@@ -80,6 +80,8 @@ public class DefaultTestScriptGenerator implements TestScriptGenerator {
         }
 
         if (buildTool == PYRONAUT) {
+            // TODO: drop the requirements-test.txt block once a Pyronaut release includes
+            // micronaut-projects/pyronaut#385, which makes `pyronaut install` read it.
             bashScript.append(
                     """
                             pyronaut install || EXIT_STATUS=$?
