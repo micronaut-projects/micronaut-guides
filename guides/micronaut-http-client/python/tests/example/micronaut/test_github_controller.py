@@ -79,6 +79,7 @@ def test_github_releases_can_be_fetched(client):
 
 
 def test_http_client_logging_configuration(client):
+    assert LOGGING["handlers"]["console"]["level"] == "TRACE"
     dictConfig(LOGGING)
     logger = logging.getLogger("io.micronaut.http.client")
     with capture_logs(logger) as records:
