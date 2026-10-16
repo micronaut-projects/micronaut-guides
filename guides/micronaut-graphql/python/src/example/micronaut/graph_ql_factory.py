@@ -1,9 +1,6 @@
-from graphql import GraphQL
-from graphql.schema import PropertyDataFetcher
-from graphql.schema.idl import RuntimeWiring, SchemaGenerator, SchemaParser
-from graphql.schema.idl import TypeRuntimeWiring
-from jakarta.inject import Singleton
-from micronaut.context.annotation import Factory
+from micronaut.graphql import create_graphql
+from pyronaut.context import Factory, Singleton
+from pyronaut.graphql import GraphQL
 
 from .graph_ql_data_fetchers import GraphQLDataFetchers
 from .schema import SCHEMA
@@ -16,38 +13,14 @@ class GraphQLFactory:
         self,
         graph_ql_data_fetchers: GraphQLDataFetchers,
     ) -> GraphQL:
-        schema_parser = SchemaParser()  # <2>
-
-        graphql_schema = SCHEMA  # <3>
-        type_registry = schema_parser.parse(graphql_schema)  # <4>
-
-        runtime_wiring = (
-            RuntimeWiring.newRuntimeWiring()  # <5>
-            .type(
-                TypeRuntimeWiring.newTypeWiring("Query").dataFetcher(
-                    "bookById",
-                    graph_ql_data_fetchers.book_by_id,
-                )
-            )  # <6>
-            .type(
-                TypeRuntimeWiring.newTypeWiring("Book")
-                .dataFetcher("author", graph_ql_data_fetchers.author)
-                .dataFetcher(
-                    "pageCount", PropertyDataFetcher.fetching("page_count")
-                )
-            )  # <7>
-            .type(
-                TypeRuntimeWiring.newTypeWiring("Author")
-                .dataFetcher("firstName", PropertyDataFetcher.fetching("first_name"))
-                .dataFetcher("lastName", PropertyDataFetcher.fetching("last_name"))
-            )  # <8>
-            .build()
-        )
-
-        schema_generator = SchemaGenerator()
-        graph_ql_schema = schema_generator.makeExecutableSchema(
-            type_registry,
-            runtime_wiring,
-        )  # <9>
-
-        return GraphQL.newGraphQL(graph_ql_schema).build()  # <10>
+        return create_graphql(  # <2>
+            SCHEMA,  # <3>
+            bindings={
+                "Query": {"bookById": graph_ql_data_fetchers.book_by_id},  # <4>
+                "Book": {  # <5>
+                    "author": graph_ql_data_fetchers.author,
+                    "pageCount": "page_count",
+                },
+                "Author": {"firstName": "first_name", "lastName": "last_name"},  # <6>
+            },
+        )  # <7>
