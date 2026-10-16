@@ -13,10 +13,23 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 public class CopyFileVisitor extends SimpleFileVisitor<Path> {
 
     private final Path targetPath;
+    private final boolean createDirectoriesLazily;
     private Path sourcePath;
 
     public CopyFileVisitor(Path targetPath) {
+        this(targetPath, false);
+    }
+
+    /**
+     * @param targetPath the directory the walked tree is copied into
+     * @param createDirectoriesLazily when {@code true}, destination directories are only created once a file is
+     *                                copied into them, so source directories that end up with nothing copied
+     *                                (for example because their only content is skipped) leave no empty
+     *                                directory behind
+     */
+    public CopyFileVisitor(Path targetPath, boolean createDirectoriesLazily) {
         this.targetPath = targetPath;
+        this.createDirectoriesLazily = createDirectoriesLazily;
     }
 
     @Override
@@ -24,7 +37,7 @@ public class CopyFileVisitor extends SimpleFileVisitor<Path> {
                                              final BasicFileAttributes attrs) throws IOException {
         if (sourcePath == null) {
             sourcePath = dir;
-        } else {
+        } else if (!createDirectoriesLazily) {
             Files.createDirectories(targetPath.resolve(sourcePath.relativize(dir)));
         }
         return CONTINUE;
@@ -33,11 +46,11 @@ public class CopyFileVisitor extends SimpleFileVisitor<Path> {
     @Override
     public FileVisitResult visitFile(final Path file,
                                      final BasicFileAttributes attrs) throws IOException {
-        Files.copy(
-                file,
-                targetPath.resolve(sourcePath.relativize(file)),
-                REPLACE_EXISTING
-        );
+        Path target = targetPath.resolve(sourcePath.relativize(file));
+        if (createDirectoriesLazily) {
+            Files.createDirectories(target.getParent());
+        }
+        Files.copy(file, target, REPLACE_EXISTING);
         return CONTINUE;
     }
 }
