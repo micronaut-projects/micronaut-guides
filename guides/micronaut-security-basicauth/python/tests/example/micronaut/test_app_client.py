@@ -6,7 +6,6 @@ from micronaut.http.annotation import Consumes, Get, Header
 from micronaut.http.client.annotation import Client
 
 
-# tag::clazz[]
 @Client("/")
 class AppClient(ABC):
     @Consumes(MediaType.TEXT_PLAIN)  # <1>
@@ -14,4 +13,3 @@ class AppClient(ABC):
     @abstractmethod
     def home(self, authorization: Annotated[str, Header]) -> str:  # <2>
         ...
-# end::clazz[]
