@@ -1,54 +1,56 @@
+"""Write config/git.properties, the file the /info endpoint reads, from the current Git commit."""
+
 from pathlib import Path
 import subprocess
 
+ESCAPES = {"\\": r"\\", "\n": r"\n", "\r": r"\r", "\t": r"\t", "=": r"\=", ":": r"\:", "#": r"\#", "!": r"\!"}
 
-# tag::clazz[]
-def generate_git_properties(project_dir: Path | None = None) -> Path:
-    root = (project_dir or Path.cwd()).resolve()
-    output = root / "config" / "git.properties"
-    values = {
-        "git.branch": _git(root, "rev-parse", "--abbrev-ref", "HEAD"),
-        "git.commit.id": _git(root, "rev-parse", "HEAD"),
-        "git.commit.message.short": _git(root, "show", "-s", "--format=%s", "HEAD"),
-        "git.commit.message.full": _git(root, "show", "-s", "--format=%B", "HEAD"),
-        "git.commit.time": _git(root, "show", "-s", "--format=%ct", "HEAD"),
-        "git.commit.user.name": _git(root, "show", "-s", "--format=%an", "HEAD"),
-        "git.commit.user.email": _git(root, "show", "-s", "--format=%ae", "HEAD"),
-        "git.dirty": str(bool(_git(root, "status", "--porcelain"))).lower(),
+
+def git(*args, cwd="."):
+    return subprocess.check_output(["git", *args], cwd=cwd, text=True).strip()
+
+
+def git_info(project_dir="."):
+    """Collect the values the /info endpoint exposes under the git key."""
+    def commit(placeholder):
+        return git("log", "-1", f"--format={placeholder}", cwd=project_dir)
+
+    return {
+        "git.branch": git("rev-parse", "--abbrev-ref", "HEAD", cwd=project_dir),
+        "git.commit.id": commit("%H"),
+        "git.commit.id.abbrev": commit("%h"),
+        "git.commit.id.describe": git("describe", "--always", "--dirty", cwd=project_dir),
+        "git.commit.time": commit("%ct"),
+        "git.commit.message.short": commit("%s"),
+        "git.commit.message.full": commit("%B"),
+        "git.commit.user.name": commit("%an"),
+        "git.commit.user.email": commit("%ae"),
+        "git.dirty": str(bool(git("status", "--porcelain", cwd=project_dir))).lower(),
     }
-    output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(
-        "".join(f"{key}={_property_value(value)}\n" for key, value in values.items()),
-        encoding="ascii",
-    )
+
+
+def _escape(value):
+    # The /info endpoint reads git.properties as Latin-1 rather than UTF-8, so separators and control
+    # characters are escaped and every character outside ASCII is written as \uXXXX UTF-16 code units.
+    escaped = ""
+    for char in value:
+        if char in ESCAPES:
+            escaped += ESCAPES[char]
+        elif " " <= char <= "~":
+            escaped += char
+        else:
+            units = char.encode("utf-16-be").hex()
+            escaped += "".join(f"\\u{units[i:i + 4]}" for i in range(0, len(units), 4))
+    return "\\" + escaped if escaped.startswith(" ") else escaped
+
+
+def generate_git_properties(project_dir="."):
+    """Write config/git.properties for the repository in project_dir and return its path."""
+    output = Path(project_dir, "config", "git.properties")
+    output.parent.mkdir(exist_ok=True)
+    output.write_text("".join(f"{key}={_escape(value)}\n" for key, value in git_info(project_dir).items()))
     return output
 
 
-def _git(root: Path, *args: str) -> str:
-    return subprocess.run(
-        ["git", "-C", str(root), *args],
-        check=True,
-        stdout=subprocess.PIPE,
-    ).stdout.decode("utf-8").removesuffix("\n")
-
-
-def _property_value(value: str) -> str:
-    escapes = {
-        "\\": "\\\\", "\t": "\\t", "\n": "\\n", "\r": "\\r", "\f": "\\f",
-        " ": "\\ ", "=": "\\=", ":": "\\:", "#": "\\#", "!": "\\!",
-    }
-    result = []
-    for character in value:
-        if character in escapes:
-            result.append(escapes[character])
-        elif "!" <= character <= "~":
-            result.append(character)
-        else:
-            encoded = character.encode("utf-16-be").hex()
-            result.extend("\\u" + encoded[i:i + 4] for i in range(0, len(encoded), 4))
-    return "".join(result)
-# end::clazz[]
-
-
 if __name__ == "__main__":
-    generate_git_properties()
+    print(f"Wrote {generate_git_properties()}")
