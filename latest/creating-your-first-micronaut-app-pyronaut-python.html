@@ -123,7 +123,11 @@
 </ul>
 </li>
 <li><a href="#testing-the-application">5. Testing the Application</a></li>
-<li><a href="#running-the-application">6. Running the Application</a></li>
+<li><a href="#running-the-application">6. Running the Application</a>
+<ul class="sectlevel2">
+<li><a href="#logging">6.1. Logging</a></li>
+</ul>
+</li>
 <li><a href="#license">7. License</a></li>
 </ul>
 
@@ -193,6 +197,9 @@
 <pre class="rouge highlight"><code data-lang="bash">pyronaut create example.micronaut.micronautguide</code></pre>
 </div>
 </div>
+<div class="paragraph">
+<p>The HTTP endpoint below is an ordinary Python function. Micronaut&#8217;s decorators define its route and response content type; a controller class is not required.</p>
+</div>
 <div class="sect2">
 <h3 id="controller">4.1. Controller</h3>
 <div class="paragraph">
@@ -239,7 +246,6 @@
 <pre class="rouge highlight"><code data-lang="python"><span class="kn">import</span> <span class="nn">pytest</span>
 <span class="kn">import</span> <span class="nn">requests</span>
 
-<span class="kn">from</span> <span class="nn">micronaut.runtime.server</span> <span class="kn">import</span> <span class="n">EmbeddedServer</span>
 <span class="kn">from</span> <span class="nn">pyronaut.test</span> <span class="kn">import</span> <span class="n">MicronautTest</span><span class="p">,</span> <span class="n">micronaut_test_fixture</span>
 
 
@@ -254,14 +260,16 @@
 
 
 <span class="o">@</span><span class="n">pytest</span><span class="p">.</span><span class="n">fixture</span>
-<span class="k">def</span> <span class="nf">base_url</span><span class="p">(</span><span class="n">my_context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="n">server</span> <span class="o">=</span> <span class="n">my_context</span><span class="p">[</span><span class="n">EmbeddedServer</span><span class="p">]</span>
-    <span class="k">return</span> <span class="sa">f</span><span class="s">"http://localhost:</span><span class="si">{</span><span class="n">server</span><span class="p">.</span><span class="n">getPort</span><span class="p">()</span><span class="si">}</span><span class="s">"</span>
+<span class="k">def</span> <span class="nf">client</span><span class="p">(</span><span class="n">my_context</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">requests</span><span class="p">.</span><span class="n">with_context</span><span class="p">(</span><span class="n">my_context</span><span class="p">)</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="n">session</span>
 
 
-<span class="k">def</span> <span class="nf">test_hello_world_response</span><span class="p">(</span><span class="n">base_url</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-    <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s">"</span><span class="si">{</span><span class="n">base_url</span><span class="si">}</span><span class="s">/hello"</span><span class="p">)</span>  <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="k">def</span> <span class="nf">test_hello_world_response</span><span class="p">(</span><span class="n">client</span><span class="p">):</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">"/hello"</span><span class="p">)</span>  <i class="conum" data-value="2"></i><b>(2)</b>
 
+    <span class="k">assert</span> <span class="n">response</span><span class="p">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span>
+    <span class="k">assert</span> <span class="n">response</span><span class="p">.</span><span class="n">headers</span><span class="p">[</span><span class="s">"content-type"</span><span class="p">].</span><span class="n">startswith</span><span class="p">(</span><span class="s">"text/plain"</span><span class="p">)</span>
     <span class="k">assert</span> <span class="n">response</span><span class="p">.</span><span class="n">text</span> <span class="o">==</span> <span class="s">"Hello World"</span>  <i class="conum" data-value="3"></i><b>(3)</b></code></pre>
 </div>
 </div>
@@ -280,6 +288,9 @@
 <td>Verify the response body.</td>
 </tr>
 </table>
+</div>
+<div class="paragraph">
+<p><code>requests.with_context</code> connects the test client to the application&#8217;s assigned port, so tests do not need to construct a server URL or access the embedded server directly.</p>
 </div>
 </div>
 </div>
@@ -306,16 +317,50 @@ pyronaut <span class="nb">test</span></code></pre>
 <p>To run the application, use the <code>pyronaut dev</code> command, which starts the application on port 8080.</p>
 </div>
 <div class="paragraph">
-<p>You can execute the endpoint exposed by the native executable:</p>
+<p>With the application running, call the endpoint:</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="bash">curl localhost:8080/hello</code></pre>
 </div>
 </div>
+<div class="paragraph">
+<p>The response is <code>Hello World</code>.</p>
+</div>
+<div class="sect2">
+<h3 id="logging">6.1. Logging</h3>
+<div class="paragraph">
+<p>Pyronaut configures logging in <code>src/main.py</code>:</p>
+</div>
 <div class="listingblock">
+<div class="title">src/main.py</div>
 <div class="content">
-<pre class="rouge highlight"><code>Hello World</code></pre>
+<pre class="rouge highlight"><code data-lang="py"><span class="kn">from</span> <span class="nn">logback.config</span> <span class="kn">import</span> <span class="n">dictConfig</span>
+
+<span class="n">LOGGING</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">"version"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s">"disable_existing_loggers"</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+    <span class="s">"formatters"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">"colored"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">"format"</span><span class="p">:</span> <span class="s">"%cyan(%d{HH:mm:ss.SSS}) %highlight(%-5level) %magenta(%logger{36}): %msg"</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="s">"handlers"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">"console"</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s">"class"</span><span class="p">:</span> <span class="s">"logging.StreamHandler"</span><span class="p">,</span>
+            <span class="s">"level"</span><span class="p">:</span> <span class="s">"INFO"</span><span class="p">,</span>
+            <span class="s">"formatter"</span><span class="p">:</span> <span class="s">"colored"</span><span class="p">,</span>
+            <span class="s">"stream"</span><span class="p">:</span> <span class="s">"ext://sys.stdout"</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="s">"root"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s">"level"</span><span class="p">:</span> <span class="s">"INFO"</span><span class="p">,</span>
+        <span class="s">"handlers"</span><span class="p">:</span> <span class="p">[</span><span class="s">"console"</span><span class="p">]</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="n">dictConfig</span><span class="p">(</span><span class="n">LOGGING</span><span class="p">)</span></code></pre>
+</div>
 </div>
 </div>
 </div>

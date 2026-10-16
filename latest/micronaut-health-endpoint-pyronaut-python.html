@@ -231,13 +231,15 @@
 
 <span class="o">@</span><span class="n">pytest</span><span class="p">.</span><span class="n">fixture</span>
 <span class="k">def</span> <span class="nf">client</span><span class="p">(</span><span class="n">my_context</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">requests</span><span class="p">.</span><span class="n">with_context</span><span class="p">(</span><span class="n">my_context</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">requests</span><span class="p">.</span><span class="n">with_context</span><span class="p">(</span><span class="n">my_context</span><span class="p">)</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="n">session</span>
 
 
 <span class="k">def</span> <span class="nf">test_health_endpoint_exposed</span><span class="p">(</span><span class="n">client</span><span class="p">):</span>
     <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">"/health"</span><span class="p">)</span>  <i class="conum" data-value="2"></i><b>(2)</b>
 
-    <span class="k">assert</span> <span class="n">response</span><span class="p">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span>  <i class="conum" data-value="3"></i><b>(3)</b></code></pre>
+    <span class="k">assert</span> <span class="n">response</span><span class="p">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span>  <i class="conum" data-value="3"></i><b>(3)</b>
+    <span class="k">assert</span> <span class="n">response</span><span class="p">.</span><span class="n">json</span><span class="p">()[</span><span class="s">"status"</span><span class="p">]</span> <span class="o">==</span> <span class="s">"UP"</span></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -248,11 +250,11 @@
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>The test sends an HTTP request with a context-bound <code>requests</code> client.</td>
+<td>The test sends an HTTP request with a context-bound <code>requests</code> session. The fixture closes the session when the test finishes; no server port or base URL needs to be constructed.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>The health endpoint returns information about the "health" of the application, which is determined by any number of "health indicators".</td>
+<td>The health endpoint returns HTTP 200 and a JSON object whose <code>status</code> is <code>UP</code>. <code>response.json()</code> makes the body available as a Python dictionary.</td>
 </tr>
 </table>
 </div>
@@ -298,7 +300,8 @@ The leading and trailing <code>/</code> are required for <code>endpoints.all.pat
 
 <span class="o">@</span><span class="n">pytest</span><span class="p">.</span><span class="n">fixture</span>
 <span class="k">def</span> <span class="nf">client</span><span class="p">(</span><span class="n">my_context</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">requests</span><span class="p">.</span><span class="n">with_context</span><span class="p">(</span><span class="n">my_context</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">requests</span><span class="p">.</span><span class="n">with_context</span><span class="p">(</span><span class="n">my_context</span><span class="p">)</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="n">session</span>
 
 
 <span class="k">def</span> <span class="nf">test_health_endpoint_exposed_at_non_default_endpoints_path</span><span class="p">(</span><span class="n">client</span><span class="p">):</span>
@@ -313,7 +316,7 @@ The leading and trailing <code>/</code> are required for <code>endpoints.all.pat
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Sets the base path for all management endpoints to <code>/endpoints/</code>. This is normally specified in the application configuration (e.g. <code>config/application.toml</code>).</td>
+<td>Sets the base path for all management endpoints to <code>/endpoints/</code> for this test. To set it for the application, configure <code>endpoints.all.path</code> in <code>config/application.toml</code>.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
@@ -358,7 +361,8 @@ The leading and trailing <code>/</code> are required for <code>endpoints.all.pat
 
 <span class="o">@</span><span class="n">pytest</span><span class="p">.</span><span class="n">fixture</span>
 <span class="k">def</span> <span class="nf">client</span><span class="p">(</span><span class="n">my_context</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">requests</span><span class="p">.</span><span class="n">with_context</span><span class="p">(</span><span class="n">my_context</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">requests</span><span class="p">.</span><span class="n">with_context</span><span class="p">(</span><span class="n">my_context</span><span class="p">)</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="n">session</span>
 
 
 <span class="k">def</span> <span class="nf">test_health_endpoint_exposes_out_of_disk_space</span><span class="p">(</span><span class="n">client</span><span class="p">):</span>
@@ -372,7 +376,7 @@ The leading and trailing <code>/</code> are required for <code>endpoints.all.pat
 <table>
 <tr>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Sets the <code>endpoints.health.disk-space.threshold</code> property to an impossibly high value to force a service down status. This is normally specified in the application configuration (e.g. <code>config/application.toml</code>).</td>
+<td>Sets the <code>endpoints.health.disk-space.threshold</code> property to an impossibly high value for this test. To set it for the application, configure the property in <code>config/application.toml</code>.</td>
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
