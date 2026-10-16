@@ -33,6 +33,12 @@ class SharedGuideResourcesTest {
         Guide guide = guide("shared-resources", null, "default");
         write(source(guide, "default").resolve("src/main/resources/data.txt"), "shared main");
         write(source(guide, "default").resolve("src/test/resources/data.json"), "shared test");
+        for (GuidesOption option : GuideGenerationUtils.guidesOptions(guide, LOG)) {
+            if (option.getLanguage() == Language.PYTHON) {
+                write(project(guide, option, "default").resolve("src/main/resources/data.txt"), "stale main");
+                write(project(guide, option, "default").resolve("src/test/resources/data.json"), "stale test");
+            }
+        }
 
         transfer(guide, "default");
 
@@ -78,6 +84,8 @@ class SharedGuideResourcesTest {
         Path source = source(guide, "default");
         write(source.resolve("src/main/resources/application.properties"), "shared");
         write(source.resolve("jvm/src/main/resources/application.properties"), "jvm");
+        write(source.resolve("src/main/resources/layer.txt"), "shared");
+        write(source.resolve("jvm/src/main/resources/layer.txt"), "jvm");
         for (String language : new String[]{"java", "groovy", "kotlin"}) {
             write(source.resolve(language).resolve("src/main/resources/application.properties"), language);
         }
@@ -86,8 +94,11 @@ class SharedGuideResourcesTest {
         transfer(guide, "default");
 
         for (GuidesOption option : GuideGenerationUtils.guidesOptions(guide, LOG)) {
-            String resource = option.getLanguage() == Language.PYTHON ? "config/application.properties" : "src/main/resources/application.properties";
+            boolean python = option.getLanguage() == Language.PYTHON;
+            String resource = python ? "config/application.properties" : "src/main/resources/application.properties";
             assertEquals(option.getLanguage().toString(), Files.readString(project(guide, option, "default").resolve(resource)));
+            String layer = python ? "config/layer.txt" : "src/main/resources/layer.txt";
+            assertEquals(python ? "shared" : "jvm", Files.readString(project(guide, option, "default").resolve(layer)));
         }
     }
 
