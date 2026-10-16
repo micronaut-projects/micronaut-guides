@@ -31,8 +31,8 @@ class DocumentController {
 
     @Post
     HttpResponse<DocumentCreated> create(@Body DocumentRequest request) {
-        String content = required(request.content) // <1>
-        Document saved = documents.save(new Document(content: content, embedding: embeddings.embed(content)))
+        String content = required(request.content)
+        Document saved = documents.save(new Document(content: content, embedding: embeddings.embed(content))) // <1>
         HttpResponse.created(new DocumentCreated(saved.id, saved.content))
     }
 

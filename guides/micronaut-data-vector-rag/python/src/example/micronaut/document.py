@@ -7,9 +7,9 @@ from micronaut.data.model.vector import FloatVector
 from .embeddings import DIMENSIONS
 
 
-@dataclass
 @MappedEntity("documents")
+@dataclass
 class Document:
-    id: Annotated[int | None, Id, GeneratedValue("IDENTITY")]
     content: str
     embedding: Annotated[FloatVector, VectorStorage(length=DIMENSIONS)]
+    id: Annotated[int | None, Id, GeneratedValue("IDENTITY")] = None

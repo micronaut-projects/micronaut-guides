@@ -30,8 +30,8 @@ final class DocumentController {
 
     @Post
     HttpResponse<DocumentCreated> create(@Body DocumentRequest request) {
-        var content = required(request.content()); // <1>
-        var saved = documents.save(new Document(null, content, embeddings.embed(content)));
+        var content = required(request.content());
+        var saved = documents.save(new Document(null, content, embeddings.embed(content))); // <1>
         return HttpResponse.created(new DocumentCreated(saved.id(), saved.content()));
     }
 

@@ -20,8 +20,8 @@ class DocumentController(private val documents: DocumentRepository, private val 
 
     @Post
     fun create(@Body request: DocumentRequest): HttpResponse<DocumentCreated> {
-        val content = required(request.content) // <1>
-        val saved = documents.save(Document(null, content, embeddings.embed(content)))
+        val content = required(request.content)
+        val saved = documents.save(Document(null, content, embeddings.embed(content))) // <1>
         return HttpResponse.created(DocumentCreated(saved.id, saved.content))
     }
 

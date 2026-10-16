@@ -9,5 +9,5 @@ from .document import Document
 @JdbcRepository(dialect="ORACLE")
 class DocumentRepository(CrudRepository[Document, int]):
     def searchTop3ByEmbeddingNear(
-        self, vector: FloatVector, maxDistance: Score, scoringFunction: ScoringFunction
+        self, vector: FloatVector, max_distance: Score, scoring_function: ScoringFunction
     ) -> SearchResults[Document]: ...
