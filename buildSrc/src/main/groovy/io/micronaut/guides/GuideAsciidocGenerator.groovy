@@ -76,13 +76,12 @@ class GuideAsciidocGenerator {
         allLines.add("")
         allLines.add(COMMON_LICENSE)
 
-        List<String> rawLinesExpanded = expandMacros(allLines, projectDir)
-
         List<GuidesOption> guidesOptionList = GuideProjectGenerator.guidesOptions(metadata)
                 .findAll { GuidesOption option -> languageFilter == null || option.language == languageFilter }
         for (GuidesOption guidesOption : guidesOptionList) {
             String projectName = "${metadata.slug()}-${guidesOption.buildTool}-${guidesOption.language}"
 
+            List<String> rawLinesExpanded = expandMacros(allLines, projectDir, guidesOption)
             List<String> lines = []
             boolean excludeLineForLanguage = false
             boolean excludeLineForMinJdk = false
@@ -286,7 +285,7 @@ class GuideAsciidocGenerator {
         features
     }
 
-    private static List<String> expandMacros(List<String> lines, File projectDir) {
+    private static List<String> expandMacros(List<String> lines, File projectDir, GuidesOption guidesOption) {
         List<String> rawLines = []
         for (String rawLine : lines) {
 
@@ -295,15 +294,15 @@ class GuideAsciidocGenerator {
             }
 
             if (rawLine.startsWith(CALLOUT) && rawLine.endsWith(']')) {
-                rawLines << callout(rawLine, projectDir)
+                rawLines << callout(rawLine, projectDir, guidesOption)
             } else if (rawLine.startsWith(INCLUDE_COMMONDIR) && rawLine.endsWith('[]')) {
-                include rawLine, rawLines, projectDir, true
+                include rawLine, rawLines, projectDir, true, guidesOption
             } else if (rawLine.startsWith(EXTERNAL) && rawLine.endsWith(']')) {
-                include rawLine, rawLines, projectDir, false
+                include rawLine, rawLines, projectDir, false, guidesOption
             } else if (rawLine.startsWith(COMMON_PARAMETRIZED) && rawLine.endsWith(']')) {
-                rawLines.addAll includeParametrized(rawLine, projectDir, true)
+                rawLines.addAll includeParametrized(rawLine, projectDir, true, guidesOption)
             } else if (rawLine.startsWith(EXTERNAL_PARAMETRIZED) && rawLine.endsWith(']')) {
-                rawLines.addAll includeParametrized(rawLine, projectDir, false)
+                rawLines.addAll includeParametrized(rawLine, projectDir, false, guidesOption)
             } else {
                 rawLines << rawLine
             }
@@ -311,14 +310,15 @@ class GuideAsciidocGenerator {
         return rawLines
     }
 
-    private static String callout(String rawLine, File projectDir) {
+    private static String callout(String rawLine, File projectDir, GuidesOption guidesOption) {
         String relativePath = parseFileName(rawLine, CALLOUT)
                 .orElseThrow(() -> new GradleException("could not parse filename from callout for line: " + rawLine))
         relativePath = 'src/docs/common/callouts/callout-' + relativePath
+        relativePath = pyronautVariant(relativePath, projectDir, guidesOption)
 
         File file = new File(projectDir, relativePath)
 
-        List<String> newLines = commonLines(file, projectDir)
+        List<String> newLines = commonLines(file, projectDir, guidesOption)
 
         String line = newLines.first()
 
@@ -332,7 +332,7 @@ class GuideAsciidocGenerator {
         line
     }
 
-    private static List<String> includeParametrized(String rawLine, File projectDir, boolean snippet) {
+    private static List<String> includeParametrized(String rawLine, File projectDir, boolean snippet, GuidesOption guidesOption) {
 
         String prefix = snippet ? COMMON_PARAMETRIZED : EXTERNAL_PARAMETRIZED
 
@@ -347,7 +347,7 @@ class GuideAsciidocGenerator {
 
         File file = new File(projectDir, relativePath)
 
-        List<String> newLines = commonLines(file, projectDir)
+        List<String> newLines = commonLines(file, projectDir, guidesOption)
 
         String pattern = "(\\{(\\d+)(_?([UL])?)})"
 
@@ -383,7 +383,7 @@ class GuideAsciidocGenerator {
     }
 
     private static void include(String rawLine, List<String> rawLines, File projectDir,
-                                boolean snippet) {
+                                boolean snippet, GuidesOption guidesOption) {
 
         String prefix = snippet ? INCLUDE_COMMONDIR : EXTERNAL
 
@@ -392,6 +392,7 @@ class GuideAsciidocGenerator {
 
         if (snippet) {
             relativePath = 'src/docs/common/snippets/common-' + relativePath
+            relativePath = pyronautVariant(relativePath, projectDir, guidesOption)
         } else {
             relativePath = 'guides/' + relativePath
         }
@@ -399,7 +400,7 @@ class GuideAsciidocGenerator {
         File file = new File(projectDir, relativePath)
 
         rawLines << '// Start: ' + relativePath
-        rawLines.addAll commonLines(file, projectDir)
+        rawLines.addAll commonLines(file, projectDir, guidesOption)
         rawLines << '// End: ' + relativePath
     }
 
@@ -428,9 +429,23 @@ class GuideAsciidocGenerator {
         Optional.empty()
     }
 
-    private static List<String> commonLines(File file, File projectDir) {
+    private static List<String> commonLines(File file, File projectDir, GuidesOption guidesOption) {
         assert file.exists()
-        return expandMacros(file.readLines(), projectDir)
+        return expandMacros(file.readLines(), projectDir, guidesOption)
+    }
+
+    /**
+     * For Pyronaut options, a callout or common snippet resolves to its {@code -pyronaut} sibling
+     * (for example {@code callout-micronaut-test-pyronaut.adoc}) when that file exists.
+     */
+    private static String pyronautVariant(String relativePath, File projectDir, GuidesOption guidesOption) {
+        if (guidesOption.buildTool == PYRONAUT) {
+            String variantPath = relativePath.substring(0, relativePath.length() - '.adoc'.length()) + '-pyronaut.adoc'
+            if (new File(projectDir, variantPath).exists()) {
+                return variantPath
+            }
+        }
+        relativePath
     }
 
     private static boolean shouldProcessLine(String line, String macro) {
