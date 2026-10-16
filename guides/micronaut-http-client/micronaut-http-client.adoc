@@ -16,9 +16,13 @@ To use the https://docs.micronaut.io/snapshot/guide/#nettyHttpClient[Micronaut H
 
 dependency:micronaut-http-client[groupId=io.micronaut]
 
+:exclude-for-languages:python
+
 To use the https://docs.micronaut.io/snapshot/guide/#jdkHttpClient[Micronaut HTTP Client based on Java HTTP Client], add the following dependency:
 
 dependency:micronaut-http-client-jdk[groupId=io.micronaut]
+
+:exclude-for-languages:
 
 === GitHub API
 
@@ -100,6 +104,8 @@ resource:application.toml[tag=githubapi]
 
 :only-for-languages:
 
+:exclude-for-languages:python
+
 === Low Level Client
 
 Initially, you will create a Bean which uses the low-level Client API.
@@ -109,42 +115,45 @@ Create `GithubLowLevelClient`:
 source:GithubLowLevelClient[]
 
 callout:singleton[]
-:exclude-for-languages:python
 <.> Inject `HttpClient` via constructor injection. The `@Client` `id` member uses `github`; the service identifier set in the configuration.
 <.> Inject the previously defined configuration parameters.
-:exclude-for-languages:
-:only-for-languages:python
-<.> Inject `HttpClient` into an annotated class attribute. The `@Client` `id` member uses `github`; the service identifier set in the configuration.
-<.> Inject the previously defined configuration parameters into an annotated class attribute.
-:only-for-languages:
 callout:http-request[]
 <.> GitHub API requires to set the `User-Agent` header.
-:exclude-for-languages:python
 <.> GitHub encourages to explicitly request the version 3 via the `Accept` header. With `@Header`, you add the `Accept: application/vnd.github.v3+json` HTTP header to every request.
 <.> Use `retrieve` to perform an HTTP request for the given request object and convert the full HTTP response's body into the specified type. e.g. `List<GithubRelease>`.
+
 :exclude-for-languages:
-:only-for-languages:python
-<.> Set the `Accept` header to request GitHub's version 3 JSON media type.
-<.> Await `retrieve` to perform the HTTP request and decode the response body as `list[GithubRelease]`. `Argument.listOf(GithubRelease)` supplies the element type for JSON mapping.
-:only-for-languages:
 
 === Declarative Client
+
+:exclude-for-languages:python
 
 It is time to take a look at support for declarative clients via the Client annotation.
 
 Create `GithubApiClient` which clearly illustrates how a declarative Micronaut HTTP Client, which is generated at compile-time, simplifies our code.
+
+:exclude-for-languages:
+
+:only-for-languages:python
+
+For one-off calls, the `requests` library works in Pyronaut applications; this guide uses a declarative client instead, so the GitHub API is described once with the `@Client` decorator and the implementation is generated for you.
+
+Create `GithubApiClient`:
+
+:only-for-languages:
 
 source:GithubApiClient[]
 
 <.> URL of the remote service
 <.> GitHub API requires to set the `User-Agent` header.
 <.> GitHub encourages to explicitly request the version 3 via the `Accept` header. With `@Header`, you add the `Accept: application/vnd.github.v3+json` HTTP header to every request.
-<.> You can use configuration parameter interpolation when you define the path of the GET endpoint.
 :exclude-for-languages:python
+<.> You can use configuration parameter interpolation when you define the path of the GET endpoint.
 callout:singleresult[]
 <.> You can return any reactive type of any implementation (RxJava, Reactor...), but it's better to use the Reactive Streams public interfaces like `Publisher`.
 :exclude-for-languages:
 :only-for-languages:python
+<.> You can use configuration parameter interpolation when you define the path of the GET endpoint. The `${github.organization}` and `${github.repo}` placeholders are resolved from `config/application.toml`.
 <.> Declare an `async def` method returning `list[GithubRelease]`. Awaiting it fetches and decodes the releases without blocking the event loop.
 :only-for-languages:
 
@@ -158,7 +167,7 @@ Create a Controller. It uses both (low-level and declarative clients). The Micro
 
 :only-for-languages:python
 
-Create asynchronous route functions that await the low-level and declarative clients and return lists of releases.
+Create a controller with an `async def` route that awaits the declarative client and returns the list of releases.
 
 :only-for-languages:
 
@@ -173,11 +182,10 @@ callout:get[arg0=fetchReleases,arg1=/releases]
 :exclude-for-languages:
 
 :only-for-languages:python
-<.> Inject beans into annotated module variables.
-<.> The @api@/io/micronaut/http/annotation/Get.html[@Get] annotation maps the route function to an HTTP GET request.
-<.> Await the low-level client to fetch and decode the releases.
-<.> The @api@/io/micronaut/http/annotation/Get.html[@Get] annotation maps the `fetch_releases` route function to `/github/releases`.
-<.> Await the declarative client and return its list of releases.
+callout:controller-pyronaut[arg0=/github]
+callout:constructor-di[arg0=GithubApiClient]
+callout:get-pyronaut[arg0=fetch_releases,arg1=/github/releases]
+<.> Declare the route as `async def` and `await` the declarative client, so the event loop is not blocked while the releases are fetched.
 :only-for-languages:
 
 === Tests
@@ -211,14 +219,14 @@ include::{sourceDir}/micronaut-http-client/@sourceDir@/tests-config/single-relea
 Create a test to verify that both clients work as expected, and the controller echoes the output of the GitHub API in a Reactive way.
 :exclude-for-languages:
 :only-for-languages:python
-Create a test to verify that both asynchronous routes return the releases provided by the local GitHub API fixture.
+Create a test to verify that the controller returns the releases served by the local GitHub API fixture.
 :only-for-languages:
 
 test:GithubControllerTest[]
 
+:exclude-for-languages:python
 callout:spec-name[]
 callout:mock-http-server[arg0=GitHub]
-:exclude-for-languages:python
 <.> Create a sample `single-release.json` file in the `src/test/resources` directory. To get some test data, call the GitHub API with curl or provide a release entry yourself.
 <.> Sometimes, receiving just the object is not enough, and you need information about the response. In this case, instead of `retrieve` you should use the `exchange` method.
 callout:binding-json-array[]
@@ -226,11 +234,14 @@ callout:binding-json-array[]
 callout:body-method[]
 :exclude-for-languages:
 :only-for-languages:python
-<.> Create a sample `releases.json` file in the `tests-config` directory. To get some test data call GitHub API with curl or provide a few entries yourself.
-<.> Use `requests.with_context(my_context)` to call the application under test with a context-bound HTTP client.
-<.> Decode the JSON response body into a Python list.
+callout:spec-name-pyronaut[]
+callout:mock-http-server[arg0=GitHub]
+<.> Create a sample `single-release.json` file in the `tests-config` directory. To get some test data, call the GitHub API with curl or provide a release entry yourself.
+callout:http-client-pyronaut[]
+callout:http-request-pyronaut[]
 <.> Use `status_code` to check the HTTP status code.
-<.> Validate the response body.
+callout:binding-json-array-pyronaut[]
+callout:http-response-pyronaut[]
 :only-for-languages:
 
 
@@ -249,7 +260,12 @@ Create a Filter:
 
 source:GithubFilter[]
 
+:exclude-for-languages:python
 callout:client-filter[]
+:exclude-for-languages:
+:only-for-languages:python
+callout:client-filter-pyronaut[]
+:only-for-languages:
 :exclude-for-languages:kotlin
 <.> The Micronaut framework will not load the bean unless configuration properties are set.
 :exclude-for-languages:
@@ -258,12 +274,7 @@ callout:client-filter[]
 <.> Kotlin doesn't support runtime repeatable annotations (see https://youtrack.jetbrains.com/issue/KT-12794[KT-12794]. We use a custom condition to enable the bean where appropriate.
 :only-for-languages:
 
-:exclude-for-languages:python
 <.> Constructor injection of the configuration parameters.
-:exclude-for-languages:
-:only-for-languages:python
-<.> Inject the configuration parameters into an annotated class attribute.
-:only-for-languages:
 callout:request-filter[]
 <.> Enhance every request sent to GitHub API providing Basic Authentication.
 
@@ -318,7 +329,7 @@ Add a logger to `src/main/resources/logback.xml` to see the HTTP client output.
 
 :only-for-languages:python
 
-Configure logging in `src/main.py` to see the HTTP client output. The Pyronaut logging module applies this Python logging configuration through Logback.
+Configure logging in `src/main.py` to see the HTTP client output. Pyronaut applies this logging configuration to the HTTP client logger.
 Set both the HTTP client logger and its console handler to `TRACE` to display request headers.
 
 :only-for-languages:
