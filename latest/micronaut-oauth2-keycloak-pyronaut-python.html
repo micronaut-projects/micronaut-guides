@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name='robots' content='index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'/>
+    <title>Secure a Pyronaut application with Keycloak</title>
+    <link rel='stylesheet' id='wp-block-library-css' href='https://legacy.micronaut.io/wp-includes/css/dist/block-library/style.min.css' type='text/css' media='all'/>
+    <link rel='stylesheet' id='fonts-fira-sans-css' href='https://fonts.googleapis.com/css2?family=Fira+Sans%3Awght%40300%3B500&#038;display=swap&#038;ver=5.7' type='text/css' media='all'/>
+    <link rel='stylesheet' id='micronaut-style-css' href='https://legacy.micronaut.io/wp-content/themes/micronaut/style.min.css' type='text/css' media='all'/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="icon" href="https://legacy.micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link rel="shortcut icon" href="https://legacy.micronaut.io/wp-content/uploads/2021/02/favicon.ico" type="image/png">
+    <link rel="alternate" type="application/rss+xml" title="Micronaut Guides RSS Feed" href="https://micronaut-projects.github.io/micronaut-guides/latest/rss.xml" />
+    <link rel="alternate" type="application/json" title="Micronaut Guides JSON Feed" href="https://micronaut-projects.github.io/micronaut-guides/latest/feed.json" />
+    <link href="coderay.css" rel="stylesheet" />
+    <link href="rouge-github.css" rel="stylesheet" />
+    <link href="guide.css" rel="stylesheet" />
+    <script src="lunr.js"></script>
+    <script src="guide.js"></script>
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:image" content="https://micronaut-projects.github.io/micronaut-guides/latest/images/cards/micronaut-oauth2-keycloak.png"/>
+    <meta name="twitter:creator" content="@micronautfw"/>
+    <meta name="twitter:site" content="@micronautfw"/>
+    <meta name="twitter:title" content="Secure a Pyronaut application with Keycloak"/>
+    <meta name="twitter:description" content="Learn how to create a Pyronaut application and secure it with an Authorization Server provided by Keycloak."/>
+</head>
+<body class="page-template page-template-page-sidebar page-template-page-sidebar-php page page-parent guide">
+
+<header id="header">
+
+    <div class="container">
+
+        <nav class="navbar navbar-expand-lg navbar-dark">
+
+            <button class="collapsed" type="button" data-toggle="collapse" data-target="#nav" aria-expanded="false">
+                <span></span>
+            </button>
+
+            <a class="navbar-brand" href="https://micronaut.io">
+                <img src="https://legacy.micronaut.io/wp-content/uploads/2020/11/MIcronautLogo_Horizontal.svg" alt="Micronaut framework"/>
+            </a>
+
+            <div class="collapse navbar-collapse" id="nav">
+
+                <ul class="navbar-nav ml-auto">
+
+                    <li id="menu-item-2865" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2865 nav-item"><a href="https://micronaut.io/download/" class="nav-link">Download</a></li>
+                    <li id="menu-item-2868" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-2868 dropdown nav-item"><a href="https://micronaut.io/learn/" class="nav-link dropdown-toggle" data-toggle="dropdown">Learn</a><ul class="dropdown-menu">
+                        <li id="menu-item-4943" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4943"><a href="https://micronaut.io/learn/" class="dropdown-item">Overview</a></li>
+                        <li id="menu-item-5111" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-5111"><a href="https://docs.micronaut.io/index.html" class="dropdown-item">User Documentation</a></li>
+                        <li id="menu-item-4510" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4510"><a href="https://micronaut.io/guides/" class="dropdown-item">Guides</a></li>
+                        <li id="menu-item-2896" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2896"><a href="https://micronaut.io/category/microcast/" class="dropdown-item">Microcasts</a></li>
+                        <li id="menu-item-2897" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2897"><a href="https://micronaut.io/category/webinar/" class="dropdown-item">Webinars</a></li>
+                        <li id="menu-item-2871" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2871"><a href="https://micronaut.io/professional-training/" class="dropdown-item">Professional Training</a></li>
+                        <li id="menu-item-6526" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-6526"><a href="https://micronaut-projects.github.io/micronaut-guides-mn3/latest/" class="dropdown-item">Guides for Micronaut Framework 3</a></li>
+                    </ul>
+                    </li>
+                    <li id="menu-item-2878" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2878 dropdown nav-item"><a href="https://micronaut.io/resources/" class="nav-link dropdown-toggle" data-toggle="dropdown">Resources</a><ul class="dropdown-menu">
+                        <li id="menu-item-4999" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4999"><a href="https://micronaut.io/upcoming-events/" class="dropdown-item">Upcoming Events</a></li>
+                        <li id="menu-item-2879" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2879"><a href="https://micronaut.io/blog/" class="dropdown-item">Blog</a></li>
+                        <li id="menu-item-6478" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-6478"><a href="https://micronaut.io/category/release-announcements/" class="dropdown-item">Releases</a></li>
+                        <li id="menu-item-6715" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-6715"><a href="https://micronaut.io/category/security-announcements/" class="dropdown-item">Security Announcements</a></li>
+                        <li id="menu-item-4499" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-4499"><a href="https://micronautpodcast.com/" class="dropdown-item">Podcast</a></li>
+                        <li id="menu-item-5798" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-5798"><a href="https://micronaut.io/support/" class="dropdown-item">Commercial Support</a></li>
+                        <li id="menu-item-4186" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4186"><a href="https://micronaut.io/resources/community-support/" class="dropdown-item">Community Support</a></li>
+                        <li id="menu-item-2882" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2882"><a href="https://micronaut.io/faq/" class="dropdown-item">FAQ</a></li>
+                        <li id="menu-item-2883" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2883"><a href="https://micronaut.io/contact/" class="dropdown-item">Contact</a></li>
+                        <li id="menu-item-6479" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-6479"><a href="https://micronaut.io/micronaut-success-stories/" class="dropdown-item">Micronaut Success Stories</a></li>
+                    </ul>
+                    </li>
+                    <li id="menu-item-2872" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-2872 dropdown nav-item"><a href="https://micronaut.io/foundation/" class="nav-link dropdown-toggle" data-toggle="dropdown">Foundation</a><ul class="dropdown-menu">
+                        <li id="menu-item-2877" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2877"><a href="https://micronaut.io/foundation/" class="dropdown-item">Overview</a></li>
+                        <li id="menu-item-2874" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2874"><a href="https://micronaut.io/foundation/corporate-sponsorship/" class="dropdown-item">Corporate Sponsorship</a></li>
+                        <li id="menu-item-2873" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2873"><a href="https://micronaut.io/foundation/community-sponsorship/" class="dropdown-item">Community Sponsorship</a></li>
+                        <li id="menu-item-2876" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2876"><a href="https://micronaut.io/foundation/sponsors/" class="dropdown-item">Sponsors</a></li>
+                        <li id="menu-item-3838" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-3838"><a href="https://micronaut.io/meeting-minutes/" class="dropdown-item">Meeting Minutes</a></li>
+                    </ul>
+                    </li>
+                    <li id="menu-item-2884" class="action menu-item menu-item-type-custom menu-item-object-custom menu-item-2884 nav-item"><a target="_blank" rel="noopener" href="https://micronaut.io/launch/" class="nav-link">Launch</a></li>
+
+                </ul>
+
+            </div>
+
+        </nav>
+
+    </div>
+</header>
+
+<div style="background: #fff;padding-top: 20px;padding-bottom: 20px;">
+    <div class="container" style="clear: both;">
+        <fieldset style="float: right;">
+            <input type="search" id="search-form-query"/>
+            <input type="submit" onclick="search()" value="Search">
+            <input type="submit" onclick="resetSearch()" value="Reset">
+        </fieldset>
+    </div>
+    <div class="container" style="clear: both;margin-top: -20px;">
+        <div class="guide-list" id="searchResults">
+        </div>
+    </div>
+</div>
+<div id="breadcrumbs"><div class="container"><a href="https://micronaut.io/">Home</a> » <a href="./index.html">Guides</a> » <a href="micronaut-oauth2-keycloak.html">Secure a Pyronaut application with Keycloak</a> » <span class="breadcrumb_last" aria-current="page">pyronaut | python</span></div></div><!-- .breadcrumbs -->
+<main id="main">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+
+                <div class="toc">
+                    <div class="inner">
+                        <h1 class="title title_large first-word-bold first-word-break">Table of Contents</h1>
+                        <div class="underline"></div>
+                        
+<ul class="sectlevel1">
+<li><a href="#getting-started">1. Getting Started</a></li>
+<li><a href="#what-you-will-need">2. What you will need</a></li>
+<li><a href="#solution">3. Solution</a></li>
+<li><a href="#run-keycloak-on-docker">4. Run Keycloak on Docker</a></li>
+<li><a href="#writing-the-application">5. Writing the Application</a>
+<ul class="sectlevel2">
+<li><a href="#start-in-port-8081">5.1. Start in Port 8081</a></li>
+<li><a href="#views">5.2. Views</a></li>
+<li><a href="#oauth-2-0">5.3. OAuth 2.0</a></li>
+<li><a href="#oauth-2-0-configuration">5.4. OAuth 2.0 Configuration</a></li>
+<li><a href="#home">5.5. Home</a></li>
+<li><a href="#keycloak-logout">5.6. Keycloak Logout</a></li>
+<li><a href="#controller-test">5.7. Controller Test</a></li>
+</ul>
+</li>
+<li><a href="#testing-the-application">6. Testing the Application</a></li>
+<li><a href="#running-the-application">7. Running the Application</a></li>
+<li><a href="#next-steps">8. Next Steps</a></li>
+<li><a href="#license">9. License</a></li>
+</ul>
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <h1>Secure a Pyronaut application with Keycloak</h1>
+                <div class="underline"></div>
+<div class="sect1">
+<div class="sectionbody">
+
+<div class="paragraph">
+<p>Learn how to create a Pyronaut application and secure it with an Authorization Server provided by Keycloak.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="getting-started">1. Getting Started</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In this guide, we will create a Python application built with Pyronaut.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="what-you-will-need">2. What you will need</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To complete this guide, you will need the following:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Some time on your hands</p>
+</li>
+<li>
+<p>GraalPy installed and the Pyronaut CLI available locally</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div></div><div class="row"><div class="col-md-12"><div class="sect1">
+<h2 id="solution">3. Solution</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>We recommend that you follow the instructions in the next sections and create the application step by step. However, you can go right to the <strong>completed example</strong>.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><a href="micronaut-oauth2-keycloak-pyronaut-python.zip">Download</a> and unzip the source</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="run-keycloak-on-docker">4. Run Keycloak on Docker</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Follow the tutorial <a href="https://www.keycloak.org/getting-started/getting-started-docker">Get started with Keycloak on Docker</a>.</p>
+</div>
+<div class="paragraph">
+<p>Replace the client creation in the tutorial with the steps illustrated in the following screenshots.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/keycloak/keycloak-client-step1.png" alt="keycloak client step1">
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/keycloak/keycloak-client-step2.png" alt="keycloak client step2">
+</div>
+</div>
+<div class="paragraph">
+<p>Set <code><a href="http://localhost:8081/oauth/callback/keycloak" class="bare">http://localhost:8081/oauth/callback/keycloak</a></code> as <em>Valid redirect URIs</em> and <code><a href="http://localhost:8081/logout" class="bare">http://localhost:8081/logout</a></code> as <em>Valid post logout redirect URIs</em>.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/keycloak/keycloak-client-step3.png" alt="keycloak client step3">
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="writing-the-application">5. Writing the Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Create an application using the Pyronaut CLI (Command Line Interface) or <a href="https://pyronaut.io/launch">Pyronaut Launch</a></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">pyronaut create example.micronaut.micronautguide <span class="nt">--features</span><span class="o">=</span>security-jwt,security-oauth2,views-jinjava</code></pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="start-in-port-8081">5.1. Start in Port 8081</h3>
+<div class="paragraph">
+<p>Create <code>config/application-dev.toml</code>. The Micronaut framework applies this configuration file only when the <code>dev</code> environment is active.</p>
+</div>
+<div class="paragraph">
+<p>Configure the application to start in port 8081:</p>
+</div>
+<div class="listingblock">
+<div class="title">config/application-dev.toml</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="toml"><span class="nn">[micronaut.server]</span>
+<span class="py">port</span> <span class="p">=</span> <span class="mi">8081</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="views">5.2. Views</h3>
+<div class="paragraph">
+<p>Although the Micronaut framework is primarily designed around message encoding / decoding, there are occasions where it is convenient to render a view on the server side.</p>
+</div>
+<div class="paragraph">
+<p>The <code>views-jinjava</code> feature uses Micronaut Views' <a href="https://micronaut-projects.github.io/micronaut-views/latest/guide/#jinjava">Jinjava integration</a> to render Jinja templates from Python dictionaries.</p>
+</div>
+<div class="paragraph">
+<p>Add the Jinjava dependency:</p>
+</div>
+<div class="listingblock">
+<div class="title">pyproject.toml</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="toml"><span class="nn">[tool.pyronaut.dependencies]</span>
+<span class="py">runtime</span> <span class="p">=</span> <span class="p">[</span>
+    <span class="s">"io.micronaut.views:micronaut-views-jinjava"</span><span class="p">,</span>
+<span class="p">]</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Configure HTML as the default template extension:</p>
+</div>
+<div class="listingblock">
+<div class="title">config/application.toml</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="toml"><span class="nn">[micronaut.views.jinja]</span>
+<span class="py">default-extension</span> <span class="p">=</span> <span class="s">"html"</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="oauth-2-0">5.3. OAuth 2.0</h3>
+<div class="paragraph">
+<p>To use OAuth 2.0 integration, add the following dependency:</p>
+</div>
+<div class="listingblock">
+<div class="title">pyproject.toml</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="toml"><span class="nn">[tool.pyronaut.dependencies]</span>
+<span class="py">runtime</span> <span class="p">=</span> <span class="p">[</span>
+    <span class="s">"io.micronaut.security:micronaut-security-oauth2"</span><span class="p">,</span>
+<span class="p">]</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Also add JWT <a href="https://micronaut-projects.github.io/micronaut-security/latest/guide/#jwt">Micronaut JWT support</a> dependencies:</p>
+</div>
+<div class="listingblock">
+<div class="title">pyproject.toml</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="toml"><span class="nn">[tool.pyronaut.dependencies]</span>
+<span class="py">runtime</span> <span class="p">=</span> <span class="p">[</span>
+    <span class="s">"io.micronaut.security:micronaut-security-jwt"</span><span class="p">,</span>
+<span class="p">]</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="oauth-2-0-configuration">5.4. OAuth 2.0 Configuration</h3>
+<div class="paragraph">
+<p>Add the following OAuth 2.0 configuration:</p>
+</div>
+<div class="listingblock">
+<div class="title">config/application-dev.toml</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="toml"><span class="nn">[micronaut.security]</span>
+<span class="py">authentication</span> <span class="p">=</span> <span class="s">"idtoken"</span> <i class="conum" data-value="1"></i><b>(1)</b>
+
+<span class="nn">[micronaut.security.oauth2.clients.keycloak]</span> <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="py">authorization-server</span> <span class="p">=</span> <span class="s">"KEYCLOAK"</span>
+<span class="py">client-secret</span> <span class="p">=</span> <span class="s">"${OAUTH_CLIENT_SECRET:secret}"</span> <i class="conum" data-value="3"></i><b>(3)</b>
+<span class="py">client-id</span> <span class="p">=</span> <span class="s">"${OAUTH_CLIENT_ID:myclient}"</span> <i class="conum" data-value="4"></i><b>(4)</b>
+
+<span class="nn">[micronaut.security.oauth2.clients.keycloak.openid]</span>
+<span class="py">issuer</span> <span class="p">=</span> <span class="s">"${OIDC_ISSUER_DOMAIN:`http://localhost:8080`}/realms/${KEYCLOAK_REALM:myrealm}"</span> <i class="conum" data-value="5"></i><b>(5)</b>
+
+<span class="nn">[micronaut.security.endpoints.logout]</span>
+<span class="py">get-allowed</span> <span class="p">=</span> <span class="kc">true</span> <i class="conum" data-value="6"></i><b>(6)</b>
+
+<span class="nn">[micronaut.security.oauth2.openid.additional-claims]</span>
+<span class="py">jwt</span> <span class="p">=</span> <span class="kc">true</span> <i class="conum" data-value="7"></i><b>(7)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Set <code>micronaut.security.authentication</code> as <code>idtoken</code>. The <code>idtoken</code> provided by Keycloak when the OAuth 2.0 Authorization code flow ends will be saved in a cookie. The id token is a signed JWT. For every request, the Micronaut framework extracts the JWT from the Cookie and validates the JWT signature with the remote Json Web Key Set exposed by Keycloak. JWKS is exposed by the <code>jws-uri</code> entry of Keycloak <code>.well-known/openid-configuration</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The provider identifier should match the last part of the URL you entered as a redirect URL: <code>/oauth/callback/keycloak</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Client Secret. See previous screenshot.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Client ID. See previous screenshot.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td><code>issuer</code> URL. It allows the Micronaut framework to discover the configuration of the OpenID Connect server.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>Accept GET requests to the <code>/logout</code> endpoint.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>Retain the ID token in the authentication attributes so Micronaut&#8217;s built-in Keycloak logout endpoint can send the required <code>id_token_hint</code>.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Check Keycloak realm&#8217;s OpenID configuration by visiting <a href="http://localhost:8080/realms/myrealm/.well-known/openid-configuration">http://localhost:8080/realms/myrealm/.well-known/openid-configuration</a>.</p>
+</div>
+<div class="paragraph">
+<p>The previous configuration uses several placeholders. You will need to set up <code>OAUTH_CLIENT_ID</code>, <code>OAUTH_CLIENT_SECRET</code>, <code>OIDC_ISSUER_DOMAIN</code>, and <code>KEYCLOAK_REALM</code> environment variables.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash"><span class="nb">export </span><span class="nv">OAUTH_CLIENT_ID</span><span class="o">=</span>XXXXXXXXXX
+<span class="nb">export </span><span class="nv">OAUTH_CLIENT_SECRET</span><span class="o">=</span>YYYYYYYYYY
+<span class="nb">export </span><span class="nv">OIDC_ISSUER_DOMAIN</span><span class="o">=</span>ZZZZZ
+<span class="nb">export </span><span class="nv">KEYCLOAK_REALM</span><span class="o">=</span>myrealm</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You can obtain the realm name, client ID, and client secret in the Keycloak UI:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/keycloak/keycloak-clientid.png" alt="keycloak clientid">
+</div>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/keycloak/keycloak-clientsecret.png" alt="keycloak clientsecret">
+</div>
+</div>
+<div class="paragraph">
+<p>We want to use an <strong>Authorization Code</strong> grant type flow, which is described in the following diagram:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/diagramm.png" alt="diagramm">
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="home">5.5. Home</h3>
+<div class="paragraph">
+<p>Create a route function for <code>/</code> that returns an empty Python dictionary. <code>@View</code> selects the Jinja template, which displays the authenticated user&#8217;s preferred username when available.</p>
+</div>
+<div class="listingblock">
+<div class="title">src/example/micronaut/home_controller.py</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="python"><span class="kn">from</span> <span class="nn">micronaut.http.annotation</span> <span class="kn">import</span> <span class="n">Get</span>
+<span class="kn">from</span> <span class="nn">micronaut.security.annotation</span> <span class="kn">import</span> <span class="n">Secured</span>
+<span class="kn">from</span> <span class="nn">micronaut.security.rules</span> <span class="kn">import</span> <span class="n">SecurityRule</span>
+<span class="kn">from</span> <span class="nn">micronaut.views</span> <span class="kn">import</span> <span class="n">View</span>
+
+
+<span class="o">@</span><span class="n">Secured</span><span class="p">(</span><span class="n">SecurityRule</span><span class="p">.</span><span class="n">IS_ANONYMOUS</span><span class="p">)</span>  <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="o">@</span><span class="n">View</span><span class="p">(</span><span class="s">"home"</span><span class="p">)</span>  <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="o">@</span><span class="n">Get</span><span class="p">(</span><span class="s">"/"</span><span class="p">)</span>  <i class="conum" data-value="3"></i><b>(3)</b>
+<span class="k">def</span> <span class="nf">index</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="k">return</span> <span class="p">{}</span></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Annotate with <code>io.micronaut.security.Secured</code> to configure secured access. The <code>SecurityRule.IS_ANONYMOUS</code> expression will allow access without authentication.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Use <a href="https://micronaut-projects.github.io/micronaut-views/latest/api/io/micronaut/views/View.html">View</a> annotation to specify which template to use to render the response.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>The <a href="https://docs.micronaut.io/latest/api/io/micronaut/http/annotation/Get.html">@Get</a> annotation maps the <code>index</code> method to an HTTP GET request on <code>/</code>.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Create a Jinja template. Use the <code>e</code> filter to escape the username for HTML:</p>
+</div>
+<div class="listingblock">
+<div class="title">config/views/home.html</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="html"><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="nt">&lt;html</span> <span class="na">lang=</span><span class="s">"en"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;head&gt;</span>
+    <span class="nt">&lt;title&gt;</span>Home<span class="nt">&lt;/title&gt;</span>
+<span class="nt">&lt;/head&gt;</span>
+<span class="nt">&lt;body&gt;</span>
+<span class="nt">&lt;h1&gt;</span>Micronaut - Keycloak example<span class="nt">&lt;/h1&gt;</span>
+
+{% if security %}
+<span class="nt">&lt;h2&gt;</span>username: <span class="nt">&lt;span&gt;</span>{{ security.attributes.preferred_username | e }}<span class="nt">&lt;/span&gt;&lt;/h2&gt;</span>
+{% else %}
+<span class="nt">&lt;h2&gt;</span>username: Anonymous<span class="nt">&lt;/h2&gt;</span>
+{% endif %}
+
+<span class="nt">&lt;nav&gt;</span>
+    <span class="nt">&lt;ul&gt;</span>
+        {% if not security %}<span class="nt">&lt;li&gt;&lt;a</span> <span class="na">href=</span><span class="s">"/oauth/login/keycloak"</span><span class="nt">&gt;</span>Enter<span class="nt">&lt;/a&gt;&lt;/li&gt;</span>{% endif %}
+        {% if security %}<span class="nt">&lt;li&gt;&lt;a</span> <span class="na">href=</span><span class="s">"/oauth/logout"</span><span class="nt">&gt;</span>Logout<span class="nt">&lt;/a&gt;&lt;/li&gt;</span>{% endif %}
+    <span class="nt">&lt;/ul&gt;</span>
+<span class="nt">&lt;/nav&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The controller returns an empty dictionary, but the template can still access <code>security</code>:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The <a href="https://micronaut-projects.github.io/micronaut-views/latest/api/io/micronaut/views/model/security/SecurityViewModelProcessor.html">SecurityViewModelProcessor</a>
+injects into the model a <code>security</code> map with the authenticated user.  See
+<a href="https://micronaut-projects.github.io/micronaut-views/latest/guide/#security-model-enhancement">User in a view</a> documentation.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="keycloak-logout">5.6. Keycloak Logout</h3>
+<div class="paragraph">
+<p>The <code>authorization-server = "KEYCLOAK"</code> setting selects Micronaut Security&#8217;s built-in Keycloak end-session endpoint. Together with the retained ID token, it supports provider logout without a custom endpoint resolver.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="controller-test">5.7. Controller Test</h3>
+<div class="paragraph">
+<p>The test verifies the anonymous HTML page and its login link. It activates only the <code>test</code> environment, so the OAuth client configuration in <code>config/application-dev.toml</code> is not loaded and no Keycloak server is needed. Check the real login and provider logout manually using the running Keycloak server below.</p>
+</div>
+<div class="listingblock">
+<div class="title">tests/example/micronaut/test_home_controller.py</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="python"><span class="kn">import</span> <span class="nn">pytest</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+
+<span class="kn">from</span> <span class="nn">pyronaut.test</span> <span class="kn">import</span> <span class="n">MicronautTest</span><span class="p">,</span> <span class="n">micronaut_test_fixture</span>
+
+
+<span class="o">@</span><span class="n">pytest</span><span class="p">.</span><span class="n">fixture</span>
+<span class="k">def</span> <span class="nf">my_context</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="n">fixture</span> <span class="o">=</span> <span class="n">micronaut_test_fixture</span><span class="p">(</span>
+        <span class="n">request</span><span class="p">,</span>
+        <span class="n">MicronautTest</span><span class="p">(</span><span class="n">environments</span><span class="o">=</span><span class="p">[</span><span class="s">"test"</span><span class="p">],</span> <span class="n">transactional</span><span class="o">=</span><span class="bp">False</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="k">yield</span> <span class="n">fixture</span>
+    <span class="n">fixture</span><span class="p">.</span><span class="n">stop</span><span class="p">()</span>
+
+
+<span class="o">@</span><span class="n">pytest</span><span class="p">.</span><span class="n">fixture</span>
+<span class="k">def</span> <span class="nf">client</span><span class="p">(</span><span class="n">my_context</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">requests</span><span class="p">.</span><span class="n">with_context</span><span class="p">(</span><span class="n">my_context</span><span class="p">)</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="n">session</span>
+
+
+<span class="k">def</span> <span class="nf">test_home_page_renders_anonymous_user</span><span class="p">(</span><span class="n">client</span><span class="p">):</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">"/"</span><span class="p">)</span>
+
+    <span class="k">assert</span> <span class="n">response</span><span class="p">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span>
+    <span class="k">assert</span> <span class="n">response</span><span class="p">.</span><span class="n">headers</span><span class="p">[</span><span class="s">"content-type"</span><span class="p">].</span><span class="n">startswith</span><span class="p">(</span><span class="s">"text/html"</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="s">"username: Anonymous"</span> <span class="ow">in</span> <span class="n">response</span><span class="p">.</span><span class="n">text</span>
+    <span class="k">assert</span> <span class="s">'href="/oauth/login/keycloak"'</span> <span class="ow">in</span> <span class="n">response</span><span class="p">.</span><span class="n">text</span>
+    <span class="k">assert</span> <span class="s">'href="/oauth/logout"'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">response</span><span class="p">.</span><span class="n">text</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="testing-the-application">6. Testing the Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To run the tests:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">pyronaut <span class="nb">install
+</span>pyronaut validate-config
+pyronaut <span class="nb">test</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="running-the-application">7. Running the Application</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Start the application on port 8081 with the <code>dev</code> environment enabled:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash"><span class="nb">export </span><span class="nv">MICRONAUT_ENVIRONMENTS</span><span class="o">=</span>dev
+pyronaut run</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>On Windows PowerShell, set <code>$env:MICRONAUT_ENVIRONMENTS = "dev"</code> before running <code>pyronaut run</code>.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/keycloak.gif" alt="keycloak">
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="next-steps">8. Next Steps</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Read <a href="https://micronaut-projects.github.io/micronaut-security/latest/guide/#oauth">Micronaut OAuth 2.0 documentation</a> to learn more.</p>
+</div>
+<div class="paragraph">
+<p>Check out the <a href="https://www.keycloak.org">Keycloak</a> website.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="license">9. License</h2>
+<div class="sectionbody">
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+All guides are released with an <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache License 2.0</a> for the code and a <a href="https://creativecommons.org/licenses/by/4.0/deed.en">Creative Commons Attribution 4.0</a> license for the writing and media (images).
+</td>
+</tr>
+</table>
+</div>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer id="footer">
+    <div class="container">
+
+        <div class="row">
+            <div class="col-sm-5 footer-left">
+
+                <div id="text-14" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <a href="https://micronaut.io/foundation/"><img class="alignnone size-medium wp-image-3736" src="./images/micronaut_foundation_horizontal_white.svg" alt="Micronaut Foundation"/></a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-7 footer-right">
+
+                <ul class="meta">
+
+                    <li id="menu-item-2895" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2895">
+                        <a href="https://micronaut.io/brand-guidelines/">Brand Guidelines</a>
+                    </li>
+                    <li id="menu-item-2894" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-2894">
+                        <a href="https://micronaut.io/community-guidelines/">Community Guidelines</a>
+                    </li>
+                    <li id="menu-item-3377" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-privacy-policy menu-item-3377">
+                        <a href="https://micronaut.io/privacy-policy/">Privacy Policy</a>
+                    </li>
+
+                </ul>
+
+                <div id="nav_menu-2" class="widget widget_nav_menu">
+                    <div class="menu-links-container">
+                        <ul id="menu-links" class="menu">
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="https://micronautpodcast.com"><i class="fa fa-podcast"><span class="sr-only">Podcast</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="https://micronaut.io/feed/rss/"><i class="fa fa-feed"><span class="sr-only">Feed</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom "><a href="mailto:info@micronaut.io"><i class="fas fa-envelope"><span class="sr-only">Mail</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://twitter.com/micronautfw"><i class="fab fa-twitter"><span class="sr-only">Twitter</span></i></a></li>
+                            <li id="menu-item-6740" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-6740"><a href="https://fosstodon.org/@micronaut"><i class="fab fa-mastodon"><span class="sr-only">Mastodon</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://discord.gg/9xRFsHv98T"><i class="fab fa-discord"><span class="sr-only">Discord</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://github.com/micronaut-projects/"><i class="fab fa-github"><span class="sr-only">GitHub</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.youtube.com/@MicronautFramework"><i class="fab fa-youtube"><span class="sr-only">YouTube</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.linkedin.com/showcase/micronaut"><i class="fab fa-linkedin"><span class="sr-only">LinkedIn</span></i></a></li>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom"><a href="https://www.twitch.tv/micronautfw"><i class="fab fa-twitch"><span class="sr-only">Twitch</span></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="text-5" class="widget widget_text">
+                    <div class="textwidget">
+                        <p>
+                            <small>Guides are licensed under <a href="https://creativecommons.org/licenses/by/4.0/deed.en">CC BY 4.0</a> for the writing/media and <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0</a> for the code</small>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>
