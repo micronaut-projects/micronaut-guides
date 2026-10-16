@@ -42,6 +42,8 @@ public class PlaceholderMacroSubstitution implements MacroSubstitution {
         str = str.replace("@api@", guidesConfiguration.getApiUrl());
         String configurationFile = option.getLanguage() == PYTHON ? "config/application.toml" : "application.properties";
         str = str.replace("@configuration-file@", configurationFile);
+        String devConfigurationFile = option.getLanguage() == PYTHON ? "config/application-dev.toml" : "src/main/resources/application-dev.properties";
+        str = str.replace("@dev-configuration-file@", devConfigurationFile);
 
         for (Map.Entry<String, Coordinate> entry : coordinatesProvider.getCoordinates().entrySet()) {
             if (StringUtils.isNotEmpty(entry.getValue().getVersion())) {
