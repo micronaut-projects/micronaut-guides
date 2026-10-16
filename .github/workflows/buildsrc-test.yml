@@ -1,0 +1,51 @@
+name: Test buildSrc
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'buildSrc/**'
+      - 'build.gradle'
+      - 'settings.gradle'
+      - 'gradle/**'
+      - 'gradle.properties'
+      - '.github/workflows/buildsrc-test.yml'
+  pull_request:
+    branches:
+      - master
+    paths:
+      - 'buildSrc/**'
+      - 'build.gradle'
+      - 'settings.gradle'
+      - 'gradle/**'
+      - 'gradle.properties'
+      - '.github/workflows/buildsrc-test.yml'
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  buildsrc_test:
+    name: Run buildSrc tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6.0.2
+      - uses: actions/cache@v5.0.5
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: Set up JDK
+        uses: actions/setup-java@v5.2.0
+        with:
+          distribution: 'adopt'
+          java-version: '25'
+      - name: Run buildSrc tests
+        run: ./gradlew buildSrc:test --stacktrace --console=plain
+      - name: Upload buildSrc test report
+        if: failure()
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: buildsrc-test-report
+          path: buildSrc/build/reports/tests/test
+          if-no-files-found: ignore
