@@ -47,7 +47,7 @@ public class DefaultFilesTransferUtility implements FilesTransferUtility {
         }
     }
 
-    private static void copyGuideSourceFiles(File inputDir, Path destinationPath,
+    public static void copyGuideSourceFiles(File inputDir, Path destinationPath,
                                              String appName, String language,
                                              boolean ignoreMissingDirectories) throws IOException {
 
@@ -56,22 +56,14 @@ public class DefaultFilesTransferUtility implements FilesTransferUtility {
         Path srcPath = Paths.get(inputDir.getAbsolutePath(), appName, srcFolder);
         if (Files.exists(srcPath)) {
             Path resourcesPath = srcPath.resolve("main").resolve("resources");
-            if (Language.PYTHON.toString().equals(language) && Files.exists(resourcesPath)) {
-                Path configPath = Paths.get(destinationPath.toString(), "config");
-                Files.createDirectories(configPath);
-                Files.walkFileTree(resourcesPath, new CopyFileVisitor(configPath));
-                Path destinationResourcesPath = Paths.get(destinationPath.toString(), srcFolder, "main", "resources");
-                Files.walkFileTree(resourcesPath, new SimpleFileVisitor<>() {
-                    @Override
-                    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                        Files.deleteIfExists(destinationResourcesPath.resolve(resourcesPath.relativize(file)));
-                        return FileVisitResult.CONTINUE;
-                    }
-                });
+            Path testResourcesPath = srcPath.resolve("test").resolve("resources");
+            if (Language.PYTHON.toString().equals(language)) {
+                copyPythonResources(resourcesPath, destinationPath.resolve("config"), destinationPath.resolve("src/main/resources"));
+                copyPythonResources(testResourcesPath, destinationPath.resolve("tests-config"), destinationPath.resolve("src/test/resources"));
                 Files.walkFileTree(srcPath, new CopyFileVisitor(Paths.get(destinationPath.toString(), srcFolder)) {
                     @Override
                     public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-                        if (dir.equals(resourcesPath)) {
+                        if (dir.equals(resourcesPath) || dir.equals(testResourcesPath)) {
                             return FileVisitResult.SKIP_SUBTREE;
                         }
                         return super.preVisitDirectory(dir, attrs);
@@ -80,6 +72,11 @@ public class DefaultFilesTransferUtility implements FilesTransferUtility {
             } else {
                 Files.walkFileTree(srcPath, new CopyFileVisitor(Paths.get(destinationPath.toString(), srcFolder)));
             }
+        }
+
+        Path jvmPath = Paths.get(inputDir.getAbsolutePath(), appName, "jvm");
+        if (!Language.PYTHON.toString().equals(language) && Files.exists(jvmPath)) {
+            Files.walkFileTree(jvmPath, new CopyFileVisitor(destinationPath));
         }
 
         Path sourcePath = Paths.get(inputDir.getAbsolutePath(), appName, language);
@@ -92,6 +89,21 @@ public class DefaultFilesTransferUtility implements FilesTransferUtility {
         } else if (!ignoreMissingDirectories) {
             throw new GradleException("source directory " + sourcePath.toFile().getAbsolutePath() + " does not exist");
         }
+    }
+
+    private static void copyPythonResources(Path resourcesPath, Path configPath, Path destinationResourcesPath) throws IOException {
+        if (!Files.exists(resourcesPath)) {
+            return;
+        }
+        Files.createDirectories(configPath);
+        Files.walkFileTree(resourcesPath, new CopyFileVisitor(configPath));
+        Files.walkFileTree(resourcesPath, new SimpleFileVisitor<>() {
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                Files.deleteIfExists(destinationResourcesPath.resolve(resourcesPath.relativize(file)));
+                return FileVisitResult.CONTINUE;
+            }
+        });
     }
 
     private static File fileToDelete(File destination, String path) {
