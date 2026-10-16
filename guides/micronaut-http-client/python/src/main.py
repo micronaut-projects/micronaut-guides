@@ -4,28 +4,22 @@ from logback.config import dictConfig
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
-    "formatters": {
-        "standard": {
-            "format": "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
-        }
-    },
     "handlers": {
         "console": {
             "class": "logging.StreamHandler",
             "level": "TRACE",
-            "formatter": "standard",
-            "stream": "ext://sys.stdout"
+            "stream": "ext://sys.stdout",
         }
     },
     "root": {
         "level": "INFO",
-        "handlers": ["console"]
+        "handlers": ["console"],
     },
     "loggers": {
         "io.micronaut.http.client": {
-            "level": "TRACE"
+            "level": "TRACE",
         }
-    }
+    },
 }
 
 dictConfig(LOGGING)
