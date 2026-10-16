@@ -11,14 +11,17 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import static io.micronaut.core.util.StringUtils.EMPTY_STRING;
 
@@ -28,6 +31,17 @@ public class DefaultFilesTransferUtility implements FilesTransferUtility {
     private static final String EXTENSION_JAVA = ".java";
     private static final String EXTENSION_GROOVY = ".groovy";
     private static final String EXTENSION_KT = ".kt";
+    private static final String EXTENSION_TOML = ".toml";
+    /**
+     * Shared resources in the root of {@code src/main/resources} or {@code src/test/resources} that only configure the JVM
+     * (logging and bootstrap configuration) and must not be copied into a Python project.
+     */
+    private static final PathMatcher JVM_ONLY_RESOURCES = FileSystems.getDefault().getPathMatcher("glob:{logback*.xml,bootstrap*.*}");
+    /**
+     * Shared configuration formats that Micronaut loads next to {@code application.toml} and that are therefore not
+     * copied into a Python project when it provides its own TOML file with the same name.
+     */
+    private static final Set<String> CONFIGURATION_EXTENSIONS = Set.of("properties", "yml", "yaml");
 
     private final LicenseLoader licenseLoader;
     private final GuidesConfiguration guidesConfiguration;
@@ -58,9 +72,13 @@ public class DefaultFilesTransferUtility implements FilesTransferUtility {
             Path resourcesPath = srcPath.resolve("main").resolve("resources");
             Path testResourcesPath = srcPath.resolve("test").resolve("resources");
             if (Language.PYTHON.toString().equals(language)) {
-                copyPythonResources(resourcesPath, destinationPath.resolve("config"), destinationPath.resolve("src/main/resources"));
-                copyPythonResources(testResourcesPath, destinationPath.resolve("tests-config"), destinationPath.resolve("src/test/resources"));
-                Files.walkFileTree(srcPath, new CopyFileVisitor(Paths.get(destinationPath.toString(), srcFolder)) {
+                Path pythonPath = Paths.get(inputDir.getAbsolutePath(), appName, Language.PYTHON.toString());
+                copyPythonResources(resourcesPath, destinationPath.resolve("config"), pythonPath.resolve("config"),
+                        destinationPath.resolve("src/main/resources"));
+                copyPythonResources(testResourcesPath, destinationPath.resolve("tests-config"), pythonPath.resolve("tests-config"),
+                        destinationPath.resolve("src/test/resources"));
+                // directories are created lazily so that src/main and src/test are not left empty once their resources are skipped
+                Files.walkFileTree(srcPath, new CopyFileVisitor(Paths.get(destinationPath.toString(), srcFolder), true) {
                     @Override
                     public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
                         if (dir.equals(resourcesPath) || dir.equals(testResourcesPath)) {
@@ -91,12 +109,20 @@ public class DefaultFilesTransferUtility implements FilesTransferUtility {
         }
     }
 
-    private static void copyPythonResources(Path resourcesPath, Path configPath, Path destinationResourcesPath) throws IOException {
+    private static void copyPythonResources(Path resourcesPath, Path configPath, Path pythonConfigPath,
+                                            Path destinationResourcesPath) throws IOException {
         if (!Files.exists(resourcesPath)) {
             return;
         }
-        Files.createDirectories(configPath);
-        Files.walkFileTree(resourcesPath, new CopyFileVisitor(configPath));
+        Files.walkFileTree(resourcesPath, new CopyFileVisitor(configPath, true) {
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                if (isJvmOnlyResource(resourcesPath.relativize(file), pythonConfigPath)) {
+                    return FileVisitResult.CONTINUE;
+                }
+                return super.visitFile(file, attrs);
+            }
+        });
         Files.walkFileTree(resourcesPath, new SimpleFileVisitor<>() {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
@@ -104,6 +130,52 @@ public class DefaultFilesTransferUtility implements FilesTransferUtility {
                 return FileVisitResult.CONTINUE;
             }
         });
+        // deleting the stale copies must not leave empty src/main/resources and src/main (or src/test...) directories behind
+        deleteEmptyDirectories(destinationResourcesPath);
+        deleteIfEmpty(destinationResourcesPath.getParent());
+    }
+
+    /**
+     * @param resource the path of a shared resource, relative to {@code src/main/resources} or {@code src/test/resources}
+     * @param pythonConfigPath the guide's {@code python/config} or {@code python/tests-config} directory
+     * @return whether the shared resource configures the JVM only: root level logging and bootstrap configuration, or
+     * configuration for which the guide provides a TOML file with the same name for Python
+     */
+    private static boolean isJvmOnlyResource(Path resource, Path pythonConfigPath) {
+        Path fileName = resource.getFileName();
+        if (resource.getNameCount() == 1 && JVM_ONLY_RESOURCES.matches(fileName)) {
+            return true;
+        }
+        String name = fileName.toString();
+        int extensionIndex = name.lastIndexOf('.');
+        if (extensionIndex <= 0 || !CONFIGURATION_EXTENSIONS.contains(name.substring(extensionIndex + 1))) {
+            return false;
+        }
+        return Files.exists(pythonConfigPath.resolve(resource.resolveSibling(name.substring(0, extensionIndex) + EXTENSION_TOML)));
+    }
+
+    private static void deleteEmptyDirectories(Path directory) throws IOException {
+        if (!Files.isDirectory(directory)) {
+            return;
+        }
+        Files.walkFileTree(directory, new SimpleFileVisitor<>() {
+            @Override
+            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                deleteIfEmpty(dir);
+                return FileVisitResult.CONTINUE;
+            }
+        });
+    }
+
+    private static void deleteIfEmpty(Path directory) throws IOException {
+        if (!Files.isDirectory(directory)) {
+            return;
+        }
+        try (var entries = Files.list(directory)) {
+            if (entries.findAny().isEmpty()) {
+                Files.delete(directory);
+            }
+        }
     }
 
     private static File fileToDelete(File destination, String path) {
