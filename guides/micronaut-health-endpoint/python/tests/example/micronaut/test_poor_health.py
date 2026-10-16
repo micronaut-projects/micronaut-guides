@@ -22,7 +22,8 @@ def my_context(request):
 
 @pytest.fixture
 def client(my_context):
-    return requests.with_context(my_context)
+    with requests.with_context(my_context) as session:
+        yield session
 
 
 def test_health_endpoint_exposes_out_of_disk_space(client):
