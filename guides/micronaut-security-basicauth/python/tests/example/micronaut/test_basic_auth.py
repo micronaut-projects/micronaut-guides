@@ -12,7 +12,8 @@ def my_context(request):
 
 @pytest.fixture
 def client(my_context):
-    return requests.with_context(my_context)  # <2>
+    with requests.with_context(my_context) as session:  # <2>
+        yield session
 
 
 def test_verify_http_basic_auth_works(client):
