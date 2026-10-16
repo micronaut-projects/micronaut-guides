@@ -8,6 +8,7 @@ import jakarta.inject.Singleton;
 import java.util.Map;
 
 import static io.micronaut.starter.api.TestFramework.SPOCK;
+import static io.micronaut.starter.options.Language.PYTHON;
 
 @Singleton
 public class PlaceholderMacroSubstitution implements MacroSubstitution {
@@ -39,6 +40,10 @@ public class PlaceholderMacroSubstitution implements MacroSubstitution {
         str = str.replace("@sourceDir@", MacroUtils.getSourceDir(guide.slug(), option));
         str = str.replace("@minJdk@", String.valueOf(guide.minimumJavaVersion() != null ? guide.minimumJavaVersion() : guidesConfiguration.getDefaultMinJdk()));
         str = str.replace("@api@", guidesConfiguration.getApiUrl());
+        String configurationFile = option.getLanguage() == PYTHON ? "config/application.toml" : "application.properties";
+        str = str.replace("@configuration-file@", configurationFile);
+        String devConfigurationFile = option.getLanguage() == PYTHON ? "config/application-dev.toml" : "src/main/resources/application-dev.properties";
+        str = str.replace("@dev-configuration-file@", devConfigurationFile);
 
         for (Map.Entry<String, Coordinate> entry : coordinatesProvider.getCoordinates().entrySet()) {
             if (StringUtils.isNotEmpty(entry.getValue().getVersion())) {

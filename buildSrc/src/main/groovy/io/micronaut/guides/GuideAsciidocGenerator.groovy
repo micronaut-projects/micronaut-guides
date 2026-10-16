@@ -190,6 +190,10 @@ class GuideAsciidocGenerator {
             text = text.replace("@sourceDir@", projectName)
             text = text.replace("@minJdk@", metadata.minimumJavaVersion()?.toString() ?: "21")
             text = text.replace("@api@", 'https://docs.micronaut.io/latest/api')
+            String configurationFile = guidesOption.language == PYTHON ? 'config/application.toml' : 'application.properties'
+            text = text.replace("@configuration-file@", configurationFile)
+            String devConfigurationFile = guidesOption.language == PYTHON ? 'config/application-dev.toml' : 'src/main/resources/application-dev.properties'
+            text = text.replace("@dev-configuration-file@", devConfigurationFile)
 
             text = text.replaceAll(~/@([\w-]*):?cli-command@/) { List<String> matches ->
                 String app = matches[1] ?: 'default'

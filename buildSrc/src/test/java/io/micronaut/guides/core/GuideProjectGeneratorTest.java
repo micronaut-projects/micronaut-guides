@@ -224,7 +224,7 @@ class GuideProjectGeneratorTest {
         App app = new App(
                 "default", "example.micronaut", ApplicationType.DEFAULT, "Micronaut",
                 List.of("serialization-jackson"), List.of(), List.of(), List.of(), List.of(), List.of(),
-                null, null, null, true
+                null, null, null, true, null
         );
         Guide guide = new Guide(
                 "Test a Groovy application with Spock", "Run Spock tests using Maven.",
