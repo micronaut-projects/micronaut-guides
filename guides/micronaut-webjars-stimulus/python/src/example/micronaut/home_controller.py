@@ -8,5 +8,5 @@ class HomeController:
 
     @View("index")  # <3>
     @Get(produces=MediaType.TEXT_HTML)  # <2>
-    def index(self) -> dict[str, object]:
+    def index(self) -> dict[str, str]:
         return {"title": "Hello Stimulus"}
