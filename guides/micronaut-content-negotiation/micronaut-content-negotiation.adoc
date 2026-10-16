@@ -6,21 +6,61 @@ common:completesolution.adoc[]
 
 common:create-app-features.adoc[]
 
+:exclude-for-languages:python
+
 common:micronaut-views-thymeleaf.adoc[]
+
+:exclude-for-languages:
+
+:only-for-languages:python
+
+== Views
+
+common:jinja.adoc[]
+
+The Python routes below supply the template model as a dictionary.
+
+:only-for-languages:
 
 == Controller
 
 Create a controller that responds with HTML or JSON depending on the request `Accept` HTTP header.
 
 source:MessageController[]
+
+:exclude-for-languages:python
+
 callout:controller[arg0=/]
 <.> Use the `@Produces` annotation to indicate the possible response content types. It matches the `Accept` header of the request, as you will see in the test.
 callout:get-generic[]
 callout:http-request-method-parameter[]
 
+:exclude-for-languages:
+
+:only-for-languages:python
+
+callout:controller-pyronaut[arg0=/]
+<.> Declare the response content types with `produces=`. Micronaut selects the route whose `produces` value matches the request's `Accept` header. The JSON route also lists `MediaType.ALL`, so it answers clients that accept any type, such as `curl`.
+<.> Return a Python dictionary, which Micronaut serializes as JSON.
+callout:view-pyronaut[]
+
+:only-for-languages:
+
+:exclude-for-languages:python
+
 For HTML, the previous controller uses a Thymeleaf view:
 
 resource:views/message.html[]
+
+:exclude-for-languages:
+
+:only-for-languages:python
+
+For HTML, the previous controller uses a Jinja template. The template engine does not autoescape yet, so the `e` filter escapes the message for HTML:
+
+resource:views/message.html[]
+
+:only-for-languages:
 
 == Test
 
@@ -35,8 +75,8 @@ callout:http-request[]
 :exclude-for-languages:
 
 :only-for-languages:python
-<.> Create a Micronaut test fixture for the application under test.
-<.> Use `requests.with_context(my_context)` to call the application under test with a context-bound HTTP client.
+callout:python-test-fixture[]
+callout:python-requests-client[]
 <.> Send requests with explicit `Accept` headers.
 :only-for-languages:
 
