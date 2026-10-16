@@ -8,7 +8,6 @@ from micronaut.security.authentication import (
 )
 
 
-# tag::clazz[]
 @Singleton  # <1>
 @Replaces(DefaultAuthorizationExceptionHandler)  # <2>
 class DefaultAuthorizationExceptionHandlerReplacement(
@@ -21,4 +20,3 @@ class DefaultAuthorizationExceptionHandlerReplacement(
             HttpHeaders.WWW_AUTHENTICATE,
             'Basic realm="Micronaut Guide"',
         )
-# end::clazz[]
