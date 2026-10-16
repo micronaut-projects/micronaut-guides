@@ -254,6 +254,8 @@ Following this same approach there are macros like:
 
 In all the cases it is possible to pass additional parameters to the macros to customise them. For example, to extract a custom tag from a snippet, we can do `resource:application.yml[tag=githubconfig]`. Look for usages of those macros in the `guides` directory to find more examples.
 
+Python (Pyronaut) guides use their own callout text in files named `callout-<name>-pyronaut.adoc`, for example `callout-controller-pyronaut.adoc` next to `callout-controller.adoc`. Reference them with `callout:<name>-pyronaut[]` inside an `:only-for-languages:python` block, and keep the text free of Java package names, fully qualified annotation names, and Gradle, Maven or JUnit references.
+
 #### Special custom blocks
 
 There are also special custom blocks to exclude content from the generated guide based on a condition. This is useful when explaining something specific to a build tool, such as how to run tests with Gradle or Maven, or when excluding content based on the language, such as not rendering the GraalVM section in Groovy guides because Groovy is not compatible with GraalVM.
