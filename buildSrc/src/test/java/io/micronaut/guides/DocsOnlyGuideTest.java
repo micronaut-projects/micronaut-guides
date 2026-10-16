@@ -77,6 +77,9 @@ class DocsOnlyGuideTest {
         assertEquals(List.of("docs-only-pyronaut-python"), SampleProjectGenerationTask.outputDirectoryNames(guide, Language.PYTHON));
         assertTrue(coreScripts.generatePythonTestScript(new ArrayList<>(List.of(guide))).contains("cd docs-only-pyronaut-python"));
         assertTrue(TestScriptGenerator.generateScript(new ArrayList<>(List.of(guide)), false, false, true, null).contains("cd docs-only-pyronaut-python"));
+        String jvmScript = TestScriptGenerator.generateScript(new ArrayList<>(List.of(guide)), false, false, false, null);
+        assertTrue(jvmScript.contains("cd docs-only-gradle-java"));
+        assertFalse(jvmScript.contains("cd docs-only-pyronaut-python"));
     }
 
     @Test
