@@ -5,8 +5,8 @@
 from typing import Annotated
 
 from jakarta.validation import ConstraintViolationException, Valid
-from micronaut.http import HttpResponse, MediaType
-from micronaut.http.annotation import Body, Consumes, Controller, Error, Get, Post, Produces
+from micronaut.http import HttpResponse, HttpStatus, MediaType
+from micronaut.http.annotation import Body, Consumes, Controller, Error, Get, Post, Produces, Status
 from micronaut.views import View
 
 from .command_book_save import CommandBookSave
@@ -49,6 +49,7 @@ class BookController:
     # tag::onSavedFailed[]
     @View("bookscreate")
     @Error(exception=ConstraintViolationException)  # <2>
+    @Status(HttpStatus.BAD_REQUEST)
     def on_saved_failed(
         self,
         cmd: Annotated[CommandBookSave, Body],
