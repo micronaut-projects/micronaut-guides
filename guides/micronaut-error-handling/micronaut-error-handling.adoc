@@ -14,11 +14,25 @@ image::notfound.png[]
 
 The views module provides support for view rendering on the server side and does so by rendering views on the I/O thread pool in order to avoid blocking the Netty event loop.
 
-To use the view rendering features described in this section, add the following dependency on your classpath. Add the following dependency to your build file:
+To use the view rendering features described in this section, add the following dependency to your application:
 
+:exclude-for-languages:python
 dependency:micronaut-views-velocity[groupId=io.micronaut.views]
+:exclude-for-languages:
 
+:only-for-languages:python
+dependency:micronaut-views-jinjava[groupId=io.micronaut.views]
+:only-for-languages:
+
+:exclude-for-languages:python
 The Micronaut framework ships out-of-the-box with support for https://velocity.apache.org/[Apache Velocity], https://www.thymeleaf.org/[Thymeleaf] or https://jknack.github.io/handlebars.java/[Handlebars]. In this guide, we use Apache Velocity.
+:exclude-for-languages:
+
+:only-for-languages:python
+Use Micronaut Views with Jinja syntax. Configure the renderer to use the existing `.vm` template extension so that the static `notFound.vm` page is shared with the other languages:
+
+resource:application.toml[]
+:only-for-languages:
 
 Create a `notFound.vm` view:
 
@@ -30,7 +44,7 @@ source:NotFoundController[]
 
 callout:controller[arg0=/notfound]
 <.> Inject an available https://micronaut-projects.github.io/micronaut-views/latest/api/[ViewRenderer] bean to render an HTML view.
-<.> The Error declares which `HttpStatus` error code to handle (in this case 404). We declare the method as a global error handler due to `global = true`.
+<.> The Error declares which `HttpStatus` error code to handle (in this case 404). Enable global error handling to apply it to all controllers.
 <.> If the request `Accept` HTTP header contains `text/html`, we respond with an HTML view.
 <.> By default, we respond JSON.
 
@@ -42,7 +56,15 @@ Then create a view to display a form:
 
 image::createbook.png[]
 
+:exclude-for-languages:python
 resource:views/bookscreate.vm[]
+:exclude-for-languages:
+
+:only-for-languages:python
+The Jinja template escapes submitted values and validation messages with the `e` filter before including them in HTML:
+
+resource:views/bookscreate.vm[]
+:only-for-languages:
 
 common:serde-params.adoc[]
 
@@ -52,12 +74,17 @@ source:BookController[tags=package|imports|clazz|create|save|createModelWithBlan
 
 callout:controller[arg0=/books]
 <.> Use `@View` annotation to indicate the view name which should be used to render a view for the route.
-<.> You can specify the HTTP verb that a controller action responds to. To respond to a GET request, use the `io.micronaut.http.annotation.Get` annotation.
-<.> `@Consumes` annotation takes a `String[]` of supported media types for an incoming request.
-<.> The `@Post` annotation maps the index method to all requests that use an HTTP POST
-<.> Add `@Valid` to any method parameter which requires validation. We use a POJO to encapsulate the form submission.
+<.> Use `@Get` to map a controller method to HTTP GET requests.
+<.> `@Consumes` specifies the supported media types for an incoming request.
+<.> Use `@Post` to map a controller method to HTTP POST requests.
+:exclude-for-languages:python
+<.> Add `@Valid` to any method parameter which requires validation. The form submission is bound to `CommandBookSave`.
+:exclude-for-languages:
+:only-for-languages:python
+<.> Use `Annotated[CommandBookSave, Body, Valid]` to bind and validate the form submission.
+:only-for-languages:
 
-Create the POJO encapsulating the submission:
+Create the object encapsulating the submission:
 
 source:CommandBookSave[]
 
@@ -69,7 +96,9 @@ When the form submission fails, we want to display the errors in the UI as the n
 
 image::createbookserrors.png[]
 
-An easy way to achieve it is to capture the `jakarta.validation.ConstraintViolationException` exception in a local `@Error` handler. Modify `BookController.java`:
+An easy way to achieve it is to capture the `jakarta.validation.ConstraintViolationException` exception in a local `@Error` handler. Modify `BookController`:
+
+:exclude-for-languages:python
 
 [source,@lang@]
 .src/main/@lang@/example/micronaut/BookController.@languageextension@
@@ -89,11 +118,22 @@ include::{sourceDir}/micronaut-error-handling/@sourceDir@/src/main/@lang@/exampl
 }
 ----
 
+:exclude-for-languages:
+
+:only-for-languages:python
+source:BookController[tags=di|onSavedFailed]
+:only-for-languages:
+
 <.> Constructor injection
 callout:on-error[]
+:exclude-for-languages:python
 callout:on-error-request[]
+:exclude-for-languages:
+:only-for-languages:python
+<.> Bind the submitted form to `CommandBookSave` and receive the validation exception. Keep the submitted values in the model while adding its validation messages.
+:only-for-languages:
 
-Create a `jakarta.inject.Singleton` to encapsulate the generation of a list of messages from a `Set` of `ConstraintViolation`:
+Create a singleton bean to generate a list of messages from the constraint violations:
 
 source:MessageSource[]
 
@@ -103,6 +143,7 @@ Another mechanism to handle a global exception is to use an `ExceptionHandler`.
 
 Modify the controller and add a method to throw an exception:
 
+:exclude-for-languages:python
 [source,@lang@]
 .src/main/@lang@/example/micronaut/BookController.@languageextension@
 ----
@@ -114,6 +155,11 @@ include::{sourceDir}/micronaut-error-handling/@sourceDir@/src/main/@lang@/exampl
 }
 ----
 
+:exclude-for-languages:
+:only-for-languages:python
+source:BookController[tags=clazz|stock]
+:only-for-languages:
+
 callout:controller[arg0=/books]
 
 source:OutOfStockException[]
@@ -124,8 +170,20 @@ source:OutOfStockExceptionHandler[]
 
 callout:singleton[]
 <.> This bean loads if `OutOfStockException`, `ExceptionHandler` are available.
-<.> Specify the `Throwable` to handle.
+<.> Specify the exception type to handle.
 <.> Return 200 OK with a body of 0; no stock.
+
+:only-for-languages:python
+== Tests
+
+The HTTP tests verify both representations of the global error, the form values and validation messages after an invalid submission, and the native Python exception handler. They also check that submitted HTML is escaped.
+
+test:ErrorHandlingTest[]
+callout:micronaut-test[]
+callout:http-client[]
+
+common:testApp.adoc[]
+:only-for-languages:
 
 common:graal-with-plugins.adoc[]
 
