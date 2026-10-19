@@ -2,7 +2,12 @@ common:header-top.adoc[]
 
 == Introduction
 
+:exclude-for-languages:python
 Micronaut features an extensible bean scoping mechanism based on https://javax-inject.github.io/javax-inject/[JSR-330].
+:exclude-for-languages:
+:only-for-languages:python
+Micronaut manages when beans are created and how long they live. Choose a scope with a decorator on a Python class.
+:only-for-languages:
 
 common:requirements.adoc[]
 
@@ -16,22 +21,47 @@ We use the following scenario to talk about the different types of scopes.
 
 The following `@Controller` injects two collaborators.
 
+:exclude-for-languages:python
 source:singleton/RobotController[tags=pkg|imports|controller|clazz]
 
 callout:controller[arg0=/]
 callout:constructor-di[arg0=RobotFather]
 callout:constructor-di[arg0=RobotMother]
 callout:get[arg0=children,arg1=/]
+:exclude-for-languages:
+:only-for-languages:python
+source:singleton/RobotController[]
+
+<.> Decorate the class with `@Controller("/singleton")` to set its route.
+<.> Inject `RobotFather` and `RobotMother` through the constructor.
+<.> `@Get` exposes `children` as an HTTP GET route. Return both serial numbers as a Python list.
+:only-for-languages:
 
 Each collaborator has an injection point for a bean of type `Robot`.
 
+:exclude-for-languages:python
 source:singleton/RobotFather[]
 callout:singleton[]
 callout:constructor-di[arg0=Robot]
+:exclude-for-languages:
+:only-for-languages:python
+source:singleton/RobotFather[]
 
+<.> `@Singleton` creates one instance of this collaborator per application context.
+<.> Inject the scoped `Robot` through the constructor.
+:only-for-languages:
+
+:exclude-for-languages:python
 source:singleton/RobotMother[]
 callout:singleton[]
 callout:constructor-di[arg0=Robot]
+:exclude-for-languages:
+:only-for-languages:python
+source:singleton/RobotMother[]
+
+<.> `@Singleton` creates one instance of this collaborator per application context.
+<.> Inject the scoped `Robot` through the constructor.
+:only-for-languages:
 
 Let's discuss how the application behaves depending on the scope used for the bean of type `Robot`.
 
@@ -39,26 +69,47 @@ Let's discuss how the application behaves depending on the scope used for the be
 
 **Singleton scope indicates only one instance of the bean will exist**.
 
+:exclude-for-languages:python
 To define a singleton, annotate a class with `jakarta.inject.Singleton` at the class level.
+:exclude-for-languages:
+:only-for-languages:python
+To define a singleton, decorate the class with `@Singleton`.
+:only-for-languages:
 
 The following class creates a unique identifier in the constructor. This identifier allows us to identify how many `Robot` instances are used.
 
+:exclude-for-languages:python
 source:singleton/Robot[tags=pkg|clazz]
 callout:singleton[]
+:exclude-for-languages:
+:only-for-languages:python
+source:singleton/Robot[]
+
+<.> `@Singleton` makes every injection point use the same `Robot`. The identifier comes from Python's `uuid4()`.
+:only-for-languages:
 
 === Singleton Test
 
-:exclude-for-languages:groovy
+:exclude-for-languages:groovy,python
 common:junit-params.adoc[]
 :exclude-for-languages:
 
 The following test verifies `@Singleton` behavior.
 
+:exclude-for-languages:python
 test:SingletonScopeTest[tags=package|imports|testheader|test]
 callout:micronaut-test[]
 callout:http-client[]
 <.> The same instance fulfills both injection points at `RobotFather` and `RobotMother`.
 <.> Same instance is used upon subsequent requests.
+:exclude-for-languages:
+:only-for-languages:python
+test:SingletonScopeTest[]
+callout:python-test-fixture[]
+callout:python-requests-client[]
+<.> The same instance fulfills both injection points at `RobotFather` and `RobotMother`.
+<.> Same instance is used upon subsequent requests.
+:only-for-languages:
 
 == Prototype
 
@@ -66,45 +117,88 @@ callout:http-client[]
 
 Let's use `@Prototype` instead of `@Singleton`.
 
+:exclude-for-languages:python
 source:prototype/Robot[]
 callout:prototype[]
+:exclude-for-languages:
+:only-for-languages:python
+source:prototype/Robot[]
+
+<.> `@Prototype` creates a new `Robot` for each injection point.
+:only-for-languages:
 
 === Prototype Tests
 
 The following test verifies the behavior of `Prototype` scope.
 
+:exclude-for-languages:python
 test:PrototypeScopeTest[tags=package|imports|testheader|test]
 callout:micronaut-test[]
 callout:http-client[]
 <.> A new instance is created to fulfill each injection point. Two instances - one for `RobotFather` and another for `RobotMother`.
 <.> Instances remain upon subsequent requests.
+:exclude-for-languages:
+:only-for-languages:python
+test:PrototypeScopeTest[]
+callout:python-test-fixture[]
+callout:python-requests-client[]
+<.> A new instance is created to fulfill each injection point. Two instances - one for `RobotFather` and another for `RobotMother`.
+<.> Instances remain upon subsequent requests.
+:only-for-languages:
+
+:only-for-languages:python
+The parameterized tests also exercise `@Bean` and `@Infrastructure` without a singleton scope at `/bean` and `/infrastructure`. These beans use the same prototype lifetime. Combining `@Infrastructure` with `@Singleton` at `/infrastructuresingleton` keeps one instance.
+:only-for-languages:
 
 == Request
 
 **@RequestScope scope is a custom scope that indicates a new instance of the bean is created and associated with each HTTP request**
 
+:exclude-for-languages:python
 source:request/Robot[]
 callout:request-scope[]
 callout:request-aware[]
+:exclude-for-languages:
+:only-for-languages:python
+source:request/Robot[]
+
+<.> `@RequestScope` shares one `Robot` during a request. Its constructor creates a fresh serial number for the next request.
+:only-for-languages:
 
 === Request Tests
 
 The following test verifies the behavior of `@RequestScope` scope.
 
+:exclude-for-languages:python
 test:RequestScopeTest[tags=package|imports|test]
 
 callout:micronaut-test[]
 callout:http-client[]
 <.> Both injection points, `RobotFather` and `RobotMother`, are fulfilled with the same instance of `Robot`. An instance associated with the HTTP Request.
 <.> Both injection points are fulfilled with the new instance of `Robot`.
+:exclude-for-languages:
+:only-for-languages:python
+test:RequestScopeTest[]
+callout:python-test-fixture[]
+callout:python-requests-client[]
+<.> Both collaborators use the same `Robot` within a request.
+<.> The next request gets a new `Robot`, shared by both collaborators.
+:only-for-languages:
 
 == Refreshable
 
 **https://docs.micronaut.io/latest/guide/#refreshable[Refreshable scope] is a custom scope that allows a bean's state to be refreshed via the https://docs.micronaut.io/latest/guide/#refreshEndpoint[/refresh endpoint].**
 
+:exclude-for-languages:python
 source:refreshable/Robot[]
 
 callout:refreshable[]
+:exclude-for-languages:
+:only-for-languages:python
+source:refreshable/Robot[]
+
+<.> `@Refreshable` keeps the bean until a refresh invalidates it.
+:only-for-languages:
 
 Your application needs the `management` dependency to enable the refresh endpoint.
 
@@ -114,6 +208,7 @@ dependency:micronaut-management[]
 
 The following test enables the https://docs.micronaut.io/latest/guide/#refreshEndpoint[refresh endpoint] and verifies the behavior of `@Refreshable`
 
+:exclude-for-languages:python
 test:RefreshableScopeTest[tags=package|imports|test]
 callout:property[]
 <.> The refresh endpoint is sensitive by default. To invoke it in the test, we set `endpoints.refresh.sensitive` to false.
@@ -123,6 +218,18 @@ callout:http-client[]
 <.> The same instance serves a new request.
 <.> Hitting the refresh endpoint, publishes a https://docs.micronaut.io/latest/api/io/micronaut/runtime/context/scope/refresh/RefreshEvent.html[RefreshEvent], which invalidates the instance of `Robot`.
 <.> A new instance of `Robot` is created the next time the object is requested.
+:exclude-for-languages:
+:only-for-languages:python
+Enable `endpoints.refresh.enabled` and set `endpoints.refresh.sensitive` to `False` in the test fixture. This lets the test invoke the refresh endpoint.
+
+test:RefreshableScopeTest[]
+callout:python-test-fixture[]
+callout:python-requests-client[]
+<.> Both collaborators use the same `Robot`.
+<.> The same instance serves the next request.
+<.> Send a forced refresh to invalidate the bean.
+<.> The next request creates a new `Robot`, shared by both collaborators.
+:only-for-languages:
 
 == @Context
 
@@ -132,9 +239,16 @@ The following example uses `@Context` in combination with `@ConfigurationPropert
 
 source:context/FrameworkConfiguration[]
 
+:exclude-for-languages:python
 callout:context[]
 callout:configuration-properties[]
 callout:constraints[]
+:exclude-for-languages:
+:only-for-languages:python
+<.> `@Context` creates the configuration bean when the application context starts.
+<.> `@ConfigurationProperties("framework")` binds the `framework` configuration.
+<.> `Pattern` validates the language against the supported names. Python's dataclass declares the configuration fields.
+:only-for-languages:
 
 The result is validation being performed on the Application Context start-up.
 
@@ -146,11 +260,21 @@ Micronaut Framework ships with other built-in scopes:
 
 === @Infrastructure
 
+:exclude-for-languages:python
 https://docs.micronaut.io/latest/api/io/micronaut/context/annotation/Infrastructure.html[@Infrastructure] scope represents a bean that cannot be overridden or replaced using `@Replaces` because it is critical to the functioning of the system.
+:exclude-for-languages:
+:only-for-languages:python
+`@Infrastructure` marks a bean that cannot be overridden or replaced with `@Replaces`. Add `@Singleton` when it should have a singleton lifetime.
+:only-for-languages:
 
 === @ThreadLocal
 
+:exclude-for-languages:python
 https://docs.micronaut.io/latest/api/io/micronaut/runtime/context/scope/ThreadLocal.html[@ThreadLocal] scope is a custom scope that associates a bean per thread via a ThreadLocal
+:exclude-for-languages:
+:only-for-languages:python
+`@ThreadLocal` associates a separate bean instance with each thread.
+:only-for-languages:
 
 === Next Steps
 
