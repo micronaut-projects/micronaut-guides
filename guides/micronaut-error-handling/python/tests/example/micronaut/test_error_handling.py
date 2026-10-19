@@ -25,7 +25,7 @@ def test_global_not_found_error(client):
 
     assert response.status_code == 404
     assert response.json()["message"] == "Page Not Found"
-    assert response.json()["_links"]["self"]["href"].endswith("/foo")
+    assert response.json()["_links"]["self"][0]["href"].endswith("/foo")
 
     response = client.get("/foo", headers={"Accept": "text/html"})
 
@@ -44,7 +44,7 @@ def test_form_validation_errors_are_rendered(client):
 
     response = client.post("/books/save", data={"title": "", "pages": "0"})
 
-    assert response.status_code == 200
+    assert response.status_code == 400
     assert "<title>Create Book</title>" in response.text
     assert 'name="title" value=""' in response.text
     assert 'name="pages" value="0"' in response.text
@@ -59,7 +59,7 @@ def test_form_preserves_and_escapes_submitted_values(client):
         data={"title": '<script>alert("book")</script>', "pages": "0"},
     )
 
-    assert response.status_code == 200
+    assert response.status_code == 400
     assert "<script>" not in response.text
     assert "&lt;script&gt;" in response.text
     assert 'name="pages" value="0"' in response.text

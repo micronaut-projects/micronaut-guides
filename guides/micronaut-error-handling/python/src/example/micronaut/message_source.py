@@ -1,5 +1,6 @@
 from jakarta.inject import Singleton
-from jakarta.validation import ConstraintViolation, Path
+from jakarta.validation import ConstraintViolation
+from jakarta.validation.Path import Node
 
 
 # tag::clazz[]
@@ -10,7 +11,7 @@ class MessageSource:
 
     @staticmethod
     def violation_message(violation: ConstraintViolation) -> str:
-        last_node: Path.Node | None = None
+        last_node: Node | None = None
         for node in violation.get_property_path():
             last_node = node
 
