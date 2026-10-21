@@ -5,6 +5,7 @@ from micronaut.security.authentication import (
 )
 from micronaut.security.authentication.provider import HttpRequestAuthenticationProvider
 
+
 @Singleton  # <1>
 class AuthenticationProviderUserPassword(HttpRequestAuthenticationProvider):  # <2>
     def authenticate(self, http_request, authentication_request) -> AuthenticationResponse:
