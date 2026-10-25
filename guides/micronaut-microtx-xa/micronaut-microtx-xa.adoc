@@ -1,0 +1,227 @@
+common:header-top.adoc[]
+
+== Getting Started
+
+In this guide, you will place orders across two Micronaut services, each with its own Oracle database, and commit the work of both services atomically with an XA transaction coordinated by https://docs.oracle.com/en/database/oracle/transaction-manager-for-microservices/[Oracle Transaction Manager for Microservices] (MicroTx).
+
+* `stock` keeps the stock of items and reserves it.
+* `orders` saves an order and reserves its items in the `stock` service.
+
+Each service runs its database work on a branch of the XA transaction. When `orders` completes, the MicroTx coordinator prepares the branch of each database, then commits them all, or rolls them all back if a service failed: either the order is saved and the stock reduced, or neither.
+
+common:requirements.adoc[]
+
+* https://www.docker.io/gettingstarted/[Docker] installed to run Oracle Database and the MicroTx coordinator.
+
+common:completesolution.adoc[]
+
+== Run the MicroTx Coordinator
+
+The coordinator runs in a container. Create a `tcs.yaml` configuration that enables XA transactions and keeps them in memory, which is enough for development:
+
+[source,yaml]
+----
+tmmConfiguration:
+  tmmAppName: tcs
+  listenAddr: 0.0.0.0:9000
+  internalAddr: http://localhost:9000
+  externalUrl: http://localhost:9000
+  xaCoordinator:
+    enabled: true
+  storage:
+    type: memory
+  authentication:
+    enabled: false
+  authorization:
+    enabled: false
+  serveTLS:
+    enabled: false
+----
+
+Start the coordinator with it:
+
+[source,bash]
+----
+docker run -d --name otmm -p 9000:9000 -v "$(pwd)":/app/config -e CONFIG_FILE=/app/config/tcs.yaml \
+  -e SERVE_TLS_ENABLED=false container-registry.oracle.com/database/otmm:24.4.1
+----
+
+The coordinator calls the services back to prepare and commit their branches, so it must reach them. On Linux, add `--add-host=host.docker.internal:host-gateway` and set the participant URLs of the services to `host.docker.internal`.
+
+== Stock Service
+
+=== Create the Stock Application
+
+common:cli-or-launch.adoc[]
+
+[source,bash]
+----
+mn @stock:cli-command@ example.micronaut.micronautguide \
+    --features=@stock:features@ \
+    --build=@build@ --lang=@lang@
+----
+
+common:build-lang-arguments.adoc[]
+
+common:default-package.adoc[]
+
+Rename this `micronautguide` directory to `stock`.
+
+If you use Micronaut Launch, select Micronaut Application as application type and add @stock:features-words@ features.
+
+Add the `micronaut-oracledb-microtx` dependency, which adds MicroTx transactions to the application:
+
+dependency:micronaut-oracledb-microtx[groupId=io.micronaut.oracledb]
+
+=== Database
+
+Configure the data source. Micronaut Test Resources starts an Oracle Database Free container for it in development and tests:
+
+resource:application.properties[app=stock,tag=datasource]
+
+The database takes part in XA transactions through XA connections, which MicroTx opens with the Oracle JDBC driver for the URL and credentials of the data source. To pool them, use the UCP connection pool with `oracle.jdbc.xa.client.OracleXADataSource` as its connection factory class, or define an `XADataSource` bean named after the data source.
+
+=== Stock
+
+source:Stock[app=stock]
+
+source:StockRepository[app=stock]
+
+<1> Reserve stock only if enough is left, and return the number of updated rows.
+
+Load some stock when the service starts:
+
+source:StockLoader[app=stock]
+
+=== Stock Controller
+
+source:StockController[app=stock]
+
+<1> The method blocks while it uses the database, so run it on the blocking executor.
+<2> `@XA` runs the method in the XA transaction of the request, which carries it in its `Link` header. The database of the service is enlisted in the transaction, and the repository runs on its branch: the update is committed or rolled back with the transaction, by the coordinator.
+<3> Reserve the stock.
+<4> Fail the request when the stock is short. The branch ends as failed, and the caller rolls the transaction back.
+
+Configure the transaction coordinator, the id of the resource manager of the database, and the URL at which the coordinator calls the service:
+
+resource:application.properties[app=stock,tag=microtx]
+
+<1> The id of the resource manager is unique among the services of a transaction and stable across restarts.
+<2> The coordinator prepares, commits and rolls back the branch of the service through callbacks under `/microtx` at this URL.
+
+=== Test the Stock Service
+
+The test runs the coordinator with Testcontainers and drives the transaction itself:
+
+test:StockControllerTest[app=stock]
+
+<1> Run the MicroTx coordinator with an in-memory store.
+<2> Let the coordinator reach the application on the host, at `host.testcontainers.internal`.
+<3> The coordinator calls the XA callbacks of the application at this URL.
+<4> Begin a transaction at the coordinator.
+<5> Reserve stock in the transaction, as the `orders` service does.
+<6> The reservation is not visible until the transaction commits.
+<7> Ask the coordinator to commit the transaction. It commits the branch of the `stock` database through the callbacks of the application.
+<8> Ask the coordinator to roll the transaction back.
+
+== Orders Service
+
+=== Create the Orders Application
+
+common:cli-or-launch.adoc[]
+
+[source,bash]
+----
+mn @orders:cli-command@ example.micronaut.micronautguide \
+    --features=@orders:features@ \
+    --build=@build@ --lang=@lang@
+----
+
+common:build-lang-arguments.adoc[]
+
+common:default-package.adoc[]
+
+Rename this `micronautguide` directory to `orders`.
+
+If you use Micronaut Launch, select Micronaut Application as application type and add @orders:features-words@ features.
+
+Add the `micronaut-oracledb-microtx` dependency:
+
+dependency:micronaut-oracledb-microtx[groupId=io.micronaut.oracledb]
+
+=== Database
+
+The `orders` service has its own database:
+
+resource:application.properties[app=orders,tag=datasource]
+
+=== Orders
+
+source:PurchaseOrder[app=orders]
+
+source:PurchaseOrderRepository[app=orders]
+
+source:OrderRequest[app=orders]
+
+source:StockClient[app=orders]
+
+<1> A declarative client for the `stock` service. MicroTx adds the XA transaction of the current request to the requests of Micronaut HTTP clients.
+
+=== Order Controller
+
+source:OrderController[app=orders]
+
+<1> The request does not carry a transaction, so `@XA` begins one, and commits it when the method returns or rolls it back when it throws. The database of the `orders` service is enlisted in it.
+<2> `@Transactional` runs on the branch of the XA transaction: it joins the transaction instead of committing on its own.
+<3> Save the order on the branch of the `orders` database.
+<4> Reserve the stock on the branch of the `stock` database. When the `stock` service fails, the client throws, and the transaction rolls back, including the order.
+<5> When the method returns, the coordinator prepares and commits both branches.
+
+Configure the coordinator, the resource manager of the database, the URL of the service for the callbacks of the coordinator, and the URL of the `stock` service:
+
+resource:application.properties[app=orders,tag=microtx]
+
+=== Test the Orders Service
+
+The test runs the coordinator and a `stock` stub without a database:
+
+test:StockStub[app=orders]
+
+test:OrderControllerTest[app=orders]
+
+<1> Use the stub instead of the `stock` service.
+<2> The coordinator committed the order.
+<3> The stub could not reserve the stock, so the coordinator rolled back the order.
+
+== Running the Application
+
+Start the `stock` service, then the `orders` service. In each application directory:
+
+:exclude-for-build:maven
+
+To run the application, execute `./gradlew run`.
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+To run the application, execute `./mvnw mn:run`.
+
+:exclude-for-build:
+
+Micronaut Test Resources starts a database for each service. The `stock` service listens on port 8082 and the `orders` service on port 8080.
+
+Place an order:
+
+[source,bash]
+----
+curl -X POST -H 'Content-Type: application/json' -d '{"item":"book","quantity":2}' localhost:8080/orders
+----
+
+== Recovery
+
+If a service or the coordinator fails after the branches are prepared, the coordinator completes them later through the callbacks of the services. Listing the prepared branches of a database needs the `SELECT` privilege on `DBA_PENDING_TRANSACTIONS` for the database user of the data source.
+
+common:next.adoc[]
+
+Read more about https://micronaut-projects.github.io/micronaut-oracledb/latest/guide/[Micronaut Oracle Database] and https://docs.oracle.com/en/database/oracle/transaction-manager-for-microservices/[Oracle MicroTx].

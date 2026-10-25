@@ -1,0 +1,216 @@
+common:header-top.adoc[]
+
+== Getting Started
+
+In this guide, you will book a trip across two Micronaut services with a try-confirm/cancel (TCC) transaction coordinated by https://docs.oracle.com/en/database/oracle/transaction-manager-for-microservices/[Oracle Transaction Manager for Microservices] (MicroTx).
+
+* `hotel` reserves rooms. A reservation is provisional until it is confirmed or cancelled.
+* `trip` books a trip: it reserves a room in the `hotel` service, then confirms or cancels all the reservations of the trip at once.
+
+In a TCC transaction, each participant makes a provisional reservation in the try phase and exposes it at a URI. The MicroTx coordinator then confirms the reservations with a `PUT` to their URIs, or cancels them with a `DELETE`. Unlike a database transaction, no locks are held while the services talk to each other: each service only keeps a reservation for a limited time.
+
+common:requirements.adoc[]
+
+* https://www.docker.io/gettingstarted/[Docker] installed to run the MicroTx coordinator.
+
+common:completesolution.adoc[]
+
+== Run the MicroTx Coordinator
+
+The coordinator runs in a container. Create a `tcs.yaml` configuration that enables TCC transactions and keeps them in memory, which is enough for development:
+
+[source,yaml]
+----
+tmmConfiguration:
+  tmmAppName: tcs
+  listenAddr: 0.0.0.0:9000
+  internalAddr: http://localhost:9000
+  externalUrl: http://localhost:9000
+  tccCoordinator:
+    enabled: true
+  storage:
+    type: memory
+  authentication:
+    enabled: false
+  authorization:
+    enabled: false
+  serveTLS:
+    enabled: false
+----
+
+Start the coordinator with it:
+
+[source,bash]
+----
+docker run -d --name otmm -p 9000:9000 -v "$(pwd)":/app/config -e CONFIG_FILE=/app/config/tcs.yaml \
+  -e SERVE_TLS_ENABLED=false container-registry.oracle.com/database/otmm:24.4.1
+----
+
+== Hotel Service
+
+=== Create the Hotel Application
+
+common:cli-or-launch.adoc[]
+
+[source,bash]
+----
+mn @hotel:cli-command@ example.micronaut.micronautguide \
+    --features=@hotel:features@ \
+    --build=@build@ --lang=@lang@
+----
+
+common:build-lang-arguments.adoc[]
+
+common:default-package.adoc[]
+
+Rename this `micronautguide` directory to `hotel`.
+
+If you use Micronaut Launch, select Micronaut Application as application type and add @hotel:features-words@ features.
+
+Add the `micronaut-oracledb-microtx` dependency, which adds MicroTx transactions to the application:
+
+dependency:micronaut-oracledb-microtx[groupId=io.micronaut.oracledb]
+
+=== Bookings
+
+A booking is provisional until the coordinator confirms or cancels it:
+
+source:BookingStatus[app=hotel]
+
+source:Booking[app=hotel]
+
+source:BookingRequest[app=hotel]
+
+Keep the bookings in memory:
+
+source:BookingRepository[app=hotel]
+
+=== Booking Controller
+
+source:BookingController[app=hotel]
+
+callout:controller[number=1,arg0=/bookings]
+<2> Inject `MicroTxTccClient`, which gives access to the TCC transaction of the current request.
+<3> The coordinator calls the service at the URL configured with `hotel.url`.
+<4> `@TCC` runs the method in a TCC transaction. The request of the `trip` service carries its transaction in a `Link` header, so the method joins it. The coordinator keeps the reservations of this method for 60 seconds.
+<5> Make a provisional booking.
+<6> Add the URI of the booking as a participant of the transaction. The participants are returned to the caller in the `Link` header of the response.
+<7> The coordinator confirms the booking with a `PUT` to its URI.
+<8> The coordinator cancels the booking with a `DELETE` to its URI.
+
+The confirm and cancel endpoints are not annotated with `@TCC`: the coordinator calls them outside the transaction.
+
+Configure the port of the service and the URL at which the coordinator reaches it:
+
+resource:application.properties[app=hotel,tag=port]
+
+resource:application.properties[app=hotel,tag=url]
+
+=== Test the Hotel Service
+
+test:BookingControllerTest[app=hotel]
+
+<1> A request that carries a TCC transaction in its `Link` header joins it.
+<2> The response returns the booking as a participant of the transaction, with its time limit in milliseconds.
+<3> A `PUT` to the URI of the booking confirms it, as the coordinator does.
+
+== Trip Service
+
+=== Create the Trip Application
+
+common:cli-or-launch.adoc[]
+
+[source,bash]
+----
+mn @trip:cli-command@ example.micronaut.micronautguide \
+    --features=@trip:features@ \
+    --build=@build@ --lang=@lang@
+----
+
+common:build-lang-arguments.adoc[]
+
+common:default-package.adoc[]
+
+Rename this `micronautguide` directory to `trip`.
+
+If you use Micronaut Launch, select Micronaut Application as application type and add @trip:features-words@ features.
+
+Add the `micronaut-oracledb-microtx` dependency:
+
+dependency:micronaut-oracledb-microtx[groupId=io.micronaut.oracledb]
+
+=== Hotel Client
+
+source:BookingRequest[app=trip]
+
+source:HotelClient[app=trip]
+
+<1> A declarative client for the `hotel` service. MicroTx adds the TCC transaction of the current request to the requests of Micronaut HTTP clients, and adds the participants that the `hotel` service returns to the transaction.
+
+=== Trip Controller
+
+source:TripRequest[app=trip]
+
+source:TripController[app=trip]
+
+<1> The method blocks while it calls the `hotel` service and the coordinator, so run it on the blocking executor.
+<2> The request does not carry a transaction, so `@TCC` begins one, which the coordinator keeps for two minutes.
+<3> Reserve a room. The reservation is added to the transaction.
+<4> Ask the coordinator to confirm all the reservations of the transaction, or to cancel them. `confirm` and `cancel` return the outcome reported by the coordinator, and throw a `TccException` when the coordinator does not know the transaction or the participants end up in mixed states.
+
+Configure the URL of the API of the coordinator, which the service needs to begin transactions, and the URL of the `hotel` service:
+
+resource:application.properties[app=trip,tag=microtx]
+
+=== Test the Trip Service
+
+The test runs the coordinator with Testcontainers, and a `hotel` stub in the same application:
+
+test:HotelStub[app=trip]
+
+test:TripControllerTest[app=trip]
+
+<1> Implement `TestPropertyProvider` to start the coordinator before the application and configure it.
+<2> Run the MicroTx coordinator with an in-memory store.
+<3> Let the coordinator reach the application on the host, at `host.testcontainers.internal`.
+<4> The stub adds participants at an address that the coordinator can reach.
+<5> The coordinator reports the outcome of the transaction.
+<6> The coordinator confirmed the booking.
+
+== Running the Application
+
+Start the `hotel` service, then the `trip` service. In each application directory:
+
+:exclude-for-build:maven
+
+To run the application, execute `./gradlew run`.
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+To run the application, execute `./mvnw mn:run`.
+
+:exclude-for-build:
+
+The `hotel` service listens on port 8081 and the `trip` service on port 8080.
+
+Book a trip and confirm it:
+
+[source,bash]
+----
+curl -X POST -H 'Content-Type: application/json' -d '{"hotel":"Grand","confirm":true}' localhost:8080/trips
+----
+
+The coordinator reports that it confirmed the booking:
+
+[source,json]
+----
+{"txid":"...","status":"Confirmed","participants":[{"uri":"http://localhost:8081/bookings/...","timeLimit":60000,"status":"Confirmed"}]}
+----
+
+To run the services in their own containers, set `hotel.url` to an address of the `hotel` service that the coordinator can reach, and `microtx.coordinator-url` to the address of the coordinator.
+
+common:next.adoc[]
+
+Read more about https://micronaut-projects.github.io/micronaut-oracledb/latest/guide/[Micronaut Oracle Database] and https://docs.oracle.com/en/database/oracle/transaction-manager-for-microservices/[Oracle MicroTx].
