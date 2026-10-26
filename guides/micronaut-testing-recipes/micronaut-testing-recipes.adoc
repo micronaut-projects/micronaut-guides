@@ -1,0 +1,650 @@
+common:header.adoc[]
+
+This guide is a collection of small testing recipes. Each recipe shows how to verify one aspect of a Micronaut application: the beans in the application context, the active environments, validation constraints, serialization, introspection, controllers, views, redirections, cookies, security, static resources, and localization bundles.
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+common:create-app-features.adoc[]
+
+== Application
+
+The recipes test a small application that manages contacts. This section describes the code under test.
+
+=== Calculators
+
+Create an interface with two implementations:
+
+source:Calculator[]
+
+source:BasicCalculator[]
+
+callout:primary[]
+callout:singleton[]
+
+source:ScientificCalculator[]
+
+callout:singleton[]
+
+=== Contact
+
+:exclude-for-languages:kotlin,groovy,python
+Create a `Contact` record:
+:exclude-for-languages:
+
+:exclude-for-languages:java,groovy,python
+Create a `Contact` data class:
+:exclude-for-languages:
+
+:exclude-for-languages:java,kotlin,python
+Create a `Contact` class:
+:exclude-for-languages:
+
+:only-for-languages:python
+Create a `Contact` dataclass:
+:only-for-languages:
+
+source:Contact[]
+
+callout:serdeable[]
+:exclude-for-languages:python
+callout:reflective-access[]
+:exclude-for-languages:
+:exclude-for-languages:python
+Thymeleaf evaluates expressions such as `${contact.firstName}` with reflection.
+:exclude-for-languages:
+:exclude-for-languages:kotlin
+<.> The `firstName` and `lastName` fields are required.
+:exclude-for-languages:
+:exclude-for-languages:java,groovy,python
+<.> The `firstName` and `lastName` fields are required. `@field:NotBlank` applies the constraint to the backing field. The properties use nullable types so that validation, rather than the Kotlin compiler, rejects a `null` value.
+:exclude-for-languages:
+:only-for-languages:python
+The Python dataclass uses `Annotated` with `NotBlank` so Micronaut Validation applies the constraint to each field.
+:only-for-languages:
+<.> The `company` field is optional.
+
+=== Repository
+
+:exclude-for-languages:python
+Create a repository interface. Its `findByFirstName` method declares a constraint on its parameter:
+:exclude-for-languages:
+:only-for-languages:python
+Create a repository interface. Its `find_by_first_name` method declares a constraint on its parameter:
+:only-for-languages:
+
+source:ContactRepository[]
+
+<.> The `firstName` parameter cannot be blank.
+
+And an in-memory implementation:
+
+source:InMemoryContactRepository[]
+
+callout:singleton[]
+
+:exclude-for-languages:java,groovy,python
+The class is `open` because Micronaut validation applies AOP advice to the bean to validate the `firstName` parameter, and Kotlin classes are final by default.
+:exclude-for-languages:
+:only-for-languages:python
+`@Validated` enables method parameter validation on the Python bean.
+:only-for-languages:
+
+=== Controllers
+
+Create a controller that renders the contacts as HTML:
+
+source:ContactController[]
+
+callout:controller[arg0=/contacts]
+callout:constructor-di[arg0=ContactRepository]
+callout:secured-anonymous[]
+callout:produces-html[]
+callout:view[]
+callout:get[arg0=list,arg1=/contacts]
+
+Create the Thymeleaf template rendered by the controller:
+
+resource:views/contacts/list.html[]
+
+Create a controller that redirects the home page to the contacts page:
+
+source:HomeController[]
+
+callout:controller[arg0=/]
+callout:secured-anonymous[]
+callout:get[arg0=index,arg1=/]
+<.> `HttpResponse.seeOther` responds with the `303 See Other` HTTP status and sets the `Location` HTTP header.
+
+Create a controller that saves the locale selected by the user in a cookie:
+
+source:LocaleController[]
+
+callout:controller[arg0=/locale]
+callout:secured-anonymous[]
+callout:consumes[]
+callout:post[arg0=changeLocale,arg1=/locale]
+<.> Set a cookie in the redirect response.
+
+:exclude-for-languages:java,groovy,python
+The class and the method are `open` because Micronaut validation applies AOP advice to validate the `locale` parameter.
+:exclude-for-languages:
+
+Create a controller which only authenticated users can access:
+
+source:AccountController[]
+
+callout:controller[arg0=/account]
+callout:secured-is-authenticated[]
+callout:text-plain[]
+callout:get[arg0=index,arg1=/account]
+
+=== Static resources
+
+:exclude-for-languages:python
+Save an image in `src/main/resources/assets/images/micronaut_stacked_black.png` and expose it as a static resource. Because the application uses Micronaut Security, allow anonymous access to the images path:
+:exclude-for-languages:
+
+:exclude-for-languages:python
+resource:application.properties[tag=static-resources]
+:exclude-for-languages:
+:only-for-languages:python
+Save the image in `config/static/images/micronaut_stacked_black.png` and configure the static resource and anonymous security rule in `config/application.toml`:
+
+resource:application.toml[tag=static-resources]
+:only-for-languages:
+
+=== Localization bundles
+
+:exclude-for-languages:python
+Create a messages bundle for the default language in `src/main/resources/i18n/messages_en.properties`:
+:exclude-for-languages:
+:only-for-languages:python
+Create a messages bundle for the default language in `config/i18n/messages_en.properties`:
+:only-for-languages:
+
+resource:i18n/messages_en.properties[]
+
+:exclude-for-languages:python
+And a bundle for Spanish in `src/main/resources/i18n/messages_es.properties`:
+:exclude-for-languages:
+:only-for-languages:python
+And a bundle for Spanish in `config/i18n/messages_es.properties`:
+:only-for-languages:
+
+resource:i18n/messages_es.properties[]
+
+== Testing recipes
+
+:only-for-languages:python
+Pyronaut uses pytest fixtures to start and stop Micronaut contexts. These shared fixtures start a context without the embedded server for bean and validation tests, or start the server and expose a `requests` client for HTTP tests:
+
+rawTest:conftest[]
+
+<.> `my_context` avoids starting the embedded server when a test only needs beans.
+<.> `requests.with_context` sends requests to the embedded server associated with the fixture.
+:only-for-languages:
+
+=== Test the active environments
+
+:exclude-for-languages:python
+When you annotate a test with `@MicronautTest`, the Micronaut framework activates the `test` environment by default. Inject the `ApplicationContext` and read the active environment names from its `Environment`:
+:exclude-for-languages:
+:only-for-languages:python
+Pyronaut's test fixture starts the Micronaut context with the `test` environment by default. Read the active environment names from the context:
+:only-for-languages:
+
+test:ActiveEnvironmentsTest[]
+
+:exclude-for-languages:python
+callout:micronaut-test-start-application-false[]
+<.> Inject the `ApplicationContext`.
+<.> `getActiveNames()` returns the environments activated for the running context.
+:exclude-for-languages:
+:only-for-languages:python
+<.> The `my_context` fixture starts the context with the default `test` environment.
+<.> `getActiveNames()` returns the active environment names.
+:only-for-languages:
+
+Assert the exact set of active environments when you want to detect unexpected environments. Additional environments can be activated with the `environments` member of `@MicronautTest`, the `micronaut.environments` system property, or the `MICRONAUT_ENVIRONMENTS` environment variable.
+
+=== Test a bean exists
+
+To verify a bean of a given type exists, use `containsBean`. It returns a `boolean` and does not instantiate the bean.
+
+test:CalculatorBeanExistsTest[]
+
+:exclude-for-languages:python
+callout:micronaut-test-start-application-false[]
+<.> Inject the `BeanContext`.
+<.> Assert the context contains a bean of type `Calculator`.
+:exclude-for-languages:
+:only-for-languages:python
+<.> Use `my_context` to access the context managed by the pytest fixture.
+<.> `containsBean` checks whether the context has a bean of the given type.
+:only-for-languages:
+
+You can also start an `ApplicationContext` yourself without Micronaut Test:
+
+test:CalculatorApplicationContextTest[]
+
+:exclude-for-languages:kotlin,groovy,python
+<.> Start the application context in a try-with-resources statement so it is closed after the test.
+:exclude-for-languages:
+:exclude-for-languages:java,groovy,python
+<.> Start the application context with `use` so it is closed after the test.
+:exclude-for-languages:
+:exclude-for-languages:java,kotlin,python
+<.> Start the application context. `@AutoCleanup` closes it after the test.
+:exclude-for-languages:
+:exclude-for-languages:python
+<.> `ApplicationContext` extends `BeanContext` and exposes `containsBean` too.
+:exclude-for-languages:
+:only-for-languages:python
+<.> `ApplicationContext.run()` starts a context directly.
+<.> The `finally` block closes the context after the assertion.
+:only-for-languages:
+
+=== Test a bean is annotated
+
+To verify a bean carries an annotation, retrieve its `BeanDefinition` and query its annotation metadata. Micronaut's compile-time annotation metadata captures stereotypes (meta-annotations) and annotations that are not retained at runtime, which Java reflection would miss.
+
+test:BasicCalculatorAnnotationTest[]
+
+:exclude-for-languages:python
+callout:micronaut-test-start-application-false[]
+:exclude-for-languages:
+:exclude-for-languages:python
+<.> `getBeanDefinition` returns the definition of the bean. It throws if the bean does not exist.
+<.> `hasAnnotation` checks an annotation declared directly on the bean.
+<.> `hasStereotype` checks an annotation declared directly or through a meta-annotation.
+:exclude-for-languages:
+:only-for-languages:python
+<.> Retrieve the bean definition from the context.
+<.> `hasAnnotation` checks an annotation declared directly on the bean.
+<.> `hasStereotype` checks for a declared annotation or one inherited through a meta-annotation.
+:only-for-languages:
+
+=== Test a bean is unique or primary
+
+When an injection point requests a type with multiple candidates and none of them is primary, the Micronaut framework throws a `NonUniqueBeanException`. `getBean` resolves a single bean, so the following test fails until the candidates are disambiguated with `@Primary` or `@Secondary`:
+
+test:CalculatorTest[]
+
+:exclude-for-languages:python
+callout:micronaut-test-start-application-false[]
+:exclude-for-languages:
+:exclude-for-languages:python
+<.> `getBean` throws a `NonUniqueBeanException` if multiple candidates exist and none is primary, and a `NoSuchBeanException` if none exists.
+<.> The primary bean is selected.
+<.> `getBeansOfType` returns every candidate.
+:exclude-for-languages:
+:only-for-languages:python
+<.> The primary `BasicCalculator` is returned for the `Calculator` type.
+<.> `getBeansOfType` returns both calculator implementations.
+:only-for-languages:
+
+=== Test a class is introspected
+
+Introspection is the foundation of many Micronaut features, such as serialization, validation, and bean mapping. Introspection metadata is generated at compilation time, so you don't need an application context to test it:
+
+test:ContactIntrospectedTest[]
+
+:exclude-for-languages:python
+<.> A plain unit test without `@MicronautTest`.
+:exclude-for-languages:
+<.> `BeanIntrospection.getIntrospection` throws an `IntrospectionException` if the type is not introspected. `@Serdeable` implies `@Introspected`.
+
+=== Test a class is serializable
+
+To verify Micronaut Serialization can serialize and deserialize a type, retrieve its serializable and deserializable introspections:
+
+test:ContactSerdeTest[]
+
+:exclude-for-languages:python
+callout:micronaut-test-start-application-false[]
+:exclude-for-languages:
+:exclude-for-languages:python
+<.> Inject the `SerdeIntrospections` bean.
+<.> `getDeserializableIntrospection` throws if the type cannot be deserialized.
+<.> `getSerializableIntrospection` throws if the type cannot be serialized.
+:exclude-for-languages:
+:only-for-languages:python
+<.> Retrieve the `SerdeIntrospections` bean from the context.
+<.> `getDeserializableIntrospection` throws if the type cannot be deserialized.
+<.> `getSerializableIntrospection` throws if the type cannot be serialized.
+:only-for-languages:
+
+Use `@Serdeable.Serializable` or `@Serdeable.Deserializable` to allow only one direction.
+
+=== Test JSON serialization
+
+To verify an object serializes to the expected JSON, use the `JsonMapper` API. It mirrors Jackson Databind's `ObjectMapper`:
+
+test:ContactJsonSerializationTest[]
+
+:exclude-for-languages:python
+callout:micronaut-test-start-application-false[]
+:exclude-for-languages:
+:exclude-for-languages:groovy,python
+callout:junit5-method-parameters-injection[]
+:exclude-for-languages:
+:only-for-languages:python
+<.> Retrieve `JsonMapper` from the context fixture.
+<.> `writeValueAsString` writes the contact as JSON.
+:only-for-languages:
+:exclude-for-languages:java,kotlin,python
+<.> Inject the `JsonMapper` bean.
+:exclude-for-languages:
+:exclude-for-languages:kotlin,groovy,python
+<.> `writeValueAsString` writes the object as a JSON string. Micronaut Serialization preserves the declaration order of the record components, so the output is deterministic.
+:exclude-for-languages:
+:exclude-for-languages:java,groovy,python
+<.> `writeValueAsString` writes the object as a JSON string. Micronaut Serialization preserves the declaration order of the data class properties, so the output is deterministic.
+:exclude-for-languages:
+:exclude-for-languages:java,kotlin,python
+<.> `writeValueAsString` writes the object as a JSON string. Micronaut Serialization preserves the declaration order of the properties, so the output is deterministic.
+:exclude-for-languages:
+:only-for-languages:python
+The dataclass fields are serialized in declaration order, so the expected JSON string is deterministic.
+:only-for-languages:
+
+=== Test JSON deserialization
+
+To verify JSON deserializes to the expected object, use `readValue` and compare the result with the expected object:
+
+test:ContactJsonDeserializationTest[]
+
+:exclude-for-languages:python
+callout:micronaut-test-start-application-false[]
+:exclude-for-languages:
+:exclude-for-languages:groovy,python
+callout:junit5-method-parameters-injection[]
+:exclude-for-languages:
+:exclude-for-languages:java,kotlin,python
+<.> Inject the `JsonMapper` bean.
+:exclude-for-languages:
+:only-for-languages:python
+<.> Retrieve `JsonMapper` from the context fixture.
+<.> `Argument.of(Contact)` describes the target type passed to `readValue`.
+:only-for-languages:
+:exclude-for-languages:python
+<.> `readValue` reads the JSON into an instance of the type described by the `Argument`. Use an `Argument` such as `Argument.listOf(Contact.class)` for generic types.
+:exclude-for-languages:
+
+=== Test a field is required
+
+To verify a field is required, validate an instance with an invalid value for the field and assert there are constraint violations. For a `@NotBlank` field, test both an empty string and `null`:
+
+test:ContactRequiredFieldTest[]
+
+:exclude-for-languages:python
+callout:micronaut-test-start-application-false[]
+:exclude-for-languages:
+:exclude-for-languages:python
+<.> Inject a `jakarta.validation.Validator`.
+<.> A non-empty set of constraint violations means the instance is invalid.
+:exclude-for-languages:
+:only-for-languages:python
+<.> Retrieve `jakarta.validation.Validator` from the context.
+<.> A non-empty set of constraint violations means the instance is invalid.
+<.> The `null` first name also violates `NotBlank`.
+:only-for-languages:
+
+=== Test a field is optional
+
+To verify a field is optional, validate an instance with the field set to `null` and assert there are no constraint violations:
+
+test:ContactOptionalFieldTest[]
+
+:exclude-for-languages:python
+callout:micronaut-test-start-application-false[]
+:exclude-for-languages:
+:exclude-for-languages:python
+<.> Inject `io.micronaut.validation.validator.Validator`. It extends `jakarta.validation.Validator`.
+<.> An empty set of constraint violations means the instance is valid.
+:exclude-for-languages:
+:only-for-languages:python
+<.> Retrieve `jakarta.validation.Validator` from the context.
+<.> An empty set of constraint violations means the instance is valid.
+:only-for-languages:
+
+=== Test method parameter validation
+
+:exclude-for-languages:python
+The Micronaut framework validates constraints on the parameters of methods of beans. It is easy to forget such a constraint when you define an API. Write a test which invokes the method with an invalid argument and asserts a `ConstraintViolationException` is thrown:
+:exclude-for-languages:
+:only-for-languages:python
+Micronaut Validation checks constraints on bean method parameters. Invoke the repository bean with an invalid argument and verify that validation rejects it:
+:only-for-languages:
+
+test:ContactRepositoryTest[]
+
+:exclude-for-languages:python
+callout:micronaut-test-start-application-false[]
+:exclude-for-languages:
+:exclude-for-languages:groovy,python
+callout:junit5-method-parameters-injection[]
+:exclude-for-languages:
+:exclude-for-languages:java,kotlin,python
+<.> Inject the `ContactRepository` bean.
+:exclude-for-languages:
+:only-for-languages:python
+<.> Retrieve the repository bean from the context fixture.
+<.> The method interceptor rejects the blank `first_name` argument.
+:only-for-languages:
+:exclude-for-languages:python
+<.> Validation happens before the method executes. It only applies when you invoke the method on a bean. If you instantiate the implementation yourself, validation is bypassed.
+:exclude-for-languages:
+:only-for-languages:python
+<.> Validation applies when you call the repository bean. Calling an implementation directly bypasses the bean interceptor.
+:only-for-languages:
+
+=== Test a controller returns HTML
+
+:exclude-for-languages:python
+To test a controller that renders HTML, send a request accepting HTML and retrieve the response as a `String`. Replace the controller's collaborators with a stub so that the rendered data is deterministic:
+:exclude-for-languages:
+:only-for-languages:python
+Use a context property to activate a replacement repository for this test. Send a request with `Accept: text/html` and assert on the rendered response:
+:only-for-languages:
+
+test:ContactControllerTest[]
+
+:exclude-for-languages:python
+callout:spec-name[]
+callout:micronaut-test[]
+callout:http-client[]
+:exclude-for-languages:
+:exclude-for-languages:python
+<.> Accept `text/html` to match the controller's `@Produces` annotation.
+:exclude-for-languages:
+:exclude-for-languages:groovy,python
+<.> `retrieve` throws on non-2xx responses, so wrapping it in `assertDoesNotThrow` also asserts the request succeeds.
+:exclude-for-languages:
+:exclude-for-languages:java,kotlin,python
+<.> `retrieve` throws on non-2xx responses, so `noExceptionThrown()` also asserts the request succeeds.
+:exclude-for-languages:
+:exclude-for-languages:python
+<.> `@Replaces` replaces the `ContactRepository` bean in the context.
+:exclude-for-languages:
+:only-for-languages:python
+<.> `@Requires` activates the replacement only for this test's `spec.name`.
+<.> `@Replaces` replaces the repository bean.
+<.> `requests.with_context` uses the server started for the test fixture.
+<.> Accept HTML so that the controller's `@Produces` annotation matches.
+<.> A successful response status confirms the HTTP request completed.
+:only-for-languages:
+
+=== Test view rendering
+
+:exclude-for-languages:python
+To test how a view renders without HTTP or the embedded server, inject the `ViewsRenderer` of your views engine and render the view directly. Create a utility class to convert a `Writable` to a `String`:
+:exclude-for-languages:
+:only-for-languages:python
+To test view rendering without HTTP, retrieve the Thymeleaf renderer from the context and write its `Writable` result to a Java `StringWriter`:
+:only-for-languages:
+
+:exclude-for-languages:python
+test:WritableUtils[]
+:exclude-for-languages:
+
+And render the view in a test:
+
+test:ContactListViewTest[]
+
+:exclude-for-languages:python
+callout:micronaut-test-start-application-false[]
+<.> Inject the `ViewsRenderer` for Thymeleaf.
+<.> Render the view with a model. The view name is the template path without the file extension. Pass `null` as the request if the template does not need it.
+<.> Convert the `Writable` to a `String` to assert on the HTML.
+:exclude-for-languages:
+:only-for-languages:python
+<.> Retrieve the `ThymeleafViewsRenderer` bean from the context.
+<.> Render the template with a model containing the contacts.
+<.> Convert the `Writable` to a string and assert on the HTML.
+:only-for-languages:
+
+=== Test a redirection
+
+:exclude-for-languages:python
+The Micronaut HTTP client follows redirections by default. To assert a redirection, configure the HTTP client not to follow redirections, and verify the response status and the `Location` HTTP header:
+:exclude-for-languages:
+:only-for-languages:python
+Set `allow_redirects=False` on the Pyronaut `requests` client so the response retains the redirect status and `Location` header:
+:only-for-languages:
+
+test:HomeControllerTest[]
+
+:exclude-for-languages:python
+<.> Set `micronaut.http.client.follow-redirects` to `false`.
+callout:micronaut-test[]
+callout:http-client[]
+:exclude-for-languages:
+:exclude-for-languages:python
+<.> Assert the status matches the redirection: `HttpResponse.seeOther` returns `303`, `HttpResponse.temporaryRedirect` returns `307`, and `HttpResponse.redirect` returns `301`.
+<.> Assert the `Location` HTTP header.
+:exclude-for-languages:
+:only-for-languages:python
+<.> Set `allow_redirects=False` on the request.
+<.> `HttpResponse.seeOther` returns `303`.
+<.> Assert the `Location` response header.
+:only-for-languages:
+
+=== Test a controller returns a cookie
+
+:exclude-for-languages:python
+The cookie is set in a redirect response. If the HTTP client follows the redirection, the response you observe doesn't contain the `Set-Cookie` HTTP header. Configure the HTTP client not to follow redirections:
+:exclude-for-languages:
+:only-for-languages:python
+The cookie is set on a redirect response. Disable redirect following on the request and inspect the cookies in that response:
+:only-for-languages:
+
+test:LocaleControllerTest[]
+
+:exclude-for-languages:python
+<.> Set `micronaut.http.client.follow-redirects` to `false`.
+callout:micronaut-test[]
+callout:http-client[]
+callout:exchange[]
+<.> `getCookie` returns an `Optional<Cookie>`.
+:exclude-for-languages:
+:only-for-languages:python
+<.> Pass `allow_redirects=False` so the client receives the redirect response.
+<.> Assert the response status is `303 See Other`.
+<.> `response.cookies` contains the cookie set by the redirect response.
+:only-for-languages:
+
+=== Test with security disabled
+
+:exclude-for-languages:python
+Given an endpoint which requires authentication:
+:exclude-for-languages:
+:only-for-languages:python
+The `/account` endpoint requires an authenticated user:
+:only-for-languages:
+
+test:AccountControllerTest[]
+
+:exclude-for-languages:python
+callout:micronaut-test[]
+callout:http-client[]
+:exclude-for-languages:
+:exclude-for-languages:python
+<.> Unauthenticated requests receive a `401 Unauthorized` response.
+:exclude-for-languages:
+:only-for-languages:python
+<.> An unauthenticated request receives `401 Unauthorized`.
+:only-for-languages:
+
+To disable security in a test, set `micronaut.security.filter.enabled` to `false`:
+
+test:AccountControllerSecurityDisabledTest[]
+
+:exclude-for-languages:python
+<.> Disable the Micronaut Security filter.
+:exclude-for-languages:
+:exclude-for-languages:python
+callout:micronaut-test[]
+callout:http-client[]
+:exclude-for-languages:
+:exclude-for-languages:python
+<.> The request succeeds without authentication.
+:exclude-for-languages:
+:only-for-languages:python
+<.> Set `micronaut.security.filter.enabled` to `false` in the test context.
+<.> `requests.with_context` sends the request to the test server.
+<.> The response succeeds without authentication.
+:only-for-languages:
+
+Disabling the security filter bypasses authentication and authorization. To verify authorization rules, keep security enabled and test as an authenticated user. Read the guideLink:micronaut-security-test[] guide to learn how.
+
+=== Test static resources
+
+To verify a static resource is served, send a request to its URL and assert the request succeeds:
+
+test:ImagesAssetsTest[]
+
+:exclude-for-languages:python
+callout:micronaut-test[]
+callout:http-client[]
+<.> `exchange` throws an `HttpClientResponseException` if the response status is not 2xx, for example, a `404` if the mapping is wrong or the file is missing, or a `401` if security does not allow anonymous access.
+:exclude-for-languages:
+:only-for-languages:python
+<.> Request the image URL through the context-bound `requests` client.
+<.> A successful response has a `200` status.
+<.> Check that the response body contains image data.
+:only-for-languages:
+
+=== Test every message is localized
+
+To verify every key in the bundle of the default language is present in each localized bundle, load the bundles and compare their keys:
+
+test:MessagesLocalizedTest[]
+
+:exclude-for-languages:python
+callout:micronaut-test-start-application-false[]
+:exclude-for-languages:
+:exclude-for-languages:python
+<.> Add every language you support.
+:exclude-for-languages:
+:exclude-for-languages:groovy,python
+callout:junit5-method-parameters-injection[]
+:exclude-for-languages:
+:exclude-for-languages:java,kotlin,python
+<.> Inject the `ResourceLoader` bean.
+:exclude-for-languages:
+:only-for-languages:python
+<.> Add every language suffix to the `suffixes` list.
+<.> The key sets must match.
+:only-for-languages:
+:exclude-for-languages:python
+<.> Asserting the key sets are equal detects both missing translations and extra keys in the localized bundle.
+:exclude-for-languages:
+
+common:testApp.adoc[]
+
+common:next.adoc[]
+
+Read more about https://micronaut-projects.github.io/micronaut-test/latest/guide/[Micronaut Test].
