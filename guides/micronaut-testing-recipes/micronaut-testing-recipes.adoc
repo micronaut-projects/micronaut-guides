@@ -1,0 +1,340 @@
+common:header.adoc[]
+
+This guide is a collection of small testing recipes. Each recipe shows how to verify one aspect of a Micronaut application: the beans in the application context, the active environments, validation constraints, serialization, introspection, controllers, views, redirections, cookies, security, static resources, and localization bundles.
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+common:create-app-features.adoc[]
+
+== Application
+
+The recipes test a small application that manages contacts. This section describes the code under test.
+
+=== Calculators
+
+Create an interface with two implementations:
+
+source:Calculator[]
+
+source:BasicCalculator[]
+
+callout:primary[]
+callout:singleton[]
+
+source:ScientificCalculator[]
+
+callout:singleton[]
+
+=== Contact
+
+Create a `Contact` record:
+
+source:Contact[]
+
+callout:serdeable[]
+callout:reflective-access[]
+Thymeleaf evaluates expressions such as `${contact.firstName}` with reflection.
+<.> The `firstName` and `lastName` fields are required.
+<.> The `company` field is optional.
+
+=== Repository
+
+Create a repository interface. Its `findByFirstName` method declares a constraint on its parameter:
+
+source:ContactRepository[]
+
+<.> The `firstName` parameter cannot be blank.
+
+And an in-memory implementation:
+
+source:InMemoryContactRepository[]
+
+callout:singleton[]
+
+=== Controllers
+
+Create a controller that renders the contacts as HTML:
+
+source:ContactController[]
+
+callout:controller[arg0=/contacts]
+callout:constructor-di[arg0=ContactRepository]
+callout:secured-anonymous[]
+callout:produces-html[]
+callout:view[]
+callout:get[arg0=list,arg1=/contacts]
+
+Create the Thymeleaf template rendered by the controller:
+
+resource:views/contacts/list.html[]
+
+Create a controller that redirects the home page to the contacts page:
+
+source:HomeController[]
+
+callout:controller[arg0=/]
+callout:secured-anonymous[]
+callout:get[arg0=index,arg1=/]
+<.> `HttpResponse.seeOther` responds with the `303 See Other` HTTP status and sets the `Location` HTTP header.
+
+Create a controller that saves the locale selected by the user in a cookie:
+
+source:LocaleController[]
+
+callout:controller[arg0=/locale]
+callout:secured-anonymous[]
+callout:consumes[]
+callout:post[arg0=changeLocale,arg1=/locale]
+<.> Set a cookie in the redirect response.
+
+Create a controller which only authenticated users can access:
+
+source:AccountController[]
+
+callout:controller[arg0=/account]
+callout:secured-is-authenticated[]
+callout:text-plain[]
+callout:get[arg0=index,arg1=/account]
+
+=== Static resources
+
+Save an image in `src/main/resources/assets/images/micronaut_stacked_black.png` and expose it as a static resource. Because the application uses Micronaut Security, allow anonymous access to the images path:
+
+resource:application.properties[tag=static-resources]
+
+=== Localization bundles
+
+Create a messages bundle for the default language in `src/main/resources/i18n/messages_en.properties`:
+
+resource:i18n/messages_en.properties[]
+
+And a bundle for Spanish in `src/main/resources/i18n/messages_es.properties`:
+
+resource:i18n/messages_es.properties[]
+
+== Testing recipes
+
+=== Test the active environments
+
+When you annotate a test with `@MicronautTest`, the Micronaut framework activates the `test` environment by default. Inject the `ApplicationContext` and read the active environment names from its `Environment`:
+
+test:ActiveEnvironmentsTest[]
+
+callout:micronaut-test-start-application-false[]
+<.> Inject the `ApplicationContext`.
+<.> `getActiveNames()` returns the environments activated for the running context.
+
+Assert the exact set of active environments when you want to detect unexpected environments. Additional environments can be activated with the `environments` member of `@MicronautTest`, the `micronaut.environments` system property, or the `MICRONAUT_ENVIRONMENTS` environment variable.
+
+=== Test a bean exists
+
+To verify a bean of a given type exists, use `containsBean`. It returns a `boolean` and does not instantiate the bean.
+
+test:CalculatorBeanExistsTest[]
+
+callout:micronaut-test-start-application-false[]
+<.> Inject the `BeanContext`.
+<.> Assert the context contains a bean of type `Calculator`.
+
+You can also start an `ApplicationContext` yourself without Micronaut Test:
+
+test:CalculatorApplicationContextTest[]
+
+<.> Start the application context in a try-with-resources statement so it is closed after the test.
+<.> `ApplicationContext` extends `BeanContext` and exposes `containsBean` too.
+
+=== Test a bean is annotated
+
+To verify a bean carries an annotation, retrieve its `BeanDefinition` and query its annotation metadata. Micronaut's compile-time annotation metadata captures stereotypes (meta-annotations) and annotations that are not retained at runtime, which Java reflection would miss.
+
+test:BasicCalculatorAnnotationTest[]
+
+callout:micronaut-test-start-application-false[]
+<.> `getBeanDefinition` returns the definition of the bean. It throws if the bean does not exist.
+<.> `hasAnnotation` checks an annotation declared directly on the bean.
+<.> `hasStereotype` checks an annotation declared directly or through a meta-annotation.
+
+=== Test a bean is unique or primary
+
+When an injection point requests a type with multiple candidates and none of them is primary, the Micronaut framework throws a `NonUniqueBeanException`. `getBean` resolves a single bean, so the following test fails until the candidates are disambiguated with `@Primary` or `@Secondary`:
+
+test:CalculatorTest[]
+
+callout:micronaut-test-start-application-false[]
+<.> `getBean` throws a `NonUniqueBeanException` if multiple candidates exist and none is primary, and a `NoSuchBeanException` if none exists.
+<.> The primary bean is selected.
+<.> `getBeansOfType` returns every candidate.
+
+=== Test a class is introspected
+
+Introspection is the foundation of many Micronaut features, such as serialization, validation, and bean mapping. Introspection metadata is generated at compilation time, so you don't need an application context to test it:
+
+test:ContactIntrospectedTest[]
+
+<.> A plain unit test without `@MicronautTest`.
+<.> `BeanIntrospection.getIntrospection` throws an `IntrospectionException` if the type is not introspected. `@Serdeable` implies `@Introspected`.
+
+=== Test a class is serializable
+
+To verify Micronaut Serialization can serialize and deserialize a type, retrieve its serializable and deserializable introspections:
+
+test:ContactSerdeTest[]
+
+callout:micronaut-test-start-application-false[]
+<.> Inject the `SerdeIntrospections` bean.
+<.> `getDeserializableIntrospection` throws if the type cannot be deserialized.
+<.> `getSerializableIntrospection` throws if the type cannot be serialized.
+
+Use `@Serdeable.Serializable` or `@Serdeable.Deserializable` to allow only one direction.
+
+=== Test JSON serialization
+
+To verify an object serializes to the expected JSON, use the `JsonMapper` API. It mirrors Jackson Databind's `ObjectMapper`:
+
+test:ContactJsonSerializationTest[]
+
+callout:micronaut-test-start-application-false[]
+callout:junit5-method-parameters-injection[]
+<.> `writeValueAsString` writes the object as a JSON string. Micronaut Serialization preserves the declaration order of the record components, so the output is deterministic.
+
+=== Test JSON deserialization
+
+To verify JSON deserializes to the expected object, use `readValue` and compare the result with the expected object:
+
+test:ContactJsonDeserializationTest[]
+
+callout:micronaut-test-start-application-false[]
+callout:junit5-method-parameters-injection[]
+<.> `readValue` reads the JSON into an instance of the type described by the `Argument`. Use an `Argument` such as `Argument.listOf(Contact.class)` for generic types.
+
+=== Test a field is required
+
+To verify a field is required, validate an instance with an invalid value for the field and assert there are constraint violations. For a `@NotBlank` field, test both an empty string and `null`:
+
+test:ContactRequiredFieldTest[]
+
+callout:micronaut-test-start-application-false[]
+<.> Inject a `jakarta.validation.Validator`.
+<.> A non-empty set of constraint violations means the instance is invalid.
+
+=== Test a field is optional
+
+To verify a field is optional, validate an instance with the field set to `null` and assert there are no constraint violations:
+
+test:ContactOptionalFieldTest[]
+
+callout:micronaut-test-start-application-false[]
+<.> Inject `io.micronaut.validation.validator.Validator`. It extends `jakarta.validation.Validator`.
+<.> An empty set of constraint violations means the instance is valid.
+
+=== Test method parameter validation
+
+The Micronaut framework validates constraints on the parameters of methods of beans. It is easy to forget such a constraint when you define an API. Write a test which invokes the method with an invalid argument and asserts a `ConstraintViolationException` is thrown:
+
+test:ContactRepositoryTest[]
+
+callout:micronaut-test-start-application-false[]
+callout:junit5-method-parameters-injection[]
+<.> Validation happens before the method executes. It only applies when you invoke the method on a bean. If you instantiate the implementation yourself, validation is bypassed.
+
+=== Test a controller returns HTML
+
+To test a controller that renders HTML, send a request accepting HTML and retrieve the response as a `String`. Replace the controller's collaborators with a stub so that the rendered data is deterministic:
+
+test:ContactControllerTest[]
+
+callout:spec-name[]
+callout:micronaut-test[]
+callout:http-client[]
+<.> Accept `text/html` to match the controller's `@Produces` annotation.
+<.> `retrieve` throws on non-2xx responses, so wrapping it in `assertDoesNotThrow` also asserts the request succeeds.
+<.> `@Replaces` replaces the `ContactRepository` bean in the context.
+
+=== Test view rendering
+
+To test how a view renders without HTTP or the embedded server, inject the `ViewsRenderer` of your views engine and render the view directly. Create a utility class to convert a `Writable` to a `String`:
+
+test:WritableUtils[]
+
+And render the view in a test:
+
+test:ContactListViewTest[]
+
+callout:micronaut-test-start-application-false[]
+<.> Inject the `ViewsRenderer` for Thymeleaf.
+<.> Render the view with a model. The view name is the template path without the file extension. Pass `null` as the request if the template does not need it.
+<.> Convert the `Writable` to a `String` to assert on the HTML.
+
+=== Test a redirection
+
+The Micronaut HTTP client follows redirections by default. To assert a redirection, configure the HTTP client not to follow redirections, and verify the response status and the `Location` HTTP header:
+
+test:HomeControllerTest[]
+
+<.> Set `micronaut.http.client.follow-redirects` to `false`.
+callout:micronaut-test[]
+callout:http-client[]
+<.> Assert the status matches the redirection: `HttpResponse.seeOther` returns `303`, `HttpResponse.temporaryRedirect` returns `307`, and `HttpResponse.redirect` returns `301`.
+<.> Assert the `Location` HTTP header.
+
+=== Test a controller returns a cookie
+
+The cookie is set in a redirect response. If the HTTP client follows the redirection, the response you observe doesn't contain the `Set-Cookie` HTTP header. Configure the HTTP client not to follow redirections:
+
+test:LocaleControllerTest[]
+
+<.> Set `micronaut.http.client.follow-redirects` to `false`.
+callout:micronaut-test[]
+callout:http-client[]
+callout:exchange[]
+<.> `getCookie` returns an `Optional<Cookie>`.
+
+=== Test with security disabled
+
+Given an endpoint which requires authentication:
+
+test:AccountControllerTest[]
+
+callout:micronaut-test[]
+callout:http-client[]
+<.> Unauthenticated requests receive a `401 Unauthorized` response.
+
+To disable security in a test, set `micronaut.security.filter.enabled` to `false`:
+
+test:AccountControllerSecurityDisabledTest[]
+
+<.> Disable the Micronaut Security filter.
+callout:micronaut-test[]
+callout:http-client[]
+<.> The request succeeds without authentication.
+
+Disabling the security filter bypasses authentication and authorization. To verify authorization rules, keep security enabled and test as an authenticated user. Read the guideLink:micronaut-security-test[] guide to learn how.
+
+=== Test static resources
+
+To verify a static resource is served, send a request to its URL and assert the request succeeds:
+
+test:ImagesAssetsTest[]
+
+callout:micronaut-test[]
+callout:http-client[]
+<.> `exchange` throws an `HttpClientResponseException` if the response status is not 2xx, for example, a `404` if the mapping is wrong or the file is missing, or a `401` if security does not allow anonymous access.
+
+=== Test every message is localized
+
+To verify every key in the bundle of the default language is present in each localized bundle, load the bundles and compare their keys:
+
+test:MessagesLocalizedTest[]
+
+callout:micronaut-test-start-application-false[]
+<.> Add every language you support.
+callout:junit5-method-parameters-injection[]
+<.> Asserting the key sets are equal detects both missing translations and extra keys in the localized bundle.
+
+common:testApp.adoc[]
+
+common:next.adoc[]
+
+Read more about https://micronaut-projects.github.io/micronaut-test/latest/guide/[Micronaut Test].
