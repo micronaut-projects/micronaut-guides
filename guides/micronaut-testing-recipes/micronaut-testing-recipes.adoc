@@ -29,14 +29,29 @@ callout:singleton[]
 
 === Contact
 
+:exclude-for-languages:kotlin,groovy
 Create a `Contact` record:
+:exclude-for-languages:
+
+:exclude-for-languages:java,groovy
+Create a `Contact` data class:
+:exclude-for-languages:
+
+:exclude-for-languages:java,kotlin
+Create a `Contact` class:
+:exclude-for-languages:
 
 source:Contact[]
 
 callout:serdeable[]
 callout:reflective-access[]
 Thymeleaf evaluates expressions such as `${contact.firstName}` with reflection.
+:exclude-for-languages:kotlin
 <.> The `firstName` and `lastName` fields are required.
+:exclude-for-languages:
+:exclude-for-languages:java,groovy
+<.> The `firstName` and `lastName` fields are required. `@field:NotBlank` applies the constraint to the backing field. The properties use nullable types so that validation, rather than the Kotlin compiler, rejects a `null` value.
+:exclude-for-languages:
 <.> The `company` field is optional.
 
 === Repository
@@ -52,6 +67,10 @@ And an in-memory implementation:
 source:InMemoryContactRepository[]
 
 callout:singleton[]
+
+:exclude-for-languages:java,groovy
+The class is `open` because Micronaut validation applies AOP advice to the bean to validate the `firstName` parameter, and Kotlin classes are final by default.
+:exclude-for-languages:
 
 === Controllers
 
@@ -88,6 +107,10 @@ callout:secured-anonymous[]
 callout:consumes[]
 callout:post[arg0=changeLocale,arg1=/locale]
 <.> Set a cookie in the redirect response.
+
+:exclude-for-languages:java,groovy
+The class and the method are `open` because Micronaut validation applies AOP advice to validate the `locale` parameter.
+:exclude-for-languages:
 
 Create a controller which only authenticated users can access:
 
@@ -142,7 +165,15 @@ You can also start an `ApplicationContext` yourself without Micronaut Test:
 
 test:CalculatorApplicationContextTest[]
 
+:exclude-for-languages:kotlin,groovy
 <.> Start the application context in a try-with-resources statement so it is closed after the test.
+:exclude-for-languages:
+:exclude-for-languages:java,groovy
+<.> Start the application context with `use` so it is closed after the test.
+:exclude-for-languages:
+:exclude-for-languages:java,kotlin
+<.> Start the application context. `@AutoCleanup` closes it after the test.
+:exclude-for-languages:
 <.> `ApplicationContext` extends `BeanContext` and exposes `containsBean` too.
 
 === Test a bean is annotated
@@ -196,8 +227,21 @@ To verify an object serializes to the expected JSON, use the `JsonMapper` API. I
 test:ContactJsonSerializationTest[]
 
 callout:micronaut-test-start-application-false[]
+:exclude-for-languages:groovy
 callout:junit5-method-parameters-injection[]
+:exclude-for-languages:
+:exclude-for-languages:java,kotlin
+<.> Inject the `JsonMapper` bean.
+:exclude-for-languages:
+:exclude-for-languages:kotlin,groovy
 <.> `writeValueAsString` writes the object as a JSON string. Micronaut Serialization preserves the declaration order of the record components, so the output is deterministic.
+:exclude-for-languages:
+:exclude-for-languages:java,groovy
+<.> `writeValueAsString` writes the object as a JSON string. Micronaut Serialization preserves the declaration order of the data class properties, so the output is deterministic.
+:exclude-for-languages:
+:exclude-for-languages:java,kotlin
+<.> `writeValueAsString` writes the object as a JSON string. Micronaut Serialization preserves the declaration order of the properties, so the output is deterministic.
+:exclude-for-languages:
 
 === Test JSON deserialization
 
@@ -206,7 +250,12 @@ To verify JSON deserializes to the expected object, use `readValue` and compare 
 test:ContactJsonDeserializationTest[]
 
 callout:micronaut-test-start-application-false[]
+:exclude-for-languages:groovy
 callout:junit5-method-parameters-injection[]
+:exclude-for-languages:
+:exclude-for-languages:java,kotlin
+<.> Inject the `JsonMapper` bean.
+:exclude-for-languages:
 <.> `readValue` reads the JSON into an instance of the type described by the `Argument`. Use an `Argument` such as `Argument.listOf(Contact.class)` for generic types.
 
 === Test a field is required
@@ -236,7 +285,12 @@ The Micronaut framework validates constraints on the parameters of methods of be
 test:ContactRepositoryTest[]
 
 callout:micronaut-test-start-application-false[]
+:exclude-for-languages:groovy
 callout:junit5-method-parameters-injection[]
+:exclude-for-languages:
+:exclude-for-languages:java,kotlin
+<.> Inject the `ContactRepository` bean.
+:exclude-for-languages:
 <.> Validation happens before the method executes. It only applies when you invoke the method on a bean. If you instantiate the implementation yourself, validation is bypassed.
 
 === Test a controller returns HTML
@@ -249,7 +303,12 @@ callout:spec-name[]
 callout:micronaut-test[]
 callout:http-client[]
 <.> Accept `text/html` to match the controller's `@Produces` annotation.
+:exclude-for-languages:groovy
 <.> `retrieve` throws on non-2xx responses, so wrapping it in `assertDoesNotThrow` also asserts the request succeeds.
+:exclude-for-languages:
+:exclude-for-languages:java,kotlin
+<.> `retrieve` throws on non-2xx responses, so `noExceptionThrown()` also asserts the request succeeds.
+:exclude-for-languages:
 <.> `@Replaces` replaces the `ContactRepository` bean in the context.
 
 === Test view rendering
@@ -330,7 +389,12 @@ test:MessagesLocalizedTest[]
 
 callout:micronaut-test-start-application-false[]
 <.> Add every language you support.
+:exclude-for-languages:groovy
 callout:junit5-method-parameters-injection[]
+:exclude-for-languages:
+:exclude-for-languages:java,kotlin
+<.> Inject the `ResourceLoader` bean.
+:exclude-for-languages:
 <.> Asserting the key sets are equal detects both missing translations and extra keys in the localized bundle.
 
 common:testApp.adoc[]
