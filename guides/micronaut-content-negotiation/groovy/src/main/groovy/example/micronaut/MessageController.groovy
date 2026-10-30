@@ -32,15 +32,21 @@ class MessageController {
     @Get // <3>
     HttpResponse<?> index(HttpRequest<?> request) { // <4>
         Map<String, Object> model = [message: 'Hello World']
-        Object body = accepts(request, MediaType.TEXT_HTML_TYPE)
-                ? new ModelAndView<>('message.html', model)
-                : model
-        HttpResponse.ok(body)
+        if (prefersHtml(request)) {
+            return HttpResponse.ok(new ModelAndView<>('message.html', model))
+        }
+        HttpResponse.ok(model).contentType(MediaType.APPLICATION_JSON_TYPE)
     }
 
-    private static boolean accepts(HttpRequest<?> request, MediaType mediaType) {
-        request.headers
-                .accept()
-                .any { it.name.contains(mediaType.name) }
+    private static boolean prefersHtml(HttpRequest<?> request) {
+        for (MediaType accepted : request.headers.accept()) { // ordered by quality
+            if (accepted == MediaType.TEXT_HTML_TYPE) {
+                return true
+            }
+            if (accepted == MediaType.APPLICATION_JSON_TYPE) {
+                return false
+            }
+        }
+        false
     }
 }
