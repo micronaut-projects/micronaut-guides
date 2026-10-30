@@ -1,5 +1,5 @@
+from jakarta.inject import Singleton
 from micronaut.graphql import ResolverInfo
-from pyronaut.context import Singleton
 
 from .author import Author
 from .book import Book

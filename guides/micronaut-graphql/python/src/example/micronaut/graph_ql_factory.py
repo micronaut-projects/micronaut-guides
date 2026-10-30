@@ -1,6 +1,7 @@
+from graphql import GraphQL
+from jakarta.inject import Singleton
+from micronaut.context.annotation import Factory
 from micronaut.graphql import create_graphql
-from pyronaut.context import Factory, Singleton
-from pyronaut.graphql import GraphQL
 
 from .graph_ql_data_fetchers import GraphQLDataFetchers
 from .schema import SCHEMA

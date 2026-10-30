@@ -1,4 +1,4 @@
-from pyronaut.context import Singleton
+from jakarta.inject import Singleton
 
 from .author import Author
 from .book import Book
