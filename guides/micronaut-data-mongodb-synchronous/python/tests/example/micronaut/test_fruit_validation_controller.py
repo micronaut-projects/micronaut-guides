@@ -16,7 +16,8 @@ def my_context(request):  # <1>
 
 @pytest.fixture
 def client(my_context):
-    return requests.with_context(my_context)  # <2>
+    with requests.with_context(my_context) as session:  # <2>
+        yield session
 
 
 def test_fruit_is_validated(client):

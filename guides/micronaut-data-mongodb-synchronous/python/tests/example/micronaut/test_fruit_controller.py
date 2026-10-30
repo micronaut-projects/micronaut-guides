@@ -30,7 +30,8 @@ def clean_database(fruit_repository):
 
 @pytest.fixture
 def client(my_context):
-    return requests.with_context(my_context)
+    with requests.with_context(my_context) as session:
+        yield session
 
 
 def test_empty_database_contains_no_fruit(client):
