@@ -7,6 +7,7 @@ from micronaut.security.authentication import (
     DefaultAuthorizationExceptionHandler,
 )
 
+
 @Singleton  # <1>
 @Replaces(DefaultAuthorizationExceptionHandler)  # <2>
 class DefaultAuthorizationExceptionHandlerReplacement(
