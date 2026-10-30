@@ -172,11 +172,11 @@ class GuideProjectGenerator implements AutoCloseable {
 
                 if (app.excludeSource()) {
                     for (String mainSource : app.excludeSource()) {
-                        File f = fileToDelete(destination, GuideAsciidocGenerator.mainPath(appName, mainSource), guidesOption)
+                        File f = fileToDelete(destination, GuideAsciidocGenerator.mainPath(appName, mainSource, guidesOption), guidesOption)
                         if (f.exists()) {
                             f.delete()
                         }
-                        f = fileToDelete(destination, GuideAsciidocGenerator.mainPath(EMPTY_STRING, mainSource), guidesOption)
+                        f = fileToDelete(destination, GuideAsciidocGenerator.mainPath(EMPTY_STRING, mainSource, guidesOption), guidesOption)
                         if (f.exists()) {
                             f.delete()
                         }
@@ -185,11 +185,11 @@ class GuideProjectGenerator implements AutoCloseable {
 
                 if (app.excludeTest()) {
                     for (String testSource : app.excludeTest()) {
-                        File f = fileToDelete(destination, GuideAsciidocGenerator.testPath(appName, testSource, testFramework), guidesOption)
+                        File f = fileToDelete(destination, GuideAsciidocGenerator.testPath(appName, testSource, guidesOption), guidesOption)
                         if (f.exists()) {
                             f.delete()
                         }
-                        f = fileToDelete(destination, GuideAsciidocGenerator.testPath(EMPTY_STRING, testSource, testFramework), guidesOption)
+                        f = fileToDelete(destination, GuideAsciidocGenerator.testPath(EMPTY_STRING, testSource, guidesOption), guidesOption)
                         if (f.exists()) {
                             f.delete()
                         }
