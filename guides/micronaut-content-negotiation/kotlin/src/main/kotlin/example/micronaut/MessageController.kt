@@ -30,16 +30,21 @@ class MessageController {
     @Get // <3>
     fun index(request: HttpRequest<*>): HttpResponse<*> { // <4>
         val model = mapOf("message" to "Hello World")
-        val body = if (accepts(request, MediaType.TEXT_HTML_TYPE)) {
-            ModelAndView("message.html", model)
-        } else {
-            model
+        if (prefersHtml(request)) {
+            return HttpResponse.ok(ModelAndView("message.html", model))
         }
-        return HttpResponse.ok(body)
+        return HttpResponse.ok(model).contentType(MediaType.APPLICATION_JSON_TYPE)
     }
 
-    private fun accepts(request: HttpRequest<*>, mediaType: MediaType): Boolean =
-        request.headers
-            .accept()
-            .any { it.name.contains(mediaType.name) }
+    private fun prefersHtml(request: HttpRequest<*>): Boolean {
+        for (accepted in request.headers.accept()) { // ordered by quality
+            if (accepted == MediaType.TEXT_HTML_TYPE) {
+                return true
+            }
+            if (accepted == MediaType.APPLICATION_JSON_TYPE) {
+                return false
+            }
+        }
+        return false
+    }
 }
