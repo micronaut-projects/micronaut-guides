@@ -11,5 +11,5 @@ class HelloWorldController:
 
     @Get(produces=MediaType.TEXT_PLAIN)  # <3> <4>
     def index(self) -> str:  # <5>
-        return self.message_source.get_message_or_default("hello.world", "Hello World")  # <6>
+        return self.message_source.getMessageOrDefault("hello.world", "Hello World")  # <6>
 # end::clazz[]
