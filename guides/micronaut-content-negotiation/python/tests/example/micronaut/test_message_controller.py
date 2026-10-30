@@ -68,3 +68,11 @@ def test_json_is_the_default_when_any_type_is_accepted(client):
     assert response.status_code == 200
     assert response.headers["content-type"].startswith("application/json")
     assert response.json() == {"message": "Hello World"}
+
+
+def test_json_is_the_default_without_an_accept_header(client):
+    response = client.get("/", headers={"Accept": None})
+
+    assert response.status_code == 200
+    assert response.headers["content-type"].startswith("application/json")
+    assert response.json() == {"message": "Hello World"}

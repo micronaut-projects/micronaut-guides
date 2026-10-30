@@ -1,15 +1,23 @@
-from micronaut.http import MediaType
+from micronaut.http import HttpRequest, HttpResponse, MediaType
 from micronaut.http.annotation import Controller, Get
-from micronaut.views import View
+from micronaut.views import ModelAndView
 
 
 @Controller  # <1>
 class MessageController:
-    @Get(produces=[MediaType.APPLICATION_JSON, MediaType.ALL])  # <2>
-    def json_message(self) -> dict[str, str]:  # <3>
-        return {"message": "Hello World"}
+    @Get(produces=[MediaType.TEXT_HTML, MediaType.APPLICATION_JSON])  # <2> <3>
+    def index(self, request: HttpRequest) -> HttpResponse:  # <4>
+        model = {"message": "Hello World"}
+        if prefers_html(request):
+            return HttpResponse.ok(ModelAndView("message", model))
+        return HttpResponse.ok(model).contentType(MediaType.APPLICATION_JSON)
 
-    @View("message")  # <4>
-    @Get(produces=MediaType.TEXT_HTML)
-    def html_message(self) -> dict[str, str]:
-        return {"message": "Hello World"}
+
+def prefers_html(request: HttpRequest) -> bool:
+    for accepted in request.getHeaders().accept():  # ordered by quality
+        name = str(accepted.getName())
+        if name == MediaType.TEXT_HTML:
+            return True
+        if name == MediaType.APPLICATION_JSON:
+            return False
+    return False
