@@ -58,7 +58,7 @@ class BookController:
         return {
             "title": cmd.title,
             "pages": cmd.pages,
-            "errors": self.message_source.violations_messages(ex.get_constraint_violations()),
+            "errors": self.message_source.violations_messages(ex.getConstraintViolations()),
         }
     # end::onSavedFailed[]
 
