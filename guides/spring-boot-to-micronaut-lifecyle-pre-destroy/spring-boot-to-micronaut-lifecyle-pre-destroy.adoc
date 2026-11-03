@@ -1,0 +1,64 @@
+common:header-top.adoc[]
+
+== Sample Project
+
+You can link:@sourceDir@.zip[download a sample application] with the code examples shown in this article.
+
+== Introduction
+
+Both Spring and Micronaut frameworks support the annotations `jakarta.annotation.PostConstruct` and `jakarta.annotation.PreDestroy` to hook into a bean lifecycle.
+
+== Spring Boot Example
+
+To illustrate the usage of `@PreDestroy`, the application contains a singleton bean with a counter.
+
+source:Population[app=springboot]
+
+Then, a prototype bean increments the counter through a lifecyle method annotated with `@PreDestroy`.
+
+source:Person[app=springboot]
+
+=== Tests
+
+The following test gets twice a bean of type `Person` and destroy them. Then, it checks whether the counter is incremented through the `@PreDestroy` method.
+
+test:PopulationTest[app=springboot]
+
+callout:spring-boot-test[1]
+callout:autowired[number=2,arg0=DefaultListableBeanFactory]
+callout:autowired[number=3,arg0=Population]
+
+== Micronaut Example
+
+To illustrate the usage of `@PreDestroy`, the application contains a singleton bean with a counter.
+
+source:Population[app=micronautframework]
+
+callout:singleton[1]
+
+Then, a prototype bean increments the counter through a lifecyle method annotated with `@PreDestroy`.
+
+source:Person[app=micronautframework]
+
+callout:prototype[1]
+callout:constructor-di[number=2,arg0=Population]
+callout:predestroy[3]
+
+=== Tests
+
+test:PopulationTest[app=micronautframework]
+
+callout:micronaut-test[1]
+callout:injection[number=2,arg0=BeanContext]
+
+== Conclusion
+
+NOTE: Both frameworks support the standard annotations `jakarta.annotation.PostConstruct` and `jakarta.annotation.PreDestroy` to hook into a bean lifecycle.
+
+== Next steps
+
+Read more https://guides.micronaut.io/latest/tag-spring_boot_to_micronaut.html[Spring Boot to Micronaut] guides.
+
+common:helpWithMicronaut.adoc[]
+
+
