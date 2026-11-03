@@ -1,0 +1,126 @@
+common:header-top.adoc[]
+
+== Getting Started
+
+In this guide, you will create a Micronaut application written in @language@ that exposes a small chat API with https://graphql.org/[GraphQL].
+
+The application combines:
+
+* a GraphQL query to fetch the current messages
+* a GraphQL mutation to post a new message
+* a GraphQL subscription delivered over the `graphql-ws` WebSocket protocol
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+common:create-app-features.adoc[]
+
+== Configuration
+
+Enable GraphiQL and GraphQL over WebSockets:
+
+resource:application.properties[]
+
+<1> Enables the GraphiQL UI for local development.
+<2> Enables the `graphql-ws` protocol support provided by Micronaut GraphQL.
+
+== Describe the schema
+
+Create `src/main/resources/schema.graphqls`:
+
+resource:schema.graphqls[]
+
+<1> Exposes the current messages via a query.
+<2> Exposes a mutation to post a new chat message.
+<3> Exposes a subscription that emits every new message.
+
+== Domain model
+
+Create a simple `ChatMessage` type:
+
+source:ChatMessage[]
+
+== Repository
+
+Use an in-memory repository to keep the example focused on GraphQL wiring:
+
+source:ChatRepository[]
+
+<1> Keep previously posted messages so the query can return them.
+<2> Publish every new message to a Reactor sink so subscribers receive updates.
+
+== Data fetchers
+
+Create a data fetcher for each GraphQL operation.
+
+=== Query
+
+source:MessagesDataFetcher[]
+
+=== Mutation
+
+source:ChatDataFetcher[]
+
+=== Subscription
+
+source:StreamDataFetcher[]
+
+== GraphQL factory
+
+Bind the schema to the data fetchers:
+
+source:GraphQLFactory[]
+
+<1> Load and parse the GraphQL schema.
+<2> Wire the query, mutation, and subscription operations.
+<3> Build the executable `GraphQL` bean used by the `/graphql` and `/graphql-ws` endpoints.
+
+common:runapp.adoc[]
+
+Query the message history:
+
+[source,bash]
+----
+curl -X POST 'http://localhost:8080/graphql' \
+     -H 'content-type: application/json' \
+     --data-binary '{"query":"{ messages { from text } }"}'
+----
+
+Create a new message:
+
+[source,bash]
+----
+curl -X POST 'http://localhost:8080/graphql' \
+     -H 'content-type: application/json' \
+     --data-binary '{"query":"mutation { chat(from:\"Ada\", text:\"Hello GraphQL\") { from text } }"}'
+----
+
+You can then connect a WebSocket client to `ws://localhost:8080/graphql-ws` using the `graphql-transport-ws` subprotocol and subscribe with:
+
+[source,json]
+----
+{
+  "id": "chat-stream",
+  "type": "subscribe",
+  "payload": {
+    "query": "subscription { stream { from text } }"
+  }
+}
+----
+
+== Test the application
+
+Create an HTTP test for the query and mutation flow:
+
+test:GraphQLControllerTest[]
+
+Create a WebSocket test for the subscription flow:
+
+test:GraphQLSubscriptionTest[]
+
+== Next Steps
+
+Take a look at the https://micronaut-projects.github.io/micronaut-graphql/latest/guide/[Micronaut GraphQL documentation].
+
+common:helpWithMicronaut.adoc[]
