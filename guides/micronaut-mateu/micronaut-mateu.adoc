@@ -1,0 +1,105 @@
+common:header.adoc[]
+
+https://mateu.io[Mateu] is an open-source (Apache 2.0) library that renders business UIs from plain Java classes. You declare a screen as a class annotated with `@UI`, and Mateu turns it into a complete web UI: forms, listings with search and paging, create and edit pages with validation, and the application shell with its menu. You write no HTML, CSS or JavaScript.
+
+In this guide, you will build a small product catalogue: an app shell with a menu, and a full CRUD over a Java record, rendered with the https://redwood.oracle.com[Oracle Redwood] design system.
+
+common:requirements.adoc[]
+
+common:completesolution.adoc[]
+
+common:create-app-features.adoc[]
+
+=== Mateu dependencies
+
+Add the Mateu runtime for Micronaut, the Redwood renderer and the Mateu annotation processor:
+
+:dependencies:
+
+dependency:mateu-micronaut[groupId=io.mateu,version=@mateu-micronautVersion@]
+dependency:mateu-redwood[groupId=io.mateu,version=@mateu-redwoodVersion@,scope=runtimeOnly]
+dependency:mateu-annotation-processor-micronaut[groupId=io.mateu,version=@mateu-annotation-processor-micronautVersion@,scope=annotationProcessor]
+
+:dependencies:
+
+The annotation processor generates a Micronaut controller for every class annotated with `@UI`. The Redwood renderer is a set of static assets packaged in the `mateu-redwood` jar, which the Mateu runtime serves: no configuration is needed.
+
+=== The record
+
+Create a `Product` record. It is the only description of a product the UI needs:
+
+source:Product[]
+
+<1> The identifier can be typed when a product is created and is read only afterwards.
+<2> Bean Validation constraints are checked in the browser and again on the server.
+<3> `@Stereotype(FieldStereotype.money)` renders the price as an amount.
+<4> An enum is rendered as a select with its constants as options.
+<5> `toString()` is used as the title of the edit page.
+
+=== The store
+
+Mateu reads and writes the records through `CrudStore`, a port your application implements. For this guide, keep the products in memory:
+
+source:ProductStore[]
+
+callout:singleton[]
+<2> `CrudStore` has defaults for search, filters, sorting and paging over `findAll()`. Override `find` to push them down to a database.
+
+=== The CRUD
+
+Create the CRUD screen. Extending `AutoCrud` gives a listing with search and paging, create, edit and delete:
+
+source:Products[]
+
+<1> The title of the screen.
+<2> `AutoCrud` derives the listing columns and the form fields from the `Product` record.
+callout:field-injection[]
+<4> The CRUD reads and writes through the store.
+
+Mateu creates a new `Products` instance for every request and injects its fields, so the screen holds no state between users.
+
+=== The app shell
+
+Create the application shell. The class annotated with `@UI("")` is the root of the UI:
+
+source:Home[]
+
+<1> `@UI` registers the UI at the root path of the application.
+<2> The title shown in the header and in the browser tab.
+<3> Every `@Menu` field becomes a menu entry. The entry routes to the screen of the field type.
+<4> The route the application opens on.
+
+=== Tests
+
+Write a test that verifies the application serves the UI and the listing returns the products:
+
+test:ProductsTest[]
+
+callout:micronaut-test[]
+callout:http-client[]
+<3> Every route answers with the page that boots the renderer.
+<4> The renderer talks to the server through `POST /mateu/v3/sync/{route}`. A `search` action returns a page of rows.
+
+common:testApp.adoc[]
+
+common:runapp.adoc[]
+
+Open `http://localhost:8080` in a browser. The application opens on the product listing:
+
+image::mateu-redwood-products.png[]
+
+Click a product to edit it. The form, its validation and the toolbar come from the `Product` record:
+
+image::mateu-redwood-product-edit.png[]
+
+NOTE: The Redwood renderer loads Oracle JET and the Redwood theme (open source, UPL 1.0) and the Spectra components and the Visual Builder runtime (Oracle's, governed by your Oracle terms) from Oracle's CDN. Mateu's jars contain none of Oracle's code. See https://mateu.io/design-systems/oracle-redwood/[Oracle Redwood] in the Mateu documentation.
+
+common:graal-with-plugins.adoc[]
+
+Mateu needs no reflection configuration in a native executable: `mateu-core` ships a GraalVM feature that registers Mateu's classes and your view models, records and enums for reflection, and the renderer's assets as resources. Start the native executable and open `http://localhost:8080`: the same UI, served by a process that starts in milliseconds.
+
+common:next.adoc[]
+
+Read more about https://mateu.io[Mateu]: forms, wizards, dashboards, master-detail pages and the other https://mateu.io/ux-patterns/page-templates/[Redwood page templates].
+
+The same screens can also be shown inside an existing Oracle Visual Builder or Visual Builder Studio application: import the `mateu-ui` component and drop it on a page. See https://mateu.io/design-systems/oracle-redwood/#embed-mateu-screens-in-an-existing-visual-builder-app[Embed Mateu screens in an existing Visual Builder app].
