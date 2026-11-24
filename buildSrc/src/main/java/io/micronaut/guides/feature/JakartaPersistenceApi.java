@@ -9,10 +9,12 @@ import jakarta.inject.Singleton;
 
 @Singleton
 public class JakartaPersistenceApi implements Feature {
+    private static final String NAME = "jakarta-persistence-api";
+    private static final String ARTIFACT_ID = "jakarta.persistence-api";
 
     @Override
     public @NonNull String getName() {
-        return "jakarta-persistence-api";
+        return NAME;
     }
 
     @Override
@@ -22,6 +24,9 @@ public class JakartaPersistenceApi implements Feature {
 
     @Override
     public void apply(GeneratorContext generatorContext) {
-        generatorContext.addDependency(Dependency.builder().groupId("jakarta.persistence").artifactId("jakarta.persistence-api").compileOnly().build());
+        generatorContext.addDependency(Dependency.builder()
+                .lookupArtifactId(ARTIFACT_ID)
+                .compileOnly()
+                .build());
     }
 }
