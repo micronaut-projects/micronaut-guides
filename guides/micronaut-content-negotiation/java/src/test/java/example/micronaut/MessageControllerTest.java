@@ -15,13 +15,18 @@
  */
 package example.micronaut;
 
+import io.micronaut.http.HttpHeaders;
 import io.micronaut.http.HttpRequest;
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.HttpStatus;
 import io.micronaut.http.MediaType;
 import io.micronaut.http.client.BlockingHttpClient;
 import io.micronaut.http.client.HttpClient;
 import io.micronaut.http.client.annotation.Client;
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import org.junit.jupiter.api.Test;
+
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -50,5 +55,28 @@ class MessageControllerTest {
         String html = assertDoesNotThrow(() -> client.retrieve(HttpRequest.GET("/")
                 .accept(MediaType.TEXT_HTML)));
         assertEquals(expectedHtml, html);
+    }
+
+    @Test
+    void prefersJsonWhenItHasTheHigherQuality(@Client("/") HttpClient httpClient) {
+        BlockingHttpClient client = httpClient.toBlocking();
+
+        HttpResponse<String> response = assertDoesNotThrow(() -> client.exchange(HttpRequest.GET("/")
+                .header(HttpHeaders.ACCEPT, "text/html;q=0.1, application/json;q=0.9"), String.class));
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertEquals(Optional.of(MediaType.APPLICATION_JSON_TYPE), response.getContentType());
+        assertEquals("""
+                {"message":"Hello World"}""", response.body());
+    }
+
+    @Test
+    void jsonIsTheDefaultWithoutAnAcceptHeader(@Client("/") HttpClient httpClient) {
+        BlockingHttpClient client = httpClient.toBlocking();
+
+        HttpResponse<String> response = assertDoesNotThrow(() -> client.exchange(HttpRequest.GET("/"), String.class));
+        assertEquals(HttpStatus.OK, response.getStatus());
+        assertEquals(Optional.of(MediaType.APPLICATION_JSON_TYPE), response.getContentType());
+        assertEquals("""
+                {"message":"Hello World"}""", response.body());
     }
 }

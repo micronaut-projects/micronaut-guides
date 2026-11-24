@@ -15,7 +15,10 @@
  */
 package example.micronaut
 
+import io.micronaut.http.HttpHeaders
 import io.micronaut.http.HttpRequest
+import io.micronaut.http.HttpResponse
+import io.micronaut.http.HttpStatus
 import io.micronaut.http.MediaType
 import io.micronaut.http.client.BlockingHttpClient
 import io.micronaut.http.client.HttpClient
@@ -49,5 +52,32 @@ class MessageControllerSpec extends Specification {
 </html>
 ''' == client.retrieve(HttpRequest.GET('/')
                 .accept(MediaType.TEXT_HTML))
+    }
+
+    void prefersJsonWhenItHasTheHigherQuality() {
+        given:
+        BlockingHttpClient client = httpClient.toBlocking()
+
+        when:
+        HttpResponse<String> response = client.exchange(HttpRequest.GET('/')
+                .header(HttpHeaders.ACCEPT, 'text/html;q=0.1, application/json;q=0.9'), String)
+
+        then:
+        response.status == HttpStatus.OK
+        response.contentType.get() == MediaType.APPLICATION_JSON_TYPE
+        response.body() == '{"message":"Hello World"}'
+    }
+
+    void jsonIsTheDefaultWithoutAnAcceptHeader() {
+        given:
+        BlockingHttpClient client = httpClient.toBlocking()
+
+        when:
+        HttpResponse<String> response = client.exchange(HttpRequest.GET('/'), String)
+
+        then:
+        response.status == HttpStatus.OK
+        response.contentType.get() == MediaType.APPLICATION_JSON_TYPE
+        response.body() == '{"message":"Hello World"}'
     }
 }

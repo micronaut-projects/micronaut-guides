@@ -33,16 +33,21 @@ class MessageController {
     @Get // <3>
     HttpResponse<?> index(HttpRequest<?> request) { // <4>
         Map<String, Object> model = Collections.singletonMap("message", "Hello World");
-        Object body = accepts(request, MediaType.TEXT_HTML_TYPE)
-                ? new ModelAndView<>("message.html", model)
-                : model;
-        return HttpResponse.ok(body);
+        if (prefersHtml(request)) {
+            return HttpResponse.ok(new ModelAndView<>("message.html", model));
+        }
+        return HttpResponse.ok(model).contentType(MediaType.APPLICATION_JSON_TYPE);
     }
 
-    private static boolean accepts(HttpRequest<?> request, MediaType mediaType) {
-        return request.getHeaders()
-                .accept()
-                .stream()
-                .anyMatch(it -> it.getName().contains(mediaType));
+    private static boolean prefersHtml(HttpRequest<?> request) {
+        for (MediaType accepted : request.getHeaders().accept()) { // ordered by quality
+            if (accepted.equals(MediaType.TEXT_HTML_TYPE)) {
+                return true;
+            }
+            if (accepted.equals(MediaType.APPLICATION_JSON_TYPE)) {
+                return false;
+            }
+        }
+        return false;
     }
 }
