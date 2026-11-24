@@ -1,0 +1,75 @@
+/*
+ * Copyright 2017-2026 original authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package example.micronaut
+
+import com.jayway.jsonpath.DocumentContext
+import com.jayway.jsonpath.JsonPath
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.web.server.LocalServerPort
+import org.springframework.http.HttpStatus
+import org.springframework.test.web.servlet.client.EntityExchangeResult
+import org.springframework.test.web.servlet.client.RestTestClient
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT) // <1>
+class SaasSubscriptionPostControllerSpec {
+
+    @LocalServerPort // <2>
+    int port
+
+    RestTestClient restTestClient // <3>
+
+    @BeforeEach
+    void setUp() {
+        restTestClient = RestTestClient.bindToServer()
+                .baseUrl("http://localhost:$port")
+                .build()
+    }
+
+    @Test
+    void shouldCreateANewSaasSubscription() {
+        SaasSubscriptionSave subscription = new SaasSubscriptionSave("Advanced", 2500)
+        EntityExchangeResult<Void> createResponse = withBasicAuth("sarah1", "abc123")
+                .post()
+                .uri("/subscriptions")
+                .body(subscription)
+                .exchange()
+                .returnResult(Void)
+        assert createResponse.status == HttpStatus.CREATED
+
+        URI locationOfNewSaasSubscription = createResponse.responseHeaders.location
+        EntityExchangeResult<String> getResponse = withBasicAuth("sarah1", "abc123")
+                .get()
+                .uri(locationOfNewSaasSubscription)
+                .exchange()
+                .returnResult(String)
+        assert getResponse.status == HttpStatus.OK
+
+        DocumentContext documentContext = JsonPath.parse(getResponse.responseBody)
+        Number id = documentContext.read('$.id')
+        assert id != null
+
+        Integer cents = documentContext.read('$.cents')
+        assert cents == 2500
+    }
+
+    private RestTestClient withBasicAuth(String username, String password) {
+        restTestClient.mutate()
+                .defaultHeaders { headers -> headers.setBasicAuth(username, password) }
+                .build()
+    }
+}
