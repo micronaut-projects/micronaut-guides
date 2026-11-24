@@ -25,11 +25,15 @@ import jakarta.inject.Inject
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 
 @MicronautTest // <1>
-class FruitValidationControllerTest(
-    @Inject @Client("/") val httpClient: HttpClient // <2>
-) : BaseTest() {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class FruitValidationControllerTest : BaseTest() {
+
+    @Inject
+    @field:Client("/")
+    lateinit var httpClient: HttpClient // <2>
 
     @Test
     fun fruitIsValidated() {
