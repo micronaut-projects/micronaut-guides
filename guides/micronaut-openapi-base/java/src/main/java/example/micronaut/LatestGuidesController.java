@@ -27,7 +27,7 @@ class LatestGuidesController {
     private static final List<Guide> GUIDES = Collections.singletonList(
             new Guide("Creating your first Micronaut application",
                     "Learn how to create a Hello World Micronaut application with a controller and a functional test.",
-                    List.of("Iván López", "Sergio dle Amo"),
+                    List.of("Iván López", "Sergio del Amo"),
                     List.of("junit","getting_started","graalvm"),
                     List.of("Getting Started"),
                     LocalDate.of(2018, 5, 23),
