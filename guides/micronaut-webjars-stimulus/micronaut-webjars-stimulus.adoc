@@ -6,7 +6,17 @@ common:completesolution.adoc[]
 
 common:create-app-features.adoc[]
 
+:exclude-for-languages:python
 common:micronaut-views-thymeleaf.adoc[]
+:exclude-for-languages:
+
+:only-for-languages:python
+== Views
+
+common:jinja.adoc[]
+
+This default lets Micronaut Views resolve the logical view name `index` to this guide's `index.html` template.
+:only-for-languages:
 
 == Stimulus
 
@@ -20,6 +30,7 @@ ____
 
 We use https://www.webjars.org[WebJars] to load Stimulus into our application.
 
+:exclude-for-languages:python
 ____
 WebJars are client-side web libraries (e.g. jQuery & Bootstrap) packaged into JAR (Java Archive) files.
 
@@ -29,20 +40,50 @@ WebJars are client-side web libraries (e.g. jQuery & Bootstrap) packaged into JA
 * Transitive dependencies are automatically resolved and optionally loaded via RequireJS
 * Deployed on Maven Central
 ____
+:exclude-for-languages:
+
+:only-for-languages:python
+Add the Stimulus package as a dependency; Micronaut serves its files under `/webjars/**`.
+:only-for-languages:
 
 == WebJars via Static Resources
 
 To use https://www.webjars.org[WebJars], we need to add a https://docs.micronaut.io/latest/guide/#staticResources[static resources] entry in the application's configuration.
 
+:exclude-for-languages:python
 resource:application.properties[tag=webjars]
+:exclude-for-languages:
+
+:only-for-languages:python
+resource:application.toml[tag=webjars]
+:only-for-languages:
 
 == Stimulus via WebJars
 
+:exclude-for-languages:python
 You can obtain the https://stimulus.hotwired.dev[Stimulus] Maven coordinate in the https://www.webjars.org[WebJars] website and add it to your application as you will any other Java library.
+:exclude-for-languages:
+
+:only-for-languages:python
+Add Stimulus as a runtime dependency in `pyproject.toml`. Micronaut serves its JavaScript files through the static-resource route configured above.
+:only-for-languages:
 
 dependency:hotwired__stimulus[groupId=org.webjars.npm,scope=runtimeOnly,version=@hotwired__stimulusVersion@]
 
 == WebJars Test
+
+:only-for-languages:python
+Create `tests/conftest.py` with the pytest fixtures shared by the tests in this guide. They start the application and create a `requests` session configured for the embedded server:
+
+[source,python]
+.tests/conftest.py
+----
+include::{sourceDir}/micronaut-webjars-stimulus/@sourceDir@/tests/conftest.py[]
+----
+
+callout:micronaut-test-pyronaut[]
+callout:http-client-pyronaut[]
+:only-for-languages:
 
 You can test the Javascript library is exposed:
 
@@ -53,19 +94,36 @@ test:WebJarsStimulusTest[]
 Create a controller that renders a https://micronaut-projects.github.io/micronaut-views/latest/guide[View].
 
 source:HomeController[]
+
+:exclude-for-languages:python
 callout:controller[arg0=/]
 callout:get-generic[]
 callout:view[]
+:exclude-for-languages:
+
+:only-for-languages:python
+callout:controller-pyronaut[arg0=/]
+callout:get-generic-pyronaut[]
+callout:view-pyronaut[]
+:only-for-languages:
 
 == View
 
 The view builds a simple controller described in the https://stimulus.hotwired.dev/handbook/hello-stimulus[`Hello Stimulus`] tutorial on the Stimulus website.
+
+:only-for-languages:python
+The Jinja template renders the dictionary's title using the `e` filter to escape it for HTML.
+:only-for-languages:
 
 resource:views/index.html[]
 
 == Controller Test
 
 The controller test verifies the application renders an HTML page.
+
+:only-for-languages:python
+The controller returns a Python dictionary as the view model. The tests use the `client` fixture from `tests/conftest.py` to verify both the rendered page and the actual JavaScript resource. Browser interaction with the Stimulus controller is checked manually below.
+:only-for-languages:
 
 test:HomeControllerTest[]
 
@@ -77,13 +135,15 @@ Go to http://localhost:8080, enter your name, and click the button. You will see
 
 image::micronaut-webjars-stimulus.png[]
 
+:exclude-for-languages:python
 common:graalvm-resource-config.adoc[]
 
 common:nativetest.adoc[]
 
 common:graal-with-plugins.adoc[]
+:exclude-for-languages:
 
-:exclude-for-languages:groovy
+:exclude-for-languages:groovy,python
 
 Go to http://localhost:8080, enter your name, and click the button. You will see a message in the console.
 
