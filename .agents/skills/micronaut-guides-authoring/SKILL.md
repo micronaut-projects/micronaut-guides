@@ -93,6 +93,7 @@ Use repository macros so one guide renders for all build tools and languages:
 - `resource:file.yml[]` for `src/main/resources`.
 - `testResource:file.yml[]` for test resources.
 - `callout:name[]` for `src/docs/common/callouts/callout-name.adoc`.
+  Python (Pyronaut) renderings use `callout-name-pyronaut.adoc` instead when it exists, so Python text does not need its own `callout:` lines. The same applies to `common:name.adoc[]` and `common-name-pyronaut.adoc`.
 - `dependency:artifact-id[]` and `:dependencies:` blocks for build-tool-specific dependency snippets.
 - `zipInclude:path[]`, `guideLink:slug[]`, and `diffLink:` only when matching existing examples.
 
