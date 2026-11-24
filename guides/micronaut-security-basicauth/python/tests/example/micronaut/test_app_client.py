@@ -5,6 +5,7 @@ from micronaut.http import MediaType
 from micronaut.http.annotation import Consumes, Get, Header
 from micronaut.http.client.annotation import Client
 
+
 @Client("/")
 class AppClient(ABC):
     @Consumes(MediaType.TEXT_PLAIN)  # <1>

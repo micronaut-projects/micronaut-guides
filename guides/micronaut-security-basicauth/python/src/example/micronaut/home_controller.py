@@ -4,6 +4,7 @@ from micronaut.http.annotation import Get, Produces
 from micronaut.security.annotation import Secured
 from micronaut.security.rules import SecurityRule
 
+
 @Produces(MediaType.TEXT_PLAIN)
 @Secured(SecurityRule.IS_AUTHENTICATED)  # <1>
 @Get("/")  # <2> <3>
