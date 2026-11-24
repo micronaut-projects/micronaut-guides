@@ -1,6 +1,12 @@
 common:header.adoc[]
 
+:exclude-for-languages:python
 In this guide, you will learn how to use the annotations `@ConfigurationProperties`, `@ConfigurationBuilder`, and `@EachProperty` to consume configured properties in a Micronaut application. These annotations allow declared values to be injected into a bean for use in the application.
+:exclude-for-languages:
+
+:only-for-languages:python
+In this guide, use `@ConfigurationProperties`, `@ConfigurationBuilder`, and `@EachProperty` to bind configuration to Python objects and inject them into an application.
+:only-for-languages:
 
 common:requirements.adoc[]
 
@@ -15,9 +21,17 @@ Imagine a feature where you can configure a sports team in a declarative manner.
 
 resource:application.properties[tag=teamConfig]
 
+:exclude-for-languages:python
 With Micronaut Framework, you can use the `@ConfigurationProperties` annotation to bind the configuration into a bean. Each property that matches the configuration in `application.properties` will call the setter in the bean. The bean will then be available for injection in the application.
 
 source:TeamConfiguration[tags=teamConfigClassNoBuilder|gettersandsetters]
+:exclude-for-languages:
+
+:only-for-languages:python
+The `@ConfigurationProperties` decorator binds properties under `team` to typed attributes. The `player-names` property maps to the Python attribute `player_names`. Pyronaut supports `application.properties`, so this guide shares the same configuration file across languages.
+
+source:TeamConfiguration[tag=teamConfigClassNoBuilder]
+:only-for-languages:
 
 === Test @ConfigurationProperties
 
@@ -47,26 +61,51 @@ source:TeamAdmin[]
 <3> An example of a builder method, where an attribute is set and then the builder itself is returned.
 <4> The final `build()` method creates the `TeamAdmin` object.
 
+:exclude-for-languages:python
 At the bottom of `TeamConfiguration`, add the inner class `TeamAdmin.Builder` and annotate it with `@ConfigurationBuilder`.
 This tells Micronaut Framework that configuration can be read and an object can be constructed using the Builder pattern.
 
 [NOTE]
 The builder is used only here, so call `builder.build()` later to get the `TeamAdmin` object. In this guide, the JUnit test calls `builder.build()`.
+:exclude-for-languages:
+
+:only-for-languages:python
+Add a `TeamAdminBuilder` attribute to `TeamConfiguration` with `ConfigurationBuilder` in its `Annotated` metadata. Micronaut populates the builder; call `builder.build()` to create the `TeamAdmin` object. The pytest test below demonstrates both steps.
+:only-for-languages:
 
 source:TeamConfiguration[]
 
+:exclude-for-languages:python
 callout:serdeable[]
 <2> Mark the builder as being ignored during serialization.
 <3> `prefixes` tells Micronaut Framework to find methods that are prefixed by `with`; `configurationPrefix` allows the developer to customize the `application.properties` element.
 <4> Instantiate the builder object so it can be populated with configuration values.
+:exclude-for-languages:
+
+:only-for-languages:python
+<1> `prefixes` selects methods starting with `with_`; `configurationPrefix` binds the `team.team-admin` properties.
+<2> Create a separate builder for each configuration instance so Micronaut can populate it.
+:only-for-languages:
 
 === Test @ConfigurationBuilder
 
+:exclude-for-languages:python
 Validate that `@ConfigurationBuilder` is applied properly with the following JUnit test. The test format is similar to previous tests.
+:exclude-for-languages:
+
+:only-for-languages:python
+Validate the configuration values, the populated builder, and the object returned by `build()` with pytest.
+:only-for-languages:
 
 test:TeamConfigurationTest[tag=teamConfigSpecBuilder]
 
+:exclude-for-languages:python
 <1> Properties that will invoke the builder methods on `TeamAdmin.Builder`.
+:exclude-for-languages:
+
+:only-for-languages:python
+<1> Properties that will invoke the methods on `TeamAdminBuilder`.
+:only-for-languages:
 <2> The builder object is now configured, so run `build()` on it to create the `TeamAdmin` object.
 <3> Verify the object is created with the `application.properties` properties.
 
@@ -83,29 +122,60 @@ property will be parameterized as the name.
 
 source:StadiumConfiguration[]
 
+:exclude-for-languages:python
 callout:serdeable[]
 <2> Establish the top layer of configuration.
 <3> `name` is read from the property key and sent as a parameter to the bean.
+:exclude-for-languages:
+
+:only-for-languages:python
+<1> Create one configuration bean per entry under `stadium`.
+<2> `Parameter` in the constructor's `Annotated` metadata supplies the entry name.
+:only-for-languages:
 
 === Test @EachProperty
 
+:exclude-for-languages:python
 Validate the configuration with a test. Notice multiple beans are created from the configuration. In a controller, you can
 inject a particular `StadiumConfiguration` instance bean by using the `@Named` parameter with a qualifier name.
+:exclude-for-languages:
+
+:only-for-languages:python
+Validate that both stadium beans receive their names, cities, and capacities. Retrieve a particular bean with `get_bean(StadiumConfiguration, name="fenway")`.
+:only-for-languages:
 
 test:StadiumConfigurationTest[]
 
 <1> Multiple configurations can be declared for the same class.
+:exclude-for-languages:python
 <2> Since there are multiple beans, a `Qualifier` must be sent to retrieve a bean.
+:exclude-for-languages:
+
+:only-for-languages:python
+<2> Select the bean by its configuration entry name.
+:only-for-languages:
 
 common:runapp.adoc[]
 
 == Controller
 
+:exclude-for-languages:python
 Configuration beans can be injected into the application just like any other beans. As a demonstration, create a controller where the beans are constructor injected. The `StadiumConfiguration` class has two instances, so for injection you need to use the `@Named` annotation with a qualifier name to specify the bean.
+:exclude-for-languages:
+
+:only-for-languages:python
+Inject configuration beans through the controller's constructor. Select the `pnc` stadium with `Named("pnc")` in `Annotated` metadata. Return dictionaries containing the response fields, leaving the configuration builder out of the JSON response.
+:only-for-languages:
 
 source:MyController[]
 
+:exclude-for-languages:python
 <1> Injection of configuration beans; `@Named` annotation is needed to choose which `StadiumConfiguration` instance is retrieved.
+:exclude-for-languages:
+
+:only-for-languages:python
+<1> Select the `pnc` configuration bean for constructor injection.
+:only-for-languages:
 
 [NOTE]
 In the browser go to http://localhost:8080/my/team and http://localhost:8080/my/stadium.
@@ -116,7 +186,7 @@ test:MyControllerTest[]
 
 common:graal-with-plugins.adoc[]
 
-:exclude-for-languages:groovy
+:exclude-for-languages:groovy,python
 
 You can invoke the controller exposed by the native executable:
 
