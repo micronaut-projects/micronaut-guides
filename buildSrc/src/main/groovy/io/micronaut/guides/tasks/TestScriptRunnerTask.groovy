@@ -45,7 +45,7 @@ abstract class TestScriptRunnerTask extends DefaultTask {
         Map<String, String> buildEnvironment = new LinkedHashMap<>(System.getenv())
         buildEnvironment.putAll(environment.get())
         buildEnvironment.put("JAVA_HOME", System.getProperty("java.home"))
-        logger.lifecycle("Running test script ${testScript.get()} with environment $buildEnvironment")
+        logger.lifecycle("Running test script ${testScript.get()}")
 
         WorkQueue queue = workerExecutor.processIsolation(workerSpec -> {
             workerSpec.forkOptions(options -> {
