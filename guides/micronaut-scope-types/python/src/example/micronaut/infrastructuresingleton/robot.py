@@ -1,0 +1,15 @@
+from uuid import uuid4
+
+from jakarta.inject import Singleton
+from micronaut.context.annotation import Infrastructure
+
+
+@Singleton
+@Infrastructure  # <1>
+class Robot:
+    def __init__(self):
+        self._serial_number = str(uuid4())
+
+    @property
+    def serial_number(self) -> str:
+        return self._serial_number
