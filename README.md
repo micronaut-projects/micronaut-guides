@@ -81,6 +81,10 @@ The features need to be **valid** Starter features because the list is used dire
 
 Inside the specific guide directory, there should be a directory per language with the appropriate directory structure. All these files are copied into the final guide directory after the guide is generated.
 
+Keep language-neutral resources in the shared `src/main/resources` and `src/test/resources` directories. For Python, these are copied to `config` and `tests-config`, respectively. Python skips the JVM-only files `logback*.xml` and `bootstrap*.*` in the root of these directories, and any `.properties`, `.yml` or `.yaml` file for which the guide provides a `.toml` file with the same name in `python/config` or `python/tests-config`. Files shared only by Java, Groovy, and Kotlin can live under `jvm/` using the generated project layout, for example `jvm/src/main/resources/logback.xml`.
+
+Files are copied in this order: shared `src/`, optional `jvm/` for JVM languages, then the language-specific directory. Later files override earlier files at the same destination. For multi-application guides, put these directories under the application directory. A base guide's layers are copied before the current guide's layers.
+
 ```shell
 micronaut-http-client
 ├── groovy
@@ -249,6 +253,8 @@ Following this same approach there are macros like:
 - `callout`: To include a common callout snippet.
 
 In all the cases it is possible to pass additional parameters to the macros to customise them. For example, to extract a custom tag from a snippet, we can do `resource:application.yml[tag=githubconfig]`. Look for usages of those macros in the `guides` directory to find more examples.
+
+Python (Pyronaut) guides use their own callout text in files named `callout-<name>-pyronaut.adoc`, for example `callout-controller-pyronaut.adoc` next to `callout-controller.adoc`. Reference them with `callout:<name>-pyronaut[]` inside an `:only-for-languages:python` block, and keep the text free of Java package names, fully qualified annotation names, and Gradle, Maven or JUnit references.
 
 #### Special custom blocks
 

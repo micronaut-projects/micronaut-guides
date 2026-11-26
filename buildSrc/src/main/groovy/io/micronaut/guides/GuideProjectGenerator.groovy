@@ -7,7 +7,6 @@ import io.micronaut.context.ApplicationContext
 import io.micronaut.core.annotation.NonNull
 import io.micronaut.core.annotation.Nullable
 import io.micronaut.guides.core.App
-import io.micronaut.guides.core.CopyFileVisitor
 import io.micronaut.guides.core.Guide
 import io.micronaut.guides.core.GuideParser
 import io.micronaut.guides.core.GuideUtils
@@ -16,7 +15,6 @@ import io.micronaut.starter.api.TestFramework
 import io.micronaut.starter.options.BuildTool
 import io.micronaut.starter.options.JdkVersion
 import io.micronaut.starter.options.Language
-import org.gradle.api.GradleException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -31,6 +29,7 @@ import java.util.regex.Pattern
 
 import static groovy.io.FileType.FILES
 import static io.micronaut.core.util.StringUtils.EMPTY_STRING
+import static io.micronaut.guides.core.DefaultFilesTransferUtility.copyGuideSourceFiles
 import static io.micronaut.starter.api.TestFramework.JUNIT
 import static io.micronaut.starter.api.TestFramework.PYTEST
 import static io.micronaut.starter.api.TestFramework.SPOCK
@@ -168,7 +167,7 @@ class GuideProjectGenerator implements AutoCloseable {
                     copyGuideSourceFiles(baseDir, destinationPath, appName, guidesOption.language.toString(), true)
                 }
 
-                copyGuideSourceFiles(inputDir, destinationPath, appName, guidesOption.language.toString())
+                copyGuideSourceFiles(inputDir, destinationPath, appName, guidesOption.language.toString(), false)
 
                 if (app.excludeSource()) {
                     for (String mainSource : app.excludeSource()) {
@@ -258,53 +257,6 @@ class GuideProjectGenerator implements AutoCloseable {
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         URL resource = classLoader.getResource(LICENSEHEADER)
         resource.text.replace('$YEAR', "${LocalDate.now().year}")
-    }
-
-    private static void copyGuideSourceFiles(File inputDir, Path destinationPath,
-                                             String appName, String language,
-                                             boolean ignoreMissingDirectories = false) {
-
-        // look for a common 'src' directory shared by multiple languages and copy those files first
-        final String srcFolder = 'src'
-        Path srcPath = Paths.get(inputDir.absolutePath, appName, srcFolder)
-        if (Files.exists(srcPath)) {
-            Path resourcesPath = srcPath.resolve('main').resolve('resources')
-            if (language == PYTHON.toString() && Files.exists(resourcesPath)) {
-                Path configPath = Paths.get(destinationPath.toString(), 'config')
-                Files.createDirectories(configPath)
-                Files.walkFileTree(resourcesPath, new CopyFileVisitor(configPath))
-                Path destinationResourcesPath = Paths.get(destinationPath.toString(), srcFolder, 'main', 'resources')
-                Files.walkFileTree(resourcesPath, new SimpleFileVisitor<Path>() {
-                    @Override
-                    FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
-                        Files.deleteIfExists(destinationResourcesPath.resolve(resourcesPath.relativize(file)))
-                        FileVisitResult.CONTINUE
-                    }
-                })
-                Files.walkFileTree(srcPath, new CopyFileVisitor(Paths.get(destinationPath.toString(), srcFolder)) {
-                    @Override
-                    FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
-                        if (dir.equals(resourcesPath)) {
-                            return FileVisitResult.SKIP_SUBTREE
-                        }
-                        super.preVisitDirectory(dir, attrs)
-                    }
-                })
-            } else {
-                Files.walkFileTree(srcPath, new CopyFileVisitor(Paths.get(destinationPath.toString(), srcFolder)))
-            }
-        }
-
-        Path sourcePath = Paths.get(inputDir.absolutePath, appName, language)
-        if (!Files.exists(sourcePath)) {
-            sourcePath.toFile().mkdir()
-        }
-        if (Files.exists(sourcePath)) {
-            // copy source/resource files for the current language
-            Files.walkFileTree(sourcePath, new CopyFileVisitor(destinationPath))
-        } else if (!ignoreMissingDirectories) {
-            throw new GradleException("source directory ${sourcePath.toFile().absolutePath} does not exist")
-        }
     }
 
     private static File fileToDelete(File destination, String path, GuidesOption guidesOption) {
