@@ -1,0 +1,244 @@
+common:header.adoc[]
+
+The https://modelcontextprotocol.io[Model Context Protocol (MCP)] lets applications expose tools to language models over a standard protocol. In this guide, you will connect a https://docs.langchain4j.dev/tutorials/ai-services[LangChain4j AI service] to the tools of an MCP server with https://micronaut-projects.github.io/micronaut-mcp/latest/guide/#clientLangchain4j[Micronaut MCP Client LangChain4j], so that the language model can call them.
+
+The application uses the MCP server that you build in the guideLink:micronaut-mcp-diskspace-http[Disk Space MCP Server with Streamable HTTP transport] guide, which exposes a `freeDiskSpace` tool. The tests start their own MCP server, and replace the language model with a scripted one, so they need neither the MCP server of the other guide nor a language model.
+
+common:requirements.adoc[]
+* https://ollama.com[Ollama] installed, with a model that supports tools, to run the application. For example, run `ollama pull llama3.2`.
+* The application of the guideLink:micronaut-mcp-diskspace-http[Disk Space MCP Server with Streamable HTTP transport] guide, to run the application.
+
+common:completesolution.adoc[]
+
+common:create-app-features.adoc[]
+
+:exclude-for-languages:python
+
+== Dependencies
+
+The `langchain4j-ollama` feature adds the https://micronaut-projects.github.io/micronaut-langchain4j/latest/guide/[Micronaut LangChain4j] annotation processor and the Ollama integration:
+
+:dependencies:
+dependency:micronaut-langchain4j-processor[groupId=io.micronaut.langchain4j,scope=annotationProcessor]
+dependency:micronaut-langchain4j-ollama[groupId=io.micronaut.langchain4j]
+:dependencies:
+
+Add the https://micronaut-projects.github.io/micronaut-mcp/latest/guide/#clientLangchain4j[Micronaut MCP Client LangChain4j] dependency. The application calls the MCP server at runtime, so use the `compile` scope:
+
+dependency:micronaut-mcp-client-langchain4j[groupId=io.micronaut.mcp]
+
+The tests start an MCP server. Add the https://micronaut-projects.github.io/micronaut-mcp/latest/guide/#serverJavaSdk[Micronaut MCP Server Java SDK] dependency with the `test` scope:
+
+dependency:micronaut-mcp-server-java-sdk[groupId=io.micronaut.mcp,scope=test]
+
+:exclude-for-languages:
+
+:only-for-languages:python
+
+== Dependencies
+
+The tests start an MCP server. Add the Micronaut MCP Server Java SDK to the `test` dependencies in `pyproject.toml`:
+
+[source,toml]
+.pyproject.toml
+----
+[tool.pyronaut.dependencies]
+test = [
+    "io.micronaut.mcp:micronaut-mcp-server-java-sdk",
+]
+----
+
+:only-for-languages:
+
+== Configuration
+
+:exclude-for-languages:python
+The MCP server of the disk space guide listens on port 8080. Run this application on port 8081:
+
+resource:application.properties[tag=server]
+
+Configure an MCP client named `diskspace` that connects to the MCP server with the https://modelcontextprotocol.io/specification/latest/basic/transports#streamable-http[Streamable HTTP transport]:
+
+resource:application.properties[tag=mcp]
+
+Configure Ollama with a model that supports tools:
+
+resource:application.properties[tag=ollama]
+:exclude-for-languages:
+
+:only-for-languages:python
+The MCP server of the disk space guide listens on port 8080. Run this application on port 8081:
+
+resource:application.toml[tag=server]
+
+Configure an MCP client named `diskspace` that connects to the MCP server with the https://modelcontextprotocol.io/specification/latest/basic/transports#streamable-http[Streamable HTTP transport]:
+
+resource:application.toml[tag=mcp]
+
+Configure Ollama with a model that supports tools:
+
+resource:application.toml[tag=ollama]
+:only-for-languages:
+
+For every client in the `micronaut.mcp.client.http` configuration, Micronaut MCP registers a LangChain4j `McpClient` bean, qualified by the name of the client. It also registers an `McpToolProvider` bean, which exposes the tools of all the MCP clients to LangChain4j.
+
+== AI Service
+
+Declare the AI service:
+
+source:Assistant[]
+
+:exclude-for-languages:python
+<.> Annotate the interface with `@AiService` to register a LangChain4j AI service as a bean.
+<.> `@SystemMessage` sets the instructions sent to the model with every request.
+:exclude-for-languages:
+
+:only-for-languages:python
+<1> Annotate the class with `@AiService` to register a LangChain4j AI service as a bean.
+<2> LangChain4j reads the annotations of the AI service reflectively from the Java class that Pyronaut generates for the Python class. `@AllowsReflection` keeps them available at runtime.
+<3> `@SystemMessage` sets the instructions sent to the model with every request.
+:only-for-languages:
+
+== Wire the MCP Tools
+
+An `AiServiceCustomizer` bean customizes the creation of an AI service. Use it to give the MCP tool provider to the AI service:
+
+source:AssistantCustomizer[]
+
+callout:singleton[]
+<.> The type argument of `AiServiceCustomizer` selects the AI service to customize.
+callout:constructor-di[arg0=McpToolProvider]
+<.> Register the tool provider with the LangChain4j `AiServices` builder. When the model requests a tool, the tool provider finds the MCP client that exposes it and calls the MCP server.
+
+NOTE: Micronaut LangChain4j 2.4.0 configures `ToolProvider` beans, such as the `McpToolProvider` bean, automatically, and adds an `mcpClients` member to `@AiService` to select the MCP clients of an AI service. With Micronaut LangChain4j 2.4.0, you do not need the customizer.
+
+== Controller
+
+Expose the AI service over HTTP:
+
+source:AssistantController[]
+
+:exclude-for-languages:python
+callout:controller[arg0=/assistant]
+callout:constructor-di[arg0=Assistant]
+callout:post[arg0=chat,arg1=/assistant]
+<.> The endpoint accepts the message as plain text.
+callout:produces[]
+callout:executes-on[]
+:exclude-for-languages:
+
+:only-for-languages:python
+<1> Inject the AI service.
+<2> It is critical that any blocking I/O operations, such as calls to a language model, are offloaded to a separate thread pool that does not block the event loop.
+<3> Map the `chat` function to an HTTP POST request on `/assistant`, which accepts and produces plain text.
+:only-for-languages:
+
+== Tests
+
+The tests start an MCP server that exposes a `freeDiskSpace` tool with a fixed answer:
+
+:exclude-for-languages:python
+test:DiskSpaceTools[]
+:exclude-for-languages:
+
+:only-for-languages:python
+[source,python]
+.tests/example/micronaut/disk_space_tools.py
+----
+include::{sourceDir}/micronaut-langchain4j-mcp-client/@sourceDir@/tests/example/micronaut/disk_space_tools.py[]
+----
+:only-for-languages:
+
+<.> Load the bean only in the application context of the MCP server, which sets the `spec.name` property.
+callout:mcp-tool[]
+
+The answers of a language model are not deterministic, and the small models that you can run in a continuous integration build are not good at calling tools. Replace the chat model with a scripted one:
+
+:exclude-for-languages:python
+test:ScriptedChatModel[]
+:exclude-for-languages:
+
+:only-for-languages:python
+[source,python]
+.tests/example/micronaut/scripted_chat_model.py
+----
+include::{sourceDir}/micronaut-langchain4j-mcp-client/@sourceDir@/tests/example/micronaut/scripted_chat_model.py[]
+----
+:only-for-languages:
+
+<1> Replace the Ollama `ChatModel` bean in the tests.
+<2> When the last message contains the result of the tool, answer with it.
+<3> Otherwise, ask the AI service to execute the disk space tool.
+
+Write a test that starts the MCP server and points the MCP client to it:
+
+test:AssistantTest[]
+
+:exclude-for-languages:groovy,python
+callout:micronaut-test-start-application-false[]
+callout:test-instance-per-class[]
+callout:test-property-provider[]
+<.> Start an MCP server with the Streamable HTTP transport on a random port.
+<.> Point the `diskspace` MCP client to the MCP server.
+<.> Inject the AI service and the scripted chat model.
+<.> The AI service called the tool of the MCP server, and the answer contains the result of the tool.
+<.> The AI service sent the tools of the MCP server to the model.
+:exclude-for-languages:
+
+:only-for-languages:groovy
+callout:micronaut-test-start-application-false[]
+callout:test-property-provider[]
+<.> `@AutoCleanup` stops the MCP server after the specification.
+<.> Start an MCP server with the Streamable HTTP transport on a random port.
+<.> Point the `diskspace` MCP client to the MCP server.
+<.> Inject the AI service.
+<.> The AI service called the tool of the MCP server, and the answer contains the result of the tool.
+<.> The AI service sent the tools of the MCP server to the model.
+:only-for-languages:
+
+:only-for-languages:python
+<1> Start an MCP server with the Streamable HTTP transport on a random port.
+<2> Point the `diskspace` MCP client to the MCP server.
+<3> Get the AI service and the scripted chat model from the application context.
+<4> The AI service called the tool of the MCP server, and the answer contains the result of the tool.
+<5> The AI service sent the tools of the MCP server to the model.
+:only-for-languages:
+
+common:testApp.adoc[]
+
+== Running the Application
+
+Start the application of the guideLink:micronaut-mcp-diskspace-http[Disk Space MCP Server with Streamable HTTP transport] guide, which listens on port 8080.
+
+:exclude-for-build:maven,pyronaut
+
+Then, start this application with the `./gradlew run` command. It listens on port 8081.
+
+:exclude-for-build:
+
+:exclude-for-build:gradle,pyronaut
+
+Then, start this application with the `./mvnw mn:run` command. It listens on port 8081.
+
+:exclude-for-build:
+
+:exclude-for-build:gradle,maven
+
+Then, start this application with the `pyronaut dev` command. It listens on port 8081.
+
+:exclude-for-build:
+
+Make sure Ollama is running and ask a question:
+
+[source,bash]
+----
+curl -X POST -H 'Content-Type: text/plain' -d 'How much free disk space do I have?' localhost:8081/assistant
+----
+
+The model calls the `freeDiskSpace` tool of the MCP server and answers with the free disk space of your computer.
+
+== Next Steps
+
+* Read about the https://micronaut-projects.github.io/micronaut-mcp/latest/guide/#clientLangchain4j[Micronaut MCP Client LangChain4j] and the https://micronaut-projects.github.io/micronaut-langchain4j/latest/guide/[Micronaut LangChain4j documentation].
+* Read about https://docs.langchain4j.dev/tutorials/mcp[MCP] in the LangChain4j documentation.
+* Learn how to expose the methods of your own beans as tools in guideLink:micronaut-langchain4j-tools[Function Calling with Micronaut LangChain4j Tools].

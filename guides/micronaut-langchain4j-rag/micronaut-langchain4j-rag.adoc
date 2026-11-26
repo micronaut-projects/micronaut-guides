@@ -1,0 +1,185 @@
+common:header.adoc[]
+
+Language models only know what they learned during training. With https://docs.langchain4j.dev/tutorials/rag[Retrieval Augmented Generation (RAG)], your application retrieves the pieces of your own documents that are relevant to a question and sends them to the model together with the question, so the model can answer with information it has never seen.
+
+In this guide, you will ingest a few documents into an embedding store when the application starts, and answer questions about them with a https://docs.langchain4j.dev/tutorials/ai-services[LangChain4j AI service]. The application computes embeddings in the JVM, talks to a language model served by https://ollama.com[Ollama], and the tests run against an Ollama container started by https://micronaut-projects.github.io/micronaut-test-resources/latest/guide/[Micronaut Test Resources], so you need no API key.
+
+:containerized: Ollama
+common:requirements-testcontainers.adoc[]
+
+common:completesolution.adoc[]
+
+common:create-app-features.adoc[]
+
+== Dependencies
+
+The `langchain4j-ollama` feature adds the https://micronaut-projects.github.io/micronaut-langchain4j/latest/guide/[Micronaut LangChain4j] annotation processor and the Ollama integration. Add also the LangChain4j https://docs.langchain4j.dev/integrations/embedding-models/in-process[in-process embedding model] based on `all-MiniLM-L6-v2`, which computes embeddings in the JVM. The LangChain4j BOM, imported by the Micronaut platform, manages its version.
+
+:dependencies:
+dependency:micronaut-langchain4j-processor[groupId=io.micronaut.langchain4j,scope=annotationProcessor]
+dependency:micronaut-langchain4j-ollama[groupId=io.micronaut.langchain4j]
+dependency:langchain4j-embeddings-all-minilm-l6-v2[groupId=dev.langchain4j]
+:dependencies:
+
+== Test Resources
+
+common:test-resources.adoc[]
+
+common:install-test-resources.adoc[]
+
+The Micronaut LangChain4j Ollama test resource starts an Ollama container when the application needs the `langchain4j.ollama.base-url` property and you have not set it:
+
+:exclude-for-build:maven
+
+[source,groovy]
+.build.gradle
+----
+testResourcesService("io.micronaut.langchain4j:micronaut-langchain4j-ollama-testresource")
+----
+
+:exclude-for-build:
+
+:exclude-for-build:gradle
+
+[source,xml]
+.pom.xml
+----
+<plugin>
+  <groupId>io.micronaut.maven</groupId>
+  <artifactId>micronaut-maven-plugin</artifactId>
+  <configuration>
+    <testResourcesDependencies>
+      <dependency>
+        <groupId>io.micronaut.langchain4j</groupId>
+        <artifactId>micronaut-langchain4j-ollama-testresource</artifactId>
+        <version>${micronaut.langchain4j.version}</version>
+      </dependency>
+    </testResourcesDependencies>
+  </configuration>
+</plugin>
+----
+
+:exclude-for-build:
+
+== Configuration
+
+Configure the Ollama model:
+
+resource:application.properties[tag=ollama]
+
+The test resource starts the `langchain4j/ollama-tinyllama` image, which embeds the small https://ollama.com/library/tinyllama[TinyLlama] model. To use an Ollama server you run yourself, set `langchain4j.ollama.base-url` and a model you have pulled.
+
+== Documents
+
+The application answers questions about the policies of a fictional company, Acme Space Travel. Add the documents to `src/main/resources/docs`:
+
+resource:docs/baggage.txt[]
+
+resource:docs/pets.txt[]
+
+resource:docs/cancellation.txt[]
+
+== Embedding Model and Content Retriever
+
+Micronaut LangChain4j registers an in-memory `EmbeddingStore` bean. Declare the embedding model and a `ContentRetriever` bean:
+
+source:RagFactory[]
+
+callout:factory[]
+callout:primary[]
+<.> The in-process `all-MiniLM-L6-v2` model computes embeddings without calling an external service. The Ollama integration also registers an embedding model bean, so mark this one as primary.
+<.> Inject the in-memory embedding store and the embedding model.
+<.> An `EmbeddingStoreContentRetriever` embeds the question and returns the two most similar text segments from the embedding store.
+
+An `@AiService` performs retrieval augmented generation when the application declares a `ContentRetriever` or a `RetrievalAugmentor` bean. A bean `@Named` after an AI service (for example `@Named("supportAgent")`) applies to that service only.
+
+NOTE: Micronaut LangChain4j 2.4.0 adds configuration-driven retrieval (`langchain4j.rag.*`), which creates the content retriever from configuration. The code-based approach shown in this guide works with every release since 2.3.0.
+
+== Ingestion
+
+Load, split, embed, and store the documents when the application starts:
+
+source:DocumentIngestor[]
+
+callout:singleton[]
+<.> Inject the embedding store and the embedding model.
+<.> An `EmbeddingStoreIngestor` splits documents into segments of up to 300 characters, computes the embedding of every segment, and stores them.
+<.> Listen to the `StartupEvent`, which Micronaut publishes when the application context starts.
+<.> Load the text files of the `docs` folder of the classpath. LangChain4j adds the file name to the metadata of every document.
+<.> Ingest the documents.
+
+TIP: The in-memory embedding store keeps the embeddings in memory, so the application ingests the documents every time it starts. Micronaut LangChain4j also supports persistent embedding stores, such as PGVector, Oracle Database, Elasticsearch, OpenSearch, MongoDB Atlas, Neo4j, Redis, Qdrant, and Chroma.
+
+== AI Service
+
+Declare the AI service:
+
+source:SupportAgent[]
+
+<.> Annotate the interface with `@AiService` to register a LangChain4j AI service as a bean. Because the application declares a `ContentRetriever` bean, Micronaut LangChain4j configures retrieval for it. Nothing in the interface refers to retrieval.
+<.> The system message asks the model to use only the information sent with the question.
+<.> Returning `dev.langchain4j.service.Result` gives access to the retrieved sources alongside the answer.
+
+== Controller
+
+Expose the AI service over HTTP and return the answer together with the files it is based on:
+
+source:Answer[]
+
+callout:serdeable[]
+
+source:SupportController[]
+
+callout:controller[arg0=/support]
+callout:constructor-di[arg0=SupportAgent]
+<.> The `@Post` annotation maps the `ask` method to an HTTP POST request on `/support`.
+<.> The endpoint accepts the question as plain text.
+callout:executes-on[]
+<.> Collect the file names of the retrieved text segments.
+
+== Tests
+
+The embedding model is deterministic, so you can test the retrieval exactly:
+
+test:ContentRetrieverTest[]
+
+callout:micronaut-test-start-application-false[]
+<.> Inject the `ContentRetriever` bean.
+<.> Retrieve the segments relevant to a question that does not share any keyword with the document.
+<.> The most relevant segment comes from the baggage policy.
+
+Calls to a language model are not deterministic, so the end-to-end test verifies that the answer is based on the relevant document, rather than the exact words of the model:
+
+test:SupportControllerTest[]
+
+<.> Language models can take a while to answer. Increase the read timeout of the HTTP client used by the test.
+callout:micronaut-test[]
+callout:http-client[]
+<.> The model answers.
+<.> The answer is based on the pet policy.
+
+common:testApp.adoc[]
+
+common:runapp.adoc[]
+
+When you run the application in development mode, Micronaut Test Resources starts the Ollama container for you.
+
+[source,bash]
+----
+curl -X POST -H 'Content-Type: text/plain' -d 'Can I take my cat to the Moon?' localhost:8080/support
+----
+
+The response contains the answer of the model and the documents it is based on:
+
+[source,json]
+----
+{"answer":"...","sources":["pets.txt","baggage.txt"]}
+----
+
+TinyLlama is a very small model, so its answers are not always accurate. Use a larger model, such as `llama3.2`, for better answers.
+
+== Next Steps
+
+* Read the https://micronaut-projects.github.io/micronaut-langchain4j/latest/guide/[Micronaut LangChain4j documentation] about AI services and embedding stores.
+* Read about https://docs.langchain4j.dev/tutorials/rag[RAG] in the LangChain4j documentation.
+* Learn the basics of AI services in guideLink:micronaut-langchain4j-ai-service[AI Services with Micronaut LangChain4j and Ollama].

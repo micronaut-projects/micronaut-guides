@@ -12,6 +12,7 @@ public enum Category implements Ordered {
     TEST("Testing", 5),
 
     // AI
+    LANGCHAIN4J("LangChain4j", 6),
     MCP("MCP", 6),
 
     // BEYOND THE BASICS
