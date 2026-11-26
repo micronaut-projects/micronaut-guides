@@ -1,0 +1,26 @@
+import pytest
+import requests
+
+from pyronaut.test import MicronautTest, micronaut_test_fixture
+
+
+@pytest.fixture
+def my_context(request):  # <1>
+    fixture = micronaut_test_fixture(
+        request,
+        MicronautTest(environments=["test"], transactional=False),
+    )
+    yield fixture
+    fixture.stop()
+
+
+@pytest.fixture
+def client(my_context):
+    with requests.with_context(my_context) as session:  # <2>
+        yield session
+
+
+def test_fruit_is_validated(client):
+    response = client.post("/fruits", json={"name": "", "description": ""})
+
+    assert response.status_code == 400
